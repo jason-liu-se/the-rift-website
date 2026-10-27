@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatButtonModule } from '@angular/material/button';
@@ -58,13 +58,13 @@ import { PaginatorIntlService } from './services/paginator-intl.service';
         BrowserAnimationsModule,
         MatButtonModule,
         MatPaginatorModule,
-        MatIconModule,
-        HttpClientModule
+        MatIconModule
     ],
     providers: [
         GalleryProviderService,
         MapProviderService,
-        PaginatorIntlService
+        PaginatorIntlService,
+        provideHttpClient(withInterceptorsFromDi())
     ],
     bootstrap: [AppComponent]
 })
