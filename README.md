@@ -1,4 +1,4 @@
-# The Rift website
+# The Rift Website
 
 The Rift website is a single-page application (SPA) for the Minecraft server
 community. It is built with Angular 16, Angular Material, TypeScript, and
