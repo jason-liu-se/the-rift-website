@@ -1,6 +1,8 @@
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { JoinPageComponent } from './join-page.component';
+import { AppModule } from '../../app.module';
 
 describe('JoinPageComponent', () => {
   let component: JoinPageComponent;
@@ -8,7 +10,8 @@ describe('JoinPageComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [JoinPageComponent]
+      imports: [AppModule],
+      providers: [provideHttpClientTesting()]
     });
     fixture = TestBed.createComponent(JoinPageComponent);
     component = fixture.componentInstance;

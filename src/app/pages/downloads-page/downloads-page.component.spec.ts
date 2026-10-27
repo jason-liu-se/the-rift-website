@@ -1,6 +1,8 @@
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DownloadsPageComponent } from './downloads-page.component';
+import { AppModule } from '../../app.module';
 
 describe('DownloadsPageComponent', () => {
   let component: DownloadsPageComponent;
@@ -8,7 +10,8 @@ describe('DownloadsPageComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [DownloadsPageComponent]
+      imports: [AppModule],
+      providers: [provideHttpClientTesting()]
     });
     fixture = TestBed.createComponent(DownloadsPageComponent);
     component = fixture.componentInstance;
