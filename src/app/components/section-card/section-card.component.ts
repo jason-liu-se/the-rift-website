@@ -3,7 +3,8 @@ import { Component, Input, OnInit } from '@angular/core';
 @Component({
     selector: 'app-section-card',
     templateUrl: './section-card.component.html',
-    styleUrls: ['./section-card.component.scss']
+    styleUrls: ['./section-card.component.scss'],
+    standalone: false
 })
 export class SectionCardComponent implements OnInit {
     // optional properties

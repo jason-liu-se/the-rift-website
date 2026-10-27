@@ -3,7 +3,8 @@ import { Component, Input, OnInit } from '@angular/core';
 @Component({
     selector: 'app-background-image-card',
     templateUrl: './background-image-card.component.html',
-    styleUrls: ['./background-image-card.component.scss']
+    styleUrls: ['./background-image-card.component.scss'],
+    standalone: false
 })
 export class BackgroundImageCardComponent implements OnInit {
     @Input({ alias: 'src', required: true }) backgroundImgSrc: string = '';

@@ -6,7 +6,8 @@ import { IPageTemplate } from '../../interfaces/page-template.interface';
 @Component({
     selector: 'app-page-template',
     templateUrl: './page-template.component.html',
-    styleUrls: ['./page-template.component.scss']
+    styleUrls: ['./page-template.component.scss'],
+    standalone: false
 })
 export class PageTemplateComponent implements OnInit {
     public showContactSection: boolean;

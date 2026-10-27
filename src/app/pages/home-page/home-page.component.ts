@@ -3,7 +3,8 @@ import { Component, HostListener } from '@angular/core';
 @Component({
     selector: 'app-page-home',
     templateUrl: './home-page.component.html',
-    styleUrls: ['./home-page.component.scss']
+    styleUrls: ['./home-page.component.scss'],
+    standalone: false
 })
 export class HomePageComponent {
     public showWelcomeComponentBackground: boolean = false;

@@ -5,7 +5,8 @@ import { Constants } from 'src/app/config/constants';
 @Component({
     selector: 'app-blue-map-page',
     templateUrl: './blue-map-page.component.html',
-    styleUrls: ['./blue-map-page.component.scss']
+    styleUrls: ['./blue-map-page.component.scss'],
+    standalone: false
 })
 export class BlueMapPageComponent {
     public bluemapUrl: string;

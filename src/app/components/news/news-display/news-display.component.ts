@@ -4,7 +4,8 @@ import { INewsItem } from 'src/app/interfaces/news-item.interface';
 @Component({
     selector: 'app-news-display',
     templateUrl: './news-display.component.html',
-    styleUrls: ['./news-display.component.scss']
+    styleUrls: ['./news-display.component.scss'],
+    standalone: false
 })
 export class NewsDisplayComponent {
     @Input({ required: true }) public newsItems!: INewsItem[];
