@@ -1,5 +1,5 @@
-@import '../../../font-sizes.scss';
-@import '../../../theme-colours.scss';
+@use '../../../font-sizes' as *;
+@use '../../../theme-colours' as *;
 
 $collection-card-width: 15rem;
 $collection-card-height: 25rem;

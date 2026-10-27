@@ -1,4 +1,4 @@
-@import './font-sizes.scss';
+@use './font-sizes' as *;
 
 *:not(html) {
     font-family: Calibri, Candara, Segoe, Segoe UI, Optima, Arial, sans-serif;

@@ -1,4 +1,4 @@
-@import '../../../theme-colours.scss';
+@use '../../../theme-colours' as *;
 
 $edge-padding-vertical: 10vh;
 $edge-padding-horizontal: min(3em, 1vw);

@@ -1,4 +1,4 @@
-@import '../../../theme-colours.scss';
+@use '../../../theme-colours' as *;
 
 .caption-card-gallery {
     padding: 0;

@@ -1,5 +1,5 @@
 @use '@angular/material' as mat;
-@import 'theme-colours';
+@use 'theme-colours' as *;
 @include mat.elevation-classes();
 @include mat.app-background();
 

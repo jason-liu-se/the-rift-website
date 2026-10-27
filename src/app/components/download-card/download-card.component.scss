@@ -1,5 +1,5 @@
-@import '../../../font-sizes.scss';
-@import '../../../theme-colours.scss';
+@use '../../../font-sizes' as *;
+@use '../../../theme-colours' as *;
 
 .download-card-wrapper {
     position: relative;
