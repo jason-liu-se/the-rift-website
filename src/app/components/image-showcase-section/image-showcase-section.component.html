@@ -1,30 +1,36 @@
 <div class="image-showcase-section">
     <ul class="caption-card-gallery">
-        <li
-            class="caption-card"
-            *ngFor="let image of captionedImages; index as i"
-        >
-            <button
-                class="image-button"
-                #imageButton
-                (click)="handleImageClick(imageButton)"
-                [attr.index]="i"
-            >
-                <app-caption-card
-                    [src]="image.url"
-                    [caption]="image.caption"
-                    [caption-visibility]="'hover'"
-                />
-            </button>
-        </li>
+        @for (image of captionedImages; track image; let i = $index) {
+            <li class="caption-card">
+                <button
+                    class="image-button"
+                    #imageButton
+                    (click)="handleImageClick(imageButton)"
+                    [attr.index]="i"
+                >
+                    <app-caption-card
+                        [src]="image.url"
+                        [caption]="image.caption"
+                        [caption-visibility]="'hover'"
+                    />
+                </button>
+            </li>
+        }
     </ul>
-    <div class="image-pop-up" *ngIf="isPopUpVisible">
-        <app-image-slideshow
-            [captionedImages]="captionedImages"
-            [startingIndex]="imageIndex"
-        />
-        <button class="exit-button" mat-fab extended (click)="handleClose()">
-            <mat-icon class="exit-icon">close</mat-icon>Close
-        </button>
-    </div>
+    @if (isPopUpVisible) {
+        <div class="image-pop-up">
+            <app-image-slideshow
+                [captionedImages]="captionedImages"
+                [startingIndex]="imageIndex"
+            />
+            <button
+                class="exit-button"
+                mat-fab
+                extended
+                (click)="handleClose()"
+            >
+                <mat-icon class="exit-icon">close</mat-icon>Close
+            </button>
+        </div>
+    }
 </div>

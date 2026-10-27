@@ -4,11 +4,17 @@
 >
     <div class="overlay-content">
         <div class="text-container">
-            <ng-container *ngIf="showTitle">
-                <h1 class="title" *ngIf="isPageTitle">{{ title }}</h1>
-                <h2 class="title" *ngIf="!isPageTitle">{{ title }}</h2>
-            </ng-container>
-            <p class="description" *ngIf="showDescription">{{ description }}</p>
+            @if (showTitle) {
+                @if (isPageTitle) {
+                    <h1 class="title">{{ title }}</h1>
+                }
+                @if (!isPageTitle) {
+                    <h2 class="title">{{ title }}</h2>
+                }
+            }
+            @if (showDescription) {
+                <p class="description">{{ description }}</p>
+            }
         </div>
     </div>
 </div>

@@ -1,27 +1,27 @@
 <div class="collection-section">
     <div class="collection-wrapper">
-        <div
-            class="collection-card-grid collection-card"
-            *ngFor="let item of items"
-        >
-            <div
-                class="background-content"
-                [style.background-image]="'url(' + item.imageUrl + ')'"
-                routerLink="{{ item.routerLink }}"
-            ></div>
-            <a class="overlay-content" routerLink="{{ item.routerLink }}">
-                <hr class="top-bar" />
-                <h3 class="title">{{ item.title }}</h3>
-                <p
-                    class="description {{
-                        alwaysShowDesc ? 'high-contrast' : 'transparent'
-                    }}"
-                    *ngIf="item.desc"
-                >
-                    {{ item.desc }}
-                </p>
-                <hr class="bottom-bar" />
-            </a>
-        </div>
+        @for (item of items; track item) {
+            <div class="collection-card-grid collection-card">
+                <div
+                    class="background-content"
+                    [style.background-image]="'url(' + item.imageUrl + ')'"
+                    routerLink="{{ item.routerLink }}"
+                ></div>
+                <a class="overlay-content" routerLink="{{ item.routerLink }}">
+                    <hr class="top-bar" />
+                    <h3 class="title">{{ item.title }}</h3>
+                    @if (item.desc) {
+                        <p
+                            class="description {{
+                                alwaysShowDesc ? 'high-contrast' : 'transparent'
+                            }}"
+                        >
+                            {{ item.desc }}
+                        </p>
+                    }
+                    <hr class="bottom-bar" />
+                </a>
+            </div>
+        }
     </div>
 </div>

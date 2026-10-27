@@ -1,17 +1,17 @@
 <div class="news-display">
     <ul class="news-container">
-        <li class="news-item" *ngFor="let item of newsItems">
-            <img
-                class="banner-img"
-                [src]="item.bannerImg"
-                *ngIf="isBannerImageValid(item.bannerImg)"
-            />
-            <div class="news-item-content">
-                <h2 class="title">{{ item.title }}</h2>
-                <h3 class="date">{{ newsItemToDateString(item) }}</h3>
-                <hr class="separator" />
-                <p class="content">{{ item.content }}</p>
-            </div>
-        </li>
+        @for (item of newsItems; track item) {
+            <li class="news-item">
+                @if (isBannerImageValid(item.bannerImg)) {
+                    <img class="banner-img" [src]="item.bannerImg" />
+                }
+                <div class="news-item-content">
+                    <h2 class="title">{{ item.title }}</h2>
+                    <h3 class="date">{{ newsItemToDateString(item) }}</h3>
+                    <hr class="separator" />
+                    <p class="content">{{ item.content }}</p>
+                </div>
+            </li>
+        }
     </ul>
 </div>

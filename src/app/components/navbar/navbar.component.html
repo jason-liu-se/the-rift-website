@@ -1,4 +1,6 @@
-<div class="rift-navbar edge-padding" *ngIf="!isTransparent"></div>
+@if (!isTransparent) {
+    <div class="rift-navbar edge-padding"></div>
+}
 <div
     class="rift-navbar-wrapper always-visible {{
         isTransparent ? '' : 'opaque'
@@ -9,20 +11,22 @@
     >
         <div class="hamburger-menu">
             <div class="hamburger-menu-buttons">
-                <button
-                    class="hamburger-menu-button"
-                    (click)="toggleHamburgerMenu()"
-                    *ngIf="!isHamburgerMenuVisible"
-                >
-                    <mat-icon class="hamburger-icon">menu</mat-icon>
-                </button>
-                <button
-                    class="close-hamburger-menu-button"
-                    (click)="toggleHamburgerMenu()"
-                    *ngIf="isHamburgerMenuVisible"
-                >
-                    <mat-icon class="close-icon">close</mat-icon>
-                </button>
+                @if (!isHamburgerMenuVisible) {
+                    <button
+                        class="hamburger-menu-button"
+                        (click)="toggleHamburgerMenu()"
+                    >
+                        <mat-icon class="hamburger-icon">menu</mat-icon>
+                    </button>
+                }
+                @if (isHamburgerMenuVisible) {
+                    <button
+                        class="close-hamburger-menu-button"
+                        (click)="toggleHamburgerMenu()"
+                    >
+                        <mat-icon class="close-icon">close</mat-icon>
+                    </button>
+                }
             </div>
         </div>
         <ul class="menu-links left-align">

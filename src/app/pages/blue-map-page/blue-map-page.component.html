@@ -7,32 +7,32 @@
             [title]="'Map'"
         ></app-back-button>
     </div>
-    <div class="tip-pop-up" *ngIf="showHAMsg">
-        <app-message-card
-            [title]="'Tip:'"
-            [message]="
-                'Experiencing lag? Try enabling hardware acceleration in your web browser settings!'
-            "
-            [messageColor]="'white'"
-            [backgroundColor]="'rgba(0, 0, 0, 0.65)'"
-            [borderColor]="'rgba(150, 150, 150, 0.8)'"
-        />
-        <button class="message-exit-button" (click)="toggleHAMsg()">
-            <mat-icon class="message-exit-icon">close</mat-icon>
-        </button>
-    </div>
-    <div class="control-pop-up" *ngIf="showControlMsg">
-        <app-message-card
-            [title]="'Spectator Controls:'"
-            [message]="
-                '\'W\', \'A\', \'S\', and \'D\' to move\n\'LSHIFT\' to go down\n\'SPACE\' to go up\n\'Scroll Up\' to increase speed\n\'Scroll Down\' to decrease speed'
-            "
-            [messageColor]="'white'"
-            [backgroundColor]="'rgba(0, 0, 0, 0.65)'"
-            [borderColor]="'rgba(150, 150, 150, 0.8)'"
-        />
-        <button class="message-exit-button" (click)="toggleControlMsg()">
-            <mat-icon class="message-exit-icon">close</mat-icon>
-        </button>
-    </div>
+    @if (showHAMsg) {
+        <div class="tip-pop-up">
+            <app-message-card
+                [title]="'Tip:'"
+                [message]="'Experiencing lag? Try enabling hardware acceleration in your web browser settings!'"
+                [messageColor]="'white'"
+                [backgroundColor]="'rgba(0, 0, 0, 0.65)'"
+                [borderColor]="'rgba(150, 150, 150, 0.8)'"
+            />
+            <button class="message-exit-button" (click)="toggleHAMsg()">
+                <mat-icon class="message-exit-icon">close</mat-icon>
+            </button>
+        </div>
+    }
+    @if (showControlMsg) {
+        <div class="control-pop-up">
+            <app-message-card
+                [title]="'Spectator Controls:'"
+                [message]="'\'W\', \'A\', \'S\', and \'D\' to move\n\'LSHIFT\' to go down\n\'SPACE\' to go up\n\'Scroll Up\' to increase speed\n\'Scroll Down\' to decrease speed'"
+                [messageColor]="'white'"
+                [backgroundColor]="'rgba(0, 0, 0, 0.65)'"
+                [borderColor]="'rgba(150, 150, 150, 0.8)'"
+            />
+            <button class="message-exit-button" (click)="toggleControlMsg()">
+                <mat-icon class="message-exit-icon">close</mat-icon>
+            </button>
+        </div>
+    }
 </div>

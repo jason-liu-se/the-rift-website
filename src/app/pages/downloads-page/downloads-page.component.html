@@ -6,23 +6,25 @@
         [desc]="'Check out the previous Rift seasons'"
     ></app-background-image-card>
     <div class="downloads-container">
-        <app-section-card
-            *ngFor="let collection of downloadCollections"
-            [backgroundType]="'light'"
-            [title]="collection.name"
-            [titlePosition]="'left'"
-            [contentPosition]="'left'"
-            [paddingY]="false"
-        >
-            <div class="download-section">
-                <app-download-card
-                    *ngFor="let item of collection.items"
-                    [title]="item.title"
-                    [desc]="item.desc"
-                    [src]="item.downloadUrl"
-                    [imgSrc]="item.backgroundUrl"
-                ></app-download-card>
-            </div>
-        </app-section-card>
+        @for (collection of downloadCollections; track collection) {
+            <app-section-card
+                [backgroundType]="'light'"
+                [title]="collection.name"
+                [titlePosition]="'left'"
+                [contentPosition]="'left'"
+                [paddingY]="false"
+            >
+                <div class="download-section">
+                    @for (item of collection.items; track item) {
+                        <app-download-card
+                            [title]="item.title"
+                            [desc]="item.desc"
+                            [src]="item.downloadUrl"
+                            [imgSrc]="item.backgroundUrl"
+                        ></app-download-card>
+                    }
+                </div>
+            </app-section-card>
+        }
     </div>
 </div>
