@@ -1,6 +1,8 @@
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { GalleryShowcasePageComponent } from './gallery-showcase-page.component';
+import { AppModule } from '../../app.module';
 
 describe('GalleryShowcasePageComponent', () => {
     let component: GalleryShowcasePageComponent;
@@ -8,7 +10,8 @@ describe('GalleryShowcasePageComponent', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [GalleryShowcasePageComponent]
+            imports: [AppModule],
+            providers: [provideHttpClientTesting()]
         });
         fixture = TestBed.createComponent(GalleryShowcasePageComponent);
         component = fixture.componentInstance;

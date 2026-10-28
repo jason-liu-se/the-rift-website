@@ -4,7 +4,8 @@ import { ICardSelection } from 'src/app/interfaces/card-selection.interface';
 @Component({
     selector: 'app-page-map',
     templateUrl: './map-page.component.html',
-    styleUrls: ['./map-page.component.scss']
+    styleUrls: ['./map-page.component.scss'],
+    standalone: false
 })
 export class MapPageComponent implements OnInit {
     public mapItems: ICardSelection[] = [

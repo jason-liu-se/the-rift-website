@@ -4,7 +4,8 @@ import { ICaptionCard } from 'src/app/interfaces/slideshow-image.interface';
 @Component({
     selector: 'app-image-slideshow',
     templateUrl: './image-slideshow.component.html',
-    styleUrls: ['./image-slideshow.component.scss']
+    styleUrls: ['./image-slideshow.component.scss'],
+    standalone: false
 })
 export class ImageSlideshowComponent implements OnInit {
     @Input({ required: true }) public captionedImages!: ICaptionCard[];

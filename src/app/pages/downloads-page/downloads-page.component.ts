@@ -6,7 +6,8 @@ import { IDownloadCollection } from 'src/app/interfaces/download-collection.inte
 @Component({
     selector: 'app-downloads-page',
     templateUrl: './downloads-page.component.html',
-    styleUrls: ['./downloads-page.component.scss']
+    styleUrls: ['./downloads-page.component.scss'],
+    standalone: false
 })
 export class DownloadsPageComponent {
     public downloadCollections!: IDownloadCollection[];

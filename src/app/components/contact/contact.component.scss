@@ -1,5 +1,5 @@
-@import '../../../theme-colours.scss';
-@import '../../../font-sizes.scss';
+@use '../../../theme-colours' as *;
+@use '../../../font-sizes' as *;
 
 * {
     text-align: center;

@@ -5,27 +5,31 @@
         }}"
     >
         <div class="containers {{ imagePositionClass }}">
-            <div class="main-container" *ngIf="showTitle || showContent">
-                <h2 class="title {{ titlePositionClass }}" *ngIf="showTitle">
-                    {{ title }}
-                </h2>
-                <div
-                    class="section-break"
-                    *ngIf="showTitle && showContent"
-                ></div>
-                <p
-                    class="content {{ contentPositionClass }}"
-                    *ngIf="showContent"
-                >
-                    {{ content }}
-                </p>
-                <div class="dynamic-content {{ contentPositionClass }}">
-                    <ng-content></ng-content>
+            @if (showTitle || showContent) {
+                <div class="main-container">
+                    @if (showTitle) {
+                        <h2 class="title {{ titlePositionClass }}">
+                            {{ title }}
+                        </h2>
+                    }
+                    @if (showTitle && showContent) {
+                        <div class="section-break"></div>
+                    }
+                    @if (showContent) {
+                        <p class="content {{ contentPositionClass }}">
+                            {{ content }}
+                        </p>
+                    }
+                    <div class="dynamic-content {{ contentPositionClass }}">
+                        <ng-content></ng-content>
+                    </div>
                 </div>
-            </div>
-            <div class="image-container" *ngIf="showImage">
-                <img src="{{ imageUrl }}" class="image" />
-            </div>
+            }
+            @if (showImage) {
+                <div class="image-container">
+                    <img src="{{ imageUrl }}" class="image" />
+                </div>
+            }
         </div>
     </div>
 </div>

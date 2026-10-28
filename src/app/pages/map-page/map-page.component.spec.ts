@@ -1,6 +1,8 @@
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MapPageComponent } from './map-page.component';
+import { AppModule } from '../../app.module';
 
 describe('MapPageComponent', () => {
     let component: MapPageComponent;
@@ -8,7 +10,8 @@ describe('MapPageComponent', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [MapPageComponent]
+            imports: [AppModule],
+            providers: [provideHttpClientTesting()]
         });
         fixture = TestBed.createComponent(MapPageComponent);
         component = fixture.componentInstance;

@@ -1,4 +1,4 @@
-@import '../../../font-sizes.scss';
+@use '../../../font-sizes' as *;
 
 .message-card {
     display: flex;

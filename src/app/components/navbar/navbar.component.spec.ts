@@ -1,6 +1,8 @@
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NavbarComponent } from './navbar.component';
+import { AppModule } from '../../app.module';
 
 describe('NavbarComponent', () => {
   let component: NavbarComponent;
@@ -8,7 +10,8 @@ describe('NavbarComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [NavbarComponent]
+      imports: [AppModule],
+      providers: [provideHttpClientTesting()]
     });
     fixture = TestBed.createComponent(NavbarComponent);
     component = fixture.componentInstance;

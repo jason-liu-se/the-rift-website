@@ -3,7 +3,8 @@ import { Component, Input, OnInit } from '@angular/core';
 @Component({
     selector: 'app-download-card',
     templateUrl: './download-card.component.html',
-    styleUrls: ['./download-card.component.scss']
+    styleUrls: ['./download-card.component.scss'],
+    standalone: false
 })
 export class DownloadCardComponent implements OnInit {
     @Input() public title: string = '';

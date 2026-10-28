@@ -1,6 +1,8 @@
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { BackButtonComponent } from './back-button.component';
+import { AppModule } from '../../app.module';
 
 describe('BackButtonComponent', () => {
   let component: BackButtonComponent;
@@ -8,7 +10,8 @@ describe('BackButtonComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [BackButtonComponent]
+      imports: [AppModule],
+      providers: [provideHttpClientTesting()]
     });
     fixture = TestBed.createComponent(BackButtonComponent);
     component = fixture.componentInstance;

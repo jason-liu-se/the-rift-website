@@ -5,7 +5,8 @@ import { GalleryProviderService } from 'src/app/services/gallery-provider.servic
 @Component({
     selector: 'app-page-gallery',
     templateUrl: './gallery-page.component.html',
-    styleUrls: ['./gallery-page.component.scss']
+    styleUrls: ['./gallery-page.component.scss'],
+    standalone: false
 })
 export class GalleryPageComponent {
     public galleryCollections: IGalleryCardSelection[] = [

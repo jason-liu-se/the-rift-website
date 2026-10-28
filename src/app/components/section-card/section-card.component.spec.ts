@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TextSectionCardComponent } from './section-card.component';
+import { SectionCardComponent } from './section-card.component';
 
-describe('TextSectionCardComponent', () => {
-    let component: TextSectionCardComponent;
-    let fixture: ComponentFixture<TextSectionCardComponent>;
+describe('SectionCardComponent', () => {
+    let component: SectionCardComponent;
+    let fixture: ComponentFixture<SectionCardComponent>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [TextSectionCardComponent]
+            declarations: [SectionCardComponent]
         });
-        fixture = TestBed.createComponent(TextSectionCardComponent);
+        fixture = TestBed.createComponent(SectionCardComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

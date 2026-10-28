@@ -1,4 +1,4 @@
-@import '../../../../font-sizes.scss';
+@use '../../../../font-sizes' as *;
 
 $news-container-margin: 20px;
 $news-item-padding: 15px;

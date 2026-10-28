@@ -9,7 +9,8 @@ import { PaginatorIntlService } from 'src/app/services/paginator-intl.service';
     selector: 'app-gallery-showcase-page',
     templateUrl: './gallery-showcase-page.component.html',
     styleUrls: ['./gallery-showcase-page.component.scss'],
-    providers: [{ provide: MatPaginatorIntl, useClass: PaginatorIntlService }]
+    providers: [{ provide: MatPaginatorIntl, useClass: PaginatorIntlService }],
+    standalone: false
 })
 export class GalleryShowcasePageComponent {
     public title: string;

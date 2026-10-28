@@ -1,4 +1,4 @@
-@import '../../../theme-colours.scss';
+@use '../../../theme-colours' as *;
 
 $h-logo-edge-padding: 1rem;
 $navbar-height: 3rem;

@@ -4,7 +4,8 @@ import { ICardSelection } from 'src/app/interfaces/card-selection.interface';
 @Component({
     selector: 'app-card-selection-section',
     templateUrl: './card-selection-section.component.html',
-    styleUrls: ['./card-selection-section.component.scss']
+    styleUrls: ['./card-selection-section.component.scss'],
+    standalone: false
 })
 export class CardSelectionSectionComponent {
     @Input({ alias: 'items', required: true })

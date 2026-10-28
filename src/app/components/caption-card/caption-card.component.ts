@@ -3,7 +3,8 @@ import { Component, OnInit, Input } from '@angular/core';
 @Component({
     selector: 'app-caption-card',
     templateUrl: './caption-card.component.html',
-    styleUrls: ['./caption-card.component.scss']
+    styleUrls: ['./caption-card.component.scss'],
+    standalone: false
 })
 export class CaptionCardComponent implements OnInit {
     @Input({ alias: 'src', required: true }) public imageUrl!: string;

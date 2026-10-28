@@ -8,7 +8,8 @@ import { PaginatorIntlService } from 'src/app/services/paginator-intl.service';
     selector: 'app-page-news',
     templateUrl: './news-page.component.html',
     styleUrls: ['./news-page.component.scss'],
-    providers: [{ provide: MatPaginatorIntl, useClass: PaginatorIntlService }]
+    providers: [{ provide: MatPaginatorIntl, useClass: PaginatorIntlService }],
+    standalone: false
 })
 export class NewsPageComponent {
     public paginationLength!: number;

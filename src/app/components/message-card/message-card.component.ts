@@ -3,7 +3,8 @@ import { Component, Input, Output } from '@angular/core';
 @Component({
     selector: 'app-message-card',
     templateUrl: './message-card.component.html',
-    styleUrls: ['./message-card.component.scss']
+    styleUrls: ['./message-card.component.scss'],
+    standalone: false
 })
 export class MessageCardComponent {
     @Input() public title: string = '';
