@@ -1,7 +1,7 @@
 # The Rift Website
 
 The Rift website is a single-page application (SPA) for the Minecraft server
-community. It is built with Angular 16, Angular Material, TypeScript, and
+community. It is built with Angular 21, Angular Material, TypeScript, and
 SCSS.
 
 The frontend is responsible for the site's pages, navigation, reusable
@@ -10,8 +10,9 @@ separate services; see [External services](#external-services).
 
 ## Requirements
 
-- Node.js 18.x (the project currently uses Angular 16 and TypeScript 5.1)
-- npm 9.x or a compatible npm version
+- Node.js 20.19+, 22.12+, or 24+ (the project currently uses Angular 21 and
+  TypeScript 5.9)
+- npm 11.x (npm 10.9.3 fails to resolve the Angular 21 dependencies)
 - A modern browser
 - The separate The Rift API server for dynamic news, gallery, and download
   content
