@@ -1,71 +1,71 @@
 :host {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
+	display: flex;
+	flex: 1;
+	flex-direction: column;
 }
 
 .bluemap-page {
-    display: flex;
-    flex: 1;
-    position: relative;
+	display: flex;
+	flex: 1;
+	position: relative;
 }
 
 .mapIframe {
-    flex: 1;
-    border: none;
+	flex: 1;
+	border: none;
 }
 
 .back-button-container {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    z-index: 3;
-    padding: 0.2em 0.4em 0.2em 0.2em;
-    background-color: rgb(238, 238, 238);
-    border-radius: 1px;
-    border: solid rgb(238, 238, 238) 1px;
-    filter: drop-shadow(1px 1px 3px rgba(0, 0, 0, 0.53));
+	position: absolute;
+	bottom: 10px;
+	left: 10px;
+	z-index: 3;
+	padding: 0.2em 0.4em 0.2em 0.2em;
+	background-color: rgb(238, 238, 238);
+	border-radius: 1px;
+	border: solid rgb(238, 238, 238) 1px;
+	filter: drop-shadow(1px 1px 3px rgba(0, 0, 0, 0.53));
 }
 
 .tip-pop-up {
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translate(-50%, 0);
-    z-index: 3;
+	position: absolute;
+	bottom: 10px;
+	left: 50%;
+	transform: translate(-50%, 0);
+	z-index: 3;
 }
 
 .control-pop-up {
-    position: absolute;
-    bottom: 50%;
-    left: 10px;
-    z-index: 3;
+	position: absolute;
+	bottom: 50%;
+	left: 10px;
+	z-index: 3;
 }
 
 .message-exit-button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: red;
-    background-color: transparent;
-    border: none;
-    border-radius: 50%;
-    width: fit-content;
-    padding: 0;
-    position: absolute;
-    top: 0.3em;
-    right: 0;
-    transform: translate(50%, 0);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: red;
+	background-color: transparent;
+	border: none;
+	border-radius: 50%;
+	width: fit-content;
+	padding: 0;
+	position: absolute;
+	top: 0.3em;
+	right: 0;
+	transform: translate(50%, 0);
 }
 
 .message-exit-button:hover {
-    cursor: pointer;
+	cursor: pointer;
 }
 
 .message-exit-button:hover > .message-exit-icon {
-    color: rgba(255, 0, 0, 0.529);
+	color: rgba(255, 0, 0, 0.529);
 }
 
 .message-exit-icon {
-    transition: color 0.1s linear;
+	transition: color 0.1s linear;
 }

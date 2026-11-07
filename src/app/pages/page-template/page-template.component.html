@@ -1,16 +1,16 @@
 <div class="page-template">
-    <div class="upper-content">
-        <app-navbar [transparent]="isTransparent"></app-navbar>
-        <div class="template">
-            <ng-template appPageTemplateHost></ng-template>
-        </div>
-    </div>
-    <div class="lower-content">
-        @if (showContactSection) {
-            <app-contact></app-contact>
-        }
-        @if (showFooter) {
-            <app-footer class="app-footer"></app-footer>
-        }
-    </div>
+	<div class="upper-content">
+		<app-navbar [transparent]="isTransparent"></app-navbar>
+		<div class="template">
+			<ng-template appPageTemplateHost></ng-template>
+		</div>
+	</div>
+	<div class="lower-content">
+		@if (showContactSection) {
+			<app-contact></app-contact>
+		}
+		@if (showFooter) {
+			<app-footer class="app-footer"></app-footer>
+		}
+	</div>
 </div>

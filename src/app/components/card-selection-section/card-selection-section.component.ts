@@ -1,15 +1,16 @@
 import { Component, Input } from '@angular/core';
 import { ICardSelection } from 'src/app/interfaces/card-selection.interface';
+import { RouterLink } from '@angular/router';
 
 @Component({
-    selector: 'app-card-selection-section',
-    templateUrl: './card-selection-section.component.html',
-    styleUrls: ['./card-selection-section.component.scss'],
-    standalone: false
+	selector: 'app-card-selection-section',
+	templateUrl: './card-selection-section.component.html',
+	styleUrls: ['./card-selection-section.component.scss'],
+	imports: [RouterLink]
 })
 export class CardSelectionSectionComponent {
-    @Input({ alias: 'items', required: true })
-    public items!: ICardSelection[];
+	@Input({ required: true })
+	public items!: ICardSelection[];
 
-    @Input() public alwaysShowDesc: boolean = false;
+	@Input() public alwaysShowDesc = false;
 }

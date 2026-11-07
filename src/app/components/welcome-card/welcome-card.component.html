@@ -1,23 +1,27 @@
 <div class="card-wrapper">
-    <div
-        class="card"
-        [style.background-image]="
-            backgroundUrl === '' ? null : 'url(' + backgroundUrl + ')'
-        "
-    >
-        <div class="card-content">
-            <div class="card-container">
-                <div class="image-header">
-                    <img class="image" src="{{ headerUrl }}" />
-                </div>
-                <div class="description">
-                    {{ description }}
-                </div>
-                <ng-content></ng-content>
-            </div>
-        </div>
-        <div class="down-icon-container">
-            <mat-icon class="down-icon">keyboard_arrow_down</mat-icon>
-        </div>
-    </div>
+	<div
+		class="card"
+		[style.background-image]="
+			backgroundUrl === '' ? null : 'url(' + backgroundUrl + ')'
+		"
+	>
+		<div class="card-content">
+			<div class="card-container">
+				<div class="image-header">
+					<img
+						class="image"
+						src="{{ headerUrl }}"
+						[alt]="headerAlt"
+					/>
+				</div>
+				<div class="description">
+					{{ desc }}
+				</div>
+				<ng-content></ng-content>
+			</div>
+		</div>
+		<div class="down-icon-container">
+			<mat-icon class="down-icon">keyboard_arrow_down</mat-icon>
+		</div>
+	</div>
 </div>

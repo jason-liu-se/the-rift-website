@@ -1,5 +1,5 @@
-@use '../../../theme-colours' as *;
-@use '../../../font-sizes' as *;
+@use "../../../theme-colours" as *;
+@use "../../../font-sizes" as *;
 
 $edge-padding-x: 10px;
 $edge-padding-y: 5%;
@@ -7,133 +7,133 @@ $inner-padding-x: 20px;
 $inner-padding-y: 20px;
 
 .dark-background {
-    color: $colour-light-text;
-    background-color: $colour-dark-background;
+	color: $colour-light-text;
+	background-color: $colour-dark-background;
 }
 
 .light-background {
-    color: $colour-dark-text;
-    background-color: $colour-light-background;
+	color: $colour-dark-text;
+	background-color: $colour-light-background;
 }
 
 .empty-background {
-    color: $colour-dark-text;
-    background-color: #ffffff00;
+	color: $colour-dark-text;
+	background-color: #ffffff00;
 }
 
 .section-card-wrapper {
-    display: flex;
-    justify-content: center;
+	display: flex;
+	justify-content: center;
 }
 
 .section-card {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
 }
 
 .section-card.padding-x {
-    width: calc(100% - 2 * $edge-padding-x);
-    max-width: 55rem;
-    padding-left: $edge-padding-x;
-    padding-right: $edge-padding-x;
+	width: calc(100% - 2 * $edge-padding-x);
+	max-width: 55rem;
+	padding-left: $edge-padding-x;
+	padding-right: $edge-padding-x;
 }
 
 .section-card.padding-y {
-    padding-top: $edge-padding-y;
-    padding-bottom: $edge-padding-y;
+	padding-top: $edge-padding-y;
+	padding-bottom: $edge-padding-y;
 }
 
 .containers {
-    display: flex;
-    flex-direction: column;
-    align-content: center;
-    justify-content: center;
-    width: calc(100% - 2 * $inner-padding-x);
+	display: flex;
+	flex-direction: column;
+	align-content: center;
+	justify-content: center;
+	width: calc(100% - 2 * $inner-padding-x);
 }
 
 .containers > * {
-    padding: $inner-padding-y $inner-padding-x;
+	padding: $inner-padding-y $inner-padding-x;
 }
 
 .image-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
 }
 
 .image {
-    max-height: 80vh;
-    max-width: 33vw;
+	max-height: 80vh;
+	max-width: 33vw;
 }
 
 .main-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
 }
 
 .section-break {
-    background-color: none;
-    height: 20px;
+	background-color: none;
+	height: 20px;
 }
 
 .title {
-    white-space: pre-line;
-    width: 100%;
-    font-size: $font-size-large;
-    margin: 0px;
-    text-align: center;
+	white-space: pre-line;
+	width: 100%;
+	font-size: $font-size-large;
+	margin: 0px;
+	text-align: center;
 }
 
 .content {
-    white-space: pre-line;
-    width: 100%;
-    font-size: $font-size-medium;
-    line-height: 25px;
-    margin: 0px;
-    text-align: center;
+	white-space: pre-line;
+	width: 100%;
+	font-size: $font-size-medium;
+	line-height: 25px;
+	margin: 0px;
+	text-align: center;
 }
 
 .dynamic-content {
-    width: 100%;
-    text-align: center;
+	width: 100%;
+	text-align: center;
 }
 
 @media only screen and (min-width: 60rem) {
-    .image-container {
-        width: fit-content;
-    }
+	.image-container {
+		width: fit-content;
+	}
 
-    .right-align-image {
-        flex-direction: row;
-    }
+	.right-align-image {
+		flex-direction: row;
+	}
 
-    .left-align-image {
-        flex-direction: row-reverse;
-    }
+	.left-align-image {
+		flex-direction: row-reverse;
+	}
 
-    .bottom-align-image {
-        flex-direction: column-reverse;
-    }
+	.bottom-align-image {
+		flex-direction: column-reverse;
+	}
 
-    .top-align-image {
-        flex-direction: column;
-    }
+	.top-align-image {
+		flex-direction: column;
+	}
 
-    .center-align {
-        text-align: center;
-    }
+	.center-align {
+		text-align: center;
+	}
 
-    .left-align {
-        text-align: left;
-    }
+	.left-align {
+		text-align: left;
+	}
 
-    .right-align {
-        text-align: right;
-    }
+	.right-align {
+		text-align: right;
+	}
 }

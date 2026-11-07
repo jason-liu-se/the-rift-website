@@ -1,128 +1,126 @@
-@if (!isTransparent) {
-    <div class="rift-navbar edge-padding"></div>
+@if (!transparent) {
+	<div class="rift-navbar edge-padding"></div>
 }
 <div
-    class="rift-navbar-wrapper always-visible {{
-        isTransparent ? '' : 'opaque'
-    }}"
+	class="rift-navbar-wrapper always-visible {{ transparent ? '' : 'opaque' }}"
 >
-    <nav
-        class="rift-navbar {{ isHamburgerMenuVisible ? 'expand opaque' : '' }}"
-    >
-        <div class="hamburger-menu">
-            <div class="hamburger-menu-buttons">
-                @if (!isHamburgerMenuVisible) {
-                    <button
-                        class="hamburger-menu-button"
-                        (click)="toggleHamburgerMenu()"
-                    >
-                        <mat-icon class="hamburger-icon">menu</mat-icon>
-                    </button>
-                }
-                @if (isHamburgerMenuVisible) {
-                    <button
-                        class="close-hamburger-menu-button"
-                        (click)="toggleHamburgerMenu()"
-                    >
-                        <mat-icon class="close-icon">close</mat-icon>
-                    </button>
-                }
-            </div>
-        </div>
-        <ul class="menu-links left-align">
-            <li class="link-container">
-                <a class="nav-button" routerLink="/home">
-                    <img
-                        class="rift-logo"
-                        src="../../assets/navbar/rift-logo.png"
-                        alt="The Right logo"
-                    />
-                </a>
-            </li>
-        </ul>
-        <ul
-            class="menu-links center-align {{
-                isHamburgerMenuVisible ? '' : 'hidden'
-            }}"
-        >
-            <li class="link-container">
-                <a
-                    class="nav-link"
-                    routerLink="/home"
-                    routerLinkActive="link-active"
-                    ><p>Home</p></a
-                >
-            </li>
-            <li class="link-container">
-                <a
-                    class="nav-link"
-                    routerLink="/news"
-                    routerLinkActive="link-active"
-                    ><p>News</p></a
-                >
-            </li>
-            <li class="link-container">
-                <a
-                    class="nav-link"
-                    routerLink="/gallery"
-                    routerLinkActive="link-active"
-                    ><p>Gallery</p></a
-                >
-            </li>
-            <li class="link-container">
-                <a
-                    class="nav-link"
-                    routerLink="/map"
-                    routerLinkActive="link-active"
-                    ><p>Map</p></a
-                >
-            </li>
-            <li class="link-container">
-                <a
-                    class="nav-link"
-                    routerLink="/downloads"
-                    routerLinkActive="link-active"
-                    ><p>Downloads</p></a
-                >
-            </li>
+	<nav
+		class="rift-navbar {{ isHamburgerMenuVisible ? 'expand opaque' : '' }}"
+	>
+		<div class="hamburger-menu">
+			<div class="hamburger-menu-buttons">
+				@if (!isHamburgerMenuVisible) {
+					<button
+						class="hamburger-menu-button"
+						(click)="toggleHamburgerMenu()"
+					>
+						<mat-icon class="hamburger-icon">menu</mat-icon>
+					</button>
+				}
+				@if (isHamburgerMenuVisible) {
+					<button
+						class="close-hamburger-menu-button"
+						(click)="toggleHamburgerMenu()"
+					>
+						<mat-icon class="close-icon">close</mat-icon>
+					</button>
+				}
+			</div>
+		</div>
+		<ul class="menu-links left-align">
+			<li class="link-container">
+				<a class="nav-button" routerLink="/home">
+					<img
+						class="rift-logo"
+						src="../../assets/navbar/rift-logo.png"
+						alt="The Rift logo"
+					/>
+				</a>
+			</li>
+		</ul>
+		<ul
+			class="menu-links center-align {{
+				isHamburgerMenuVisible ? '' : 'hidden'
+			}}"
+		>
+			<li class="link-container">
+				<a
+					class="nav-link"
+					routerLink="/home"
+					routerLinkActive="link-active"
+					><p>Home</p></a
+				>
+			</li>
+			<li class="link-container">
+				<a
+					class="nav-link"
+					routerLink="/news"
+					routerLinkActive="link-active"
+					><p>News</p></a
+				>
+			</li>
+			<li class="link-container">
+				<a
+					class="nav-link"
+					routerLink="/gallery"
+					routerLinkActive="link-active"
+					><p>Gallery</p></a
+				>
+			</li>
+			<li class="link-container">
+				<a
+					class="nav-link"
+					routerLink="/map"
+					routerLinkActive="link-active"
+					><p>Map</p></a
+				>
+			</li>
+			<li class="link-container">
+				<a
+					class="nav-link"
+					routerLink="/downloads"
+					routerLinkActive="link-active"
+					><p>Downloads</p></a
+				>
+			</li>
 
-            <li class="link-container">
-                <a
-                    class="nav-link"
-                    routerLink="/about"
-                    routerLinkActive="link-active"
-                    ><p>About</p></a
-                >
-            </li>
-            <li class="link-container">
-                <a
-                    class="nav-link"
-                    routerLink="/contact"
-                    routerLinkActive="link-active"
-                    ><p>Contact</p></a
-                >
-            </li>
-        </ul>
-        <ul
-            class="menu-links right-align {{
-                isHamburgerMenuVisible ? '' : 'hidden'
-            }}"
-        >
-            <li class="link-container">
-                <div class="button-container">
-                    <button
-                        class="join-button"
-                        mat-flat-button
-                        disableRipple
-                        color="primary"
-                        routerLink="/join"
-                        routerLinkActive="mat-button-active"
-                    >
-                        Join
-                    </button>
-                </div>
-            </li>
-        </ul>
-        <br class="{{ isHamburgerMenuVisible ? '' : 'hidden' }}" />
-    </nav>
+			<li class="link-container">
+				<a
+					class="nav-link"
+					routerLink="/about"
+					routerLinkActive="link-active"
+					><p>About</p></a
+				>
+			</li>
+			<li class="link-container">
+				<a
+					class="nav-link"
+					routerLink="/contact"
+					routerLinkActive="link-active"
+					><p>Contact</p></a
+				>
+			</li>
+		</ul>
+		<ul
+			class="menu-links right-align {{
+				isHamburgerMenuVisible ? '' : 'hidden'
+			}}"
+		>
+			<li class="link-container">
+				<div class="button-container">
+					<button
+						class="join-button"
+						mat-flat-button
+						disableRipple
+						color="primary"
+						routerLink="/join"
+						routerLinkActive="mat-button-active"
+					>
+						Join
+					</button>
+				</div>
+			</li>
+		</ul>
+		<br class="{{ isHamburgerMenuVisible ? '' : 'hidden' }}" />
+	</nav>
 </div>

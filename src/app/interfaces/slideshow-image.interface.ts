@@ -1,4 +1,4 @@
 export interface ICaptionCard {
-    url: string;
-    caption: string;
+	url: string;
+	caption: string;
 }

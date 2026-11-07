@@ -1,65 +1,67 @@
-@use '../../../theme-colours' as *;
+@use "../../../theme-colours" as *;
 
 .caption-card-gallery {
-    padding: 0;
-    margin: 20px 0;
-    display: flex;
-    flex-wrap: wrap;
-    list-style: none;
-    gap: 10px;
+	padding: 0;
+	margin: 20px 0;
+	display: flex;
+	flex-wrap: wrap;
+	list-style: none;
+	gap: 10px;
 }
 
 .caption-card {
-    display: flex;
-    flex: 1 1 auto;
-    height: 300px;
-    overflow: hidden;
-    transition: border-radius 0.2s ease, scale 0.2s ease;
+	display: flex;
+	flex: 1 1 auto;
+	height: 300px;
+	overflow: hidden;
+	transition:
+		border-radius 0.2s ease,
+		scale 0.2s ease;
 }
 
 .caption-card:hover {
-    border-radius: 5px;
-    outline: 2px solid rgba(0, 0, 0, 0.352);
+	border-radius: 5px;
+	outline: 2px solid rgba(0, 0, 0, 0.352);
 }
 
 .image-button {
-    background-color: transparent;
-    border: none;
-    flex: 1 1 auto;
-    padding: 0;
+	background-color: transparent;
+	border: none;
+	flex: 1 1 auto;
+	padding: 0;
 }
 
 .image-button:hover {
-    cursor: pointer;
+	cursor: pointer;
 }
 
 .image-pop-up {
-    position: fixed;
-    z-index: 100;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(5px);
+	position: fixed;
+	z-index: 100;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	width: 100vw;
+	height: 100vh;
+	background-color: rgba(0, 0, 0, 0.6);
+	backdrop-filter: blur(5px);
 }
 
 .exit-button {
-    position: absolute;
-    top: 3%;
-    right: 3%;
-    border-radius: 10px;
-    background-color: rgba($colour-blue-grey, 0.3);
-    color: $colour-light-text;
+	position: absolute;
+	top: 3%;
+	right: 3%;
+	border-radius: 10px;
+	background-color: rgba($colour-blue-grey, 0.3);
+	color: $colour-light-text;
 }
 
 .exit-button:hover {
-    color: $colour-light-text;
-    background-color: red;
+	color: $colour-light-text;
+	background-color: red;
 }
 
 .exit-button:hover > .exit-icon {
-    transform: rotate(90deg);
+	transform: rotate(90deg);
 }

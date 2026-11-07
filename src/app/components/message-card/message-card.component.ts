@@ -1,17 +1,16 @@
-import { Component, Input, Output } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
-    selector: 'app-message-card',
-    templateUrl: './message-card.component.html',
-    styleUrls: ['./message-card.component.scss'],
-    standalone: false
+	selector: 'app-message-card',
+	templateUrl: './message-card.component.html',
+	styleUrls: ['./message-card.component.scss']
 })
 export class MessageCardComponent {
-    @Input() public title: string = '';
-    @Input() public message: string = '';
-    @Input() public messageColor: string = 'black';
-    @Input() public backgroundColor: string = 'transparent';
-    @Input() public borderColor: string = 'transparent';
-    @Input() public width: string = '100%';
-    @Input() public height: string = '100%';
+	@Input() public title = '';
+	@Input() public message = '';
+	@Input() public messageColor = 'black';
+	@Input() public backgroundColor = 'transparent';
+	@Input() public borderColor = 'transparent';
+	@Input() public width = '100%';
+	@Input() public height = '100%';
 }

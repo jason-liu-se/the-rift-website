@@ -1,266 +1,266 @@
-@use '../../../theme-colours' as *;
+@use "../../../theme-colours" as *;
 
 $h-logo-edge-padding: 1rem;
 $navbar-height: 3rem;
 
 .edge-padding {
-    padding: $h-logo-edge-padding 0;
+	padding: $h-logo-edge-padding 0;
 }
 
 .rift-navbar-wrapper {
-    position: fixed;
-    top: 0;
-    left: 0;
-    display: flex;
-    width: 100%;
-    border-style: none none solid none;
-    border-color: transparent;
-    box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.2);
-    border-width: 1px;
-    background-color: rgba(0, 0, 0, 0.368);
+	position: fixed;
+	top: 0;
+	left: 0;
+	display: flex;
+	width: 100%;
+	border-style: none none solid none;
+	border-color: transparent;
+	box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.2);
+	border-width: 1px;
+	background-color: rgba(0, 0, 0, 0.368);
 }
 
 .rift-navbar {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    min-height: $navbar-height;
-    position: relative;
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	min-height: $navbar-height;
+	position: relative;
 }
 
 .rift-navbar.opaque {
-    transition: background-color 0.1s ease;
+	transition: background-color 0.1s ease;
 }
 
 .expand {
-    height: 100vh;
+	height: 100vh;
 }
 
 .always-visible {
-    position: fixed;
-    top: 0px;
-    z-index: 10;
+	position: fixed;
+	top: 0px;
+	z-index: 10;
 }
 
 .opaque {
-    background-color: rgb(44, 44, 44);
+	background-color: rgb(44, 44, 44);
 }
 
 .hamburger-menu {
-    display: flex;
-    position: absolute;
-    top: 0;
-    right: 0;
+	display: flex;
+	position: absolute;
+	top: 0;
+	right: 0;
 }
 
 .hamburger-menu-buttons {
-    display: flex;
-    flex: 1;
-    justify-content: flex-end;
-    align-items: center;
-    padding: $h-logo-edge-padding;
-    min-height: $navbar-height;
+	display: flex;
+	flex: 1;
+	justify-content: flex-end;
+	align-items: center;
+	padding: $h-logo-edge-padding;
+	min-height: $navbar-height;
 }
 
 .hamburger-menu-button,
 .close-hamburger-menu-button {
-    border: none;
-    background-color: transparent;
-    color: white;
-    height: 100%;
+	border: none;
+	background-color: transparent;
+	color: white;
+	height: 100%;
 }
 
 .hamburger-menu-button:active,
 .close-hamburger-menu-button:active {
-    filter: opacity(0.7);
+	filter: opacity(0.7);
 }
 
 .menu-links {
-    display: flex;
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    height: inherit;
-    align-items: center;
-    flex-direction: column;
+	display: flex;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	height: inherit;
+	align-items: center;
+	flex-direction: column;
 }
 
 .link-container {
-    display: flex;
-    width: 100%;
-    justify-content: center;
-    align-items: center;
-    vertical-align: middle;
+	display: flex;
+	width: 100%;
+	justify-content: center;
+	align-items: center;
+	vertical-align: middle;
 }
 
 .nav-link {
-    display: flex;
-    text-align: center;
-    align-items: center;
-    color: rgb(244, 244, 244);
-    text-decoration: none;
-    height: 2.5rem;
-    width: 100%;
-    font-weight: 500;
+	display: flex;
+	text-align: center;
+	align-items: center;
+	color: rgb(244, 244, 244);
+	text-decoration: none;
+	height: 2.5rem;
+	width: 100%;
+	font-weight: 500;
 }
 
 .nav-link.link-active {
-    color: $colour-violet;
-    border-color: $colour-violet;
-    font-weight: 500;
+	color: $colour-violet;
+	border-color: $colour-violet;
+	font-weight: 500;
 }
 
 .nav-link p {
-    display: flex;
-    width: 100%;
-    height: 100%;
-    margin: 0px;
-    text-align: center;
-    align-items: center;
-    justify-content: center;
+	display: flex;
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	text-align: center;
+	align-items: center;
+	justify-content: center;
 }
 
 .rift-logo {
-    display: block;
-    margin: 0 auto;
-    padding: $h-logo-edge-padding;
-    object-fit: contain;
-    max-width: calc(100% - 2 * $h-logo-edge-padding);
-    max-height: $navbar-height;
+	display: block;
+	margin: 0 auto;
+	padding: $h-logo-edge-padding;
+	object-fit: contain;
+	max-width: calc(100% - 2 * $h-logo-edge-padding);
+	max-height: $navbar-height;
 }
 
 .join-button {
-    padding: 2px 10px;
-    border-radius: 1px;
-    margin: 2rem 0;
+	padding: 2px 10px;
+	border-radius: 1px;
+	margin: 2rem 0;
 }
 
 .join-button.mat-button-active {
-    background-color: transparent;
-    border: 2px solid $colour-primary;
+	background-color: transparent;
+	border: 2px solid $colour-primary;
 }
 
 .hidden {
-    display: none;
+	display: none;
 }
 
 @media only screen and (min-width: 60rem) {
-    $h-logo-edge-padding: 0.1rem;
+	$h-logo-edge-padding: 0.1rem;
 
-    .edge-padding {
-        padding: 0;
-    }
+	.edge-padding {
+		padding: 0;
+	}
 
-    .hamburger-menu {
-        display: none;
-    }
+	.hamburger-menu {
+		display: none;
+	}
 
-    .rift-navbar-wrapper {
-        justify-content: center;
-    }
+	.rift-navbar-wrapper {
+		justify-content: center;
+	}
 
-    .rift-navbar {
-        flex-direction: row;
-        max-width: 55rem;
-        height: $navbar-height;
-        justify-content: space-between;
-        padding-left: calc(100vw - 100%);
-    }
+	.rift-navbar {
+		flex-direction: row;
+		max-width: 55rem;
+		height: $navbar-height;
+		justify-content: space-between;
+		padding-left: calc(100vw - 100%);
+	}
 
-    .menu-links {
-        flex-direction: row;
-        width: 100%;
-    }
+	.menu-links {
+		flex-direction: row;
+		width: 100%;
+	}
 
-    .link-container {
-        height: 100%;
-    }
+	.link-container {
+		height: 100%;
+	}
 
-    .nav-link {
-        height: 100%;
-        padding: 0 2px;
-        border-width: 2px;
-        border-color: transparent;
-        border-style: none none solid none;
-        border-radius: 2px;
-        cursor: pointer;
-    }
+	.nav-link {
+		height: 100%;
+		padding: 0 2px;
+		border-width: 2px;
+		border-color: transparent;
+		border-style: none none solid none;
+		border-radius: 2px;
+		cursor: pointer;
+	}
 
-    .nav-link:hover {
-        color: $colour-accent;
-        border-color: $colour-accent;
-        filter: saturate(2);
-    }
+	.nav-link:hover {
+		color: $colour-accent;
+		border-color: $colour-accent;
+		filter: saturate(2);
+	}
 
-    .nav-link p {
-        padding: 2px 14px;
-    }
+	.nav-link p {
+		padding: 2px 14px;
+	}
 
-    .nav-link:hover p {
-        background-color: rgba(24, 24, 24, 0.183);
-        border-radius: 5px;
-    }
+	.nav-link:hover p {
+		background-color: rgba(24, 24, 24, 0.183);
+		border-radius: 5px;
+	}
 
-    .nav-button {
-        display: flex;
-        height: 100%;
-        align-items: center;
-        cursor: pointer;
-    }
+	.nav-button {
+		display: flex;
+		height: 100%;
+		align-items: center;
+		cursor: pointer;
+	}
 
-    .rift-logo {
-        max-height: calc(100% - 2 * $h-logo-edge-padding);
-    }
+	.rift-logo {
+		max-height: calc(100% - 2 * $h-logo-edge-padding);
+	}
 
-    .join-button {
-        margin: 0;
-        margin-left: 10px;
-        transition: all 0.02s ease;
-    }
+	.join-button {
+		margin: 0;
+		margin-left: 10px;
+		transition: all 0.02s ease;
+	}
 
-    .join-button:hover {
-        background-color: rgba($colour-primary, 0.9);
-        color: $colour-light-text;
-    }
+	.join-button:hover {
+		background-color: rgba($colour-primary, 0.9);
+		color: $colour-light-text;
+	}
 
-    .button-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
-        border-width: 2px;
-        border-color: transparent;
-        border-style: none none solid none;
-        border-radius: 2px;
-    }
+	.button-container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 100%;
+		border-width: 2px;
+		border-color: transparent;
+		border-style: none none solid none;
+		border-radius: 2px;
+	}
 
-    .button-container:has(> .join-button.mat-button-active) {
-        border-color: $colour-primary;
-    }
+	.button-container:has(> .join-button.mat-button-active) {
+		border-color: $colour-primary;
+	}
 
-    .join-button {
-        width: 100%;
-        margin: 0px;
-    }
+	.join-button {
+		width: 100%;
+		margin: 0px;
+	}
 
-    .join-button.mat-button-active {
-        background-color: transparent;
-        border: 2px solid $colour-primary;
-    }
+	.join-button.mat-button-active {
+		background-color: transparent;
+		border: 2px solid $colour-primary;
+	}
 
-    .left-align {
-        justify-content: flex-start;
-    }
+	.left-align {
+		justify-content: flex-start;
+	}
 
-    .center-align {
-        justify-content: center;
-    }
+	.center-align {
+		justify-content: center;
+	}
 
-    .right-align {
-        justify-content: flex-end;
-    }
+	.right-align {
+		justify-content: flex-end;
+	}
 
-    .hidden {
-        display: flex;
-    }
+	.hidden {
+		display: flex;
+	}
 }

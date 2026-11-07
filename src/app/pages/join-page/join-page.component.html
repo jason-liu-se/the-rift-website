@@ -1,29 +1,27 @@
 <div class="join-page">
-    <app-background-image-card
-        [src]="'../../../assets/general-background-images/water-tower-1.jpg'"
-        [isPageTitle]="true"
-        [title]="'Join'"
-        [desc]="'Interested in The Rift? Then this is the right page for you!'"
-    ></app-background-image-card>
-    <app-section-card
-        [backgroundType]="'light'"
-        [title]="'Want to Join The Rift?'"
-        [content]="
-            'Fill out the form and we\'ll get in contact with you if you\'re eligible!'
-        "
-        [titlePosition]="'center'"
-        [contentPosition]="'center'"
-    >
-        <button
-            class="form-button"
-            mat-fab
-            extended
-            disableRipple
-            color="primary"
-            onClick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSdxIhoo6Ub-zT36MGa2ld9JNOZtNVeTJYPs4LYj-wDmqrsf9g/viewform?usp=sf_link');"
-        >
-            <mat-icon>open_in_new</mat-icon>
-            Fill Out Form
-        </button>
-    </app-section-card>
+	<app-background-image-card
+		[src]="'../../../assets/general-background-images/water-tower-1.jpg'"
+		[isPageTitle]="true"
+		[title]="'Join'"
+		[desc]="'Interested in The Rift? Then this is the right page for you!'"
+	></app-background-image-card>
+	<app-section-card
+		[backgroundType]="'light'"
+		[title]="'Want to Join The Rift?'"
+		[content]="'Fill out the form and we\'ll get in contact with you if you\'re eligible!'"
+		[titlePosition]="'center'"
+		[contentPosition]="'center'"
+	>
+		<button
+			class="form-button"
+			mat-fab
+			extended
+			disableRipple
+			color="primary"
+			onClick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSdxIhoo6Ub-zT36MGa2ld9JNOZtNVeTJYPs4LYj-wDmqrsf9g/viewform?usp=sf_link');"
+		>
+			<mat-icon>open_in_new</mat-icon>
+			Fill Out Form
+		</button>
+	</app-section-card>
 </div>

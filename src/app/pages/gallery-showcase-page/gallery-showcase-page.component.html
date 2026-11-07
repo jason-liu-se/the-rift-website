@@ -1,40 +1,40 @@
 <div class="gallery-showcase">
-    <app-background-image-card
-        [src]="imageUrl"
-        [isPageTitle]="true"
-        [title]="title"
-    ></app-background-image-card>
-    <div class="paginated-image-showcase-container">
-        <div class="image-showcase-header">
-            <app-back-button [destination]="'/gallery'" [title]="'Gallery'" />
-            <p class="page-caption">{{ 'Results: ' + paginationLength }}</p>
-        </div>
-        <mat-paginator
-            #paginator
-            class="paginator"
-            (page)="handlePageEvent($event)"
-            [length]="paginationLength"
-            [pageSize]="pageSize"
-            [showFirstLastButtons]="true"
-            [pageIndex]="pageIndex"
-            [hidePageSize]="true"
-            aria-label="Select page"
-        >
-        </mat-paginator>
-        <app-image-showcase-section
-            [captionedImages]="captionedImages"
-        ></app-image-showcase-section>
-        <mat-paginator
-            #paginator
-            class="paginator"
-            (page)="handlePageEvent($event)"
-            [length]="paginationLength"
-            [pageSize]="pageSize"
-            [showFirstLastButtons]="true"
-            [pageIndex]="pageIndex"
-            [hidePageSize]="true"
-            aria-label="Select page"
-        >
-        </mat-paginator>
-    </div>
+	<app-background-image-card
+		[src]="imageUrl"
+		[isPageTitle]="true"
+		[title]="title"
+	></app-background-image-card>
+	<div class="paginated-image-showcase-container">
+		<div class="image-showcase-header">
+			<app-back-button [destination]="'/gallery'" [title]="'Gallery'" />
+			<p class="page-caption">{{ "Results: " + paginationLength }}</p>
+		</div>
+		<mat-paginator
+			#paginator
+			class="paginator"
+			(page)="handlePageEvent($event)"
+			[length]="paginationLength"
+			[pageSize]="pageSize"
+			[showFirstLastButtons]="true"
+			[pageIndex]="pageIndex"
+			[hidePageSize]="true"
+			aria-label="Select page"
+		>
+		</mat-paginator>
+		<app-image-showcase-section
+			[captionedImages]="captionedImages"
+		></app-image-showcase-section>
+		<mat-paginator
+			#paginator
+			class="paginator"
+			(page)="handlePageEvent($event)"
+			[length]="paginationLength"
+			[pageSize]="pageSize"
+			[showFirstLastButtons]="true"
+			[pageIndex]="pageIndex"
+			[hidePageSize]="true"
+			aria-label="Select page"
+		>
+		</mat-paginator>
+	</div>
 </div>

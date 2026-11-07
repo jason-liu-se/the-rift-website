@@ -1,29 +1,29 @@
-@use '../../../font-sizes' as *;
+@use "../../../font-sizes" as *;
 
 .message-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border-width: 1px;
-    border-style: solid;
-    border-radius: 5px;
-    height: fit-content;
-    width: fit-content;
-    padding: 10px;
-    position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	border-width: 1px;
+	border-style: solid;
+	border-radius: 5px;
+	height: fit-content;
+	width: fit-content;
+	padding: 10px;
+	position: relative;
 }
 
 .title {
-    font-weight: 500;
-    font-size: $font-size-medium;
-    text-align: center;
-    margin: 0;
-    white-space: pre-wrap;
+	font-weight: 500;
+	font-size: $font-size-medium;
+	text-align: center;
+	margin: 0;
+	white-space: pre-wrap;
 }
 
 .message {
-    font-size: $font-size-small;
-    text-align: center;
-    margin: 0;
-    white-space: pre-wrap;
+	font-size: $font-size-small;
+	text-align: center;
+	margin: 0;
+	white-space: pre-wrap;
 }

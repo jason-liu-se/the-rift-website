@@ -1,63 +1,71 @@
-import { Component } from '@angular/core';
-import { MatPaginatorIntl, PageEvent } from '@angular/material/paginator';
+import { Component, inject } from '@angular/core';
+import {
+	MatPaginatorIntl,
+	PageEvent,
+	MatPaginator
+} from '@angular/material/paginator';
 import { INewsItem } from 'src/app/interfaces/news-item.interface';
 import { NewsItemProviderService } from 'src/app/services/news-item-provider.service';
 import { PaginatorIntlService } from 'src/app/services/paginator-intl.service';
+import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
+import { NewsDisplayComponent } from '../../components/news/news-display/news-display.component';
 
 @Component({
-    selector: 'app-page-news',
-    templateUrl: './news-page.component.html',
-    styleUrls: ['./news-page.component.scss'],
-    providers: [{ provide: MatPaginatorIntl, useClass: PaginatorIntlService }],
-    standalone: false
+	selector: 'app-page-news',
+	templateUrl: './news-page.component.html',
+	styleUrls: ['./news-page.component.scss'],
+	providers: [{ provide: MatPaginatorIntl, useClass: PaginatorIntlService }],
+	imports: [BackgroundImageCardComponent, MatPaginator, NewsDisplayComponent]
 })
 export class NewsPageComponent {
-    public paginationLength!: number;
-    public pageSize: number = 10;
-    public pageIndex: number = 0;
-    public pageEvent!: PageEvent;
-    public newsItems: INewsItem[] = [];
+	private newsItemProvider = inject(NewsItemProviderService);
 
-    private newsItemCache: Record<string, INewsItem[]> = {};
+	public paginationLength!: number;
+	public pageSize = 10;
+	public pageIndex = 0;
+	public pageEvent!: PageEvent;
+	public newsItems: INewsItem[] = [];
 
-    constructor(private newsItemProvider: NewsItemProviderService) {
-        this.newsItemProvider
-            .countNewsItems()
-            .subscribe(
-                (data: { count: number }) =>
-                    (this.paginationLength = data.count)
-            );
+	private newsItemCache: Record<string, INewsItem[]> = {};
 
-        // setting the initial page items
-        this.populateNewsItems();
-    }
+	constructor() {
+		this.newsItemProvider
+			.countNewsItems()
+			.subscribe(
+				(data: { count: number }) =>
+					(this.paginationLength = data.count)
+			);
 
-    public handlePageEvent(e: PageEvent) {
-        this.pageEvent = e;
-        this.paginationLength = e.length;
-        this.pageSize = e.pageSize;
-        this.pageIndex = e.pageIndex;
+		// setting the initial page items
+		this.populateNewsItems();
+	}
 
-        // updating the displayed news items
-        this.newsItems = [];
+	public handlePageEvent(e: PageEvent) {
+		this.pageEvent = e;
+		this.paginationLength = e.length;
+		this.pageSize = e.pageSize;
+		this.pageIndex = e.pageIndex;
 
-        // grabbing images from cache, if they have been cached
-        if (this.newsItemCache[`${this.pageIndex}`]) {
-            this.newsItems = this.newsItemCache[`${this.pageIndex}`];
-        } else {
-            this.populateNewsItems();
-        }
+		// updating the displayed news items
+		this.newsItems = [];
 
-        window.scrollTo(0, 0);
-    }
+		// grabbing images from cache, if they have been cached
+		if (this.newsItemCache[`${this.pageIndex}`]) {
+			this.newsItems = this.newsItemCache[`${this.pageIndex}`];
+		} else {
+			this.populateNewsItems();
+		}
 
-    private populateNewsItems() {
-        this.newsItemProvider
-            .getNewsItems(this.pageIndex * this.pageSize, this.pageSize)
-            .subscribe((data: INewsItem[]) => {
-                this.newsItems = data;
+		window.scrollTo(0, 0);
+	}
 
-                this.newsItemCache[`${this.pageIndex}`] = this.newsItems;
-            });
-    }
+	private populateNewsItems() {
+		this.newsItemProvider
+			.getNewsItems(this.pageIndex * this.pageSize, this.pageSize)
+			.subscribe((data: INewsItem[]) => {
+				this.newsItems = data;
+
+				this.newsItemCache[`${this.pageIndex}`] = this.newsItems;
+			});
+	}
 }

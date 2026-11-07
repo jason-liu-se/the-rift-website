@@ -1,39 +1,45 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Constants } from 'src/app/config/constants';
+import { BackButtonComponent } from '../../components/back-button/back-button.component';
+import { MessageCardComponent } from '../../components/message-card/message-card.component';
+import { MatIcon } from '@angular/material/icon';
+import { SafePipe } from '../../utilities/SafePipe.util';
 
 @Component({
-    selector: 'app-blue-map-page',
-    templateUrl: './blue-map-page.component.html',
-    styleUrls: ['./blue-map-page.component.scss'],
-    standalone: false
+	selector: 'app-blue-map-page',
+	templateUrl: './blue-map-page.component.html',
+	styleUrls: ['./blue-map-page.component.scss'],
+	imports: [BackButtonComponent, MessageCardComponent, MatIcon, SafePipe]
 })
 export class BlueMapPageComponent {
-    public bluemapUrl: string;
-    public serverUrl: string;
+	private route = inject(ActivatedRoute);
 
-    public showHAMsg: boolean = true; // HA = Hardware Acceleration
-    public showControlMsg: boolean = true;
+	public bluemapUrl: string;
+	public serverUrl: string;
 
-    private constants: Constants = new Constants();
+	public showHAMsg = true; // HA = Hardware Acceleration
+	public showControlMsg = true;
 
-    constructor(private route: ActivatedRoute) {
-        const mapNameProp = this.route.snapshot.data['mapName'];
-        const mapName = mapNameProp == null ? '' : mapNameProp;
+	private constants: Constants = new Constants();
 
-        this.bluemapUrl =
-            this.constants.BLUEMAP_URL +
-            '/#' +
-            mapName +
-            this.constants.BLUEMAP_POSTFIX;
-        this.serverUrl = this.constants.API_ENDPOINT;
-    }
+	constructor() {
+		const mapNameProp = this.route.snapshot.data['mapName'];
+		const mapName = mapNameProp == null ? '' : mapNameProp;
 
-    public toggleHAMsg(): void {
-        this.showHAMsg = !this.showHAMsg;
-    }
+		this.bluemapUrl =
+			this.constants.BLUEMAP_URL +
+			'/#' +
+			mapName +
+			this.constants.BLUEMAP_POSTFIX;
+		this.serverUrl = this.constants.API_ENDPOINT;
+	}
 
-    public toggleControlMsg(): void {
-        this.showControlMsg = !this.showControlMsg;
-    }
+	public toggleHAMsg(): void {
+		this.showHAMsg = !this.showHAMsg;
+	}
+
+	public toggleControlMsg(): void {
+		this.showControlMsg = !this.showControlMsg;
+	}
 }

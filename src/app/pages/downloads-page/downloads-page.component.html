@@ -1,30 +1,30 @@
 <div class="downloads-page">
-    <app-background-image-card
-        [src]="'../../../assets/general-background-images/iron-farm-1.jpg'"
-        [isPageTitle]="true"
-        [title]="'Downloads'"
-        [desc]="'Check out the previous Rift seasons'"
-    ></app-background-image-card>
-    <div class="downloads-container">
-        @for (collection of downloadCollections; track collection) {
-            <app-section-card
-                [backgroundType]="'light'"
-                [title]="collection.name"
-                [titlePosition]="'left'"
-                [contentPosition]="'left'"
-                [paddingY]="false"
-            >
-                <div class="download-section">
-                    @for (item of collection.items; track item) {
-                        <app-download-card
-                            [title]="item.title"
-                            [desc]="item.desc"
-                            [src]="item.downloadUrl"
-                            [imgSrc]="item.backgroundUrl"
-                        ></app-download-card>
-                    }
-                </div>
-            </app-section-card>
-        }
-    </div>
+	<app-background-image-card
+		[src]="'../../../assets/general-background-images/iron-farm-1.jpg'"
+		[isPageTitle]="true"
+		[title]="'Downloads'"
+		[desc]="'Check out the previous Rift seasons'"
+	></app-background-image-card>
+	<div class="downloads-container">
+		@for (collection of downloadCollections; track collection) {
+			<app-section-card
+				[backgroundType]="'light'"
+				[title]="collection.name"
+				[titlePosition]="'left'"
+				[contentPosition]="'left'"
+				[paddingY]="false"
+			>
+				<div class="download-section">
+					@for (item of collection.items; track item) {
+						<app-download-card
+							[title]="item.title"
+							[desc]="item.desc"
+							[src]="item.downloadUrl"
+							[imgSrc]="item.backgroundUrl"
+						></app-download-card>
+					}
+				</div>
+			</app-section-card>
+		}
+	</div>
 </div>

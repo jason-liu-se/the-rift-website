@@ -1,36 +1,36 @@
 <div class="image-showcase-section">
-    <ul class="caption-card-gallery">
-        @for (image of captionedImages; track image; let i = $index) {
-            <li class="caption-card">
-                <button
-                    class="image-button"
-                    #imageButton
-                    (click)="handleImageClick(imageButton)"
-                    [attr.index]="i"
-                >
-                    <app-caption-card
-                        [src]="image.url"
-                        [caption]="image.caption"
-                        [caption-visibility]="'hover'"
-                    />
-                </button>
-            </li>
-        }
-    </ul>
-    @if (isPopUpVisible) {
-        <div class="image-pop-up">
-            <app-image-slideshow
-                [captionedImages]="captionedImages"
-                [startingIndex]="imageIndex"
-            />
-            <button
-                class="exit-button"
-                mat-fab
-                extended
-                (click)="handleClose()"
-            >
-                <mat-icon class="exit-icon">close</mat-icon>Close
-            </button>
-        </div>
-    }
+	<ul class="caption-card-gallery">
+		@for (image of captionedImages; track image; let i = $index) {
+			<li class="caption-card">
+				<button
+					class="image-button"
+					#imageButton
+					(click)="handleImageClick(imageButton)"
+					[attr.index]="i"
+				>
+					<app-caption-card
+						[src]="image.url"
+						[caption]="image.caption"
+						[captionVisibility]="'hover'"
+					/>
+				</button>
+			</li>
+		}
+	</ul>
+	@if (isPopUpVisible) {
+		<div class="image-pop-up">
+			<app-image-slideshow
+				[captionedImages]="captionedImages"
+				[startingIndex]="imageIndex"
+			/>
+			<button
+				class="exit-button"
+				mat-fab
+				extended
+				(click)="handleClose()"
+			>
+				<mat-icon class="exit-icon">close</mat-icon>Close
+			</button>
+		</div>
+	}
 </div>
