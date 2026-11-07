@@ -1,18 +1,18 @@
-@use '../../../theme-colours' as *;
+@use "../../../theme-colours" as *;
 
 .paginated-image-showcase-container {
-    padding: min(2rem, 4vh) min(3rem, 2vw);
+	padding: min(2rem, 4vh) min(3rem, 2vw);
 }
 
 .image-showcase-header {
-    display: flex;
-    align-items: center;
-    width: 100%;
+	display: flex;
+	align-items: center;
+	width: 100%;
 }
 
 .page-caption {
-    flex: 1;
-    text-align: right;
-    margin: 0;
-    color: $colour-dark-text;
+	flex: 1;
+	text-align: right;
+	margin: 0;
+	color: $colour-dark-text;
 }

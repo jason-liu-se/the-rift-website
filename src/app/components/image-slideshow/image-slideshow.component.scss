@@ -1,79 +1,79 @@
-@use '../../../theme-colours' as *;
+@use "../../../theme-colours" as *;
 
 $edge-padding-vertical: 10vh;
 $edge-padding-horizontal: min(3em, 1vw);
 
 .image-slideshow {
-    height: calc(100% - 2 * $edge-padding-vertical);
-    width: calc(100% - 2 * $edge-padding-horizontal);
-    padding: $edge-padding-vertical $edge-padding-horizontal;
+	height: calc(100% - 2 * $edge-padding-vertical);
+	width: calc(100% - 2 * $edge-padding-horizontal);
+	padding: $edge-padding-vertical $edge-padding-horizontal;
 }
 
 .containers {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 100%;
 }
 
 .prev-button-container {
-    justify-self: flex-start;
+	justify-self: flex-start;
 }
 
 .content-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    flex: 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	flex: 1;
 }
 
 .image {
-    object-fit: contain;
-    width: 100%;
-    max-height: 70vh;
-    max-width: 100%;
+	object-fit: contain;
+	width: 100%;
+	max-height: 70vh;
+	max-width: 100%;
 }
 
 .caption {
-    color: $colour-light-text;
-    margin: 0.5em 0;
-    text-align: center;
-    max-width: 80%;
-    white-space: pre-line;
-    word-break: break-word;
+	color: $colour-light-text;
+	margin: 0.5em 0;
+	text-align: center;
+	max-width: 80%;
+	white-space: pre-line;
+	word-break: break-word;
 }
 
 .next-button-container {
-    justify-self: flex-end;
+	justify-self: flex-end;
 }
 
 .next,
 .prev {
-    height: 5vh;
-    width: 5vh;
-    color: $colour-light-text;
-    background-color: transparent;
-    border: none;
-    padding: 0;
+	height: 5vh;
+	width: 5vh;
+	color: $colour-light-text;
+	background-color: transparent;
+	border: none;
+	padding: 0;
 }
 
 .next:hover:not(:disabled),
 .prev:hover:not(:disabled) {
-    color: $colour-primary;
-    cursor: pointer;
+	color: $colour-primary;
+	cursor: pointer;
 }
 
 .next:disabled,
 .prev:disabled {
-    color: $colour-light-grey;
-    filter: opacity(0.5);
+	color: $colour-light-grey;
+	filter: opacity(0.5);
 }
 
 .icon {
-    font-size: 5vh;
-    height: 5vh;
-    width: 5vh;
+	font-size: 5vh;
+	height: 5vh;
+	width: 5vh;
 }

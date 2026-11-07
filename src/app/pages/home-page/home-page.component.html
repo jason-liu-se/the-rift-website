@@ -1,43 +1,42 @@
 <div class="background-image"></div>
 <app-welcome-card
-    [headerUrl]="'../../../assets/navbar/rift-logo.png'"
-    [desc]="'This is a description'"
-    [backgroundUrl]="
-        showWelcomeComponentBackground
-            ? '../../../assets/general-background-images/spawn-walkway-1.jpg'
-            : null
-    "
+	[headerUrl]="'../../../assets/navbar/rift-logo.png'"
+	headerAlt="The Rift logo"
+	[desc]="'This is a description'"
+	[backgroundUrl]="
+		showWelcomeComponentBackground
+			? '../../../assets/general-background-images/spawn-walkway-1.jpg'
+			: null
+	"
 >
-    <div class="actions">
-        <button
-            class="primary-button"
-            mat-flat-button
-            color="primary"
-            disableRipple
-            routerLink="/join"
-        >
-            <p class="button-text">Join</p>
-        </button>
-        <button
-            class="secondary-button"
-            mat-flat-button
-            color="accent"
-            disableRipple
-            routerLink="/about"
-        >
-            <p class="button-text">Learn More</p>
-        </button>
-    </div>
+	<div class="actions">
+		<button
+			class="primary-button"
+			mat-flat-button
+			color="primary"
+			disableRipple
+			routerLink="/join"
+		>
+			<p class="button-text">Join</p>
+		</button>
+		<button
+			class="secondary-button"
+			mat-flat-button
+			color="accent"
+			disableRipple
+			routerLink="/about"
+		>
+			<p class="button-text">Learn More</p>
+		</button>
+	</div>
 </app-welcome-card>
 <app-section-card
-    [backgroundType]="'dark'"
-    [title]="'Hey there gamers!'"
-    [content]="
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-    "
-    [titlePosition]="'left'"
-    [contentPosition]="'left'"
-    [img]="'../../../assets/home/grass-block.png'"
-    [imgPos]="'left'"
+	[backgroundType]="'dark'"
+	[title]="'Hey there gamers!'"
+	[content]="'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'"
+	[titlePosition]="'left'"
+	[contentPosition]="'left'"
+	[img]="'../../../assets/home/grass-block.png'"
+	[imgPos]="'left'"
 >
 </app-section-card>

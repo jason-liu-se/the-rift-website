@@ -1,41 +1,41 @@
 <div class="news-page">
-    <app-background-image-card
-        class="background-image-card"
-        [src]="'../../../assets/general-background-images/iron-stand-3.jpg'"
-        [isPageTitle]="true"
-        [title]="'News'"
-        [desc]="'Check out what\'s going on with The Rift'"
-    ></app-background-image-card>
-    <div class="paginated-news-display-container">
-        <mat-paginator
-            #paginator
-            class="paginator"
-            (page)="handlePageEvent($event)"
-            [length]="paginationLength"
-            [pageSize]="pageSize"
-            [showFirstLastButtons]="true"
-            [pageIndex]="pageIndex"
-            [hidePageSize]="true"
-            aria-label="Select page"
-        >
-        </mat-paginator>
-        @if (newsItems.length > 0) {
-            <app-news-display
-                class="news-display"
-                [newsItems]="newsItems"
-            ></app-news-display>
-        }
-        <mat-paginator
-            #paginator
-            class="paginator"
-            (page)="handlePageEvent($event)"
-            [length]="paginationLength"
-            [pageSize]="pageSize"
-            [showFirstLastButtons]="true"
-            [pageIndex]="pageIndex"
-            [hidePageSize]="true"
-            aria-label="Select page"
-        >
-        </mat-paginator>
-    </div>
+	<app-background-image-card
+		class="background-image-card"
+		[src]="'../../../assets/general-background-images/iron-stand-3.jpg'"
+		[isPageTitle]="true"
+		[title]="'News'"
+		[desc]="'Check out what\'s going on with The Rift'"
+	></app-background-image-card>
+	<div class="paginated-news-display-container">
+		<mat-paginator
+			#paginator
+			class="paginator"
+			(page)="handlePageEvent($event)"
+			[length]="paginationLength"
+			[pageSize]="pageSize"
+			[showFirstLastButtons]="true"
+			[pageIndex]="pageIndex"
+			[hidePageSize]="true"
+			aria-label="Select page"
+		>
+		</mat-paginator>
+		@if (newsItems.length > 0) {
+			<app-news-display
+				class="news-display"
+				[newsItems]="newsItems"
+			></app-news-display>
+		}
+		<mat-paginator
+			#paginator
+			class="paginator"
+			(page)="handlePageEvent($event)"
+			[length]="paginationLength"
+			[pageSize]="pageSize"
+			[showFirstLastButtons]="true"
+			[pageIndex]="pageIndex"
+			[hidePageSize]="true"
+			aria-label="Select page"
+		>
+		</mat-paginator>
+	</div>
 </div>

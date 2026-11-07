@@ -1,10 +1,33 @@
-import { provideZoneChangeDetection } from '@angular/core';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
+import { bootstrapApplication } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {
+	provideHttpClient,
+	withInterceptorsFromDi
+} from '@angular/common/http';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
-import { AppModule } from './app/app.module';
+import { AppComponent } from './app/app.component';
+import { AppRoutingModule } from './app/app-routing.module';
+import { GalleryProviderService } from './app/services/gallery-provider.service';
+import { MapProviderService } from './app/services/map-provider.service';
+import { PaginatorIntlService } from './app/services/paginator-intl.service';
 
-platformBrowserDynamic()
-    .bootstrapModule(AppModule, {
-        applicationProviders: [provideZoneChangeDetection()]
-    })
-    .catch((err) => console.error(err));
+bootstrapApplication(AppComponent, {
+	providers: [
+		provideZoneChangeDetection(),
+		importProvidersFrom(
+			AppRoutingModule,
+			BrowserAnimationsModule,
+			MatButtonModule,
+			MatPaginatorModule,
+			MatIconModule
+		),
+		GalleryProviderService,
+		MapProviderService,
+		PaginatorIntlService,
+		provideHttpClient(withInterceptorsFromDi())
+	]
+}).catch((err) => console.error(err));

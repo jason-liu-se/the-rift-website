@@ -1,49 +1,56 @@
-import { Component, OnInit, ViewChild, Type } from '@angular/core';
+import { Component, OnInit, ViewChild, Type, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { PageTemplateDirective } from 'src/app/directives/page-template.directive';
-import { IPageTemplate } from '../../interfaces/page-template.interface';
+import { NavbarComponent } from '../../components/navbar/navbar.component';
+import { ContactComponent } from '../../components/contact/contact.component';
+import { FooterComponent } from '../../components/footer/footer.component';
 
 @Component({
-    selector: 'app-page-template',
-    templateUrl: './page-template.component.html',
-    styleUrls: ['./page-template.component.scss'],
-    standalone: false
+	selector: 'app-page-template',
+	templateUrl: './page-template.component.html',
+	styleUrls: ['./page-template.component.scss'],
+	imports: [
+		NavbarComponent,
+		PageTemplateDirective,
+		ContactComponent,
+		FooterComponent
+	]
 })
 export class PageTemplateComponent implements OnInit {
-    public showContactSection: boolean;
-    public mainComponent: Type<any>;
-    public isTransparent!: boolean;
-    public showFooter: boolean;
+	private route = inject(ActivatedRoute);
 
-    @ViewChild(PageTemplateDirective, { static: true })
-    appPageTemplateHost!: PageTemplateDirective;
+	public showContactSection: boolean;
+	public mainComponent: Type<unknown>;
+	public isTransparent!: boolean;
+	public showFooter: boolean;
 
-    constructor(private route: ActivatedRoute) {
-        // setting values from the passed URL data
-        const isTransparentProp = this.route.snapshot.data['isTransparent'];
-        const showContactSectionProp =
-            this.route.snapshot.data['showContactSection'];
-        const showFooterProp = this.route.snapshot.data['showFooter'];
+	@ViewChild(PageTemplateDirective, { static: true })
+	appPageTemplateHost!: PageTemplateDirective;
 
-        this.isTransparent =
-            isTransparentProp == null ? true : isTransparentProp;
-        this.mainComponent = this.route.snapshot.data['component'];
-        this.showContactSection =
-            showContactSectionProp == null ? false : showContactSectionProp;
-        this.showFooter = showFooterProp == null ? true : showFooterProp;
-    }
+	constructor() {
+		// setting values from the passed URL data
+		const isTransparentProp = this.route.snapshot.data['isTransparent'];
+		const showContactSectionProp =
+			this.route.snapshot.data['showContactSection'];
+		const showFooterProp = this.route.snapshot.data['showFooter'];
 
-    // displaying the passed component dynamically
-    displayComponent(): void {
-        const viewContainerRef = this.appPageTemplateHost.viewContainerRef;
-        viewContainerRef.clear();
+		this.isTransparent =
+			isTransparentProp == null ? true : isTransparentProp;
+		this.mainComponent = this.route.snapshot.data['component'];
+		this.showContactSection =
+			showContactSectionProp == null ? false : showContactSectionProp;
+		this.showFooter = showFooterProp == null ? true : showFooterProp;
+	}
 
-        const componentRef = viewContainerRef.createComponent<IPageTemplate>(
-            this.mainComponent
-        );
-    }
+	// displaying the passed component dynamically
+	displayComponent(): void {
+		const viewContainerRef = this.appPageTemplateHost.viewContainerRef;
+		viewContainerRef.clear();
 
-    ngOnInit(): void {
-        this.displayComponent();
-    }
+		viewContainerRef.createComponent(this.mainComponent);
+	}
+
+	ngOnInit(): void {
+		this.displayComponent();
+	}
 }

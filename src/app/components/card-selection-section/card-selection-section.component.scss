@@ -1,5 +1,5 @@
-@use '../../../font-sizes' as *;
-@use '../../../theme-colours' as *;
+@use "../../../font-sizes" as *;
+@use "../../../theme-colours" as *;
 
 $collection-card-width: 15rem;
 $collection-card-height: 25rem;
@@ -7,425 +7,427 @@ $hover-animation-duration: 0.3s;
 $hover-animation-text-offset: -0.5rem;
 
 :host {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
+	display: flex;
+	flex-direction: column;
+	flex: 1;
 }
 
 .collection-section {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 40px 0;
-    height: 100%;
-    flex: 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: 40px 0;
+	height: 100%;
+	flex: 1;
 }
 
 .collection-wrapper {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    width: 55rem;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: center;
+	width: 55rem;
 }
 
 .collection-card-grid {
-    display: grid;
-    grid-template-rows: 100%;
-    grid-template-columns: 100%;
+	display: grid;
+	grid-template-rows: 100%;
+	grid-template-columns: 100%;
 }
 
 .collection-card {
-    width: $collection-card-width;
-    height: $collection-card-height;
-    outline: 1px solid black;
-    border-radius: 5px;
-    margin: 10px;
-    overflow: hidden;
-    transition: scale $hover-animation-duration,
-        filter $hover-animation-duration, border $hover-animation-duration,
-        outline $hover-animation-duration;
-    filter: drop-shadow(2px 2px 5px #00000054);
-    text-align: center;
-    word-break: break-word;
+	width: $collection-card-width;
+	height: $collection-card-height;
+	outline: 1px solid black;
+	border-radius: 5px;
+	margin: 10px;
+	overflow: hidden;
+	transition:
+		scale $hover-animation-duration,
+		filter $hover-animation-duration,
+		border $hover-animation-duration,
+		outline $hover-animation-duration;
+	filter: drop-shadow(2px 2px 5px #00000054);
+	text-align: center;
+	word-break: break-word;
 }
 
 .collection-card:hover {
-    scale: 1.02;
-    outline: 2px solid black;
-    cursor: pointer;
-    filter: drop-shadow(2px 2px 5px #000000);
+	scale: 1.02;
+	outline: 2px solid black;
+	cursor: pointer;
+	filter: drop-shadow(2px 2px 5px #000000);
 }
 
 .background-content {
-    grid-area: 1 / 1 / 2 / 2;
-    background-position: center;
-    background-size: cover;
-    transition: filter $hover-animation-duration;
+	grid-area: 1 / 1 / 2 / 2;
+	background-position: center;
+	background-size: cover;
+	transition: filter $hover-animation-duration;
 }
 
 .collection-card:hover .background-content {
-    filter: brightness(0.5) saturate(0);
+	filter: brightness(0.5) saturate(0);
 }
 
 .overlay-content {
-    grid-area: 1 / 1 / 2 / 2;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background: radial-gradient(rgba(0, 0, 0, 0.209), rgba(0, 0, 0, 0.471));
-    text-decoration: none;
+	grid-area: 1 / 1 / 2 / 2;
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	background: radial-gradient(rgba(0, 0, 0, 0.209), rgba(0, 0, 0, 0.471));
+	text-decoration: none;
 }
 
 .title {
-    font-size: $font-size-x-large;
-    line-height: $font-size-x-large;
-    font-weight: 600;
-    color: $colour-secondary;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
-    margin: 0;
+	font-size: $font-size-x-large;
+	line-height: $font-size-x-large;
+	font-weight: 600;
+	color: $colour-secondary;
+	text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+	margin: 0;
 }
 
 .collection-card:hover .title {
-    animation: title-hover-effect $hover-animation-duration ease forwards;
+	animation: title-hover-effect $hover-animation-duration ease forwards;
 }
 
 .description {
-    font-size: $font-size-medium;
-    line-height: $font-size-medium;
-    font-weight: 500;
-    margin: 0;
-    color: $colour-accent;
-    transition: color $hover-animation-duration ease;
+	font-size: $font-size-medium;
+	line-height: $font-size-medium;
+	font-weight: 500;
+	margin: 0;
+	color: $colour-accent;
+	transition: color $hover-animation-duration ease;
 }
 
 .collection-card:not(:hover) .description.high-contrast {
-    color: $colour-light-text;
+	color: $colour-light-text;
 }
 
 .collection-card:hover .description {
-    animation: slide-in-from-below $hover-animation-duration ease forwards;
+	animation: slide-in-from-below $hover-animation-duration ease forwards;
 }
 
 .top-bar {
-    border: 1px solid $colour-blue-grey;
-    border-radius: 5px;
-    width: calc($collection-card-width / 2);
-    margin-bottom: 20px;
-    filter: opacity(0);
+	border: 1px solid $colour-blue-grey;
+	border-radius: 5px;
+	width: calc($collection-card-width / 2);
+	margin-bottom: 20px;
+	filter: opacity(0);
 }
 
 .collection-card:hover .top-bar {
-    animation: slide-in-from-right $hover-animation-duration ease forwards;
+	animation: slide-in-from-right $hover-animation-duration ease forwards;
 }
 
 .bottom-bar {
-    border: 1px solid $colour-blue-grey;
-    border-radius: 5px;
-    width: calc($collection-card-width / 2);
-    margin-top: 20px;
-    filter: opacity(0);
+	border: 1px solid $colour-blue-grey;
+	border-radius: 5px;
+	width: calc($collection-card-width / 2);
+	margin-top: 20px;
+	filter: opacity(0);
 }
 
 .collection-card:hover .bottom-bar {
-    animation: slide-in-from-left $hover-animation-duration ease forwards;
+	animation: slide-in-from-left $hover-animation-duration ease forwards;
 }
 
 .transparent {
-    filter: opacity(0);
+	filter: opacity(0);
 }
 
 @keyframes title-hover-effect {
-    0% {
-        text-shadow: none;
-        background-color: $colour-secondary;
-        -webkit-background-clip: text;
-        -moz-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        -moz-text-fill-color: transparent;
-    }
-    5% {
-        text-shadow: none;
-        background-image: linear-gradient(
-            45deg,
-            $colour-violet 0%,
-            $colour-secondary 10%
-        );
-        -webkit-background-clip: text;
-        -moz-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        -moz-text-fill-color: transparent;
-    }
-    10% {
-        text-shadow: none;
-        background-image: linear-gradient(
-            45deg,
-            $colour-violet 0%,
-            $colour-secondary 20%
-        );
-        -webkit-background-clip: text;
-        -moz-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        -moz-text-fill-color: transparent;
-    }
-    15% {
-        text-shadow: none;
-        background-image: linear-gradient(
-            45deg,
-            $colour-violet 0%,
-            $colour-secondary 30%
-        );
-        -webkit-background-clip: text;
-        -moz-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        -moz-text-fill-color: transparent;
-    }
-    20% {
-        text-shadow: none;
-        background-image: linear-gradient(
-            45deg,
-            $colour-violet 0%,
-            $colour-secondary 40%
-        );
-        -webkit-background-clip: text;
-        -moz-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        -moz-text-fill-color: transparent;
-    }
-    25% {
-        text-shadow: none;
-        background-image: linear-gradient(
-            45deg,
-            $colour-violet 0%,
-            $colour-secondary 50%
-        );
-        -webkit-background-clip: text;
-        -moz-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        -moz-text-fill-color: transparent;
-    }
-    30% {
-        text-shadow: none;
-        background-image: linear-gradient(
-            45deg,
-            $colour-violet 0%,
-            $colour-secondary 60%
-        );
-        -webkit-background-clip: text;
-        -moz-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        -moz-text-fill-color: transparent;
-    }
-    35% {
-        text-shadow: none;
-        background-image: linear-gradient(
-            45deg,
-            $colour-violet 0%,
-            $colour-secondary 70%
-        );
-        -webkit-background-clip: text;
-        -moz-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        -moz-text-fill-color: transparent;
-    }
-    40% {
-        text-shadow: none;
-        background-image: linear-gradient(
-            45deg,
-            $colour-violet 0%,
-            $colour-secondary 80%
-        );
-        -webkit-background-clip: text;
-        -moz-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        -moz-text-fill-color: transparent;
-    }
-    45% {
-        text-shadow: none;
-        background-image: linear-gradient(
-            45deg,
-            $colour-violet 0%,
-            $colour-secondary 90%
-        );
-        -webkit-background-clip: text;
-        -moz-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        -moz-text-fill-color: transparent;
-    }
-    50% {
-        text-shadow: none;
-        background-image: linear-gradient(
-            45deg,
-            $colour-violet 0%,
-            $colour-secondary 100%
-        );
-        -webkit-background-clip: text;
-        -moz-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        -moz-text-fill-color: transparent;
-    }
-    55% {
-        text-shadow: none;
-        background-image: linear-gradient(
-            45deg,
-            $colour-violet 10%,
-            $colour-secondary 100%
-        );
-        -webkit-background-clip: text;
-        -moz-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        -moz-text-fill-color: transparent;
-    }
-    60% {
-        text-shadow: none;
-        background-image: linear-gradient(
-            45deg,
-            $colour-violet 20%,
-            $colour-secondary 100%
-        );
-        -webkit-background-clip: text;
-        -moz-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        -moz-text-fill-color: transparent;
-    }
-    65% {
-        text-shadow: none;
-        background-image: linear-gradient(
-            45deg,
-            $colour-violet 30%,
-            $colour-secondary 100%
-        );
-        -webkit-background-clip: text;
-        -moz-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        -moz-text-fill-color: transparent;
-    }
-    70% {
-        text-shadow: none;
-        background-image: linear-gradient(
-            45deg,
-            $colour-violet 40%,
-            $colour-secondary 100%
-        );
-        -webkit-background-clip: text;
-        -moz-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        -moz-text-fill-color: transparent;
-    }
-    75% {
-        text-shadow: none;
-        background-image: linear-gradient(
-            45deg,
-            $colour-violet 50%,
-            $colour-secondary 100%
-        );
-        -webkit-background-clip: text;
-        -moz-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        -moz-text-fill-color: transparent;
-    }
-    80% {
-        text-shadow: none;
-        background-image: linear-gradient(
-            45deg,
-            $colour-violet 60%,
-            $colour-secondary 100%
-        );
-        -webkit-background-clip: text;
-        -moz-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        -moz-text-fill-color: transparent;
-    }
-    85% {
-        text-shadow: none;
-        background-image: linear-gradient(
-            45deg,
-            $colour-violet 70%,
-            $colour-secondary 100%
-        );
-        -webkit-background-clip: text;
-        -moz-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        -moz-text-fill-color: transparent;
-    }
-    90% {
-        text-shadow: none;
-        background-image: linear-gradient(
-            45deg,
-            $colour-violet 80%,
-            $colour-secondary 100%
-        );
-        -webkit-background-clip: text;
-        -moz-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        -moz-text-fill-color: transparent;
-    }
-    95% {
-        text-shadow: none;
-        background-image: linear-gradient(
-            45deg,
-            $colour-violet 90%,
-            $colour-secondary 100%
-        );
-        -webkit-background-clip: text;
-        -moz-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        -moz-text-fill-color: transparent;
-    }
-    100% {
-        text-shadow: none;
-        background-color: $colour-violet;
-        -webkit-background-clip: text;
-        -moz-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        -moz-text-fill-color: transparent;
-        transform: translate(0, $hover-animation-text-offset);
-    }
+	0% {
+		text-shadow: none;
+		background-color: $colour-secondary;
+		-webkit-background-clip: text;
+		-moz-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		-moz-text-fill-color: transparent;
+	}
+	5% {
+		text-shadow: none;
+		background-image: linear-gradient(
+			45deg,
+			$colour-violet 0%,
+			$colour-secondary 10%
+		);
+		-webkit-background-clip: text;
+		-moz-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		-moz-text-fill-color: transparent;
+	}
+	10% {
+		text-shadow: none;
+		background-image: linear-gradient(
+			45deg,
+			$colour-violet 0%,
+			$colour-secondary 20%
+		);
+		-webkit-background-clip: text;
+		-moz-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		-moz-text-fill-color: transparent;
+	}
+	15% {
+		text-shadow: none;
+		background-image: linear-gradient(
+			45deg,
+			$colour-violet 0%,
+			$colour-secondary 30%
+		);
+		-webkit-background-clip: text;
+		-moz-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		-moz-text-fill-color: transparent;
+	}
+	20% {
+		text-shadow: none;
+		background-image: linear-gradient(
+			45deg,
+			$colour-violet 0%,
+			$colour-secondary 40%
+		);
+		-webkit-background-clip: text;
+		-moz-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		-moz-text-fill-color: transparent;
+	}
+	25% {
+		text-shadow: none;
+		background-image: linear-gradient(
+			45deg,
+			$colour-violet 0%,
+			$colour-secondary 50%
+		);
+		-webkit-background-clip: text;
+		-moz-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		-moz-text-fill-color: transparent;
+	}
+	30% {
+		text-shadow: none;
+		background-image: linear-gradient(
+			45deg,
+			$colour-violet 0%,
+			$colour-secondary 60%
+		);
+		-webkit-background-clip: text;
+		-moz-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		-moz-text-fill-color: transparent;
+	}
+	35% {
+		text-shadow: none;
+		background-image: linear-gradient(
+			45deg,
+			$colour-violet 0%,
+			$colour-secondary 70%
+		);
+		-webkit-background-clip: text;
+		-moz-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		-moz-text-fill-color: transparent;
+	}
+	40% {
+		text-shadow: none;
+		background-image: linear-gradient(
+			45deg,
+			$colour-violet 0%,
+			$colour-secondary 80%
+		);
+		-webkit-background-clip: text;
+		-moz-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		-moz-text-fill-color: transparent;
+	}
+	45% {
+		text-shadow: none;
+		background-image: linear-gradient(
+			45deg,
+			$colour-violet 0%,
+			$colour-secondary 90%
+		);
+		-webkit-background-clip: text;
+		-moz-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		-moz-text-fill-color: transparent;
+	}
+	50% {
+		text-shadow: none;
+		background-image: linear-gradient(
+			45deg,
+			$colour-violet 0%,
+			$colour-secondary 100%
+		);
+		-webkit-background-clip: text;
+		-moz-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		-moz-text-fill-color: transparent;
+	}
+	55% {
+		text-shadow: none;
+		background-image: linear-gradient(
+			45deg,
+			$colour-violet 10%,
+			$colour-secondary 100%
+		);
+		-webkit-background-clip: text;
+		-moz-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		-moz-text-fill-color: transparent;
+	}
+	60% {
+		text-shadow: none;
+		background-image: linear-gradient(
+			45deg,
+			$colour-violet 20%,
+			$colour-secondary 100%
+		);
+		-webkit-background-clip: text;
+		-moz-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		-moz-text-fill-color: transparent;
+	}
+	65% {
+		text-shadow: none;
+		background-image: linear-gradient(
+			45deg,
+			$colour-violet 30%,
+			$colour-secondary 100%
+		);
+		-webkit-background-clip: text;
+		-moz-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		-moz-text-fill-color: transparent;
+	}
+	70% {
+		text-shadow: none;
+		background-image: linear-gradient(
+			45deg,
+			$colour-violet 40%,
+			$colour-secondary 100%
+		);
+		-webkit-background-clip: text;
+		-moz-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		-moz-text-fill-color: transparent;
+	}
+	75% {
+		text-shadow: none;
+		background-image: linear-gradient(
+			45deg,
+			$colour-violet 50%,
+			$colour-secondary 100%
+		);
+		-webkit-background-clip: text;
+		-moz-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		-moz-text-fill-color: transparent;
+	}
+	80% {
+		text-shadow: none;
+		background-image: linear-gradient(
+			45deg,
+			$colour-violet 60%,
+			$colour-secondary 100%
+		);
+		-webkit-background-clip: text;
+		-moz-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		-moz-text-fill-color: transparent;
+	}
+	85% {
+		text-shadow: none;
+		background-image: linear-gradient(
+			45deg,
+			$colour-violet 70%,
+			$colour-secondary 100%
+		);
+		-webkit-background-clip: text;
+		-moz-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		-moz-text-fill-color: transparent;
+	}
+	90% {
+		text-shadow: none;
+		background-image: linear-gradient(
+			45deg,
+			$colour-violet 80%,
+			$colour-secondary 100%
+		);
+		-webkit-background-clip: text;
+		-moz-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		-moz-text-fill-color: transparent;
+	}
+	95% {
+		text-shadow: none;
+		background-image: linear-gradient(
+			45deg,
+			$colour-violet 90%,
+			$colour-secondary 100%
+		);
+		-webkit-background-clip: text;
+		-moz-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		-moz-text-fill-color: transparent;
+	}
+	100% {
+		text-shadow: none;
+		background-color: $colour-violet;
+		-webkit-background-clip: text;
+		-moz-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		-moz-text-fill-color: transparent;
+		transform: translate(0, $hover-animation-text-offset);
+	}
 }
 
 @keyframes slide-in-from-right {
-    0% {
-        filter: opacity(0);
-        transform: translate(
-            calc($collection-card-width - 50%),
-            $hover-animation-text-offset
-        );
-    }
-    70% {
-        filter: opacity(0);
-    }
-    100% {
-        filter: opacity(1);
-        transform: translate(0, $hover-animation-text-offset);
-    }
+	0% {
+		filter: opacity(0);
+		transform: translate(
+			calc($collection-card-width - 50%),
+			$hover-animation-text-offset
+		);
+	}
+	70% {
+		filter: opacity(0);
+	}
+	100% {
+		filter: opacity(1);
+		transform: translate(0, $hover-animation-text-offset);
+	}
 }
 
 @keyframes slide-in-from-left {
-    0% {
-        filter: opacity(0);
-        transform: translate(
-            calc(-1 * $collection-card-width + 50%),
-            $hover-animation-text-offset
-        );
-    }
-    70% {
-        filter: opacity(0);
-    }
-    100% {
-        filter: opacity(1);
-        transform: translate(0, $hover-animation-text-offset);
-    }
+	0% {
+		filter: opacity(0);
+		transform: translate(
+			calc(-1 * $collection-card-width + 50%),
+			$hover-animation-text-offset
+		);
+	}
+	70% {
+		filter: opacity(0);
+	}
+	100% {
+		filter: opacity(1);
+		transform: translate(0, $hover-animation-text-offset);
+	}
 }
 
 @keyframes slide-in-from-below {
-    0% {
-    }
-    70% {
-    }
-    100% {
-        filter: opacity(1);
-        transform: translate(0, $hover-animation-text-offset);
-    }
+	0% {
+	}
+	70% {
+	}
+	100% {
+		filter: opacity(1);
+		transform: translate(0, $hover-animation-text-offset);
+	}
 }

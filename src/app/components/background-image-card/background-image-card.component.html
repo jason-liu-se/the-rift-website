@@ -1,20 +1,20 @@
 <div
-    class="background-image-card"
-    [style.background-image]="'url(' + backgroundImgSrc + ')'"
+	class="background-image-card"
+	[style.background-image]="'url(' + src + ')'"
 >
-    <div class="overlay-content">
-        <div class="text-container">
-            @if (showTitle) {
-                @if (isPageTitle) {
-                    <h1 class="title">{{ title }}</h1>
-                }
-                @if (!isPageTitle) {
-                    <h2 class="title">{{ title }}</h2>
-                }
-            }
-            @if (showDescription) {
-                <p class="description">{{ description }}</p>
-            }
-        </div>
-    </div>
+	<div class="overlay-content">
+		<div class="text-container">
+			@if (showTitle) {
+				@if (isPageTitle) {
+					<h1 class="title">{{ title }}</h1>
+				}
+				@if (!isPageTitle) {
+					<h2 class="title">{{ title }}</h2>
+				}
+			}
+			@if (showDescription) {
+				<p class="description">{{ desc }}</p>
+			}
+		</div>
+	</div>
 </div>

@@ -1,30 +1,32 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
-    selector: 'app-download-card',
-    templateUrl: './download-card.component.html',
-    styleUrls: ['./download-card.component.scss'],
-    standalone: false
+	selector: 'app-download-card',
+	templateUrl: './download-card.component.html',
+	styleUrls: ['./download-card.component.scss'],
+	imports: [MatButton, MatIcon]
 })
 export class DownloadCardComponent implements OnInit {
-    @Input() public title: string = '';
-    @Input() public desc: string = '';
-    @Input({ alias: 'src', required: true }) public downloadUrl!: string;
-    @Input('imgSrc') public backgroundImgSrc: string = '';
+	@Input() public title = '';
+	@Input() public desc = '';
+	@Input({ required: true }) public src!: string;
+	@Input() public imgSrc = '';
 
-    public showTitle: boolean = false;
-    public showDesc: boolean = false;
+	public showTitle = false;
+	public showDesc = false;
 
-    ngOnInit(): void {
-        if (this.title !== '') {
-            this.showTitle = true;
-        }
+	ngOnInit(): void {
+		if (this.title !== '') {
+			this.showTitle = true;
+		}
 
-        if (this.desc !== '') {
-            this.showDesc = true;
-        }
+		if (this.desc !== '') {
+			this.showDesc = true;
+		}
 
-        // preparing the image URL for CSS styling
-        this.backgroundImgSrc = 'url(' + this.backgroundImgSrc + ')';
-    }
+		// preparing the image URL for CSS styling
+		this.imgSrc = 'url(' + this.imgSrc + ')';
+	}
 }

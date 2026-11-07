@@ -1,27 +1,27 @@
 .news-page {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
 }
 
 .background-image-card {
-    width: 100%;
+	width: 100%;
 }
 
 .news-display {
-    max-width: 55rem;
+	max-width: 55rem;
 }
 
 .paginated-news-display-container {
-    width: fit-content;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding-left: calc(100vw - 100%);
-    margin: 20px 0;
+	width: fit-content;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	padding-left: calc(100vw - 100%);
+	margin: 20px 0;
 }
 
 .paginator {
-    justify-self: flex-end;
+	justify-self: flex-end;
 }

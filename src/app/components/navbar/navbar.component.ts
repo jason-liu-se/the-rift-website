@@ -1,37 +1,40 @@
-import { Component, HostListener, Input } from '@angular/core';
+import { Component, HostListener, Input, inject } from '@angular/core';
 import { ViewportScroller } from '@angular/common';
+import { MatIcon } from '@angular/material/icon';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { MatButton } from '@angular/material/button';
 
 @Component({
-    selector: 'app-navbar',
-    templateUrl: './navbar.component.html',
-    styleUrls: ['./navbar.component.scss'],
-    standalone: false
+	selector: 'app-navbar',
+	templateUrl: './navbar.component.html',
+	styleUrls: ['./navbar.component.scss'],
+	imports: [MatIcon, RouterLink, RouterLinkActive, MatButton]
 })
 export class NavbarComponent {
-    @Input('transparent') public isTransparent: boolean = true;
+	private viewportScroller = inject(ViewportScroller);
 
-    public isHamburgerMenuVisible: boolean = false;
+	@Input() public transparent = true;
 
-    constructor(private viewportScroller: ViewportScroller) {}
+	public isHamburgerMenuVisible = false;
 
-    public handlePageScroll(elemId: string): void {
-        this.viewportScroller.scrollToAnchor(elemId);
-    }
+	public handlePageScroll(elemId: string): void {
+		this.viewportScroller.scrollToAnchor(elemId);
+	}
 
-    public toggleHamburgerMenu(): void {
-        this.isHamburgerMenuVisible = !this.isHamburgerMenuVisible;
-    }
+	public toggleHamburgerMenu(): void {
+		this.isHamburgerMenuVisible = !this.isHamburgerMenuVisible;
+	}
 
-    @HostListener('window:resize', ['$event'])
-    onResize(event: any) {
-        const breakpoint: number =
-            60 *
-            parseFloat(getComputedStyle(document.documentElement).fontSize);
-        const elem: any = event.target;
+	@HostListener('window:resize', ['$event'])
+	onResize(event: UIEvent) {
+		const breakpoint: number =
+			60 *
+			parseFloat(getComputedStyle(document.documentElement).fontSize);
+		const elem = event.target as Window;
 
-        // disabling the hamburger menu when the window size is greater than 60rem
-        if (elem.innerWidth >= breakpoint) {
-            this.isHamburgerMenuVisible = false;
-        }
-    }
+		// disabling the hamburger menu when the window size is greater than 60rem
+		if (elem.innerWidth >= breakpoint) {
+			this.isHamburgerMenuVisible = false;
+		}
+	}
 }

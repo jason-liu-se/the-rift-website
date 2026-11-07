@@ -1,100 +1,100 @@
-@use '../../../font-sizes' as *;
-@use '../../../theme-colours' as *;
+@use "../../../font-sizes" as *;
+@use "../../../theme-colours" as *;
 
 $max-content-width: 500px;
 $max-image-height: 150px;
 
 .card-wrapper {
-    overflow: hidden;
-    position: relative;
+	overflow: hidden;
+	position: relative;
 }
 
 .card {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center center;
-    height: 100vh;
-    // width: 100%;
-    // height: 0;
-    // padding-top: 56.25%; /* (img-height / img-width * container-width-percent) */
-    position: relative;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	overflow: hidden;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center center;
+	height: 100vh;
+	// width: 100%;
+	// height: 0;
+	// padding-top: 56.25%; /* (img-height / img-width * container-width-percent) */
+	position: relative;
 }
 
 .card > * {
-    z-index: 2;
+	z-index: 2;
 }
 
 .card::after {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 1;
-    content: '';
-    background: radial-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 1;
+	content: "";
+	background: radial-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
 }
 
 .card-content {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    // position: absolute;
-    // top: clamp(0px, 50vh, 50%);
-    // transform: translate(0, -50%);
-    width: 100%;
-    max-width: 55rem;
-    white-space: pre-line;
-    text-align: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	// position: absolute;
+	// top: clamp(0px, 50vh, 50%);
+	// transform: translate(0, -50%);
+	width: 100%;
+	max-width: 55rem;
+	white-space: pre-line;
+	text-align: center;
 }
 
 .card-container {
-    width: $max-content-width;
-    // background-color: rgba(0, 0, 0, 0.2);
-    // backdrop-filter: blur(3px);
-    // border: 1px solid #333333;
-    padding: 30px 10px;
-    margin: 0px;
-    border-radius: 10px;
+	width: $max-content-width;
+	// background-color: rgba(0, 0, 0, 0.2);
+	// backdrop-filter: blur(3px);
+	// border: 1px solid #333333;
+	padding: 30px 10px;
+	margin: 0px;
+	border-radius: 10px;
 }
 
 .image-header {
-    width: 100%;
+	width: 100%;
 }
 
 .image {
-    max-height: $max-image-height;
-    max-width: 100%;
+	max-height: $max-image-height;
+	max-width: 100%;
 }
 
 .description {
-    color: rgb(240, 240, 240);
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
-    font-size: $font-size-medium-plus;
-    line-height: 1.3em;
-    width: 100%;
-    padding: 0.2em 0 1.3em 0;
+	color: rgb(240, 240, 240);
+	text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+	font-size: $font-size-medium-plus;
+	line-height: 1.3em;
+	width: 100%;
+	padding: 0.2em 0 1.3em 0;
 }
 
 .down-icon-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    bottom: 0;
-    left: 50vw;
-    transform: translate(-50%, -50%);
-    z-index: 3;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: absolute;
+	bottom: 0;
+	left: 50vw;
+	transform: translate(-50%, -50%);
+	z-index: 3;
 }
 
 .down-icon {
-    color: white;
-    font-size: 3rem;
-    width: fit-content;
-    height: fit-content;
+	color: white;
+	font-size: 3rem;
+	width: fit-content;
+	height: fit-content;
 }

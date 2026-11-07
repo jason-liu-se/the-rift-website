@@ -1,9 +1,9 @@
-@use '../../../theme-colours' as *;
+@use "../../../theme-colours" as *;
 
 .form-button {
-    margin: 20px;
+	margin: 20px;
 }
 
 .form-button:hover {
-    filter: grayscale(0.2);
+	filter: grayscale(0.2);
 }

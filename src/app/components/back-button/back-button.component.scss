@@ -1,42 +1,42 @@
-@use '../../../theme-colours' as *;
-@use '../../../font-sizes' as *;
+@use "../../../theme-colours" as *;
+@use "../../../font-sizes" as *;
 
 $colour-transition-duration: 0.1s;
 
 .back-button {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    position: relative;
-    background-color: transparent;
-    border: none;
-    padding: 0px;
-    color: $colour-dark-text;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	position: relative;
+	background-color: transparent;
+	border: none;
+	padding: 0px;
+	color: $colour-dark-text;
 }
 
 .chevron {
-    position: relative;
-    scale: 0.5;
-    height: $font-size-medium;
-    width: $font-size-medium;
-    border-style: solid none none solid;
-    transform: rotate(-45deg);
-    border-radius: 5px;
-    border-width: 0.3em;
-    top: 0.05em;
-    left: 0.1em;
-    transition: all $colour-transition-duration ease;
+	position: relative;
+	scale: 0.5;
+	height: $font-size-medium;
+	width: $font-size-medium;
+	border-style: solid none none solid;
+	transform: rotate(-45deg);
+	border-radius: 5px;
+	border-width: 0.3em;
+	top: 0.05em;
+	left: 0.1em;
+	transition: all $colour-transition-duration ease;
 }
 
 .back-button-link {
-    display: block;
-    text-decoration: none;
-    font-size: $font-size-medium;
-    font-weight: bold;
-    transition: all $colour-transition-duration ease;
+	display: block;
+	text-decoration: none;
+	font-size: $font-size-medium;
+	font-weight: bold;
+	transition: all $colour-transition-duration ease;
 }
 
 .back-button:hover {
-    color: $colour-violet;
-    cursor: pointer;
+	color: $colour-violet;
+	cursor: pointer;
 }

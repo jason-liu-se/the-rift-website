@@ -1,19 +1,19 @@
 <div class="download-card-wrapper">
-    <div class="download-card" [style.background-image]="backgroundImgSrc">
-        <div class="containers">
-            <div class="text-container">
-                <h2 class="title">{{ title }}</h2>
-                <p class="description">{{ desc }}</p>
-            </div>
-            <button
-                class="download-button"
-                mat-flat-button
-                color="primary"
-                disableRipple
-            >
-                <mat-icon>open_in_new</mat-icon>
-                Download
-            </button>
-        </div>
-    </div>
+	<div class="download-card" [style.background-image]="imgSrc">
+		<div class="containers">
+			<div class="text-container">
+				<h2 class="title">{{ title }}</h2>
+				<p class="description">{{ desc }}</p>
+			</div>
+			<button
+				class="download-button"
+				mat-flat-button
+				color="primary"
+				disableRipple
+			>
+				<mat-icon>open_in_new</mat-icon>
+				Download
+			</button>
+		</div>
+	</div>
 </div>

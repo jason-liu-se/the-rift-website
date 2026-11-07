@@ -1,21 +1,21 @@
 .page-template {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
 }
 
 .template {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
+	display: flex;
+	flex-direction: column;
+	flex: 1;
 }
 
 .upper-content {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
+	display: flex;
+	flex: 1;
+	flex-direction: column;
 }
 
 .lower-content {
-    justify-content: flex-end;
+	justify-content: flex-end;
 }

@@ -1,69 +1,69 @@
-@use '../../../../font-sizes' as *;
+@use "../../../../font-sizes" as *;
 
 $news-container-margin: 20px;
 $news-item-padding: 15px;
 
 .news-display {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    margin: 0 1rem;
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	margin: 0 1rem;
 }
 
 .news-container {
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    max-width: 55rem;
-    list-style: none;
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	max-width: 55rem;
+	list-style: none;
 }
 
 .news-container > .news-item {
-    margin: $news-container-margin 0;
+	margin: $news-container-margin 0;
 }
 
 .news-item {
-    width: calc(100% - 2 * $news-item-padding);
-    outline: 1px solid rgba(0, 0, 0, 0.124);
-    border-radius: 5px;
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.15);
-    overflow: hidden;
+	width: calc(100% - 2 * $news-item-padding);
+	outline: 1px solid rgba(0, 0, 0, 0.124);
+	border-radius: 5px;
+	box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.15);
+	overflow: hidden;
 }
 
 .banner-img {
-    width: 100%;
-    max-height: 100%;
+	width: 100%;
+	max-height: 100%;
 }
 
 .news-item-content {
-    padding: $news-item-padding;
+	padding: $news-item-padding;
 }
 
 .title,
 .date,
 .content {
-    white-space: pre-line;
+	white-space: pre-line;
 }
 
 .title {
-    margin: 0;
-    font-weight: 700;
+	margin: 0;
+	font-weight: 700;
 }
 
 .date {
-    font-size: $font-size-small;
+	font-size: $font-size-small;
 }
 
 .separator {
-    border: none;
-    height: 1px;
-    background-color: rgba(0, 0, 0, 0.124);
-    color: rgba(0, 0, 0, 0.124);
-    border-radius: 10px;
+	border: none;
+	height: 1px;
+	background-color: rgba(0, 0, 0, 0.124);
+	color: rgba(0, 0, 0, 0.124);
+	border-radius: 10px;
 }
 
 .content {
-    margin: 0;
-    line-height: calc($font-size-medium + 0.2em);
-    font-size: $font-size-medium;
+	margin: 0;
+	line-height: calc($font-size-medium + 0.2em);
+	font-size: $font-size-medium;
 }

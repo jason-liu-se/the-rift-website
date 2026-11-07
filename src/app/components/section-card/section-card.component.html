@@ -1,35 +1,35 @@
 <div class="section-card-wrapper {{ backgroundTypeClass }}">
-    <div
-        class="section-card {{ sectionPaddingX ? 'padding-x' : '' }} {{
-            sectionPaddingY ? 'padding-y' : ''
-        }}"
-    >
-        <div class="containers {{ imagePositionClass }}">
-            @if (showTitle || showContent) {
-                <div class="main-container">
-                    @if (showTitle) {
-                        <h2 class="title {{ titlePositionClass }}">
-                            {{ title }}
-                        </h2>
-                    }
-                    @if (showTitle && showContent) {
-                        <div class="section-break"></div>
-                    }
-                    @if (showContent) {
-                        <p class="content {{ contentPositionClass }}">
-                            {{ content }}
-                        </p>
-                    }
-                    <div class="dynamic-content {{ contentPositionClass }}">
-                        <ng-content></ng-content>
-                    </div>
-                </div>
-            }
-            @if (showImage) {
-                <div class="image-container">
-                    <img src="{{ imageUrl }}" class="image" />
-                </div>
-            }
-        </div>
-    </div>
+	<div
+		class="section-card {{ paddingX ? 'padding-x' : '' }} {{
+			paddingY ? 'padding-y' : ''
+		}}"
+	>
+		<div class="containers {{ imagePositionClass }}">
+			@if (showTitle || showContent) {
+				<div class="main-container">
+					@if (showTitle) {
+						<h2 class="title {{ titlePositionClass }}">
+							{{ title }}
+						</h2>
+					}
+					@if (showTitle && showContent) {
+						<div class="section-break"></div>
+					}
+					@if (showContent) {
+						<p class="content {{ contentPositionClass }}">
+							{{ content }}
+						</p>
+					}
+					<div class="dynamic-content {{ contentPositionClass }}">
+						<ng-content></ng-content>
+					</div>
+				</div>
+			}
+			@if (showImage) {
+				<div class="image-container">
+					<img src="{{ img }}" [alt]="imgAlt" class="image" />
+				</div>
+			}
+		</div>
+	</div>
 </div>
