@@ -16,11 +16,6 @@ import { BlueMapPageComponent } from './pages/blue-map-page/blue-map-page.compon
 const routes: Routes = [
 	{
 		path: '',
-		redirectTo: '/home',
-		pathMatch: 'full'
-	},
-	{
-		path: 'home',
 		component: PageTemplateComponent,
 		title: 'The Rift - Home',
 		data: { component: HomePageComponent, showContactSection: true }
