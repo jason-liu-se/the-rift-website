@@ -1,0 +1,64 @@
+---
+name: new-page
+description:
+    Add a new routed page to The Rift website, or a variant of an existing page
+    (e.g. another gallery collection or BlueMap map). Use when asked to add,
+    create, or scaffold a page or route.
+argument-hint: <page name or description>
+---
+
+Add the page described in: $ARGUMENTS
+
+Follow the architecture in `CLAUDE.md`. Every route renders
+`PageTemplateComponent` and names its page in `data.component`.
+
+## 1. New component or new route?
+
+Read `src/app/app-routing.module.ts` and `src/app/pages/`. If an existing page
+already does this from route data (e.g. `GalleryShowcasePageComponent` with
+`collection`, `BlueMapPageComponent` with `mapName`), **add a route only** and
+skip to step 3. If you're not sure, ask the user.
+
+## 2. Generate the page
+
+```bash
+npm run ng -- generate component pages/<name>-page
+```
+
+- Build the page from existing `src/app/components/` before writing new markup.
+  If a piece is reusable, make it its own component under `components/`.
+- If the page needs API data, add or reuse a service in `src/app/services/` with
+  endpoints from `Constants`, and handle loading, empty, and error states.
+- If the page reads its own route data, inject `ActivatedRoute` and read it as
+  `snapshot.data['key']`.
+
+## 3. Add the route
+
+Add the route to `src/app/app-routing.module.ts` before the `**` wildcard:
+
+- `component: PageTemplateComponent`
+- `title` in the existing `The Rift - <Page>` format
+- `data.component` set to the page, plus any shell flags it needs. Check
+  `PageTemplateComponent` for the flags and their defaults, and only set flags
+  that differ from the defaults.
+
+## 4. Navigation
+
+Ask the user whether the page belongs in the navbar
+(`src/app/components/navbar/`) or should be linked from another page. Don't
+decide this yourself.
+
+## 5. Tests
+
+Replace the generated "should create" spec with tests of real behaviour:
+rendered content, the requests the page makes, and how it uses route data. Use
+the providers listed under Testing in `CLAUDE.md`. Run:
+
+```bash
+npm test -- --watch=false --include src/app/pages/<name>-page
+```
+
+## 6. Finish
+
+- Update `README.md` if it describes something this page changes.
+- Run `/pre-pr` (or tell the user to run it) before committing.
