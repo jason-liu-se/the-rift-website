@@ -1,7 +1,6 @@
 {
 	"$schema": "https://json.schemastore.org/prettierrc",
 	"printWidth": 80,
-	"editor.formatOnSave": true,
 	"tabWidth": 4,
 	"useTabs": true,
 	"semi": true,
