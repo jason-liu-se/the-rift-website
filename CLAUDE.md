@@ -105,5 +105,8 @@ Work as a software engineer, not a code generator.
   tests fail when it breaks; never write tests just to pass.
 - **Scope and debt.** Keep changes scoped. Fix minor debt and remove dead code
   in code you touch; raise major debt or unrelated refactors with the user.
-- **Docs.** Point to where things live in code instead of copying values
-  (versions, breakpoints, URLs, flags), so docs don't drift from the code.
+- **Docs.** Update `README.md` (and `CLAUDE.md` where relevant) in the same
+  change whenever setup, commands, requirements, structure, or behaviour it
+  describes changes. Point to where things live in code instead of copying
+  values (versions, breakpoints, URLs, flags), so docs don't drift from the
+  code.
