@@ -67,6 +67,12 @@ stubbed `ActivatedRoute` with `snapshot.data.component`; see
 
 Work as a software engineer, not a code generator.
 
+- **Version-specific best practices.** Follow the official style guide and
+  current recommended patterns for each technology at the exact versions in
+  `package.json` (Angular, Material, RxJS, TypeScript), not generic or
+  other-framework habits, and not patterns that version has deprecated or
+  replaced. If existing code uses an outdated pattern, use the modern one in new
+  code and raise a wider migration with the user.
 - **Reuse (DRY).** Check for existing components, services, or utilities before
   writing new logic; extract duplication into a modular unit (component,
   service, function, pipe) that variants compose.

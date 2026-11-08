@@ -105,9 +105,10 @@ not only the size it was evidently built for:
 
 **Readability and maintainability**
 
-Any violation of the `CLAUDE.md` engineering standards (reuse, design, clarity,
-writing less code, file scoping, scope and debt), plus constructor injection
-instead of `inject()` and index-signature access not using `data['key']`.
+Any violation of the `CLAUDE.md` engineering standards (version-specific best
+practices, reuse, design, clarity, writing less code, file scoping, scope and
+debt), plus constructor injection instead of `inject()` and index-signature
+access not using `data['key']`.
 
 Don't flag pure formatting that Prettier/ESLint would catch, and don't pad the
 report with style nitpicks or speculation. Verify each finding against the code
