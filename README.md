@@ -77,7 +77,6 @@ src/
 │   ├── services/         API clients and shared application services
 │   ├── utilities/        Small shared utilities and pipes
 │   ├── app-routing.module.ts
-│   ├── app.module.ts
 │   └── app.component.*
 ├── assets/               Images, icons, and other static assets
 ├── main.ts               Application bootstrap
@@ -102,7 +101,12 @@ npm run ng -- generate interface interfaces/example
 
 ## Architecture
 
-The application is bootstrapped from `src/main.ts` into `AppModule`.
+The application uses standalone components. `src/main.ts` bootstraps
+`AppComponent` with `bootstrapApplication` and registers the application-wide
+providers, including `AppRoutingModule` (via `importProvidersFrom`) and
+`HttpClient`. Each component declares its own dependencies in its `imports`
+array; there is no root `NgModule`.
+
 `AppRoutingModule` defines the public routes and uses `PageTemplateComponent` as
 the shared page shell. Page-specific components are supplied through route data
 and rendered by the page-template directive.
