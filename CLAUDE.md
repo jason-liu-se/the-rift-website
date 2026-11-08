@@ -115,4 +115,5 @@ Work as a software engineer, not a code generator.
   change whenever setup, commands, requirements, structure, or behaviour it
   describes changes. Point to where things live in code instead of copying
   values (versions, breakpoints, URLs, flags), so docs don't drift from the
-  code.
+  code. Don't list Claude tooling (hooks, skills, agents, MCP servers) in
+  `CLAUDE.md`; Claude discovers these on its own.

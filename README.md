@@ -9,8 +9,10 @@ services; see [External services](#external-services).
 
 ## Requirements
 
-- Node.js 20.19+, 22.12+, or 24+ (the project currently uses Angular 21 and
-  TypeScript 5.9)
+- Node.js at the version in [`.nvmrc`](./.nvmrc) (run `nvm use`). Other versions
+  must be on Angular's
+  [supported Node.js list](https://angular.dev/reference/versions); newer majors
+  work for npm but the Angular CLI reports them as unsupported.
 - npm 11.x (npm 10.9.3 fails to resolve the Angular 21 dependencies)
 - A modern browser
 - The separate The Rift API server for dynamic news, gallery, and download
@@ -123,6 +125,23 @@ The main architectural areas are:
   data.
 - **Assets and styles:** Static images plus global and Angular Material theme
   styles bundled by the Angular CLI.
+
+## Claude Code
+
+The repository includes shared [Claude Code](https://claude.com/claude-code)
+configuration:
+
+- [`CLAUDE.md`](./CLAUDE.md): project guidance and engineering standards.
+- [`.claude/settings.json`](./.claude/settings.json): shared permissions and
+  hooks that format each file Claude edits and log each shell command Claude
+  runs to `.claude/logs/commands.log`. Put personal overrides in
+  `.claude/settings.local.json`. Git ignores both the log and the local
+  settings.
+- [`.mcp.json`](./.mcp.json): the Angular CLI MCP server (`ng mcp`), enabled for
+  everyone through the shared settings.
+- [`.claude/skills/`](./.claude/skills/) and
+  [`.claude/agents/`](./.claude/agents/): project slash commands and review
+  agents.
 
 ## Troubleshooting
 
