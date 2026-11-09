@@ -31,15 +31,26 @@ npm start
 Open <http://localhost:4200/> after the development server has finished
 compiling.
 
+**Ensure that you've set the DEV and PROD `.env` variables.**
+
 ### External services
 
-The default local endpoints are defined in
-[`src/app/config/constants.ts`](./src/app/config/constants.ts):
+Service URLs live in a gitignored `.env` file in the repository root, with a
+development and a production URL for each service:
 
-| Service      | Default URL             | Used for                             |
-| ------------ | ----------------------- | ------------------------------------ |
-| The Rift API | `http://localhost:4000` | News, gallery, and download requests |
-| BlueMap      | `http://localhost:8100` | Embedded world maps                  |
+E.g.
+
+```bash
+DEV_API_URL=http://localhost:4000
+DEV_BLUEMAP_URL=http://localhost:8100
+PROD_API_URL=https://api.example.com
+PROD_BLUEMAP_URL=https://map.example.com
+```
+
+The API serves news, gallery, and download requests; BlueMap serves the embedded
+world maps. The e2e tests mock both services at the `DEV_` URLs, so those only
+need to be valid URLs there. All four variables must be set, even if you only
+use one pair.
 
 The frontend does not start either service. Start them separately before testing
 features that depend on them. The home page and static pages can still be
@@ -51,11 +62,13 @@ is unavailable. The map pages require a reachable BlueMap instance.
 | Command                   | Description                                                                                    |
 | ------------------------- | ---------------------------------------------------------------------------------------------- |
 | `npm start`               | Start the development server at `http://localhost:4200/`.                                      |
+| `npm run start:prod`      | Start the dev server with the production configuration and `PROD_` URLs.                       |
 | `npm run build`           | Create a production build in `dist/the-rift-site`.                                             |
 | `npm run watch`           | Rebuild continuously using the development configuration.                                      |
 | `npm test`                | Run the unit tests with Vitest (watch mode in a terminal, a single run on CI).                 |
 | `npm run e2e`             | Type-check and run the Playwright end-to-end and accessibility tests.                          |
 | `npm run e2e:ui`          | Type-check, then open the Playwright UI to run and debug end-to-end tests.                     |
+| `npm run env`             | Regenerate `src/environments/` from `.env` (run automatically by the commands above).          |
 | `npm run ng -- <command>` | Run an Angular CLI command, for example `npm run ng -- generate component components/example`. |
 
 ## Testing
@@ -142,7 +155,6 @@ e2e/                      Playwright end-to-end and accessibility tests
 src/
 ├── app/
 │   ├── components/       Reusable UI components
-│   ├── config/           Runtime constants such as service endpoints
 │   ├── directives/       Custom Angular directives
 │   ├── interfaces/       TypeScript data contracts
 │   ├── pages/            Routed page components
@@ -151,6 +163,7 @@ src/
 │   ├── app-routing.module.ts
 │   └── app.component.*
 ├── assets/               Images, icons, and other static assets
+├── environments/         Generated per-build settings (see External services)
 ├── main.ts               Application bootstrap
 ├── styles.scss           Global styles
 ├── theme.scss            Angular Material theme
@@ -217,11 +230,10 @@ configuration:
 
 ### The app loads but dynamic content is missing
 
-Confirm that the API server is running at `http://localhost:4000`, or update
-`src/app/config/constants.ts` to the correct endpoint. Check the browser
-developer console for failed requests and cross-origin (CORS) errors.
+Confirm that the API server is running at `DEV_API_URL` in `.env`, or update it
+to the correct endpoint and restart `npm start`.
 
 ### Map pages are blank
 
-Confirm that BlueMap is running at `http://localhost:8100` and that its
+Confirm that BlueMap is running at `DEV_BLUEMAP_URL` in `.env` and that its
 configured map names match the routes in `src/app/app-routing.module.ts`.

@@ -89,8 +89,9 @@ not only the size it was evidently built for:
 
 - New route not linked from the navbar (or vice versa), or route data that
   doesn't match what `PageTemplateComponent` and the page expect.
-- Hard-coded URLs instead of `Constants`; a new endpoint not added for every
-  environment.
+- Hard-coded URLs instead of `environment`; a new setting not added to
+  `IEnvironment`, `scripts/generate-environments.mjs`, and the README `.env`
+  table.
 - An interface changed in `src/app/interfaces/` but not every consumer updated.
 - Specs not updated or added for changed behaviour, missing the test setup
   `CLAUDE.md` requires, or written to pass rather than to catch regressions.

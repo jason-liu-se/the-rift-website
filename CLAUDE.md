@@ -14,6 +14,7 @@ community. Node/npm requirements are in `README.md`; framework versions in
 ```bash
 npm ci                                 # install
 npm start                              # dev server
+npm run start:prod                     # dev server with prod .env variables
 npm run build                          # production build (output path in angular.json)
 npm test                               # Vitest unit tests (jsdom)
 npm test -- --include <path/to/spec>   # single spec file
@@ -50,12 +51,12 @@ lints and formats staged files.
   can read their own values from route data, so a variant of an existing page
   (e.g. another gallery collection or map) is usually just a new route.
 - **External services.** A separate The Rift API (news, gallery, downloads) and
-  a BlueMap server (embedded maps), neither started by this repo. Endpoints live
-  in `src/assets/config.json`, fetched before bootstrap
-  (`src/app/config/app-config.ts`) so deployments can change them without a
-  rebuild. Inject `APP_CONFIG`, never hard-code URLs, and add new keys to
-  `IAppConfig`. Specs that reach `APP_CONFIG` need `provideTestAppConfig()`
-  (`app-config.testing.ts`). Map route data must match BlueMap map ids.
+  a BlueMap server (embedded maps), neither started by this repo. Endpoints come
+  from the gitignored `.env` (variables listed in README), which
+  `scripts/generate-environments.mjs` turns into Angular environment files
+  before npm scripts run. Import `environment` from `src/environments/`, never
+  hard-code URLs; a new setting needs a key in `IEnvironment`, the script, and
+  the README variable table. Map route data must match BlueMap map ids.
 - **Services** (`src/app/services/`) are thin `HttpClient` wrappers returning
   Observables; caching happens in the consuming component. `SafePipe`
   (`src/app/utilities/`) trusts resource URLs for the BlueMap iframes.

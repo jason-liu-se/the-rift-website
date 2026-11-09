@@ -1,10 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Constants } from 'src/app/config/constants';
+import { environment } from 'src/environments/environment';
 import { BackButtonComponent } from '../../components/back-button/back-button.component';
 import { MessageCardComponent } from '../../components/message-card/message-card.component';
 import { MatIcon } from '@angular/material/icon';
 import { SafePipe } from '../../utilities/SafePipe.util';
+
+/** BlueMap URL hash suffix after the map id: the initial camera position and view. */
+const BLUEMAP_CAMERA_HASH = ':0:0:0:1500:0:0:0:0:perspective';
 
 @Component({
 	selector: 'app-blue-map-page',
@@ -21,18 +24,12 @@ export class BlueMapPageComponent {
 	public showHAMsg = true; // HA = Hardware Acceleration
 	public showControlMsg = true;
 
-	private constants: Constants = new Constants();
-
 	constructor() {
 		const mapNameProp = this.route.snapshot.data['mapName'];
 		const mapName = mapNameProp == null ? '' : mapNameProp;
 
-		this.bluemapUrl =
-			this.constants.BLUEMAP_URL +
-			'/#' +
-			mapName +
-			this.constants.BLUEMAP_POSTFIX;
-		this.serverUrl = this.constants.API_ENDPOINT;
+		this.bluemapUrl = `${environment.bluemapUrl}/#${mapName}${BLUEMAP_CAMERA_HASH}`;
+		this.serverUrl = environment.apiEndpoint;
 	}
 
 	public toggleHAMsg(): void {

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Constants } from '../config/constants';
+import { environment } from '../../environments/environment';
 import { ICaptionCard } from '../interfaces/slideshow-image.interface';
 import {
 	ICountResponse,
@@ -13,8 +13,6 @@ import {
 })
 export class GalleryProviderService {
 	private http = inject(HttpClient);
-
-	private constants: Constants = new Constants();
 
 	public getCollectionImagesObservable(
 		collectionName: string,
@@ -36,6 +34,6 @@ export class GalleryProviderService {
 	}
 
 	private collectionUrl(collectionName: string): string {
-		return `${this.constants.API_ENDPOINT}/gallery/${encodeURIComponent(collectionName)}`;
+		return `${environment.apiEndpoint}/gallery/${encodeURIComponent(collectionName)}`;
 	}
 }

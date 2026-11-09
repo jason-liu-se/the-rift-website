@@ -2,7 +2,8 @@
 // never needs either service running, and blocks every other outside request.
 // Paths mirror ../web-server/src/routes.
 import { Page } from '@playwright/test';
-import { Constants } from '../../src/app/config/constants';
+// The suite runs against `npm start`, which serves the development environment.
+import { environment } from '../../src/environments/environment.development';
 import {
 	ICountResponse,
 	IPaginatedResponse
@@ -14,7 +15,7 @@ import {
 	NEWS_ITEMS
 } from './api-fixtures';
 
-const { API_ENDPOINT, BLUEMAP_URL } = new Constants();
+const { apiEndpoint: API_ENDPOINT, bluemapUrl: BLUEMAP_URL } = environment;
 
 // The only outside hosts allowed through. src/index.html loads fonts from
 // them, and blocking the Material Icons font would render icon buttons as

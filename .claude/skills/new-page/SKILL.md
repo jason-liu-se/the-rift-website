@@ -28,7 +28,7 @@ npm run ng -- generate component pages/<name>-page
 - Build the page from existing `src/app/components/` before writing new markup.
   If a piece is reusable, make it its own component under `components/`.
 - If the page needs API data, add or reuse a service in `src/app/services/` with
-  endpoints from `APP_CONFIG`, and handle loading, empty, and error states.
+  endpoints from `environment`, and handle loading, empty, and error states.
 - If the page reads its own route data, inject `ActivatedRoute` and read it as
   `snapshot.data['key']`.
 
