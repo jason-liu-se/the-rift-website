@@ -28,7 +28,7 @@ npm run ng -- generate component pages/<name>-page
 - Build the page from existing `src/app/components/` before writing new markup.
   If a piece is reusable, make it its own component under `components/`.
 - If the page needs API data, add or reuse a service in `src/app/services/` with
-  endpoints from `Constants`, and handle loading, empty, and error states.
+  endpoints from `APP_CONFIG`, and handle loading, empty, and error states.
 - If the page reads its own route data, inject `ActivatedRoute` and read it as
   `snapshot.data['key']`.
 
@@ -57,6 +57,9 @@ the providers listed under Testing in `CLAUDE.md`. Run:
 ```bash
 npm test -- --watch=false --include src/app/pages/<name>-page
 ```
+
+Add the route to `e2e/support/routes.ts` so the e2e and axe tests cover it.
+Don't run `npm run e2e` unless the user asks for it.
 
 ## 6. Finish
 

@@ -50,14 +50,20 @@ lints and formats staged files.
   can read their own values from route data, so a variant of an existing page
   (e.g. another gallery collection or map) is usually just a new route.
 - **External services.** A separate The Rift API (news, gallery, downloads) and
-  a BlueMap server (embedded maps), neither started by this repo. Endpoints
-  differ per environment and live in `src/app/config/constants.ts`; always use
-  `Constants`, never hard-coded URLs. Map route data must match BlueMap map ids.
+  a BlueMap server (embedded maps), neither started by this repo. Endpoints live
+  in `src/assets/config.json`, fetched before bootstrap
+  (`src/app/config/app-config.ts`) so deployments can change them without a
+  rebuild. Inject `APP_CONFIG`, never hard-code URLs, and add new keys to
+  `IAppConfig`. Specs that reach `APP_CONFIG` need `provideTestAppConfig()`
+  (`app-config.testing.ts`). Map route data must match BlueMap map ids.
 - **Services** (`src/app/services/`) are thin `HttpClient` wrappers returning
   Observables; caching happens in the consuming component. `SafePipe`
   (`src/app/utilities/`) trusts resource URLs for the BlueMap iframes.
 
 ## Testing
+
+Run unit tests (`npm test`) whenever useful; they're fast. Never run e2e tests
+(`npm run e2e`) unless the user explicitly asks; they're slow.
 
 Unit tests use Vitest globals in jsdom without zone.js: no `fakeAsync`, and
 `vi.spyOn` calls through unless mocked (see README "Testing"). Components
