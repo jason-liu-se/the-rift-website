@@ -1,5 +1,5 @@
 // Every page the e2e suite visits. Keep in sync with
-// src/app/app-routing.module.ts (one entry per page variant is enough).
+// src/app/app.routes.ts (one entry per page variant is enough).
 import {
 	DOWNLOAD_COLLECTIONS,
 	GALLERY_COLLECTIONS,

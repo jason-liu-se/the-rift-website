@@ -40,16 +40,16 @@ lints and formats staged files.
 ## Architecture
 
 - **Standalone components, no root `NgModule`.** `src/main.ts` calls
-  `bootstrapApplication` and pulls in `AppRoutingModule` via
-  `importProvidersFrom`. Use `inject()` rather than constructor injection.
+  `bootstrapApplication` and registers the routes from `src/app/app.routes.ts`
+  with `provideRouter`. Use `inject()` rather than constructor injection.
 - **Every route renders `PageTemplateComponent`.** Each route in
-  `src/app/app-routing.module.ts` names its page in `data.component`; the
-  template creates it inside the `appPageTemplateHost` directive and wraps it in
-  the shared shell (navbar, optional contact section, footer), with the page
-  itself in a `<main>` that gets focus after in-app navigation. Route data flags
-  toggle the shell (see `PageTemplateComponent` for flags and defaults). Pages
-  can read their own values from route data, so a variant of an existing page
-  (e.g. another gallery collection or map) is usually just a new route.
+  `src/app/app.routes.ts` names its page in `data.component`; the template
+  creates it inside the `appPageTemplateHost` directive and wraps it in the
+  shared shell (navbar, optional contact section, footer), with the page itself
+  in a `<main>` that gets focus after in-app navigation. Route data flags toggle
+  the shell (see `PageTemplateComponent` for flags and defaults). Pages can read
+  their own values from route data, so a variant of an existing page (e.g.
+  another gallery collection or map) is usually just a new route.
 - **External services.** A separate The Rift API (news, gallery, downloads) and
   a BlueMap server (embedded maps), neither started by this repo. Endpoints come
   from the gitignored `.env` (variables listed in README), which

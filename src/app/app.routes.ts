@@ -1,5 +1,4 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 import { HomePageComponent } from './pages/home-page/home-page.component';
 import { NewsPageComponent } from './pages/news-page/news-page.component';
 import { GalleryPageComponent } from './pages/gallery-page/gallery-page.component';
@@ -13,7 +12,7 @@ import { ContactPageComponent } from './pages/contact-page/contact-page.componen
 import { JoinPageComponent } from './pages/join-page/join-page.component';
 import { BlueMapPageComponent } from './pages/blue-map-page/blue-map-page.component';
 
-const routes: Routes = [
+export const routes: Routes = [
 	{
 		path: '',
 		component: PageTemplateComponent,
@@ -122,7 +121,6 @@ const routes: Routes = [
 			isTransparent: false
 		}
 	},
-
 	{
 		path: '**',
 		component: PageTemplateComponent,
@@ -133,11 +131,3 @@ const routes: Routes = [
 		}
 	}
 ];
-
-@NgModule({
-	imports: [
-		RouterModule.forRoot(routes, { scrollPositionRestoration: 'enabled' })
-	],
-	exports: [RouterModule]
-})
-export class AppRoutingModule {}

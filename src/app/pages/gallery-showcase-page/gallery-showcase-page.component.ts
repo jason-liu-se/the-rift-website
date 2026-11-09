@@ -39,7 +39,7 @@ export class GalleryShowcasePageComponent {
 
 	private imageCache: Record<string, ICaptionCard[]> = {};
 
-	// the title and imageUrl must be passed via the app-routing.module file as
+	// the title and imageUrl must be passed via the app.routes.ts file as
 	// 'data' elements
 	constructor() {
 		// parsing route data

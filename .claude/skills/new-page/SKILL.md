@@ -14,8 +14,8 @@ Follow the architecture in `CLAUDE.md`. Every route renders
 
 ## 1. New component or new route?
 
-Read `src/app/app-routing.module.ts` and `src/app/pages/`. If an existing page
-already does this from route data (e.g. `GalleryShowcasePageComponent` with
+Read `src/app/app.routes.ts` and `src/app/pages/`. If an existing page already
+does this from route data (e.g. `GalleryShowcasePageComponent` with
 `collection`, `BlueMapPageComponent` with `mapName`), **add a route only** and
 skip to step 3. If you're not sure, ask the user.
 
@@ -34,7 +34,7 @@ npm run ng -- generate component pages/<name>-page
 
 ## 3. Add the route
 
-Add the route to `src/app/app-routing.module.ts` before the `**` wildcard:
+Add the route to `src/app/app.routes.ts` before the `**` wildcard:
 
 - `component: PageTemplateComponent`
 - `title` in the existing `The Rift - <Page>` format
