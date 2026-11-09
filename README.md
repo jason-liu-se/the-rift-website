@@ -15,7 +15,7 @@ Neither service is started by this repo. Static pages work without them.
 
 ## Getting started
 
-1. Create a `.env` file in the repo root:
+1. Optional: create a `.env` file in the repo root to set the service URLs:
 
     ```bash
     DEV_API_URL=http://localhost:4000
@@ -24,7 +24,9 @@ Neither service is started by this repo. Static pages work without them.
     PROD_BLUEMAP_URL=https://map.example.com
     ```
 
-    All four are required, even if you only use one pair.
+    `DEV_` URLs default to the localhost values above. `PROD_` URLs are only
+    needed for `npm run build` and `npm run start:prod`. Use full `http(s)`
+    URLs; trailing slashes are removed. Shell variables override `.env`.
 
 2. Install and run:
 
@@ -37,18 +39,22 @@ Neither service is started by this repo. Static pages work without them.
 
 ## Commands
 
-| Command                   | What it does                                                 |
-| ------------------------- | ------------------------------------------------------------ |
-| `npm start`               | Dev server using the `DEV_` URLs                             |
-| `npm run start:prod`      | Dev server using the production build and `PROD_` URLs       |
-| `npm run build`           | Production build in `dist/the-rift-site`                     |
-| `npm run watch`           | Rebuild on change (development)                              |
-| `npm test`                | Unit tests (`-- --watch=false` for one run)                  |
-| `npm run e2e`             | End-to-end and accessibility tests                           |
-| `npm run e2e:ui`          | Same, in the Playwright UI                                   |
-| `npm run lint` / `format` | ESLint / Prettier (`lint:fix`, `format:check` also exist)    |
-| `npm run env`             | Regenerate `src/environments/` from `.env` (runs on its own) |
-| `npm run ng -- <command>` | Angular CLI, e.g. `npm run ng -- generate component <path>`  |
+| Command                   | What it does                                                |
+| ------------------------- | ----------------------------------------------------------- |
+| `npm start`               | Dev server using the `DEV_` URLs                            |
+| `npm run start:prod`      | Dev server using the production build and `PROD_` URLs      |
+| `npm run build`           | Production build (output path in `angular.json`)            |
+| `npm run watch`           | Rebuild on change (development)                             |
+| `npm test`                | Unit tests (`-- --watch=false` for one run)                 |
+| `npm run e2e`             | End-to-end and accessibility tests                          |
+| `npm run e2e:ui`          | Same, in the Playwright UI                                  |
+| `npm run lint` / `format` | ESLint / Prettier (`lint:fix`, `format:check` also exist)   |
+| `npm run env`             | Regenerate `src/environments/` from `.env` (see below)      |
+| `npm run ng -- <command>` | Angular CLI, e.g. `npm run ng -- generate component <path>` |
+
+`npm ci` and the `start`, `build`, `watch`, `test`, and `e2e` scripts run
+`npm run env` first. `npm run ng -- ...`, lint, and format don't, so run it
+yourself after editing `.env` if you use those.
 
 Use the Angular CLI to create components, services, and so on, rather than
 writing the files by hand.
@@ -69,7 +75,9 @@ If you're used to Jasmine:
 ### End-to-end tests
 
 Playwright tests in `e2e/` run every route on desktop and mobile in Chromium.
-The API and BlueMap are mocked, so you don't need either running.
+The API and BlueMap are mocked at the `DEV_` URLs, so you don't need either
+running. Playwright reuses a server already on port 4200, so stop
+`npm run start:prod` before running e2e tests.
 
 ```bash
 npx playwright install chromium   # once, and after upgrading Playwright
@@ -85,7 +93,12 @@ npm run e2e -- e2e/keyboard.spec.ts --project=desktop   # one file, one device
 | `responsive.spec.ts`    | No horizontal scroll at narrow widths / 200% zoom |
 | `data.spec.ts`          | API data appears on screen                        |
 
-Reports go to `playwright-report/` (`npx playwright show-report`).
+Reports go to `playwright-report/` (`npx playwright show-report`); screenshots
+and traces go to `test-results/`.
+
+Axe can't check everything (e.g. text contrast over background images), focus
+visibility is only checked on the desktop navbar, and the BlueMap iframe is an
+empty placeholder, so a passing run isn't a full audit.
 
 **Writing a new spec**
 
@@ -93,12 +106,14 @@ Reports go to `playwright-report/` (`npx playwright show-report`).
 - Open pages with `gotoRoute` from `e2e/support/navigation.ts`.
 - Add new routes to `e2e/support/routes.ts`.
 - Mock data lives in `e2e/support/api-fixtures.ts`.
+- Limit a test to one device with the tags in `e2e/support/projects.ts`.
 
 **Known issues**
 
 - Existing accessibility bugs are listed in `e2e/known-a11y-issues.ts`. Delete
   an entry once it's fixed (the suite fails if it no longer happens). Never add
-  one to make new code pass.
+  one to make new code pass. Entries match by CSS selector, so if a markup
+  change makes one show up as both new and gone, update its `target`.
 - Known keyboard bugs are `test.fail()` tests in `keyboard.spec.ts`. Remove the
   `test.fail` once fixed.
 
@@ -115,7 +130,7 @@ src/
 │   ├── utilities/    Small shared helpers and pipes
 │   └── app-routing.module.ts
 ├── assets/           Images and icons
-├── environments/     Generated from .env; don't edit
+├── environments/     environment*.ts generated from .env; the interface isn't
 └── *.scss            Global styles and Material theme
 e2e/                  Playwright tests and their support files
 ```
@@ -127,15 +142,17 @@ e2e/                  Playwright tests and their support files
 
 ## Troubleshooting
 
-| Problem                   | Check                                                                         |
-| ------------------------- | ----------------------------------------------------------------------------- |
-| News or gallery is empty  | The API is running at `DEV_API_URL`; restart `npm start` after editing `.env` |
-| Map pages are blank       | BlueMap is running at `DEV_BLUEMAP_URL`, and its map ids match the routes     |
-| `... is not set` on start | A variable is missing from `.env`                                             |
+| Problem                      | Check                                                                         |
+| ---------------------------- | ----------------------------------------------------------------------------- |
+| News or gallery is empty     | The API is running at `DEV_API_URL`; restart `npm start` after editing `.env` |
+| Map pages are blank          | BlueMap is running at `DEV_BLUEMAP_URL`, and its map ids match the routes     |
+| `... is not set`             | A `PROD_` variable is missing from `.env` (needed for build and `start:prod`) |
+| Requests fail in the console | CORS: the API must allow the site's origin                                    |
 
 ## Claude Code
 
 The repo ships shared [Claude Code](https://claude.com/claude-code) setup:
 [`CLAUDE.md`](./CLAUDE.md), [`.claude/`](./.claude/) (settings, skills, agents),
-and [`.mcp.json`](./.mcp.json) (Angular CLI MCP server). Put personal overrides
+and [`.mcp.json`](./.mcp.json) (Angular CLI MCP server). Shared hooks log each
+shell command Claude runs to `.claude/logs/commands.log`. Put personal overrides
 in `.claude/settings.local.json`.

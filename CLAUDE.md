@@ -53,10 +53,13 @@ lints and formats staged files.
 - **External services.** A separate The Rift API (news, gallery, downloads) and
   a BlueMap server (embedded maps), neither started by this repo. Endpoints come
   from the gitignored `.env` (variables listed in README), which
-  `scripts/generate-environments.mjs` turns into Angular environment files
-  before npm scripts run. Import `environment` from `src/environments/`, never
-  hard-code URLs; a new setting needs a key in `IEnvironment`, the script, and
-  the README `.env` example. Map route data must match BlueMap map ids.
+  `scripts/generate-environments.mjs` turns into Angular environment files on
+  `npm ci` and before `start`/`build`/`test`/`e2e` (`DEV_` values default to
+  localhost; `PROD_` is required only for `build` and `start:prod`). Run
+  `npm run env` yourself before calling `ng` directly. Import `environment` from
+  `src/environments/`, never hard-code URLs; a new setting needs a key in
+  `IEnvironment`, the script, and the README `.env` example. Map route data must
+  match BlueMap map ids.
 - **Services** (`src/app/services/`) are thin `HttpClient` wrappers returning
   Observables; caching happens in the consuming component. `SafePipe`
   (`src/app/utilities/`) trusts resource URLs for the BlueMap iframes.
@@ -97,10 +100,11 @@ Work as a software engineer, not a code generator.
   high cohesion. Prefer pure functions; isolate side effects (HTTP, DOM, global
   state).
 - **Clarity.** Descriptive names, small functions, guard clauses, and named
-  constants instead of magic values (shared ones in `src/app/config/`, otherwise
-  with the owning feature). Choose the simple solution over a clever one (dense
-  RxJS chains, compact one-liners); if a non-obvious version is worth keeping,
-  comment what it does and why.
+  constants instead of magic values (shared ones in a file under
+  `src/app/config/`, created when first needed; otherwise with the owning
+  feature). Choose the simple solution over a clever one (dense RxJS chains,
+  compact one-liners); if a non-obvious version is worth keeping, comment what
+  it does and why.
 - **Write less code.** Humans review every line. Use concise syntax where it
   stays clear, use what Angular/Material/RxJS provide, and skip speculative code
   (unused options, "just in case" branches, single-caller abstractions).

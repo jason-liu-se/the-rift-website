@@ -39,7 +39,7 @@ yarn-error.log
 testem.log
 /typings
 
-# Environment URLs (see README "External services") and the files generated from them
+# Environment URLs (see README "Getting started") and the files generated from them
 .env
 /src/environments/environment.ts
 /src/environments/environment.development.ts

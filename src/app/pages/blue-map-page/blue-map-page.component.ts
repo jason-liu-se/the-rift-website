@@ -19,17 +19,13 @@ export class BlueMapPageComponent {
 	private route = inject(ActivatedRoute);
 
 	public bluemapUrl: string;
-	public serverUrl: string;
 
 	public showHAMsg = true; // HA = Hardware Acceleration
 	public showControlMsg = true;
 
 	constructor() {
-		const mapNameProp = this.route.snapshot.data['mapName'];
-		const mapName = mapNameProp == null ? '' : mapNameProp;
-
+		const mapName = this.route.snapshot.data['mapName'] ?? '';
 		this.bluemapUrl = `${environment.bluemapUrl}/#${mapName}${BLUEMAP_CAMERA_HASH}`;
-		this.serverUrl = environment.apiEndpoint;
 	}
 
 	public toggleHAMsg(): void {
