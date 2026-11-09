@@ -51,13 +51,6 @@ export class GalleryShowcasePageComponent {
 		this.imageUrl = imageUrl == null ? '' : imageUrl;
 		this.collectionName = collectionName == null ? '' : collectionName;
 
-		// preparing data for pagination
-		this.galleryProvider
-			.getCollectionImageCountObservable(this.collectionName)
-			.subscribe((data: { count: number }) => {
-				this.paginationLength = data.count;
-			});
-
 		this.populateCaptionedImages();
 	}
 
@@ -87,8 +80,9 @@ export class GalleryShowcasePageComponent {
 				this.pageIndex * this.pageSize,
 				this.pageSize
 			)
-			.subscribe((data: ICaptionCard[]) => {
-				this.captionedImages = data;
+			.subscribe(({ items, total }) => {
+				this.captionedImages = items;
+				this.paginationLength = total;
 
 				this.imageCache[`${this.pageIndex}`] = this.captionedImages;
 			});

@@ -14,7 +14,7 @@ export class DownloadsProviderService {
 
 	public getDownloadCollections(): Observable<IDownloadCollection[]> {
 		return this.http.get<IDownloadCollection[]>(
-			this.constants.API_ENDPOINT + `/downloads/get-all`
+			this.constants.API_ENDPOINT + `/downloads`
 		);
 	}
 }

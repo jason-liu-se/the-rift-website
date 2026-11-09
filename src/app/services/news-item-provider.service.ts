@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Constants } from '../config/constants';
 import { INewsItem } from '../interfaces/news-item.interface';
+import { IPaginatedResponse } from '../interfaces/paginated-response.interface';
 
 @Injectable({
 	providedIn: 'root'
@@ -14,17 +15,11 @@ export class NewsItemProviderService {
 
 	public getNewsItems(
 		startIndex: number,
-		numItems: number
-	): Observable<INewsItem[]> {
-		return this.http.get<INewsItem[]>(
-			this.constants.API_ENDPOINT +
-				`/news/get-items?startIndex=${startIndex}&&limit=${numItems}`
-		);
-	}
-
-	public countNewsItems(): Observable<{ count: number }> {
-		return this.http.get<{ count: number }>(
-			this.constants.API_ENDPOINT + `/news/count-items`
+		limit: number
+	): Observable<IPaginatedResponse<INewsItem>> {
+		return this.http.get<IPaginatedResponse<INewsItem>>(
+			`${this.constants.API_ENDPOINT}/news`,
+			{ params: { startIndex, limit } }
 		);
 	}
 }
