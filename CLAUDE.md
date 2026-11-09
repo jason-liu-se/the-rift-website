@@ -56,7 +56,7 @@ lints and formats staged files.
   `scripts/generate-environments.mjs` turns into Angular environment files
   before npm scripts run. Import `environment` from `src/environments/`, never
   hard-code URLs; a new setting needs a key in `IEnvironment`, the script, and
-  the README variable table. Map route data must match BlueMap map ids.
+  the README `.env` example. Map route data must match BlueMap map ids.
 - **Services** (`src/app/services/`) are thin `HttpClient` wrappers returning
   Observables; caching happens in the consuming component. `SafePipe`
   (`src/app/utilities/`) trusts resource URLs for the BlueMap iframes.

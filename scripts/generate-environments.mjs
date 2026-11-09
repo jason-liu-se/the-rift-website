@@ -20,7 +20,7 @@ function requireVariable(name) {
 	const value = process.env[name];
 	if (!value) {
 		throw new Error(
-			`${name} is not set. Add it to .env (see README "External services").`
+			`${name} is not set. Add it to .env (see README "Getting started").`
 		);
 	}
 	return value;
