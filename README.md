@@ -155,7 +155,7 @@ src/
 │   ├── interfaces/   Data types
 │   ├── directives/   Custom directives
 │   ├── utilities/    Small shared helpers and pipes
-│   └── app-routing.module.ts
+│   └── app.routes.ts
 ├── assets/           Images and icons
 ├── environments/     Generated from .env; don't edit
 └── *.scss            Global styles and Material theme
@@ -164,7 +164,7 @@ scripts/environments/ config.mjs (variable settings), processors.mjs (checks),
                       generate.mjs (writes src/environments/)
 ```
 
-**How pages work:** every route in `app-routing.module.ts` renders
+**How pages work:** every route in `app.routes.ts` renders
 `PageTemplateComponent`, which wraps the page named in the route's
 `data.component` with the shared navbar and footer. Components are standalone
 (there's no root `NgModule`).
