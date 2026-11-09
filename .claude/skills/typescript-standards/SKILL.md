@@ -1,177 +1,114 @@
 ---
 name: typescript-standards
 description:
-    TypeScript and JavaScript coding conventions covering naming, typing, ESLint
-    configuration, and project structure. Use as reference when writing or
-    reviewing TS/JS code.
+    TypeScript conventions for The Rift website (Angular) covering naming,
+    typing, immutability, and error handling. Use as reference when writing or
+    reviewing TypeScript code.
 user-invocable: false
 ---
 
 # TypeScript Coding Standards
 
-Naming conventions, type safety rules, formatting, and linting configuration for
-TypeScript and JavaScript projects.
+Naming, type safety, immutability, and error handling for this Angular project.
+`CLAUDE.md` and the lint/format configs take precedence over anything here.
 
-## When to Activate
+Formatting is owned by Prettier (`.prettierrc`, `.editorconfig`) and linting by
+`eslint.config.js`; run `npm run format` and `npm run lint:fix` rather than
+formatting by hand, and don't restate their values elsewhere.
 
-- Writing or reviewing TypeScript/JavaScript code
-- Setting up a new TS/JS project
-- Configuring ESLint, Prettier, or TypeScript compiler
-- Enforcing naming or structural consistency
+## Naming
 
-## Naming Conventions
-
-### Variables and Functions
-
-- `camelCase` for variables and functions: `marketSearchQuery`,
-  `fetchMarketData`
-- `PascalCase` for types, interfaces, classes, enums, React components:
-  `Market`, `UserService`, `MarketCard`
-- `SCREAMING_SNAKE_CASE` for constants: `MAX_RETRIES`, `DEBOUNCE_DELAY_MS`
-- Boolean variables: `is`, `has`, `should` prefix: `isAuthenticated`,
-  `hasPermission`
-- Functions: verb-noun pattern: `fetchMarkets`, `calculateSimilarity`,
-  `isValidEmail`
+- `camelCase` for variables, functions, properties, and methods.
+- `PascalCase` for classes, interfaces, types, and enums. No `I` prefix on
+  interfaces (`DownloadCollection`, not `IDownloadCollection`).
+- `SCREAMING_SNAKE_CASE` for fixed, module-level constant values (`MAX_RETRIES`,
+  `SLIDE_INTERVAL_MS`). Include the unit in the name when there is one.
+- Booleans read as a question: `is`, `has`, `should`, `can` prefix (`isLoading`,
+  `hasError`).
+- Functions and methods are verb phrases (`fetchNews`, `formatDate`). Name
+  template event handlers for what they do, not the event (`saveDraft()`, not
+  `onClick()`).
 
 ### Files
 
-- React components: `PascalCase.tsx`: `MarketCard.tsx`, `UserProfile.tsx`
-- Hooks: `camelCase` with `use` prefix: `useAuth.ts`, `useDebounce.ts`
-- Utilities: `camelCase.ts`: `formatDate.ts`, `parseConfig.ts`
-- Types: `camelCase.types.ts`: `market.types.ts`
-- Tests: `.test.ts` or `.spec.ts` suffix
+- Use the file names the Angular CLI generates (`npm run ng -- generate ...`):
+  kebab-case with the type suffix, e.g. `news-card.component.ts`,
+  `gallery.service.ts`. A component's `.ts`, `.html`, `.scss`, and `.spec.ts`
+  share one base name.
+- One concept per file. Put files where the README's project structure and
+  `CLAUDE.md`'s file scoping say; types used by only one feature live with that
+  feature.
 
-### Imports
+### Imports and exports
 
-- Named imports over default imports (better refactoring, tree-shaking)
-- Group: node builtins, external packages, internal modules, relative imports
-- No circular imports
+- Named exports only; no default exports.
+- No circular imports. If two files need each other, extract the shared part.
 
-## Type Safety
+## Type safety
 
-### Rules
+The compiler runs in strict mode with Angular's strict templates
+(`tsconfig.json`); keep it that way.
 
-- Never use `any` — use `unknown` and narrow, or define a proper type
-- Prefer `interface` for object shapes, `type` for unions/intersections
-- Use discriminated unions over optional fields for mutually exclusive states
-- Use `as const` for literal types
-- Use `satisfies` for type checking without widening
-
-### Patterns
+- Never use `any`. Use `unknown` and narrow it, or define a proper type.
+- No `// @ts-ignore`. If a suppression is unavoidable, use `// @ts-expect-error`
+  with a comment explaining why.
+- Let TypeScript infer obvious types; annotate function parameters, public
+  return types, and anything inference gets wrong.
+- `interface` for object shapes, `type` for unions, intersections, and mapped
+  types.
+- Discriminated unions over optional fields for mutually exclusive states.
+- `as const` for literal values, `satisfies` to check a value against a type
+  without widening it.
+- Treat API responses as untrusted at the boundary: type the `HttpClient` call
+  with an interface for the contract, and validate or narrow anything the UI
+  can't safely assume (e.g. optional or nullable fields).
 
 ```typescript
-// Discriminated union over optional fields
-type Result<T> = { success: true; data: T } | { success: false; error: string };
-
-// Zod for runtime validation at system boundaries
-const CreateMarketSchema = z.object({
-	name: z.string().min(1).max(200),
-	description: z.string().min(1),
-	endDate: z.string().datetime()
-});
-type CreateMarket = z.infer<typeof CreateMarketSchema>;
+// Discriminated union instead of { data?: T; error?: string }
+type LoadState<T> =
+	| { status: "loading" }
+	| { status: "loaded"; data: T }
+	| { status: "error"; message: string };
 ```
+
+### Angular class members
+
+- Mark properties `readonly` when Angular or `inject()` initialises them and
+  they are never reassigned: injected dependencies, `input()`, `output()`,
+  `model()`, queries, and signals.
+- Use `protected` for members only the template reads; keep `public` for the
+  component's API.
+- Use `inject()`, signal-based `input()`/`output()`, and `computed()` rather
+  than constructor injection, `@Input`/`@Output`, or manually synced state.
 
 ## Immutability
 
-- Use `const` by default, `let` only when mutation is required, never `var`
-- Spread for object/array updates: `{ ...obj, key: value }`, `[...arr, item]`
-- Use `readonly` for function parameters that should not be mutated
-- Use `Readonly<T>` and `ReadonlyArray<T>` where appropriate
+- `const` by default, `let` only when reassignment is required, never `var`.
+- Update objects and arrays by copying: `{ ...obj, key: value }`,
+  `[...arr, item]`. This is required for signals, which compare by reference:
+  use `signal.update(items => [...items, item])`, never mutate the current
+  value.
+- Don't mutate function parameters or shared state. Use `readonly` parameters,
+  `Readonly<T>`, and `readonly T[]` to make that explicit.
 
-## Error Handling
+## Error handling
 
-- Always handle errors from async operations
-- Use typed error classes for domain errors
-- `try/catch` at boundaries, not around every call
-- `Promise.all` for parallel async, not sequential awaits
-- Never swallow errors silently
+- Handle errors from every Observable or Promise that can fail: `catchError` in
+  the pipe or an `error` callback in `subscribe`, and show the user a meaningful
+  state, not a blank page.
+- Never swallow errors silently. If an error is genuinely ignorable, comment
+  why.
+- Handle errors where you can do something about them (usually the consuming
+  component), not around every call.
+- Run independent requests in parallel (`forkJoin`, `combineLatest`, or
+  `Promise.all`), not one after another.
 
-## Project Structure
+## Anti-patterns
 
-```text
-src/
-├── app/              # Next.js App Router / entry points
-├── components/       # React components
-│   ├── ui/          # Generic UI components
-│   ├── forms/       # Form components
-│   └── layouts/     # Layout components
-├── hooks/           # Custom React hooks
-├── lib/             # Utilities and configs
-│   ├── api/        # API clients
-│   ├── utils/      # Helper functions
-│   └── constants/  # Constants
-├── types/           # Shared TypeScript types
-└── styles/         # Global styles
-```
-
-## ESLint Configuration
-
-### Recommended Rules
-
-```json
-{
-	"extends": [
-		"eslint:recommended",
-		"plugin:@typescript-eslint/recommended",
-		"plugin:@typescript-eslint/recommended-type-checked"
-	],
-	"rules": {
-		"@typescript-eslint/no-explicit-any": "error",
-		"@typescript-eslint/no-unused-vars": [
-			"error",
-			{ "argsIgnorePattern": "^_" }
-		],
-		"@typescript-eslint/consistent-type-imports": "error",
-		"@typescript-eslint/no-floating-promises": "error",
-		"no-console": ["warn", { "allow": ["warn", "error"] }],
-		"prefer-const": "error",
-		"no-var": "error"
-	}
-}
-```
-
-### Prettier Integration
-
-```json
-{
-	"semi": false,
-	"singleQuote": true,
-	"trailingComma": "es5",
-	"printWidth": 100,
-	"tabWidth": 2
-}
-```
-
-## Anti-Patterns
-
-- `any` as an escape hatch instead of proper typing
-- `// @ts-ignore` without explanation
-- Mutation of function parameters or shared state
-- `var` declarations
-- Default exports (harder to refactor)
-- Deep nesting — use early returns
-- Magic numbers without named constants
-- Long functions (>50 lines) — split into smaller functions
-- Copy-paste code — extract to shared utilities
-
-## Quick Reference
-
-| Topic                    | Convention                    |
-| ------------------------ | ----------------------------- |
-| Variables/functions      | `camelCase`                   |
-| Types/interfaces/classes | `PascalCase`                  |
-| Constants                | `SCREAMING_SNAKE_CASE`        |
-| React components         | `PascalCase`                  |
-| Hooks                    | `useCamelCase`                |
-| Files (components)       | `PascalCase.tsx`              |
-| Files (utilities)        | `camelCase.ts`                |
-| Booleans                 | `is/has/should` prefix        |
-| Functions                | verb-noun pattern             |
-| Never                    | `any`, `var`, `// @ts-ignore` |
-
-## Related Skills
-
-- `frontend-patterns` — React component and state patterns
-- `bun-backend` — Bun/TS backend architecture
-- `api-design` — API contract design
+- `any`, `var`, `// @ts-ignore`, default exports.
+- Deep nesting; use guard clauses and early returns.
+- Magic numbers and strings; use named constants (see `CLAUDE.md` for where they
+  live).
+- Long functions doing several things; split them so each has one job.
+- Copy-pasted logic; extract it into a shared component, service, function, or
+  pipe.
