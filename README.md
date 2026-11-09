@@ -54,6 +54,8 @@ is unavailable. The map pages require a reachable BlueMap instance.
 | `npm run build`           | Create a production build in `dist/the-rift-site`.                                             |
 | `npm run watch`           | Rebuild continuously using the development configuration.                                      |
 | `npm test`                | Run the unit tests with Vitest (watch mode in a terminal, a single run on CI).                 |
+| `npm run e2e`             | Type-check and run the Playwright end-to-end and accessibility tests.                          |
+| `npm run e2e:ui`          | Open the Playwright UI to run and debug end-to-end tests interactively.                        |
 | `npm run ng -- <command>` | Run an Angular CLI command, for example `npm run ng -- generate component components/example`. |
 
 ## Testing
@@ -76,9 +78,44 @@ differences from Jasmine to keep in mind:
 - zone.js is not loaded, so `fakeAsync`/`tick`/`waitForAsync` are unavailable;
   use `async`/`await` or Vitest fake timers instead.
 
+### End-to-end and accessibility tests
+
+The `e2e/` folder holds Playwright tests that drive the real app in Chromium, at
+the desktop and mobile sizes set in `playwright.config.ts`. They check WCAG 2.2
+AA rules with axe on every page, keyboard navigation and visible focus, reflow
+without horizontal scrolling at 320px and at 200% zoom, and that API data
+reaches the screen.
+
+Install the browser once, then run the suite. Playwright starts the dev server
+itself, or reuses one already running on port 4200.
+
+```bash
+npx playwright install chromium
+npm run e2e
+npm run e2e -- e2e/keyboard.spec.ts --project=desktop   # one file and project
+```
+
+You don't need the API or BlueMap running: `e2e/support/mock-api.ts` answers
+their requests with the data in `e2e/support/api-fixtures.ts`. Import `test` and
+`expect` from `e2e/support/test.ts` in new specs so the mocks always apply.
+Pages the suite visits are listed in `e2e/support/routes.ts`; add new routes
+there.
+
+Accessibility violations that existed when the suite was added are listed in
+`e2e/known-a11y-issues.ts`. Any violation not in that list fails the suite, and
+so does a listed one that no longer happens. When you fix an issue, delete its
+entry. Only add an entry for an existing bug you're deliberately leaving for
+later, never to make a new feature pass.
+
+Failure reports, screenshots, and traces are written to `playwright-report/`
+(open it with `npx playwright show-report`) and `test-results/`.
+
 ## Project structure
 
 ```text
+e2e/                      Playwright end-to-end and accessibility tests
+├── support/              Shared fixtures, API mocks, route list, and helpers
+└── known-a11y-issues.ts  Existing accessibility bugs the suite tolerates
 src/
 ├── app/
 │   ├── components/       Reusable UI components

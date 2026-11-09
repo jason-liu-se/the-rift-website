@@ -18,6 +18,7 @@ npm run build                          # production build (output path in angula
 npm test                               # Vitest unit tests (jsdom)
 npm test -- --include <path/to/spec>   # single spec file
 npm test -- --watch=false              # single run (CI-style)
+npm run e2e                            # Playwright e2e + axe accessibility tests
 npm run lint / lint:fix                # angular-eslint
 npm run format / format:check          # prettier
 ```
@@ -64,6 +65,11 @@ touching routing or HTTP need `provideHttpClient()`,
 `provideNoopAnimations()`. Anything under `PageTemplateComponent` needs a
 stubbed `ActivatedRoute` with `snapshot.data.component`; see
 `page-template.component.spec.ts`.
+
+E2E specs in `e2e/` import `test`/`expect` from `e2e/support/test.ts`, which
+mocks the API and BlueMap. New routes go in `e2e/support/routes.ts`. Fix new axe
+violations rather than adding them to `e2e/known-a11y-issues.ts`, and delete
+entries there once fixed.
 
 ## Engineering standards
 
