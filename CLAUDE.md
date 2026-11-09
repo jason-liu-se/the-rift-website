@@ -15,7 +15,7 @@ community. Node/npm requirements are in `README.md`; framework versions in
 npm ci                                 # install
 npm start                              # dev server
 npm run build                          # production build (output path in angular.json)
-npm test                               # Karma + Jasmine unit tests
+npm test                               # Vitest unit tests (jsdom)
 npm test -- --include <path/to/spec>   # single spec file
 npm test -- --watch=false              # single run (CI-style)
 npm run lint / lint:fix                # angular-eslint
@@ -57,7 +57,9 @@ lints and formats staged files.
 
 ## Testing
 
-Components touching routing or HTTP need `provideHttpClient()`,
+Unit tests use Vitest globals in jsdom without zone.js: no `fakeAsync`, and
+`vi.spyOn` calls through unless mocked (see README "Testing"). Components
+touching routing or HTTP need `provideHttpClient()`,
 `provideHttpClientTesting()`, `provideRouter([])`, and
 `provideNoopAnimations()`. Anything under `PageTemplateComponent` needs a
 stubbed `ActivatedRoute` with `snapshot.data.component`; see

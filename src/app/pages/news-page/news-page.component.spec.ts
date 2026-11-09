@@ -54,14 +54,15 @@ describe('NewsPageComponent', () => {
 
 		expect(component.newsItems).toEqual(firstPage);
 		expect(paginators.length).toBe(2);
-		expect(paginators.every((p) => p.length === 25)).toBeTrue();
+		expect(paginators.every((p) => p.length === 25)).toBe(true);
 		expect(
 			fixture.nativeElement.querySelector('app-news-display')
 		).not.toBeNull();
 	});
 
 	it('fetches a new page from its offset and reuses cached pages', () => {
-		spyOn(window, 'scrollTo');
+		// jsdom doesn't implement scrolling, and vi.spyOn calls through by default.
+		vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined);
 
 		component.handlePageEvent({ pageIndex: 2, pageSize: 10, length: 25 });
 		httpTesting
