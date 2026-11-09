@@ -53,18 +53,28 @@ is unavailable. The map pages require a reachable BlueMap instance.
 | `npm start`               | Start the development server at `http://localhost:4200/`.                                      |
 | `npm run build`           | Create a production build in `dist/the-rift-site`.                                             |
 | `npm run watch`           | Rebuild continuously using the development configuration.                                      |
-| `npm test`                | Run the unit tests with Karma and Jasmine.                                                     |
+| `npm test`                | Run the unit tests with Vitest (watch mode in a terminal, a single run on CI).                 |
 | `npm run ng -- <command>` | Run an Angular CLI command, for example `npm run ng -- generate component components/example`. |
 
 ## Testing
 
-Run the unit tests with:
+Unit tests are `*.spec.ts` files next to the code they test. They run with
+Vitest through Angular's `@angular/build:unit-test` builder (see the `test`
+target in `angular.json`), in a jsdom browser emulation, so no browser install
+is needed.
 
 ```bash
-npm test
+npm test                               # watch mode
+npm test -- --watch=false              # single run
+npm test -- --include <path/to/spec>   # one spec file
 ```
 
-> > > TODO: Write unit and integration tests
+Test globals (`describe`, `it`, `expect`, `vi`) come from Vitest. Two
+differences from Jasmine to keep in mind:
+
+- `vi.spyOn` calls the real method unless you add `.mockImplementation(...)`.
+- zone.js is not loaded, so `fakeAsync`/`tick`/`waitForAsync` are unavailable;
+  use `async`/`await` or Vitest fake timers instead.
 
 ## Project structure
 
