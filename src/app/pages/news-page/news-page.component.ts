@@ -29,14 +29,6 @@ export class NewsPageComponent {
 	private newsItemCache: Record<string, INewsItem[]> = {};
 
 	constructor() {
-		this.newsItemProvider
-			.countNewsItems()
-			.subscribe(
-				(data: { count: number }) =>
-					(this.paginationLength = data.count)
-			);
-
-		// setting the initial page items
 		this.populateNewsItems();
 	}
 
@@ -62,8 +54,9 @@ export class NewsPageComponent {
 	private populateNewsItems() {
 		this.newsItemProvider
 			.getNewsItems(this.pageIndex * this.pageSize, this.pageSize)
-			.subscribe((data: INewsItem[]) => {
-				this.newsItems = data;
+			.subscribe(({ items, total }) => {
+				this.newsItems = items;
+				this.paginationLength = total;
 
 				this.newsItemCache[`${this.pageIndex}`] = this.newsItems;
 			});

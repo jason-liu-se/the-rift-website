@@ -41,7 +41,7 @@ export class GalleryPageComponent {
 			this.galleryProvider
 				.getCollectionImageCountObservable(collection.dbCollectionName)
 				.subscribe((data) => {
-					collection.desc = `${data.count} photos`;
+					collection.desc = `${data.total} photos`;
 				});
 		}
 	}

@@ -3,6 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Constants } from '../config/constants';
 import { ICaptionCard } from '../interfaces/slideshow-image.interface';
+import {
+	ICountResponse,
+	IPaginatedResponse
+} from '../interfaces/paginated-response.interface';
 
 @Injectable({
 	providedIn: 'root'
@@ -10,34 +14,28 @@ import { ICaptionCard } from '../interfaces/slideshow-image.interface';
 export class GalleryProviderService {
 	private http = inject(HttpClient);
 
-	private constants: Constants;
-
-	constructor() {
-		this.constants = new Constants();
-	}
+	private constants: Constants = new Constants();
 
 	public getCollectionImagesObservable(
 		collectionName: string,
 		startIndex: number,
-		numItems: number
-	): Observable<ICaptionCard[]> {
-		return this.http.get<ICaptionCard[]>(
-			this.constants.API_ENDPOINT +
-				`/gallery/get-collection?collection=${collectionName}&&startIndex=${startIndex}&&limit=${numItems}`
+		limit: number
+	): Observable<IPaginatedResponse<ICaptionCard>> {
+		return this.http.get<IPaginatedResponse<ICaptionCard>>(
+			this.collectionUrl(collectionName),
+			{ params: { startIndex, limit } }
 		);
 	}
 
 	public getCollectionImageCountObservable(
 		collectionName: string
-	): Observable<{ count: number }> {
-		return this.http.get<{ count: number }>(
-			this.constants.API_ENDPOINT +
-				`/gallery/count-collection-items?collection=${collectionName}`,
-			{
-				headers: {
-					'Content-Type': 'application/json'
-				}
-			}
+	): Observable<ICountResponse> {
+		return this.http.get<ICountResponse>(
+			`${this.collectionUrl(collectionName)}/count`
 		);
+	}
+
+	private collectionUrl(collectionName: string): string {
+		return `${this.constants.API_ENDPOINT}/gallery/${encodeURIComponent(collectionName)}`;
 	}
 }
