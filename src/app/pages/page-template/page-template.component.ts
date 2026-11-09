@@ -1,5 +1,14 @@
-import { Component, OnInit, ViewChild, Type, inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import {
+	Component,
+	ElementRef,
+	OnInit,
+	ViewChild,
+	Type,
+	afterNextRender,
+	inject,
+	viewChild
+} from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PageTemplateDirective } from 'src/app/directives/page-template.directive';
 import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { ContactComponent } from '../../components/contact/contact.component';
@@ -18,6 +27,9 @@ import { FooterComponent } from '../../components/footer/footer.component';
 })
 export class PageTemplateComponent implements OnInit {
 	private route = inject(ActivatedRoute);
+	private router = inject(Router);
+	private mainContent =
+		viewChild.required<ElementRef<HTMLElement>>('mainContent');
 
 	public showContactSection: boolean;
 	public mainComponent: Type<unknown>;
@@ -40,6 +52,14 @@ export class PageTemplateComponent implements OnInit {
 		this.showContactSection =
 			showContactSectionProp == null ? false : showContactSectionProp;
 		this.showFooter = showFooterProp == null ? true : showFooterProp;
+
+		// After an in-app navigation (not the first page load), start keyboard
+		// and screen reader users at the new page's content instead of <body>.
+		if (this.router.navigated) {
+			afterNextRender(() =>
+				this.mainContent().nativeElement.focus({ preventScroll: true })
+			);
+		}
 	}
 
 	// displaying the passed component dynamically

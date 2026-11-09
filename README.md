@@ -54,6 +54,8 @@ is unavailable. The map pages require a reachable BlueMap instance.
 | `npm run build`           | Create a production build in `dist/the-rift-site`.                                             |
 | `npm run watch`           | Rebuild continuously using the development configuration.                                      |
 | `npm test`                | Run the unit tests with Vitest (watch mode in a terminal, a single run on CI).                 |
+| `npm run e2e`             | Type-check and run the Playwright end-to-end and accessibility tests.                          |
+| `npm run e2e:ui`          | Type-check, then open the Playwright UI to run and debug end-to-end tests.                     |
 | `npm run ng -- <command>` | Run an Angular CLI command, for example `npm run ng -- generate component components/example`. |
 
 ## Testing
@@ -76,9 +78,67 @@ differences from Jasmine to keep in mind:
 - zone.js is not loaded, so `fakeAsync`/`tick`/`waitForAsync` are unavailable;
   use `async`/`await` or Vitest fake timers instead.
 
+### End-to-end and accessibility tests
+
+The `e2e/` folder holds Playwright tests that drive the real app in Chromium, on
+the desktop and mobile projects defined in `playwright.config.ts`:
+
+- `accessibility.spec.ts`: axe scan of every route for WCAG 2.2 A/AA rules.
+- `keyboard.spec.ts`: on every route, Tab reaches each focusable element once,
+  in page order, without getting stuck. On desktop: the navbar's tab order and
+  visible focus, and that navigating moves focus to the new page's `<main>`. On
+  mobile: opening and closing the navbar menu by keyboard.
+- `responsive.spec.ts`: no horizontal scrolling at the widths listed in the
+  file, which also stand in for 200% zoom.
+- `data.spec.ts`: API data reaches the screen.
+
+Axe only covers rules it can automate, and it skips some cases, such as text
+contrast over background images. Visible focus is only checked on the desktop
+navbar, and the iframe on BlueMap pages is replaced with an empty placeholder.
+
+Install the browser once, and again after upgrading `@playwright/test` (on Linux
+or WSL, add `--with-deps` the first time). Then run the suite. Playwright starts
+the dev server at the `baseURL` in `playwright.config.ts`, or reuses one that is
+already running there.
+
+```bash
+npx playwright install chromium
+npm run e2e                                              # type-check, then run
+npm run e2e -- e2e/keyboard.spec.ts --project=desktop    # one file and project
+```
+
+You don't need the API or BlueMap running: `e2e/support/mock-api.ts` answers
+their requests with the data in `e2e/support/api-fixtures.ts`, and blocks other
+outside requests apart from the fonts loaded in `src/index.html`. In new specs:
+
+- Import `test` and `expect` from `e2e/support/test.ts` so the mocks always
+  apply.
+- Open pages with `gotoRoute` from `e2e/support/navigation.ts`. It fails if the
+  wrong page renders, and waits for the page's data, fonts, and images.
+- Add new routes to `e2e/support/routes.ts`.
+- Limit a test to one device with the tags in `e2e/support/projects.ts`.
+
+Accessibility violations that existed when the suite was added are listed in
+`e2e/known-a11y-issues.ts`. Any violation not in that list fails the suite, and
+so does a listed one that no longer happens. When you fix an issue, delete its
+entry. Only add an entry for an existing bug you're deliberately leaving for
+later, never to make a new feature pass. Entries are matched by CSS selector, so
+if a markup change makes an entry show up as both new and no longer happening,
+update the entry's `target` to the new selector.
+
+Known keyboard gaps are tests marked `test.fail()` in `keyboard.spec.ts`. Once
+one is fixed, the test starts failing; remove its `test.fail` to keep it as a
+normal test.
+
+Failure reports, screenshots, and traces are written to `playwright-report/`
+(open it with `npx playwright show-report`) and `test-results/`.
+
 ## Project structure
 
 ```text
+e2e/                      Playwright end-to-end and accessibility tests
+├── support/              Shared fixtures, API mocks, route list, and helpers
+└── known-a11y-issues.ts  Existing accessibility bugs the suite tolerates
 src/
 ├── app/
 │   ├── components/       Reusable UI components
