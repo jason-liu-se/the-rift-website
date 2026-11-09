@@ -22,6 +22,9 @@ npm run build
 The build enforces the style budgets in `angular.json`, so report any budget
 warnings too.
 
+Don't run `npm run e2e` unless the user asks for it; it's slow. Instead, remind
+the user to run it themselves before opening the PR.
+
 ## 2. Code review
 
 Use the `code-reviewer` agent to review the current branch against `main`,

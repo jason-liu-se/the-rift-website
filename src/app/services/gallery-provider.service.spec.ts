@@ -4,7 +4,7 @@ import {
 	provideHttpClientTesting
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { Constants } from '../config/constants';
+import { environment } from 'src/environments/environment';
 import {
 	ICountResponse,
 	IPaginatedResponse
@@ -13,7 +13,7 @@ import { ICaptionCard } from '../interfaces/slideshow-image.interface';
 import { GalleryProviderService } from './gallery-provider.service';
 
 describe('GalleryProviderService', () => {
-	const apiEndpoint = new Constants().API_ENDPOINT;
+	const apiEndpoint = environment.API_URL;
 	let service: GalleryProviderService;
 	let httpTesting: HttpTestingController;
 

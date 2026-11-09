@@ -8,12 +8,12 @@ import { MatPaginator } from '@angular/material/paginator';
 import { By } from '@angular/platform-browser';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
-import { Constants } from 'src/app/config/constants';
+import { environment } from 'src/environments/environment';
 import { INewsItem } from 'src/app/interfaces/news-item.interface';
 import { NewsPageComponent } from './news-page.component';
 
 describe('NewsPageComponent', () => {
-	const newsUrl = `${new Constants().API_ENDPOINT}/news`;
+	const newsUrl = `${environment.API_URL}/news`;
 	const firstPage: INewsItem[] = [
 		{ title: 'Launch', date: '2026-01-01', content: 'Hi' }
 	];

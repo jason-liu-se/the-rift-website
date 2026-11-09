@@ -2,7 +2,8 @@
 // never needs either service running, and blocks every other outside request.
 // Paths mirror ../web-server/src/routes.
 import { Page } from '@playwright/test';
-import { Constants } from '../../src/app/config/constants';
+// The suite runs against `npm start`, which serves the development environment.
+import { environment } from '../../src/environments/environment.development';
 import {
 	ICountResponse,
 	IPaginatedResponse
@@ -14,7 +15,7 @@ import {
 	NEWS_ITEMS
 } from './api-fixtures';
 
-const { API_ENDPOINT, BLUEMAP_URL } = new Constants();
+const { API_URL, BLUEMAP_URL } = environment;
 
 // The only outside hosts allowed through. src/index.html loads fonts from
 // them, and blocking the Material Icons font would render icon buttons as
@@ -84,7 +85,7 @@ export async function mockExternalServices(
 	page: Page,
 	appUrl: string
 ): Promise<void> {
-	const handledOrigins = [appUrl, API_ENDPOINT, BLUEMAP_URL].map(
+	const handledOrigins = [appUrl, API_URL, BLUEMAP_URL].map(
 		(url) => new URL(url).origin
 	);
 
@@ -96,7 +97,7 @@ export async function mockExternalServices(
 			!ALLOWED_EXTERNAL_HOSTS.includes(url.hostname),
 		(route) => route.abort('blockedbyclient')
 	);
-	await page.route(`${API_ENDPOINT}/**`, (route) =>
+	await page.route(`${API_URL}/**`, (route) =>
 		route.fulfill(respondTo(new URL(route.request().url())))
 	);
 	await page.route(`${BLUEMAP_URL}/**`, (route) =>

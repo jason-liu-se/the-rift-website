@@ -4,12 +4,12 @@ import {
 	provideHttpClientTesting
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { Constants } from '../config/constants';
+import { environment } from 'src/environments/environment';
 import { IDownloadCollection } from '../interfaces/download-collection.interface';
 import { DownloadsProviderService } from './downloads-provider.service';
 
 describe('DownloadsProviderService', () => {
-	const apiEndpoint = new Constants().API_ENDPOINT;
+	const apiEndpoint = environment.API_URL;
 	let service: DownloadsProviderService;
 	let httpTesting: HttpTestingController;
 

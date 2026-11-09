@@ -14,6 +14,7 @@ community. Node/npm requirements are in `README.md`; framework versions in
 ```bash
 npm ci                                 # install
 npm start                              # dev server
+npm run start:prod                     # dev server with prod .env variables
 npm run build                          # production build (output path in angular.json)
 npm test                               # Vitest unit tests (jsdom)
 npm test -- --include <path/to/spec>   # single spec file
@@ -50,14 +51,25 @@ lints and formats staged files.
   can read their own values from route data, so a variant of an existing page
   (e.g. another gallery collection or map) is usually just a new route.
 - **External services.** A separate The Rift API (news, gallery, downloads) and
-  a BlueMap server (embedded maps), neither started by this repo. Endpoints
-  differ per environment and live in `src/app/config/constants.ts`; always use
-  `Constants`, never hard-coded URLs. Map route data must match BlueMap map ids.
+  a BlueMap server (embedded maps), neither started by this repo. Endpoints come
+  from the gitignored `.env` (variables listed in README), which
+  `scripts/environments/generate.mjs` turns into Angular environment files on
+  `npm ci` and before `start`/`build`/`test`/`e2e`. Only `PUBLIC_` environment
+  variables are read; `PUBLIC_X` becomes `environment.X`, with `DEV_`/`PROD_`
+  prefixes overriding per environment, and `IEnvironment` is generated from the
+  keys, so a new setting only needs `.env` and the README `.env` example, plus a
+  `PROCESSORS` entry in `scripts/environments/config.mjs` if it needs checking
+  (e.g. URLs). Run `npm run env` yourself before calling `ng` directly. Import
+  `environment` from `src/environments/`, never hard-code URLs. Map route data
+  must match BlueMap map ids.
 - **Services** (`src/app/services/`) are thin `HttpClient` wrappers returning
   Observables; caching happens in the consuming component. `SafePipe`
   (`src/app/utilities/`) trusts resource URLs for the BlueMap iframes.
 
 ## Testing
+
+Run unit tests (`npm test`) whenever useful; they're fast. Never run e2e tests
+(`npm run e2e`) unless the user explicitly asks; they're slow.
 
 Unit tests use Vitest globals in jsdom without zone.js: no `fakeAsync`, and
 `vi.spyOn` calls through unless mocked (see README "Testing"). Components
@@ -90,10 +102,11 @@ Work as a software engineer, not a code generator.
   high cohesion. Prefer pure functions; isolate side effects (HTTP, DOM, global
   state).
 - **Clarity.** Descriptive names, small functions, guard clauses, and named
-  constants instead of magic values (shared ones in `src/app/config/`, otherwise
-  with the owning feature). Choose the simple solution over a clever one (dense
-  RxJS chains, compact one-liners); if a non-obvious version is worth keeping,
-  comment what it does and why.
+  constants instead of magic values (shared ones in a file under
+  `src/app/config/`, created when first needed; otherwise with the owning
+  feature). Choose the simple solution over a clever one (dense RxJS chains,
+  compact one-liners); if a non-obvious version is worth keeping, comment what
+  it does and why.
 - **Write less code.** Humans review every line. Use concise syntax where it
   stays clear, use what Angular/Material/RxJS provide, and skip speculative code
   (unused options, "just in case" branches, single-caller abstractions).

@@ -4,13 +4,13 @@ import {
 	provideHttpClientTesting
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { Constants } from '../config/constants';
+import { environment } from 'src/environments/environment';
 import { INewsItem } from '../interfaces/news-item.interface';
 import { IPaginatedResponse } from '../interfaces/paginated-response.interface';
 import { NewsItemProviderService } from './news-item-provider.service';
 
 describe('NewsItemProviderService', () => {
-	const apiEndpoint = new Constants().API_ENDPOINT;
+	const apiEndpoint = environment.API_URL;
 	let service: NewsItemProviderService;
 	let httpTesting: HttpTestingController;
 

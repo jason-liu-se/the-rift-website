@@ -39,6 +39,10 @@ yarn-error.log
 testem.log
 /typings
 
+# Environment URLs (see README "Getting started") and the files generated from them
+.env
+/src/environments/
+
 # System files
 .DS_Store
 Thumbs.db

@@ -6,11 +6,11 @@ import {
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
-import { Constants } from 'src/app/config/constants';
+import { environment } from 'src/environments/environment';
 import { GalleryPageComponent } from './gallery-page.component';
 
 describe('GalleryPageComponent', () => {
-	const galleryUrl = `${new Constants().API_ENDPOINT}/gallery`;
+	const galleryUrl = `${environment.API_URL}/gallery`;
 	let component: GalleryPageComponent;
 	let fixture: ComponentFixture<GalleryPageComponent>;
 	let httpTesting: HttpTestingController;
