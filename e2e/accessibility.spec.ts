@@ -1,5 +1,7 @@
 import { IKnownA11yIssue, KNOWN_A11Y_ISSUES } from './known-a11y-issues';
 import { scanForViolations, violationKey } from './support/axe';
+import { gotoRoute } from './support/navigation';
+import { PROJECT, TAG } from './support/projects';
 import { ROUTES } from './support/routes';
 import { expect, test } from './support/test';
 
@@ -15,8 +17,7 @@ for (const route of ROUTES) {
 	test(`${route.path} has no new WCAG 2.2 AA violations`, async ({
 		page
 	}, testInfo) => {
-		await page.goto(route.path);
-		await page.waitForLoadState('networkidle');
+		await gotoRoute(page, route);
 
 		const found = await scanForViolations(page);
 		const known = KNOWN_A11Y_ISSUES.filter((issue) =>
@@ -39,3 +40,23 @@ for (const route of ROUTES) {
 		).toEqual([]);
 	});
 }
+
+// An entry naming a removed route or renamed project would never apply, so
+// the "no longer occur" check above could never flag it.
+test(
+	'known issues only name routes and projects that exist',
+	{ tag: TAG.desktopOnly },
+	() => {
+		const routePaths = ROUTES.map((route) => route.path);
+		const projects: readonly string[] = Object.values(PROJECT);
+
+		for (const issue of KNOWN_A11Y_ISSUES) {
+			expect(routePaths).toEqual(
+				expect.arrayContaining([...(issue.routes ?? [])])
+			);
+			expect(projects).toEqual(
+				expect.arrayContaining([...(issue.projects ?? [])])
+			);
+		}
+	}
+);

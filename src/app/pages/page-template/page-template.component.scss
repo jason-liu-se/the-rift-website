@@ -10,6 +10,11 @@
 	flex: 1;
 }
 
+// Focused by script after navigation; it isn't interactive, so no focus ring.
+.template:focus {
+	outline: none;
+}
+
 .upper-content {
 	display: flex;
 	flex: 1;

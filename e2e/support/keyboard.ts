@@ -3,7 +3,10 @@ import { Locator, Page } from '@playwright/test';
 const TAB_STOP_ATTRIBUTE = 'data-e2e-tab-stop';
 
 // Marks every element a Tab press should reach (visible, enabled, not removed
-// from the tab order) with an index, and returns how many there are.
+// from the tab order) with its index in page order, and returns how many there
+// are. Chromium can also focus scroll containers; those aren't marked, so
+// callers must allow for extra, unmarked Tab stops. An iframe counts as one
+// stop: focus inside it isn't followed.
 export async function markTabStops(page: Page): Promise<number> {
 	return page.evaluate((attribute) => {
 		const candidates = document.querySelectorAll<HTMLElement>(
@@ -23,11 +26,12 @@ export async function markTabStops(page: Page): Promise<number> {
 }
 
 // The tab-stop index of the focused element, or null if it isn't one.
-export async function focusedTabStop(page: Page): Promise<string | null> {
-	return page.evaluate(
+export async function focusedTabStop(page: Page): Promise<number | null> {
+	const index = await page.evaluate(
 		(attribute) => document.activeElement?.getAttribute(attribute) ?? null,
 		TAB_STOP_ATTRIBUTE
 	);
+	return index === null ? null : Number(index);
 }
 
 export const focused = (page: Page): Locator => page.locator('*:focus');

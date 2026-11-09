@@ -44,7 +44,8 @@ lints and formats staged files.
 - **Every route renders `PageTemplateComponent`.** Each route in
   `src/app/app-routing.module.ts` names its page in `data.component`; the
   template creates it inside the `appPageTemplateHost` directive and wraps it in
-  the shared shell (navbar, optional contact section, footer). Route data flags
+  the shared shell (navbar, optional contact section, footer), with the page
+  itself in a `<main>` that gets focus after in-app navigation. Route data flags
   toggle the shell (see `PageTemplateComponent` for flags and defaults). Pages
   can read their own values from route data, so a variant of an existing page
   (e.g. another gallery collection or map) is usually just a new route.
@@ -67,8 +68,9 @@ stubbed `ActivatedRoute` with `snapshot.data.component`; see
 `page-template.component.spec.ts`.
 
 E2E specs in `e2e/` import `test`/`expect` from `e2e/support/test.ts`, which
-mocks the API and BlueMap. New routes go in `e2e/support/routes.ts`. Fix new axe
-violations rather than adding them to `e2e/known-a11y-issues.ts`, and delete
+mocks the API and BlueMap, and open pages with `gotoRoute`
+(`e2e/support/navigation.ts`). New routes go in `e2e/support/routes.ts`. Fix new
+axe violations rather than adding them to `e2e/known-a11y-issues.ts`, and delete
 entries there once fixed.
 
 ## Engineering standards

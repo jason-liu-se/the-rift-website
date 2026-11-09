@@ -1,13 +1,14 @@
 import AxeBuilder from '@axe-core/playwright';
 import { Page } from '@playwright/test';
 
-// axe rule tags for WCAG 2.2 level A and AA (each version adds new rules).
+// axe rule tags for WCAG 2.2 level A and AA (each WCAG version adds rules;
+// 2.2 added no level A rules that axe automates). Selecting by tag also runs
+// rules axe disables by default, such as 2.2's 24x24px `target-size`.
 const WCAG_22_AA_TAGS = [
 	'wcag2a',
 	'wcag2aa',
 	'wcag21a',
 	'wcag21aa',
-	'wcag22a',
 	'wcag22aa'
 ];
 

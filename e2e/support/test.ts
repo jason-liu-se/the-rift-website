@@ -5,8 +5,11 @@ import { mockExternalServices } from './mock-api';
 
 export const test = base.extend<{ mockedServices: void }>({
 	mockedServices: [
-		async ({ page }, use) => {
-			await mockExternalServices(page);
+		async ({ page, baseURL }, use) => {
+			if (!baseURL) {
+				throw new Error('Set `use.baseURL` in playwright.config.ts');
+			}
+			await mockExternalServices(page, baseURL);
 			await use();
 		},
 		{ auto: true }

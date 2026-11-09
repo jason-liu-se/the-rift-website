@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import { PROJECT, TAG } from './e2e/support/projects';
 
 const BASE_URL = 'http://localhost:4200';
 const isCI = !!process.env['CI'];
@@ -11,8 +12,16 @@ export default defineConfig({
 	reporter: [['list'], ['html', { open: 'never' }]],
 	use: { baseURL: BASE_URL, trace: 'on-first-retry' },
 	projects: [
-		{ name: 'desktop', use: { ...devices['Desktop Chrome'] } },
-		{ name: 'mobile', use: { ...devices['Pixel 7'] } }
+		{
+			name: PROJECT.desktop,
+			use: { ...devices['Desktop Chrome'] },
+			grepInvert: new RegExp(TAG.mobileOnly)
+		},
+		{
+			name: PROJECT.mobile,
+			use: { ...devices['Pixel 7'] },
+			grepInvert: new RegExp(TAG.desktopOnly)
+		}
 	],
 	webServer: {
 		command: 'npm start',

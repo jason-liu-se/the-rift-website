@@ -1,9 +1,9 @@
 <div class="page-template">
 	<div class="upper-content">
 		<app-navbar [transparent]="isTransparent"></app-navbar>
-		<div class="template">
+		<main class="template" tabindex="-1" #mainContent>
 			<ng-template appPageTemplateHost></ng-template>
-		</div>
+		</main>
 	</div>
 	<div class="lower-content">
 		@if (showContactSection) {

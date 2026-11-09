@@ -3,6 +3,7 @@
 // suite. When you fix one, delete its entry: the suite also fails on entries
 // that no longer occur, so this list can't go stale.
 import { IA11yViolation } from './support/axe';
+import { PROJECT } from './support/projects';
 
 export interface IKnownA11yIssue extends Omit<IA11yViolation, 'help'> {
 	// Route paths (from support/routes.ts) it occurs on; omit for every route.
@@ -20,7 +21,7 @@ export const KNOWN_A11Y_ISSUES: readonly IKnownA11yIssue[] = [
 	{
 		ruleId: 'button-name',
 		target: '.hamburger-menu-button',
-		projects: ['mobile'],
+		projects: [PROJECT.mobile],
 		note: 'Icon-only menu button needs an aria-label.'
 	},
 	{
@@ -45,28 +46,28 @@ export const KNOWN_A11Y_ISSUES: readonly IKnownA11yIssue[] = [
 		ruleId: 'color-contrast',
 		target: '.link-active > p',
 		routes: ['/join', '/not-a-page'],
-		projects: ['desktop'],
+		projects: [PROJECT.desktop],
 		note: OPAQUE_NAVBAR_NOTE
 	},
 	{
 		ruleId: 'color-contrast',
 		target: '.link-active[routerlink="/"][href="/"] > p',
 		routes: ['/news', BLUEMAP_ROUTE],
-		projects: ['desktop'],
+		projects: [PROJECT.desktop],
 		note: `${OPAQUE_NAVBAR_NOTE} Also, the Home link is marked active on every page because its routerLinkActive lacks exact matching.`
 	},
 	{
 		ruleId: 'color-contrast',
 		target: 'a[routerlink="/news"] > p',
 		routes: ['/news'],
-		projects: ['desktop'],
+		projects: [PROJECT.desktop],
 		note: OPAQUE_NAVBAR_NOTE
 	},
 	{
 		ruleId: 'color-contrast',
 		target: 'a[routerlink="/map"] > p',
 		routes: [BLUEMAP_ROUTE],
-		projects: ['desktop'],
+		projects: [PROJECT.desktop],
 		note: OPAQUE_NAVBAR_NOTE
 	}
 ];
