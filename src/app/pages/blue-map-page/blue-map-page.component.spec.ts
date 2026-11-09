@@ -34,13 +34,13 @@ function renderIframeSrc(routeData: Record<string, unknown>): string | null {
 describe('BlueMapPageComponent', () => {
 	it('embeds the BlueMap map named in the route data', () => {
 		expect(renderIframeSrc({ mapName: 'world' })).toBe(
-			`${environment.bluemapUrl}/#world${CAMERA_HASH}`
+			`${environment.BLUEMAP_URL}/#world${CAMERA_HASH}`
 		);
 	});
 
 	it('embeds the default BlueMap map when the route names none', () => {
 		expect(renderIframeSrc({})).toBe(
-			`${environment.bluemapUrl}/#${CAMERA_HASH}`
+			`${environment.BLUEMAP_URL}/#${CAMERA_HASH}`
 		);
 	});
 });

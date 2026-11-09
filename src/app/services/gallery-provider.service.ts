@@ -34,6 +34,6 @@ export class GalleryProviderService {
 	}
 
 	private collectionUrl(collectionName: string): string {
-		return `${environment.apiEndpoint}/gallery/${encodeURIComponent(collectionName)}`;
+		return `${environment.API_URL}/gallery/${encodeURIComponent(collectionName)}`;
 	}
 }

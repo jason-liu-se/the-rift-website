@@ -41,8 +41,7 @@ testem.log
 
 # Environment URLs (see README "Getting started") and the files generated from them
 .env
-/src/environments/environment.ts
-/src/environments/environment.development.ts
+/src/environments/
 
 # System files
 .DS_Store

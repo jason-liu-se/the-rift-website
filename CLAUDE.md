@@ -53,13 +53,15 @@ lints and formats staged files.
 - **External services.** A separate The Rift API (news, gallery, downloads) and
   a BlueMap server (embedded maps), neither started by this repo. Endpoints come
   from the gitignored `.env` (variables listed in README), which
-  `scripts/generate-environments.mjs` turns into Angular environment files on
-  `npm ci` and before `start`/`build`/`test`/`e2e` (`DEV_` values default to
-  localhost; `PROD_` is required only for `build` and `start:prod`). Run
-  `npm run env` yourself before calling `ng` directly. Import `environment` from
-  `src/environments/`, never hard-code URLs; a new setting needs a key in
-  `IEnvironment`, the script, and the README `.env` example. Map route data must
-  match BlueMap map ids.
+  `scripts/environments/generate.mjs` turns into Angular environment files on
+  `npm ci` and before `start`/`build`/`test`/`e2e`. Only `PUBLIC_` environment
+  variables are read; `PUBLIC_X` becomes `environment.X`, with `DEV_`/`PROD_`
+  prefixes overriding per environment, and `IEnvironment` is generated from the
+  keys, so a new setting only needs `.env` and the README `.env` example, plus a
+  `PROCESSORS` entry in `scripts/environments/config.mjs` if it needs checking
+  (e.g. URLs). Run `npm run env` yourself before calling `ng` directly. Import
+  `environment` from `src/environments/`, never hard-code URLs. Map route data
+  must match BlueMap map ids.
 - **Services** (`src/app/services/`) are thin `HttpClient` wrappers returning
   Observables; caching happens in the consuming component. `SafePipe`
   (`src/app/utilities/`) trusts resource URLs for the BlueMap iframes.

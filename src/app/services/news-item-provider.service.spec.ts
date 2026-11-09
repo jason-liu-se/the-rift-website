@@ -10,7 +10,7 @@ import { IPaginatedResponse } from '../interfaces/paginated-response.interface';
 import { NewsItemProviderService } from './news-item-provider.service';
 
 describe('NewsItemProviderService', () => {
-	const apiEndpoint = environment.apiEndpoint;
+	const apiEndpoint = environment.API_URL;
 	let service: NewsItemProviderService;
 	let httpTesting: HttpTestingController;
 

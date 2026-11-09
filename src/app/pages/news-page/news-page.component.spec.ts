@@ -13,7 +13,7 @@ import { INewsItem } from 'src/app/interfaces/news-item.interface';
 import { NewsPageComponent } from './news-page.component';
 
 describe('NewsPageComponent', () => {
-	const newsUrl = `${environment.apiEndpoint}/news`;
+	const newsUrl = `${environment.API_URL}/news`;
 	const firstPage: INewsItem[] = [
 		{ title: 'Launch', date: '2026-01-01', content: 'Hi' }
 	];

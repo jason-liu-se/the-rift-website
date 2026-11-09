@@ -13,7 +13,7 @@ import { ICaptionCard } from '../interfaces/slideshow-image.interface';
 import { GalleryProviderService } from './gallery-provider.service';
 
 describe('GalleryProviderService', () => {
-	const apiEndpoint = environment.apiEndpoint;
+	const apiEndpoint = environment.API_URL;
 	let service: GalleryProviderService;
 	let httpTesting: HttpTestingController;
 

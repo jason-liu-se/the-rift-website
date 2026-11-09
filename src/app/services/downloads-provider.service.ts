@@ -12,7 +12,7 @@ export class DownloadsProviderService {
 
 	public getDownloadCollections(): Observable<IDownloadCollection[]> {
 		return this.http.get<IDownloadCollection[]>(
-			`${environment.apiEndpoint}/downloads`
+			`${environment.API_URL}/downloads`
 		);
 	}
 }

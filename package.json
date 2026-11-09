@@ -10,7 +10,7 @@
 		"pree2e": "npm run env",
 		"pree2e:ui": "npm run env",
 		"ng": "ng",
-		"env": "node scripts/generate-environments.mjs",
+		"env": "node scripts/environments/generate.mjs",
 		"start": "ng serve",
 		"start:prod": "ng serve --configuration production",
 		"build": "ng build",

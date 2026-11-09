@@ -9,7 +9,7 @@ import { IDownloadCollection } from '../interfaces/download-collection.interface
 import { DownloadsProviderService } from './downloads-provider.service';
 
 describe('DownloadsProviderService', () => {
-	const apiEndpoint = environment.apiEndpoint;
+	const apiEndpoint = environment.API_URL;
 	let service: DownloadsProviderService;
 	let httpTesting: HttpTestingController;
 

@@ -11,7 +11,7 @@ import { ICaptionCard } from 'src/app/interfaces/slideshow-image.interface';
 import { GalleryShowcasePageComponent } from './gallery-showcase-page.component';
 
 describe('GalleryShowcasePageComponent', () => {
-	const collectionUrl = `${environment.apiEndpoint}/gallery/season-5`;
+	const collectionUrl = `${environment.API_URL}/gallery/season-5`;
 	const images: ICaptionCard[] = [{ url: 'image.png', caption: 'Spawn' }];
 	let component: GalleryShowcasePageComponent;
 	let fixture: ComponentFixture<GalleryShowcasePageComponent>;

@@ -16,7 +16,7 @@ export class NewsItemProviderService {
 		limit: number
 	): Observable<IPaginatedResponse<INewsItem>> {
 		return this.http.get<IPaginatedResponse<INewsItem>>(
-			`${environment.apiEndpoint}/news`,
+			`${environment.API_URL}/news`,
 			{ params: { startIndex, limit } }
 		);
 	}

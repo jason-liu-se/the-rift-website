@@ -15,18 +15,25 @@ Neither service is started by this repo. Static pages work without them.
 
 ## Getting started
 
-1. Optional: create a `.env` file in the repo root to set the service URLs:
+1. Optional: create a `.env` file in the repo root to set the service URLs and
+   any other settings:
 
     ```bash
-    DEV_API_URL=http://localhost:4000
-    DEV_BLUEMAP_URL=http://localhost:8100
-    PROD_API_URL=https://api.example.com
-    PROD_BLUEMAP_URL=https://map.example.com
+    DEV_PUBLIC_API_URL=http://localhost:4000
+    DEV_PUBLIC_BLUEMAP_URL=http://localhost:8100
+    PROD_PUBLIC_API_URL=https://api.example.com
+    PROD_PUBLIC_BLUEMAP_URL=https://map.example.com
     ```
 
-    `DEV_` URLs default to the localhost values above. `PROD_` URLs are only
-    needed for `npm run build` and `npm run start:prod`. Use full `http(s)`
-    URLs; trailing slashes are removed. Shell variables override `.env`.
+    Only variables starting with `PUBLIC_` are used, because every value ends up
+    in the public JS bundle. Others are ignored, so secrets and system variables
+    never reach it. `PUBLIC_X` becomes `environment.X`. A `DEV_` or `PROD_`
+    prefix limits it to that environment and overrides the unprefixed name (e.g.
+    `PUBLIC_API_URL` for both, `PROD_PUBLIC_API_URL` for production only). Every
+    key must be set for both environments: development values default to the
+    localhost URLs above, and production falls back to them except for
+    `npm run build` and `npm run start:prod`. See
+    [Environment variables](#environment-variables) to add or change one.
 
 2. Install and run:
 
@@ -37,12 +44,32 @@ Neither service is started by this repo. Static pages work without them.
 
 3. Open <http://localhost:4200/>.
 
+## Environment variables
+
+`npm run env` turns the `PUBLIC_` variables into `src/environments/` (including
+the `IEnvironment` type). Per-variable settings live in
+`scripts/environments/config.mjs`, the only script file you need to edit:
+
+- **Adding a variable:** set `PUBLIC_<NAME>` in `.env` (or the shell, or as a
+  `NAME=value` argument to `npm run env`), add it to the `.env` example above,
+  and read it in code as `environment.<NAME>`. No other file changes.
+- **Checking or transforming a value:** add `<NAME>: someCheck` to `PROCESSORS`
+  in `config.mjs`, using a check from `scripts/environments/processors.mjs`
+  (e.g. `normaliseUrl`) or a new one added there. Values not listed are used
+  as-is.
+- **Different values per environment:** use `DEV_PUBLIC_<NAME>` and
+  `PROD_PUBLIC_<NAME>`; either overrides `PUBLIC_<NAME>` in its environment.
+  Both environments share one `IEnvironment`, so a variable set for only one
+  must still get a value in the other: set the other prefix too, set
+  `PUBLIC_<NAME>`, or add a development default to `DEV_DEFAULTS` in
+  `config.mjs`.
+
 ## Commands
 
 | Command                   | What it does                                                |
 | ------------------------- | ----------------------------------------------------------- |
-| `npm start`               | Dev server using the `DEV_` URLs                            |
-| `npm run start:prod`      | Dev server using the production build and `PROD_` URLs      |
+| `npm start`               | Dev server using the development URLs                       |
+| `npm run start:prod`      | Dev server using the production build and URLs              |
 | `npm run build`           | Production build (output path in `angular.json`)            |
 | `npm run watch`           | Rebuild on change (development)                             |
 | `npm test`                | Unit tests (`-- --watch=false` for one run)                 |
@@ -75,7 +102,7 @@ If you're used to Jasmine:
 ### End-to-end tests
 
 Playwright tests in `e2e/` run every route on desktop and mobile in Chromium.
-The API and BlueMap are mocked at the `DEV_` URLs, so you don't need either
+The API and BlueMap are mocked at the development URLs, so you don't need either
 running. Playwright reuses a server already on port 4200, so stop
 `npm run start:prod` before running e2e tests.
 
@@ -130,9 +157,11 @@ src/
 │   ├── utilities/    Small shared helpers and pipes
 │   └── app-routing.module.ts
 ├── assets/           Images and icons
-├── environments/     environment*.ts generated from .env; the interface isn't
+├── environments/     Generated from .env; don't edit
 └── *.scss            Global styles and Material theme
 e2e/                  Playwright tests and their support files
+scripts/environments/ config.mjs (variable settings), processors.mjs (checks),
+                      generate.mjs (writes src/environments/)
 ```
 
 **How pages work:** every route in `app-routing.module.ts` renders
@@ -142,12 +171,13 @@ e2e/                  Playwright tests and their support files
 
 ## Troubleshooting
 
-| Problem                      | Check                                                                         |
-| ---------------------------- | ----------------------------------------------------------------------------- |
-| News or gallery is empty     | The API is running at `DEV_API_URL`; restart `npm start` after editing `.env` |
-| Map pages are blank          | BlueMap is running at `DEV_BLUEMAP_URL`, and its map ids match the routes     |
-| `... is not set`             | A `PROD_` variable is missing from `.env` (needed for build and `start:prod`) |
-| Requests fail in the console | CORS: the API must allow the site's origin                                    |
+| Problem                      | Check                                                                                     |
+| ---------------------------- | ----------------------------------------------------------------------------------------- |
+| News or gallery is empty     | The API is running at the development `API_URL`; restart `npm start` after editing `.env` |
+| Map pages are blank          | BlueMap is running at the development `BLUEMAP_URL`, and its map ids match the routes     |
+| `Not set: ...`               | A variable is set for one environment only, or a production one is missing                |
+| A `.env` value is ignored    | Its name must start with `PUBLIC_`, `DEV_PUBLIC_`, or `PROD_PUBLIC_`                      |
+| Requests fail in the console | CORS: the API must allow the site's origin                                                |
 
 ## Claude Code
 

@@ -25,7 +25,7 @@ export class BlueMapPageComponent {
 
 	constructor() {
 		const mapName = this.route.snapshot.data['mapName'] ?? '';
-		this.bluemapUrl = `${environment.bluemapUrl}/#${mapName}${BLUEMAP_CAMERA_HASH}`;
+		this.bluemapUrl = `${environment.BLUEMAP_URL}/#${mapName}${BLUEMAP_CAMERA_HASH}`;
 	}
 
 	public toggleHAMsg(): void {
