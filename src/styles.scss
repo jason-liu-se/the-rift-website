@@ -1,4 +1,7 @@
+@use "@angular/cdk";
 @use "./font-sizes" as *;
+
+@include cdk.a11y-visually-hidden();
 
 *:not(html) {
 	font-family:

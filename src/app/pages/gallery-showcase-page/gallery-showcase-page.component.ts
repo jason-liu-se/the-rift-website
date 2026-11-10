@@ -32,7 +32,7 @@ export class GalleryShowcasePageComponent {
 	public imageUrl: string;
 	public captionedImages: ICaptionCard[] = [];
 	public collectionName: string;
-	public paginationLength!: number;
+	public paginationLength?: number;
 	public pageSize = 30;
 	public pageIndex = 0;
 	public pageEvent!: PageEvent;
@@ -74,17 +74,26 @@ export class GalleryShowcasePageComponent {
 	}
 
 	private populateCaptionedImages(): void {
+		if (!this.collectionName) {
+			return;
+		}
+
+		// the user may change page before this response arrives
+		const requestedPageIndex = this.pageIndex;
+
 		this.galleryProvider
 			.getCollectionImagesObservable(
 				this.collectionName,
-				this.pageIndex * this.pageSize,
+				requestedPageIndex * this.pageSize,
 				this.pageSize
 			)
 			.subscribe(({ items, total }) => {
-				this.captionedImages = items;
+				this.imageCache[`${requestedPageIndex}`] = items;
 				this.paginationLength = total;
 
-				this.imageCache[`${this.pageIndex}`] = this.captionedImages;
+				if (requestedPageIndex === this.pageIndex) {
+					this.captionedImages = items;
+				}
 			});
 	}
 }

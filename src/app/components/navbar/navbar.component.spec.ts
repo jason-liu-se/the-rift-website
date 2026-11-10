@@ -5,24 +5,17 @@ import {
 	ANY_URL_ROUTES,
 	renderComponent
 } from 'src/app/testing/render-component';
-import { MENU_BREAKPOINT_REM, NavbarComponent } from './navbar.component';
-
-const ROOT_FONT_SIZE_PX = 16;
-const MENU_BREAKPOINT_PX = MENU_BREAKPOINT_REM * ROOT_FONT_SIZE_PX;
-
-/** jsdom ignores plain assignment to `window.innerWidth`. */
-function setInnerWidth(width: number): void {
-	Object.defineProperty(window, 'innerWidth', {
-		value: width,
-		configurable: true,
-		writable: true
-	});
-}
+import {
+	DESKTOP_BREAKPOINT_PX,
+	resetViewport,
+	setInnerWidth,
+	useRootFontSize
+} from 'src/app/testing/viewport';
+import { NavbarComponent } from './navbar.component';
 
 describe('NavbarComponent', () => {
 	let fixture: ComponentFixture<NavbarComponent>;
 	let element: HTMLElement;
-	const originalInnerWidth = window.innerWidth;
 
 	const menuLinks = () => element.querySelector('.menu-links.center-align');
 	const click = (selector: string) => {
@@ -48,10 +41,7 @@ describe('NavbarComponent', () => {
 		element = fixture.nativeElement;
 	});
 
-	afterEach(() => {
-		setInnerWidth(originalInnerWidth);
-		document.documentElement.style.fontSize = '';
-	});
+	afterEach(resetViewport);
 
 	describe('transparent', () => {
 		it('is see-through with no spacer by default', () => {
@@ -104,18 +94,18 @@ describe('NavbarComponent', () => {
 
 		describe('on window resize', () => {
 			beforeEach(() => {
-				document.documentElement.style.fontSize = `${ROOT_FONT_SIZE_PX}px`;
+				useRootFontSize();
 				click('.hamburger-menu-button');
 			});
 
 			it('closes at the desktop breakpoint', () => {
-				resizeWindow(MENU_BREAKPOINT_PX);
+				resizeWindow(DESKTOP_BREAKPOINT_PX);
 
 				expect(menuLinks()?.classList).toContain('hidden');
 			});
 
 			it('stays open below the desktop breakpoint', () => {
-				resizeWindow(MENU_BREAKPOINT_PX - 1);
+				resizeWindow(DESKTOP_BREAKPOINT_PX - 1);
 
 				expect(menuLinks()?.classList).not.toContain('hidden');
 			});

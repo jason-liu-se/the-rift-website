@@ -12,16 +12,19 @@
 		[titlePosition]="'center'"
 		[contentPosition]="'center'"
 	>
-		<button
+		<a
 			class="form-button"
 			mat-fab
 			extended
 			disableRipple
 			color="primary"
-			onClick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSdxIhoo6Ub-zT36MGa2ld9JNOZtNVeTJYPs4LYj-wDmqrsf9g/viewform?usp=sf_link');"
+			[href]="joinFormUrl"
+			target="_blank"
+			rel="noopener"
 		>
 			<mat-icon>open_in_new</mat-icon>
 			Fill Out Form
-		</button>
+			<span class="cdk-visually-hidden">(opens in new tab)</span>
+		</a>
 	</app-section-card>
 </div>

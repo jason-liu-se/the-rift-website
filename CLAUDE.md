@@ -67,12 +67,13 @@ Run unit tests (`npm test`) whenever useful; they're fast. Never run e2e tests
 (`npm run e2e`) unless the user explicitly asks; they're slow.
 
 Unit tests use Vitest globals in jsdom without zone.js: no `fakeAsync`, and
-`vi.spyOn` calls through unless mocked (see README "Testing"). Components
-touching routing or HTTP need `provideHttpClient()`,
-`provideHttpClientTesting()`, `provideRouter([])`, and
-`provideNoopAnimations()`. Anything under `PageTemplateComponent` needs a
-stubbed `ActivatedRoute` with `snapshot.data.component`; see
-`page-template.component.spec.ts`.
+`vi.spyOn` calls through unless mocked (see README "Testing"). Provide only what
+the component uses: `provideRouter(...)` for router links (with `ANY_URL_ROUTES`
+to assert navigation), and `provideHttpClient()` plus
+`provideHttpClientTesting()` for HTTP. Anything under `PageTemplateComponent`
+needs a stubbed `ActivatedRoute` with `snapshot.data.component`; see
+`page-template.component.spec.ts`. Use the helpers in `src/app/testing/` before
+defining new ones.
 
 E2E specs in `e2e/` import `test`/`expect` from `e2e/support/test.ts`, which
 mocks the API and BlueMap, and open pages with `gotoRoute`

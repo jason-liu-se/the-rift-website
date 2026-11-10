@@ -4,6 +4,9 @@ import { SectionCardComponent } from '../../components/section-card/section-card
 import { MatFabButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 
+/** Google Form that applicants fill out to join the server. */
+export const JOIN_FORM_URL = 'https://exampleform.com';
+
 @Component({
 	selector: 'app-join-page',
 	templateUrl: './join-page.component.html',
@@ -15,4 +18,6 @@ import { MatIcon } from '@angular/material/icon';
 		MatIcon
 	]
 })
-export class JoinPageComponent {}
+export class JoinPageComponent {
+	public readonly joinFormUrl = JOIN_FORM_URL;
+}

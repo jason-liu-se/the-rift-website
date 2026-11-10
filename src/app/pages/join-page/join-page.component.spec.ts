@@ -1,31 +1,19 @@
-import { provideHttpClient } from '@angular/common/http';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
-import { provideRouter } from '@angular/router';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 
-import { JoinPageComponent } from './join-page.component';
+import { JOIN_FORM_URL, JoinPageComponent } from './join-page.component';
 
 describe('JoinPageComponent', () => {
-	let component: JoinPageComponent;
-	let fixture: ComponentFixture<JoinPageComponent>;
-
-	beforeEach(() => {
-		TestBed.configureTestingModule({
-			imports: [JoinPageComponent],
-			providers: [
-				provideHttpClient(),
-				provideHttpClientTesting(),
-				provideRouter([]),
-				provideNoopAnimations()
-			]
-		});
-		fixture = TestBed.createComponent(JoinPageComponent);
-		component = fixture.componentInstance;
+	it('links Fill Out Form to the join form in a new tab', () => {
+		TestBed.configureTestingModule({ imports: [JoinPageComponent] });
+		const fixture = TestBed.createComponent(JoinPageComponent);
 		fixture.detectChanges();
-	});
 
-	it('should create', () => {
-		expect(component).toBeTruthy();
+		const link: HTMLAnchorElement =
+			fixture.nativeElement.querySelector('.form-button');
+
+		expect(link.textContent).toContain('Fill Out Form');
+		expect(link.getAttribute('href')).toBe(JOIN_FORM_URL);
+		expect(link.target).toBe('_blank');
+		expect(link.textContent).toContain('(opens in new tab)');
 	});
 });

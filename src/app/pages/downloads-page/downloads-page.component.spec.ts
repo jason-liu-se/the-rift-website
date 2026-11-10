@@ -1,31 +1,86 @@
 import { provideHttpClient } from '@angular/common/http';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
-import { provideRouter } from '@angular/router';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {
+	HttpTestingController,
+	provideHttpClientTesting
+} from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
 
+import { IDownloadCollection } from 'src/app/interfaces/download-collection.interface';
+import { environment } from 'src/environments/environment';
 import { DownloadsPageComponent } from './downloads-page.component';
 
+const COLLECTIONS: IDownloadCollection[] = [
+	{
+		name: 'Worlds',
+		items: [
+			{
+				title: 'Season 5',
+				desc: 'Full world',
+				downloadUrl: 'https://example.com/season-5.zip',
+				backgroundUrl: 'assets/season-5.png'
+			},
+			{
+				title: 'Season 4',
+				desc: 'Full world',
+				downloadUrl: 'https://example.com/season-4.zip',
+				backgroundUrl: 'assets/season-4.png'
+			}
+		]
+	},
+	{
+		name: 'Resource packs',
+		items: [
+			{
+				title: 'Rift pack',
+				desc: 'Textures',
+				downloadUrl: 'https://example.com/pack.zip',
+				backgroundUrl: 'assets/pack.png'
+			}
+		]
+	}
+];
+
 describe('DownloadsPageComponent', () => {
-	let component: DownloadsPageComponent;
-	let fixture: ComponentFixture<DownloadsPageComponent>;
+	let httpTesting: HttpTestingController;
 
 	beforeEach(() => {
 		TestBed.configureTestingModule({
 			imports: [DownloadsPageComponent],
-			providers: [
-				provideHttpClient(),
-				provideHttpClientTesting(),
-				provideRouter([]),
-				provideNoopAnimations()
-			]
+			providers: [provideHttpClient(), provideHttpClientTesting()]
 		});
-		fixture = TestBed.createComponent(DownloadsPageComponent);
-		component = fixture.componentInstance;
-		fixture.detectChanges();
+		httpTesting = TestBed.inject(HttpTestingController);
 	});
 
-	it('should create', () => {
-		expect(component).toBeTruthy();
+	afterEach(() => httpTesting.verify());
+
+	it('renders a section of download cards for each collection', () => {
+		const fixture = TestBed.createComponent(DownloadsPageComponent);
+		fixture.detectChanges();
+
+		httpTesting
+			.expectOne(`${environment.API_URL}/downloads`)
+			.flush(COLLECTIONS);
+		fixture.detectChanges();
+
+		const sections: NodeListOf<HTMLElement> =
+			fixture.nativeElement.querySelectorAll('app-section-card');
+		expect(sections).toHaveLength(COLLECTIONS.length);
+		sections.forEach((section, i) => {
+			const collection = COLLECTIONS[i];
+			const cards = section.querySelectorAll('app-download-card');
+
+			expect(section.querySelector('h2')?.textContent?.trim()).toBe(
+				collection.name
+			);
+			expect(cards).toHaveLength(collection.items.length);
+			cards.forEach((card, j) => {
+				expect(card.querySelector('h2')?.textContent).toBe(
+					collection.items[j].title
+				);
+				expect(card.querySelector('a')?.getAttribute('href')).toBe(
+					collection.items[j].downloadUrl
+				);
+			});
+		});
 	});
 });

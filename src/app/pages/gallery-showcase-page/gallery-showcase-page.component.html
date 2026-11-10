@@ -7,13 +7,15 @@
 	<div class="paginated-image-showcase-container">
 		<div class="image-showcase-header">
 			<app-back-button [destination]="'/gallery'" [title]="'Gallery'" />
-			<p class="page-caption">{{ "Results: " + paginationLength }}</p>
+			@if (paginationLength !== undefined) {
+				<p class="page-caption">{{ "Results: " + paginationLength }}</p>
+			}
 		</div>
 		<mat-paginator
 			#paginator
 			class="paginator"
 			(page)="handlePageEvent($event)"
-			[length]="paginationLength"
+			[length]="paginationLength ?? 0"
 			[pageSize]="pageSize"
 			[showFirstLastButtons]="true"
 			[pageIndex]="pageIndex"
@@ -28,7 +30,7 @@
 			#paginator
 			class="paginator"
 			(page)="handlePageEvent($event)"
-			[length]="paginationLength"
+			[length]="paginationLength ?? 0"
 			[pageSize]="pageSize"
 			[showFirstLastButtons]="true"
 			[pageIndex]="pageIndex"

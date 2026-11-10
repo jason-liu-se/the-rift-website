@@ -53,5 +53,6 @@ describe('DownloadCardComponent', () => {
 		expect(link?.textContent).toContain('Download');
 		expect(link?.getAttribute('href')).toBe(DOWNLOAD_URL);
 		expect(link?.target).toBe('_blank');
+		expect(link?.textContent).toContain('(opens in new tab)');
 	});
 });

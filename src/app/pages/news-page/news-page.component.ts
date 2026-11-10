@@ -51,14 +51,19 @@ export class NewsPageComponent {
 		window.scrollTo(0, 0);
 	}
 
-	private populateNewsItems() {
+	private populateNewsItems(): void {
+		// the user may change page before this response arrives
+		const requestedPageIndex = this.pageIndex;
+
 		this.newsItemProvider
-			.getNewsItems(this.pageIndex * this.pageSize, this.pageSize)
+			.getNewsItems(requestedPageIndex * this.pageSize, this.pageSize)
 			.subscribe(({ items, total }) => {
-				this.newsItems = items;
+				this.newsItemCache[`${requestedPageIndex}`] = items;
 				this.paginationLength = total;
 
-				this.newsItemCache[`${this.pageIndex}`] = this.newsItems;
+				if (requestedPageIndex === this.pageIndex) {
+					this.newsItems = items;
+				}
 			});
 	}
 }

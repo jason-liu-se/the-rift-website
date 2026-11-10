@@ -92,6 +92,7 @@ writing the files by hand.
 
 `*.spec.ts` files sit next to the code they test and run in Vitest (jsdom, no
 browser needed). Run one file with `npm test -- --include <path/to/spec>`.
+Shared helpers live in `src/app/testing/`.
 
 If you're used to Jasmine:
 

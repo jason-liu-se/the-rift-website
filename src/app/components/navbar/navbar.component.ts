@@ -2,9 +2,7 @@ import { Component, Input } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatButton } from '@angular/material/button';
-
-/** Width at which the hamburger menu gives way to the full menu (matches the stylesheet's 60rem query). */
-export const MENU_BREAKPOINT_REM = 60;
+import { isDesktopWidth } from 'src/app/utilities/viewport.util';
 
 @Component({
 	selector: 'app-navbar',
@@ -22,12 +20,9 @@ export class NavbarComponent {
 		this.isHamburgerMenuVisible = !this.isHamburgerMenuVisible;
 	}
 
+	// the hamburger menu only exists below the desktop breakpoint
 	public onResize(): void {
-		const rootFontSize = parseFloat(
-			getComputedStyle(document.documentElement).fontSize
-		);
-
-		if (window.innerWidth >= MENU_BREAKPOINT_REM * rootFontSize) {
+		if (isDesktopWidth()) {
 			this.isHamburgerMenuVisible = false;
 		}
 	}
