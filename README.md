@@ -15,25 +15,8 @@ Neither service is started by this repo. Static pages work without them.
 
 ## Getting started
 
-1. Optional: create a `.env` file in the repo root to set the service URLs and
-   any other settings:
-
-    ```bash
-    DEV_PUBLIC_API_URL=http://localhost:4000
-    DEV_PUBLIC_BLUEMAP_URL=http://localhost:8100
-    PROD_PUBLIC_API_URL=https://api.example.com
-    PROD_PUBLIC_BLUEMAP_URL=https://map.example.com
-    ```
-
-    Only variables starting with `PUBLIC_` are used, because every value ends up
-    in the public JS bundle. Others are ignored, so secrets and system variables
-    never reach it. `PUBLIC_X` becomes `environment.X`. A `DEV_` or `PROD_`
-    prefix limits it to that environment and overrides the unprefixed name (e.g.
-    `PUBLIC_API_URL` for both, `PROD_PUBLIC_API_URL` for production only). Every
-    key must be set for both environments: development values default to the
-    localhost URLs above, and production falls back to them except for
-    `npm run build` and `npm run start:prod`. See
-    [Environment variables](#environment-variables) to add or change one.
+1. Optional: create a `.env` file in the repo root (see
+   [Environment variables](#environment-variables)).
 
 2. Install and run:
 
@@ -46,13 +29,41 @@ Neither service is started by this repo. Static pages work without them.
 
 ## Environment variables
 
+| Variable                | `DEV_`/`PROD_` versions | Required for                                | Sets                                                                                            |
+| ----------------------- | ----------------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `PUBLIC_API_URL`        | Yes                     | `npm run build`, `npm run start:prod`       | The Rift API's base URL (`environment.API_URL`)                                                 |
+| `PUBLIC_BLUEMAP_URL`    | Yes                     | `npm run build`, `npm run start:prod`       | BlueMap's base URL (`environment.BLUEMAP_URL`)                                                  |
+| `LOCAL_WEB_SERVER_PATH` | No                      | `npm run api:sync` (and a real `api:check`) | Your web-server checkout, absolute or relative to this repo (see [API contract](#api-contract)) |
+
+The URLs have development defaults (`DEV_DEFAULTS` in
+`scripts/environments/config.mjs`), so only production needs them set. Example:
+
+```bash
+DEV_PUBLIC_API_URL=http://localhost:4000
+DEV_PUBLIC_BLUEMAP_URL=http://localhost:8100
+PROD_PUBLIC_API_URL=https://api.example.com
+PROD_PUBLIC_BLUEMAP_URL=https://map.example.com
+LOCAL_WEB_SERVER_PATH=../web-server
+```
+
+### App settings (`PUBLIC_`)
+
 `npm run env` turns the `PUBLIC_` variables into `src/environments/` (including
-the `IEnvironment` type). Per-variable settings live in
-`scripts/environments/config.mjs`, the only script file you need to edit:
+the `IEnvironment` type). Every value ends up in the public JS bundle, so only
+names starting with `PUBLIC_` are read; others (secrets, system variables, and
+script settings like `LOCAL_WEB_SERVER_PATH`) never reach it. `PUBLIC_X` becomes
+`environment.X`. A `DEV_` or `PROD_` prefix limits it to that environment and
+overrides the unprefixed name (e.g. `PUBLIC_API_URL` for both,
+`PROD_PUBLIC_API_URL` for production only). Every key must be set for both
+environments: production falls back to the development values except for
+`npm run build` and `npm run start:prod`.
+
+Per-variable settings live in `scripts/environments/config.mjs`, the only script
+file you need to edit:
 
 - **Adding a variable:** set `PUBLIC_<NAME>` in `.env` (or the shell, or as a
-  `NAME=value` argument to `npm run env`), add it to the `.env` example above,
-  and read it in code as `environment.<NAME>`. No other file changes.
+  `NAME=value` argument to `npm run env`), add it to the table and example
+  above, and read it in code as `environment.<NAME>`. No other file changes.
 - **Checking or transforming a value:** add `<NAME>: someCheck` to `PROCESSORS`
   in `config.mjs`, using a check from `scripts/environments/processors.mjs`
   (e.g. `normaliseUrl`) or a new one added there. Values not listed are used
@@ -134,7 +145,9 @@ empty placeholder, so a passing run isn't a full audit.
 - Open pages with `gotoRoute` from `e2e/support/navigation.ts`.
 - Add new routes to `e2e/support/routes.ts`.
 - Mock data lives in `src/app/testing/api-fixtures.ts`, shared with the service
-  unit tests so both suites expect the same API response shapes.
+  unit tests and typed against the API contract (see
+  [API contract](#api-contract)). This keeps both suites consistent with each
+  other and with the contract, but neither talks to the real server.
 - Limit a test to one device with the tags in `e2e/support/projects.ts`.
 
 **Known issues**
@@ -154,7 +167,7 @@ src/
 │   ├── components/   Reusable UI pieces (cards, navbar, footer, ...)
 │   ├── pages/        One component per routed page
 │   ├── services/     API clients
-│   ├── interfaces/   Data types
+│   ├── interfaces/   Data types; api-responses.ts is synced from web-server
 │   ├── directives/   Custom directives
 │   ├── utilities/    Small shared helpers and pipes
 │   └── app.routes.ts
@@ -164,6 +177,7 @@ src/
 e2e/                  Playwright tests and their support files
 scripts/environments/ config.mjs (variable settings), processors.mjs (checks),
                       generate.mjs (writes src/environments/)
+scripts/api-contract/ sync.mjs (copies the API contract from web-server)
 ```
 
 **How pages work:** every route in `app.routes.ts` renders
@@ -171,15 +185,36 @@ scripts/environments/ config.mjs (variable settings), processors.mjs (checks),
 `data.component` with the shared navbar and footer. Components are standalone
 (there's no root `NgModule`).
 
+## API contract
+
+The API's response types are owned by the web-server repo
+(`src/contract/api-responses.ts` there). The server sends every response through
+schemas checked against that file. This repo keeps a verbatim copy at
+`src/app/interfaces/api-responses.ts`, which the services and fixtures use.
+Don't edit the copy.
+
+Clone the [web-server repo](https://github.com/jason-liu-se/the-rift-web-server)
+anywhere and set `LOCAL_WEB_SERVER_PATH` in `.env` to its folder (see
+[Environment variables](#environment-variables)). Then, from this repo:
+
+```bash
+npm run api:sync    # copy the server's current contract here
+npm run api:check   # fail if the copy is out of date (runs before tests and commits)
+```
+
+Without `LOCAL_WEB_SERVER_PATH` (e.g. in CI), `api:check` warns and skips, and
+the committed copy is used.
+
 ## Troubleshooting
 
-| Problem                      | Check                                                                                     |
-| ---------------------------- | ----------------------------------------------------------------------------------------- |
-| News or gallery is empty     | The API is running at the development `API_URL`; restart `npm start` after editing `.env` |
-| Map pages are blank          | BlueMap is running at the development `BLUEMAP_URL`, and its map ids match the routes     |
-| `Not set: ...`               | A variable is set for one environment only, or a production one is missing                |
-| A `.env` value is ignored    | Its name must start with `PUBLIC_`, `DEV_PUBLIC_`, or `PROD_PUBLIC_`                      |
-| Requests fail in the console | CORS: the API must allow the site's origin                                                |
+| Problem                       | Check                                                                                     |
+| ----------------------------- | ----------------------------------------------------------------------------------------- |
+| News or gallery is empty      | The API is running at the development `API_URL`; restart `npm start` after editing `.env` |
+| Map pages are blank           | BlueMap is running at the development `BLUEMAP_URL`, and its map ids match the routes     |
+| `Not set: ...`                | A variable is set for one environment only, or a production one is missing                |
+| A `.env` value is ignored     | Its name must start with `PUBLIC_`, `DEV_PUBLIC_`, or `PROD_PUBLIC_`                      |
+| `api-contract: ... not found` | `LOCAL_WEB_SERVER_PATH` points to the web-server repo's root folder                       |
+| Requests fail in the console  | CORS: the API must allow the site's origin                                                |
 
 ## Claude Code
 

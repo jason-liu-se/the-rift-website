@@ -5,10 +5,9 @@ import { Page } from '@playwright/test';
 // The suite runs against `npm start`, which serves the development environment.
 import { environment } from '../../src/environments/environment.development';
 import {
-	ICountResponse,
-	IPaginatedResponse
-} from '../../src/app/interfaces/paginated-response.interface';
-import { ICaptionCard } from '../../src/app/interfaces/slideshow-image.interface';
+	CountResponse,
+	GalleryImage
+} from '../../src/app/interfaces/api-responses';
 import {
 	DOWNLOAD_COLLECTIONS,
 	GALLERY_COLLECTIONS,
@@ -36,19 +35,44 @@ interface IMockResponse {
 }
 
 const ok = (json: unknown): IMockResponse => ({ status: 200, json });
+const badRequest: IMockResponse = {
+	status: 400,
+	json: { error: 'ERROR: invalid request parameters' }
+};
+
+/**
+ * Reads an integer query parameter the way the server's `paginationQuery`
+ * does: missing gives `fallback`; a non-integer or a value below `min` gives
+ * undefined, which the server answers with a 400.
+ */
+function queryInteger(
+	params: URLSearchParams,
+	name: string,
+	min: number,
+	fallback: number
+): number | undefined {
+	const value = params.get(name);
+	if (value === null) {
+		return fallback;
+	}
+
+	const number = Number(value);
+	return Number.isInteger(number) && number >= min ? number : undefined;
+}
 
 function paginateByQuery<T>(
 	items: T[],
 	params: URLSearchParams
-): IPaginatedResponse<T> {
-	return paginate(
-		items,
-		Number(params.get('startIndex') ?? 0),
-		Number(params.get('limit') ?? items.length)
-	);
+): IMockResponse {
+	const startIndex = queryInteger(params, 'startIndex', 0, 0);
+	const limit = queryInteger(params, 'limit', 1, items.length);
+
+	return startIndex === undefined || limit === undefined
+		? badRequest
+		: ok(paginate(items, startIndex, limit));
 }
 
-function galleryCollection(encodedName: string): ICaptionCard[] | undefined {
+function galleryCollection(encodedName: string): GalleryImage[] | undefined {
 	return GALLERY_COLLECTIONS[decodeURIComponent(encodedName)];
 }
 
@@ -56,7 +80,7 @@ function respondTo(url: URL): IMockResponse {
 	const notFound = { status: 404, json: { error: `ERROR: ${url.pathname}` } };
 
 	if (url.pathname === '/news') {
-		return ok(paginateByQuery(NEWS_ITEMS, url.searchParams));
+		return paginateByQuery(NEWS_ITEMS, url.searchParams);
 	}
 	if (url.pathname === '/downloads') {
 		return ok(DOWNLOAD_COLLECTIONS);
@@ -65,7 +89,7 @@ function respondTo(url: URL): IMockResponse {
 	const countMatch = GALLERY_COUNT_PATH.exec(url.pathname);
 	if (countMatch) {
 		const images = galleryCollection(countMatch[1]);
-		const count: ICountResponse | undefined = images && {
+		const count: CountResponse | undefined = images && {
 			total: images.length
 		};
 		return count ? ok(count) : notFound;
@@ -74,9 +98,7 @@ function respondTo(url: URL): IMockResponse {
 	const pageMatch = GALLERY_PAGE_PATH.exec(url.pathname);
 	if (pageMatch) {
 		const images = galleryCollection(pageMatch[1]);
-		return images
-			? ok(paginateByQuery(images, url.searchParams))
-			: notFound;
+		return images ? paginateByQuery(images, url.searchParams) : notFound;
 	}
 
 	return notFound;

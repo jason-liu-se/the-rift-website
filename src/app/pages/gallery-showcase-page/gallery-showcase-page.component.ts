@@ -5,7 +5,7 @@ import {
 	MatPaginator
 } from '@angular/material/paginator';
 import { ActivatedRoute } from '@angular/router';
-import { ICaptionCard } from 'src/app/interfaces/slideshow-image.interface';
+import { GalleryImage } from 'src/app/interfaces/api-responses';
 import { GalleryProviderService } from 'src/app/services/gallery-provider.service';
 import { PaginatorIntlService } from 'src/app/services/paginator-intl.service';
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
@@ -30,14 +30,14 @@ export class GalleryShowcasePageComponent {
 
 	public title: string;
 	public imageUrl: string;
-	public captionedImages: ICaptionCard[] = [];
+	public captionedImages: GalleryImage[] = [];
 	public collectionName: string;
 	public paginationLength?: number;
 	public pageSize = 30;
 	public pageIndex = 0;
 	public pageEvent!: PageEvent;
 
-	private imageCache: Record<string, ICaptionCard[]> = {};
+	private imageCache: Record<string, GalleryImage[]> = {};
 
 	// the title and imageUrl must be passed via the app.routes.ts file as
 	// 'data' elements

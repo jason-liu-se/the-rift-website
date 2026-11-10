@@ -1,1 +1,2 @@
+npm run api:check
 npx lint-staged

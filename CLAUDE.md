@@ -53,10 +53,15 @@ pre-commit hook lints and formats staged files.
   directly. Only `PUBLIC_` variables are read: `PUBLIC_X` becomes
   `environment.X`, `DEV_`/`PROD_` prefixes override per environment, and
   `IEnvironment` is generated from the keys. A new setting needs only `.env` and
-  the README `.env` example, plus a `PROCESSORS` entry in
+  the README variables table and `.env` example, plus a `PROCESSORS` entry in
   `scripts/environments/config.mjs` if it needs checking (e.g. URLs). Import
-  `environment` from `src/environments/`; never hard-code URLs. Map route data
-  must match BlueMap map ids.
+  `environment` from `src/environments/`; never hard-code URLs. Settings for
+  scripts (not the app) drop the `PUBLIC_` prefix, and every variable is listed
+  in the README "Environment variables" table. API response types come from
+  `src/app/interfaces/api-responses.ts`, a verbatim copy of the web-server's
+  contract: never edit it here. Change it in the web-server repo (found through
+  `LOCAL_WEB_SERVER_PATH`) and run `npm run api:sync` (README "API contract").
+  Map route data must match BlueMap map ids.
 - **Services** (`src/app/services/`) are thin `HttpClient` wrappers returning
   Observables; caching happens in the consuming component. `SafePipe`
   (`src/app/utilities/`) trusts resource URLs for the BlueMap iframes.

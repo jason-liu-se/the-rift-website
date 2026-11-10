@@ -4,7 +4,7 @@ import {
 	PageEvent,
 	MatPaginator
 } from '@angular/material/paginator';
-import { INewsItem } from 'src/app/interfaces/news-item.interface';
+import { NewsItem } from 'src/app/interfaces/api-responses';
 import { NewsItemProviderService } from 'src/app/services/news-item-provider.service';
 import { PaginatorIntlService } from 'src/app/services/paginator-intl.service';
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
@@ -24,9 +24,9 @@ export class NewsPageComponent {
 	public pageSize = 10;
 	public pageIndex = 0;
 	public pageEvent!: PageEvent;
-	public newsItems: INewsItem[] = [];
+	public newsItems: NewsItem[] = [];
 
-	private newsItemCache: Record<string, INewsItem[]> = {};
+	private newsItemCache: Record<string, NewsItem[]> = {};
 
 	constructor() {
 		this.populateNewsItems();

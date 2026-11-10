@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ICaptionCard } from 'src/app/interfaces/slideshow-image.interface';
+import { GalleryImage } from 'src/app/interfaces/api-responses';
 import { MatIcon } from '@angular/material/icon';
 
 @Component({
@@ -9,7 +9,7 @@ import { MatIcon } from '@angular/material/icon';
 	imports: [MatIcon]
 })
 export class ImageSlideshowComponent implements OnInit {
-	@Input({ required: true }) public captionedImages!: ICaptionCard[];
+	@Input({ required: true }) public captionedImages!: GalleryImage[];
 	@Input() public startingIndex = 0;
 
 	public index = 0;

@@ -2,11 +2,11 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { ICaptionCard } from '../interfaces/slideshow-image.interface';
 import {
-	ICountResponse,
-	IPaginatedResponse
-} from '../interfaces/paginated-response.interface';
+	CountResponse,
+	GalleryImage,
+	PaginatedResponse
+} from '../interfaces/api-responses';
 
 @Injectable({
 	providedIn: 'root'
@@ -18,8 +18,8 @@ export class GalleryProviderService {
 		collectionName: string,
 		startIndex: number,
 		limit: number
-	): Observable<IPaginatedResponse<ICaptionCard>> {
-		return this.http.get<IPaginatedResponse<ICaptionCard>>(
+	): Observable<PaginatedResponse<GalleryImage>> {
+		return this.http.get<PaginatedResponse<GalleryImage>>(
 			this.collectionUrl(collectionName),
 			{ params: { startIndex, limit } }
 		);
@@ -27,8 +27,8 @@ export class GalleryProviderService {
 
 	public getCollectionImageCountObservable(
 		collectionName: string
-	): Observable<ICountResponse> {
-		return this.http.get<ICountResponse>(
+	): Observable<CountResponse> {
+		return this.http.get<CountResponse>(
 			`${this.collectionUrl(collectionName)}/count`
 		);
 	}

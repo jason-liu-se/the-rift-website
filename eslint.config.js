@@ -12,7 +12,9 @@ module.exports = defineConfig([
 			".angular/",
 			"coverage/",
 			"test-results/",
-			"playwright-report/"
+			"playwright-report/",
+			// verbatim copy of the web-server's contract (npm run api:sync)
+			"src/app/interfaces/api-responses.ts"
 		]
 	},
 	{
