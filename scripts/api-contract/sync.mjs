@@ -46,7 +46,7 @@ const source = resolve(serverPath, CONTRACT_IN_SERVER);
 
 if (!existsSync(source)) {
 	console.error(
-		`api-contract: ${source} not found. Check that ${PATH_VARIABLE} points to your web-server checkout.`
+		`api-contract: ${source} not found. Check that ${PATH_VARIABLE} points to your the-rift-web-server clone.`
 	);
 	process.exit(1);
 }
