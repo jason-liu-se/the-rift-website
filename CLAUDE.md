@@ -1,8 +1,5 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with
-code in this repository.
-
 ## Overview
 
 Angular + Angular Material SPA (TypeScript, SCSS) for The Rift Minecraft server
@@ -24,43 +21,41 @@ npm run lint / lint:fix                # angular-eslint
 npm run format / format:check          # prettier
 ```
 
-Scaffold with the Angular CLI, e.g.
-`npm run ng -- generate component components/<name>`. A Husky pre-commit hook
-lints and formats staged files.
+Scaffold with `npm run ng -- generate component components/<name>`. A Husky
+pre-commit hook lints and formats staged files.
 
 ## Conventions
 
-- Formatting and lint rules live in `.prettierrc`, `.editorconfig`, and
-  `eslint.config.js`. Selectors use the `app` prefix.
-- Strict TS with `noPropertyAccessFromIndexSignature`, so route data is read as
+- Lint and format config: `.prettierrc`, `.editorconfig`, `eslint.config.js`.
+  Selectors use the `app` prefix.
+- Strict TS with `noPropertyAccessFromIndexSignature`: read route data as
   `data['key']`.
 - Production builds enforce style size budgets (`angular.json`); keep component
   stylesheets small.
 
 ## Architecture
 
-- **Standalone components, no root `NgModule`.** `src/main.ts` calls
-  `bootstrapApplication` and registers the routes from `src/app/app.routes.ts`
-  with `provideRouter`. Use `inject()` rather than constructor injection.
-- **Every route renders `PageTemplateComponent`.** Each route in
-  `src/app/app.routes.ts` names its page in `data.component`; the template
-  creates it inside the `appPageTemplateHost` directive and wraps it in the
-  shared shell (navbar, optional contact section, footer), with the page itself
-  in a `<main>` that gets focus after in-app navigation. Route data flags toggle
-  the shell (see `PageTemplateComponent` for flags and defaults). Pages can read
-  their own values from route data, so a variant of an existing page (e.g.
-  another gallery collection or map) is usually just a new route.
-- **External services.** A separate The Rift API (news, gallery, downloads) and
-  a BlueMap server (embedded maps), neither started by this repo. Endpoints come
-  from the gitignored `.env` (variables listed in README), which
-  `scripts/environments/generate.mjs` turns into Angular environment files on
-  `npm ci` and before `start`/`build`/`test`/`e2e`. Only `PUBLIC_` environment
-  variables are read; `PUBLIC_X` becomes `environment.X`, with `DEV_`/`PROD_`
-  prefixes overriding per environment, and `IEnvironment` is generated from the
-  keys, so a new setting only needs `.env` and the README `.env` example, plus a
-  `PROCESSORS` entry in `scripts/environments/config.mjs` if it needs checking
-  (e.g. URLs). Run `npm run env` yourself before calling `ng` directly. Import
-  `environment` from `src/environments/`, never hard-code URLs. Map route data
+- **Standalone components, no root `NgModule`.** `src/main.ts` bootstraps with
+  `provideRouter` and the routes in `src/app/app.routes.ts`. Use `inject()`, not
+  constructor injection.
+- **Every route renders `PageTemplateComponent`.** It creates the page named in
+  the route's `data.component` inside the `appPageTemplateHost` directive, in a
+  `<main>` (focused after in-app navigation) wrapped by the shared shell
+  (navbar, optional contact section, footer). Route data flags toggle the shell
+  (flags and defaults in `PageTemplateComponent`). Pages read their own values
+  from route data, so a variant of an existing page (e.g. another gallery
+  collection or map) is usually just a new route.
+- **External services.** The Rift API (news, gallery, downloads) and a BlueMap
+  server (embedded maps) run separately from this repo. Endpoints come from the
+  gitignored `.env` (see README), which `scripts/environments/generate.mjs`
+  turns into Angular environment files on `npm ci` and before
+  `start`/`build`/`test`/`e2e`; run `npm run env` yourself before calling `ng`
+  directly. Only `PUBLIC_` variables are read: `PUBLIC_X` becomes
+  `environment.X`, `DEV_`/`PROD_` prefixes override per environment, and
+  `IEnvironment` is generated from the keys. A new setting needs only `.env` and
+  the README `.env` example, plus a `PROCESSORS` entry in
+  `scripts/environments/config.mjs` if it needs checking (e.g. URLs). Import
+  `environment` from `src/environments/`; never hard-code URLs. Map route data
   must match BlueMap map ids.
 - **Services** (`src/app/services/`) are thin `HttpClient` wrappers returning
   Observables; caching happens in the consuming component. `SafePipe`
@@ -87,29 +82,35 @@ entries there once fixed.
 
 ## Engineering standards
 
-Work as a software engineer, not a code generator.
-
 - **Version-specific best practices.** Follow the official style guide and
-  current recommended patterns for each technology at the exact versions in
-  `package.json` (Angular, Material, RxJS, TypeScript), not generic or
-  other-framework habits, and not patterns that version has deprecated or
-  replaced. If existing code uses an outdated pattern, use the modern one in new
-  code and raise a wider migration with the user.
-- **Reuse (DRY).** Check for existing components, services, or utilities before
-  writing new logic; extract duplication into a modular unit (component,
-  service, function, pipe) that variants compose.
-- **Design.** Encapsulation, composition, single responsibility; low coupling,
-  high cohesion. Prefer pure functions; isolate side effects (HTTP, DOM, global
+  current patterns for the exact versions in `package.json` (Angular, Material,
+  RxJS, TypeScript), not generic, other-framework, or deprecated ones. Where
+  existing code is outdated, use the modern pattern in new code and raise a
+  wider migration with the user.
+- **Reuse and design.** Check for existing components, services, utilities, and
+  styles before writing new ones; extract duplication into a unit (component,
+  service, function, pipe) that variants compose. Single responsibility, low
+  coupling; prefer pure functions and isolate side effects (HTTP, DOM, global
   state).
 - **Clarity.** Descriptive names, small functions, guard clauses, and named
   constants instead of magic values (shared ones in a file under
   `src/app/config/`, created when first needed; otherwise with the owning
-  feature). Choose the simple solution over a clever one (dense RxJS chains,
-  compact one-liners); if a non-obvious version is worth keeping, comment what
-  it does and why.
+  feature). Prefer simple over clever (dense RxJS chains, compact one-liners);
+  if a non-obvious version is worth keeping, comment what it does and why.
 - **Write less code.** Humans review every line. Use concise syntax where it
   stays clear, use what Angular/Material/RxJS provide, and skip speculative code
   (unused options, "just in case" branches, single-caller abstractions).
+- **Colours.** The design is colourful, but every colour comes from the palette
+  in `src/theme-colours.scss` (which `src/theme.scss` builds the Material theme
+  from), using role names (`$colour-primary` etc.) where a colour plays that
+  role. Reuse an existing colour rather than adding a near-duplicate shade, and
+  derive transparent variants from it (e.g. `rgba($colour-primary, 0.9)`). Add
+  genuinely new colours to the palette with a descriptive name, never as a raw
+  hex/`rgb()` in a component stylesheet; replace raw literals in styles you
+  touch. Keep the palette organized: grouped by purpose (e.g. brand, neutrals,
+  text/backgrounds, overlays/shadows) under comment headings, base colours
+  before the role names that reference them, consistent `$colour-<name>` naming,
+  and no unused colours.
 - **Dependencies.** Add a package only for substantial functionality likely to
   be reused soon, or that is costly or error-prone to build (e.g. security,
   date/time, parsing), and justify it to the user.
@@ -123,13 +124,13 @@ Work as a software engineer, not a code generator.
   `<button>`/`<a>` elements (no positive `tabindex`), always-visible focus, no
   focus traps outside dialogs/menus (which close on Escape and restore focus),
   and sensible focus on route changes.
-- **Responsive.** Mobile-first with `min-width` queries, reusing existing
-  breakpoints; relative units and flexible layouts (flexbox, grid, `clamp()`)
-  over fixed widths; images and embeds scale to their container. Reflow at 320px
-  and 200% zoom without horizontal scroll, 24×24 CSS px minimum targets, nothing
-  hover-only. Designs may differ by device, but always check how a change looks
-  on other screen sizes; if it doesn't translate smoothly, ask the user whether
-  mobile and desktop should diverge or share one modular, scalable approach.
+- **Responsive.** Mobile-first `min-width` queries reusing existing breakpoints;
+  flexible layouts (flexbox, grid, `clamp()`, relative units) over fixed widths;
+  images and embeds scale to their container. Reflow at 320px and 200% zoom
+  without horizontal scroll; 24×24 CSS px minimum targets; nothing hover-only.
+  Check how a change looks on other screen sizes; if it doesn't translate
+  smoothly, ask whether mobile and desktop should diverge or share one scalable
+  approach.
 - **Tests.** Test real behaviour (inputs, outputs, rendered state, requests) so
   tests fail when it breaks; never write tests just to pass.
 - **Scope and debt.** Keep changes scoped. Fix minor debt and remove dead code
@@ -137,6 +138,6 @@ Work as a software engineer, not a code generator.
 - **Docs.** Update `README.md` (and `CLAUDE.md` where relevant) in the same
   change whenever setup, commands, requirements, structure, or behaviour it
   describes changes. Point to where things live in code instead of copying
-  values (versions, breakpoints, URLs, flags), so docs don't drift from the
-  code. Don't list Claude tooling (hooks, skills, agents, MCP servers) in
-  `CLAUDE.md`; Claude discovers these on its own.
+  values (versions, breakpoints, URLs, flags) so docs don't drift. Don't list
+  Claude tooling (hooks, skills, agents, MCP servers) in `CLAUDE.md`; Claude
+  discovers these on its own.
