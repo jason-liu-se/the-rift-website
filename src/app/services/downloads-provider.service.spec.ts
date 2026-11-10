@@ -4,36 +4,41 @@ import {
 	provideHttpClientTesting
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+
+import { DOWNLOAD_COLLECTIONS } from 'src/app/testing/api-fixtures';
+import { expectGet, flushServerError } from 'src/app/testing/http';
 import { environment } from 'src/environments/environment';
-import { IDownloadCollection } from '../interfaces/download-collection.interface';
 import { DownloadsProviderService } from './downloads-provider.service';
 
 describe('DownloadsProviderService', () => {
-	const apiEndpoint = environment.API_URL;
+	const downloadsUrl = `${environment.API_URL}/downloads`;
 	let service: DownloadsProviderService;
-	let httpTesting: HttpTestingController;
 
 	beforeEach(() => {
 		TestBed.configureTestingModule({
 			providers: [provideHttpClient(), provideHttpClientTesting()]
 		});
 		service = TestBed.inject(DownloadsProviderService);
-		httpTesting = TestBed.inject(HttpTestingController);
 	});
 
-	afterEach(() => httpTesting.verify());
+	afterEach(() => TestBed.inject(HttpTestingController).verify());
 
-	it('requests every download collection', () => {
-		const collections: IDownloadCollection[] = [
-			{ name: 'Resource packs', items: [] }
-		];
-		let result: IDownloadCollection[] | undefined;
+	it('GETs every download collection and returns the response', () => {
+		expect(
+			expectGet(
+				service.getDownloadCollections(),
+				downloadsUrl,
+				DOWNLOAD_COLLECTIONS
+			)
+		).toEqual(DOWNLOAD_COLLECTIONS);
+	});
 
-		service.getDownloadCollections().subscribe((data) => (result = data));
+	it('passes server errors to the subscriber', () => {
+		const error = flushServerError(
+			service.getDownloadCollections(),
+			downloadsUrl
+		);
 
-		const request = httpTesting.expectOne(`${apiEndpoint}/downloads`);
-		expect(request.request.method).toBe('GET');
-		request.flush(collections);
-		expect(result).toEqual(collections);
+		expect(error?.status).toBe(500);
 	});
 });

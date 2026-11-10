@@ -24,8 +24,8 @@ export function expectGet<T extends object>(
 }
 
 /**
- * Subscribes to `source`, answers its request to `url` with a server error,
- * and returns the error the subscriber received.
+ * Subscribes to `source`, checks it sent a GET to exactly `url`, answers with
+ * a server error, and returns the error the subscriber received.
  */
 export function flushServerError(
 	source: Observable<unknown>,
@@ -34,9 +34,9 @@ export function flushServerError(
 	let error: HttpErrorResponse | undefined;
 	source.subscribe({ error: (e: HttpErrorResponse) => (error = e) });
 
-	TestBed.inject(HttpTestingController)
-		.expectOne(url)
-		.flush(null, { status: 500, statusText: 'Server Error' });
+	const request = TestBed.inject(HttpTestingController).expectOne(url);
+	expect(request.request.method).toBe('GET');
+	request.flush(null, { status: 500, statusText: 'Server Error' });
 
 	return error;
 }

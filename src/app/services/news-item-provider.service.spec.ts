@@ -4,40 +4,37 @@ import {
 	provideHttpClientTesting
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+
+import { NEWS_ITEMS, paginate } from 'src/app/testing/api-fixtures';
+import { expectGet, flushServerError } from 'src/app/testing/http';
 import { environment } from 'src/environments/environment';
-import { INewsItem } from '../interfaces/news-item.interface';
-import { IPaginatedResponse } from '../interfaces/paginated-response.interface';
 import { NewsItemProviderService } from './news-item-provider.service';
 
 describe('NewsItemProviderService', () => {
-	const apiEndpoint = environment.API_URL;
+	// offset and limit differ, so swapping them changes the URL
+	const pageUrl = `${environment.API_URL}/news?startIndex=10&limit=5`;
 	let service: NewsItemProviderService;
-	let httpTesting: HttpTestingController;
 
 	beforeEach(() => {
 		TestBed.configureTestingModule({
 			providers: [provideHttpClient(), provideHttpClientTesting()]
 		});
 		service = TestBed.inject(NewsItemProviderService);
-		httpTesting = TestBed.inject(HttpTestingController);
 	});
 
-	afterEach(() => httpTesting.verify());
+	afterEach(() => TestBed.inject(HttpTestingController).verify());
 
-	it('requests a page of news items with its total', () => {
-		const page: IPaginatedResponse<INewsItem> = {
-			items: [{ title: 'Launch', date: '2026-01-01', content: 'Hi' }],
-			total: 11
-		};
-		let result: IPaginatedResponse<INewsItem> | undefined;
+	it('GETs a page of news by offset and limit and returns the response', () => {
+		const response = paginate(NEWS_ITEMS, 10, 5);
 
-		service.getNewsItems(20, 10).subscribe((data) => (result = data));
+		expect(
+			expectGet(service.getNewsItems(10, 5), pageUrl, response)
+		).toEqual(response);
+	});
 
-		const request = httpTesting.expectOne(
-			`${apiEndpoint}/news?startIndex=20&limit=10`
-		);
-		expect(request.request.method).toBe('GET');
-		request.flush(page);
-		expect(result).toEqual(page);
+	it('passes server errors to the subscriber', () => {
+		const error = flushServerError(service.getNewsItems(10, 5), pageUrl);
+
+		expect(error?.status).toBe(500);
 	});
 });

@@ -4,75 +4,94 @@ import {
 	provideHttpClientTesting
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+
+import { CountResponse } from 'src/app/interfaces/api-responses';
+import { GALLERY_COLLECTIONS, paginate } from 'src/app/testing/api-fixtures';
+import { expectGet, flushServerError } from 'src/app/testing/http';
 import { environment } from 'src/environments/environment';
-import {
-	ICountResponse,
-	IPaginatedResponse
-} from '../interfaces/paginated-response.interface';
-import { ICaptionCard } from '../interfaces/slideshow-image.interface';
 import { GalleryProviderService } from './gallery-provider.service';
 
 describe('GalleryProviderService', () => {
-	const apiEndpoint = environment.API_URL;
+	const galleryUrl = `${environment.API_URL}/gallery`;
+	const images = GALLERY_COLLECTIONS['season-5'];
+	// offset and limit differ, so swapping them changes the URL
+	const pageUrl = `${galleryUrl}/season-5?startIndex=1&limit=2`;
+	const countUrl = `${galleryUrl}/season-5/count`;
 	let service: GalleryProviderService;
-	let httpTesting: HttpTestingController;
 
 	beforeEach(() => {
 		TestBed.configureTestingModule({
 			providers: [provideHttpClient(), provideHttpClientTesting()]
 		});
 		service = TestBed.inject(GalleryProviderService);
-		httpTesting = TestBed.inject(HttpTestingController);
 	});
 
-	afterEach(() => httpTesting.verify());
+	afterEach(() => TestBed.inject(HttpTestingController).verify());
 
-	it('requests a page of a collection with its total', () => {
-		const page: IPaginatedResponse<ICaptionCard> = {
-			items: [{ url: 'image.png', caption: 'Spawn' }],
-			total: 31
-		};
-		let result: IPaginatedResponse<ICaptionCard> | undefined;
+	describe('collection page', () => {
+		it('GETs a page of a collection by offset and limit and returns the response', () => {
+			const response = paginate(images, 1, 2);
 
-		service
-			.getCollectionImagesObservable('season-5', 60, 30)
-			.subscribe((data) => (result = data));
+			expect(
+				expectGet(
+					service.getCollectionImagesObservable('season-5', 1, 2),
+					pageUrl,
+					response
+				)
+			).toEqual(response);
+		});
 
-		const request = httpTesting.expectOne(
-			`${apiEndpoint}/gallery/season-5?startIndex=60&limit=30`
-		);
-		expect(request.request.method).toBe('GET');
-		request.flush(page);
-		expect(result).toEqual(page);
+		it('passes server errors to the subscriber', () => {
+			const error = flushServerError(
+				service.getCollectionImagesObservable('season-5', 1, 2),
+				pageUrl
+			);
+
+			expect(error?.status).toBe(500);
+		});
 	});
 
-	it('requests the image count of a collection', () => {
-		let result: ICountResponse | undefined;
+	describe('collection count', () => {
+		it('GETs the image count of a collection and returns the response', () => {
+			const response: CountResponse = { total: images.length };
 
-		service
-			.getCollectionImageCountObservable('season-6')
-			.subscribe((data) => (result = data));
+			expect(
+				expectGet(
+					service.getCollectionImageCountObservable('season-5'),
+					countUrl,
+					response
+				)
+			).toEqual(response);
+		});
 
-		const request = httpTesting.expectOne(
-			`${apiEndpoint}/gallery/season-6/count`
-		);
-		expect(request.request.method).toBe('GET');
-		request.flush({ total: 12 });
-		expect(result).toEqual({ total: 12 });
+		it('passes server errors to the subscriber', () => {
+			const error = flushServerError(
+				service.getCollectionImageCountObservable('season-5'),
+				countUrl
+			);
+
+			expect(error?.status).toBe(500);
+		});
 	});
 
 	it('encodes the collection name as a single path segment', () => {
-		const encodedUrl = `${apiEndpoint}/gallery/a%2Fb%20c`;
+		const encodedUrl = `${galleryUrl}/a%2Fb%20c`;
+		const page = paginate(images, 0, 30);
+		const count: CountResponse = { total: images.length };
 
-		service.getCollectionImagesObservable('a/b c', 0, 30).subscribe();
-		service.getCollectionImageCountObservable('a/b c').subscribe();
-
-		// expectOne throws if no request matches, failing the test.
-		expect(() => {
-			httpTesting
-				.expectOne(`${encodedUrl}?startIndex=0&limit=30`)
-				.flush({ items: [], total: 0 });
-			httpTesting.expectOne(`${encodedUrl}/count`).flush({ total: 0 });
-		}).not.toThrow();
+		expect(
+			expectGet(
+				service.getCollectionImagesObservable('a/b c', 0, 30),
+				`${encodedUrl}?startIndex=0&limit=30`,
+				page
+			)
+		).toEqual(page);
+		expect(
+			expectGet(
+				service.getCollectionImageCountObservable('a/b c'),
+				`${encodedUrl}/count`,
+				count
+			)
+		).toEqual(count);
 	});
 });
