@@ -23,10 +23,8 @@ export class ImageShowcaseSectionComponent {
 	public imageIndex = 0;
 	public isPopUpVisible = false;
 
-	public handleImageClick(imageButton: Element): void {
-		const imageIndex: string | null = imageButton.getAttribute('index');
-
-		this.imageIndex = imageIndex ? (imageIndex as unknown as number) : 0;
+	public handleImageClick(imageIndex: number): void {
+		this.imageIndex = imageIndex;
 		this.isPopUpVisible = true;
 
 		this.disablePageScrolling();

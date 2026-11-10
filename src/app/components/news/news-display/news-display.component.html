@@ -2,7 +2,7 @@
 	<ul class="news-container">
 		@for (item of newsItems; track item) {
 			<li class="news-item">
-				@if (isBannerImageValid(item.bannerImg)) {
+				@if (item.bannerImg) {
 					<img class="banner-img" [src]="item.bannerImg" alt="" />
 				}
 				<div class="news-item-content">

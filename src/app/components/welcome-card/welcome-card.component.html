@@ -2,7 +2,7 @@
 	<div
 		class="card"
 		[style.background-image]="
-			backgroundUrl === '' ? null : 'url(' + backgroundUrl + ')'
+			backgroundUrl ? 'url(' + backgroundUrl + ')' : null
 		"
 	>
 		<div class="card-content">

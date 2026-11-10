@@ -1,31 +1,38 @@
-import { provideHttpClient } from '@angular/common/http';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
-import { provideRouter } from '@angular/router';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
+import { provideRouter, Router } from '@angular/router';
 
+import {
+	ANY_URL_ROUTES,
+	renderComponent
+} from 'src/app/testing/render-component';
 import { BackButtonComponent } from './back-button.component';
 
 describe('BackButtonComponent', () => {
-	let component: BackButtonComponent;
-	let fixture: ComponentFixture<BackButtonComponent>;
-
 	beforeEach(() => {
 		TestBed.configureTestingModule({
 			imports: [BackButtonComponent],
-			providers: [
-				provideHttpClient(),
-				provideHttpClientTesting(),
-				provideRouter([]),
-				provideNoopAnimations()
-			]
+			providers: [provideRouter(ANY_URL_ROUTES)]
 		});
-		fixture = TestBed.createComponent(BackButtonComponent);
-		component = fixture.componentInstance;
-		fixture.detectChanges();
 	});
 
-	it('should create', () => {
-		expect(component).toBeTruthy();
+	it('shows the title', () => {
+		const fixture = renderComponent(BackButtonComponent, {
+			destination: '/gallery',
+			title: 'Back to gallery'
+		});
+
+		expect(fixture.nativeElement.textContent).toContain('Back to gallery');
+	});
+
+	it('navigates to the destination when clicked', async () => {
+		const fixture = renderComponent(BackButtonComponent, {
+			destination: '/gallery',
+			title: 'Back to gallery'
+		});
+
+		fixture.nativeElement.querySelector('button').click();
+		await fixture.whenStable();
+
+		expect(TestBed.inject(Router).url).toBe('/gallery');
 	});
 });

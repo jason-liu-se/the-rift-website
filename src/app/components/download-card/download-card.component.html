@@ -1,19 +1,29 @@
 <div class="download-card-wrapper">
-	<div class="download-card" [style.background-image]="imgSrc">
+	<div
+		class="download-card"
+		[style.background-image]="imgSrc ? 'url(' + imgSrc + ')' : null"
+	>
 		<div class="containers">
 			<div class="text-container">
-				<h2 class="title">{{ title }}</h2>
-				<p class="description">{{ desc }}</p>
+				@if (showTitle) {
+					<h2 class="title">{{ title }}</h2>
+				}
+				@if (showDesc) {
+					<p class="description">{{ desc }}</p>
+				}
 			</div>
-			<button
+			<a
 				class="download-button"
 				mat-flat-button
 				color="primary"
 				disableRipple
+				[href]="src"
+				target="_blank"
+				rel="noopener"
 			>
 				<mat-icon>open_in_new</mat-icon>
 				Download
-			</button>
+			</a>
 		</div>
 	</div>
 </div>

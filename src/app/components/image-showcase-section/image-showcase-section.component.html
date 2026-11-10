@@ -2,12 +2,7 @@
 	<ul class="caption-card-gallery">
 		@for (image of captionedImages; track image; let i = $index) {
 			<li class="caption-card">
-				<button
-					class="image-button"
-					#imageButton
-					(click)="handleImageClick(imageButton)"
-					[attr.index]="i"
-				>
+				<button class="image-button" (click)="handleImageClick(i)">
 					<app-caption-card
 						[src]="image.url"
 						[caption]="image.caption"

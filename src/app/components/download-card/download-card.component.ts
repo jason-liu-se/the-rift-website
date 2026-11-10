@@ -25,8 +25,5 @@ export class DownloadCardComponent implements OnInit {
 		if (this.desc !== '') {
 			this.showDesc = true;
 		}
-
-		// preparing the image URL for CSS styling
-		this.imgSrc = 'url(' + this.imgSrc + ')';
 	}
 }
