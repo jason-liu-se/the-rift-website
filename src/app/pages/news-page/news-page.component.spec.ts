@@ -5,17 +5,17 @@ import {
 } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { INewsItem } from 'src/app/interfaces/news-item.interface';
+import { NewsItem } from 'src/app/interfaces/api-responses';
 import { environment } from 'src/environments/environment';
 import { NewsPageComponent } from './news-page.component';
 
 const PAGE_SIZE = 10;
 const TOTAL = 25;
-const FIRST_PAGE: INewsItem[] = [
+const FIRST_PAGE: NewsItem[] = [
 	{ title: 'Launch', date: '2026-01-01', content: 'Hi' },
 	{ title: 'Patch', date: '2026-01-15', content: 'Fixes' }
 ];
-const SECOND_PAGE: INewsItem[] = [
+const SECOND_PAGE: NewsItem[] = [
 	{ title: 'Update', date: '2026-02-01', content: 'More' }
 ];
 
@@ -26,7 +26,7 @@ describe('NewsPageComponent', () => {
 
 	const pageUrl = (startIndex: number) =>
 		`${environment.API_URL}/news?startIndex=${startIndex}&limit=${PAGE_SIZE}`;
-	const flushPage = (startIndex: number, items: INewsItem[]) => {
+	const flushPage = (startIndex: number, items: NewsItem[]) => {
 		httpTesting
 			.expectOne(pageUrl(startIndex))
 			.flush({ items, total: TOTAL });
