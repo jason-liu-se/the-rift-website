@@ -4,7 +4,7 @@ import {
 	DOWNLOAD_COLLECTIONS,
 	GALLERY_COLLECTIONS,
 	NEWS_ITEMS
-} from './support/api-fixtures';
+} from '../src/app/testing/api-fixtures';
 import { expect, test } from './support/test';
 
 const NEWS_PAGE_SIZE = 10;

@@ -12,8 +12,9 @@ import { ICaptionCard } from '../../src/app/interfaces/slideshow-image.interface
 import {
 	DOWNLOAD_COLLECTIONS,
 	GALLERY_COLLECTIONS,
-	NEWS_ITEMS
-} from './api-fixtures';
+	NEWS_ITEMS,
+	paginate
+} from '../../src/app/testing/api-fixtures';
 
 const { API_URL, BLUEMAP_URL } = environment;
 
@@ -36,17 +37,15 @@ interface IMockResponse {
 
 const ok = (json: unknown): IMockResponse => ({ status: 200, json });
 
-function paginate<T>(
+function paginateByQuery<T>(
 	items: T[],
 	params: URLSearchParams
 ): IPaginatedResponse<T> {
-	const startIndex = Number(params.get('startIndex') ?? 0);
-	const limit = Number(params.get('limit') ?? items.length);
-
-	return {
-		items: items.slice(startIndex, startIndex + limit),
-		total: items.length
-	};
+	return paginate(
+		items,
+		Number(params.get('startIndex') ?? 0),
+		Number(params.get('limit') ?? items.length)
+	);
 }
 
 function galleryCollection(encodedName: string): ICaptionCard[] | undefined {
@@ -57,7 +56,7 @@ function respondTo(url: URL): IMockResponse {
 	const notFound = { status: 404, json: { error: `ERROR: ${url.pathname}` } };
 
 	if (url.pathname === '/news') {
-		return ok(paginate(NEWS_ITEMS, url.searchParams));
+		return ok(paginateByQuery(NEWS_ITEMS, url.searchParams));
 	}
 	if (url.pathname === '/downloads') {
 		return ok(DOWNLOAD_COLLECTIONS);
@@ -75,7 +74,9 @@ function respondTo(url: URL): IMockResponse {
 	const pageMatch = GALLERY_PAGE_PATH.exec(url.pathname);
 	if (pageMatch) {
 		const images = galleryCollection(pageMatch[1]);
-		return images ? ok(paginate(images, url.searchParams)) : notFound;
+		return images
+			? ok(paginateByQuery(images, url.searchParams))
+			: notFound;
 	}
 
 	return notFound;

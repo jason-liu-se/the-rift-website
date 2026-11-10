@@ -1,14 +1,17 @@
-// Canned API data, typed against the app's interfaces so a shape change in
-// the app breaks the fixtures at compile time.
-import { IDownloadCollection } from '../../src/app/interfaces/download-collection.interface';
-import { INewsItem } from '../../src/app/interfaces/news-item.interface';
-import { ICaptionCard } from '../../src/app/interfaces/slideshow-image.interface';
+// Canned The Rift API data, shared by the service specs and the e2e mock API
+// (e2e/support/mock-api.ts). Typed against the app's interfaces, so changing a
+// response shape in the app breaks the fixtures, and every test using them, at
+// compile time. Relative imports only: Playwright loads this file in Node.
+import { IDownloadCollection } from '../interfaces/download-collection.interface';
+import { INewsItem } from '../interfaces/news-item.interface';
+import { IPaginatedResponse } from '../interfaces/paginated-response.interface';
+import { ICaptionCard } from '../interfaces/slideshow-image.interface';
 
 const NEWS_ITEM_COUNT = 12; // more than one page of 10
 
 export const NEWS_ITEMS: INewsItem[] = Array.from(
 	{ length: NEWS_ITEM_COUNT },
-	(_, index) => ({
+	(_, index): INewsItem => ({
 		title: `News item ${index + 1}`,
 		date: '2026-01-01T00:00:00.000Z',
 		content: `Content of news item ${index + 1}.`
@@ -46,3 +49,15 @@ export const DOWNLOAD_COLLECTIONS: IDownloadCollection[] = [
 		]
 	}
 ];
+
+/** One page of `items` with the total, as a paginated endpoint answers. */
+export function paginate<T>(
+	items: T[],
+	startIndex: number,
+	limit: number
+): IPaginatedResponse<T> {
+	return {
+		items: items.slice(startIndex, startIndex + limit),
+		total: items.length
+	};
+}

@@ -10,6 +10,6 @@ export class PaginatorIntlService extends MatPaginatorIntl {
 		pageSize: number,
 		length: number
 	): string => {
-		return `Page ${page + 1} of ${Math.ceil(length / pageSize)}`;
+		return `Page ${page + 1} of ${Math.max(1, Math.ceil(length / pageSize))}`;
 	};
 }

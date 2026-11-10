@@ -1,5 +1,5 @@
 import { Page } from '@playwright/test';
-import { NEWS_ITEMS } from './support/api-fixtures';
+import { NEWS_ITEMS } from '../src/app/testing/api-fixtures';
 import {
 	focused,
 	focusedTabStop,

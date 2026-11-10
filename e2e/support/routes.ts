@@ -4,7 +4,7 @@ import {
 	DOWNLOAD_COLLECTIONS,
 	GALLERY_COLLECTIONS,
 	NEWS_ITEMS
-} from './api-fixtures';
+} from '../../src/app/testing/api-fixtures';
 
 export interface IE2eRoute {
 	path: string;

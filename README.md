@@ -133,7 +133,8 @@ empty placeholder, so a passing run isn't a full audit.
 - Import `test` and `expect` from `e2e/support/test.ts` (applies the mocks).
 - Open pages with `gotoRoute` from `e2e/support/navigation.ts`.
 - Add new routes to `e2e/support/routes.ts`.
-- Mock data lives in `e2e/support/api-fixtures.ts`.
+- Mock data lives in `src/app/testing/api-fixtures.ts`, shared with the service
+  unit tests so both suites expect the same API response shapes.
 - Limit a test to one device with the tags in `e2e/support/projects.ts`.
 
 **Known issues**
