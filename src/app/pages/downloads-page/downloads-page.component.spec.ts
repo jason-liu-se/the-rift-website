@@ -5,11 +5,11 @@ import {
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { IDownloadCollection } from 'src/app/interfaces/download-collection.interface';
+import { DownloadCollection } from 'src/app/interfaces/api-responses';
 import { environment } from 'src/environments/environment';
 import { DownloadsPageComponent } from './downloads-page.component';
 
-const COLLECTIONS: IDownloadCollection[] = [
+const COLLECTIONS: DownloadCollection[] = [
 	{
 		name: 'Worlds',
 		items: [

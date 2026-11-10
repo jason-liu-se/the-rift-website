@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 
-import { INewsItem } from 'src/app/interfaces/news-item.interface';
+import { NewsItem } from 'src/app/interfaces/api-responses';
 import { renderComponent } from 'src/app/testing/render-component';
 import { NewsDisplayComponent } from './news-display.component';
 
-const NEWS_ITEMS: INewsItem[] = [
+const NEWS_ITEMS: NewsItem[] = [
 	{
 		title: 'Season 6',
 		date: '2026-01-02T12:00:00',

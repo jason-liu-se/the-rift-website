@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ICaptionCard } from 'src/app/interfaces/slideshow-image.interface';
+import { GalleryImage } from 'src/app/interfaces/api-responses';
 import { renderComponent } from 'src/app/testing/render-component';
 import { ImageShowcaseSectionComponent } from './image-showcase-section.component';
 
-const IMAGES: ICaptionCard[] = [
+const IMAGES: GalleryImage[] = [
 	{ url: 'assets/one.png', caption: 'One' },
 	{ url: 'assets/two.png', caption: 'Two' }
 ];

@@ -6,18 +6,18 @@ import {
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, provideRouter, Router } from '@angular/router';
 
-import { ICaptionCard } from 'src/app/interfaces/slideshow-image.interface';
+import { GalleryImage } from 'src/app/interfaces/api-responses';
 import { ANY_URL_ROUTES } from 'src/app/testing/render-component';
 import { environment } from 'src/environments/environment';
 import { GalleryShowcasePageComponent } from './gallery-showcase-page.component';
 
 const PAGE_SIZE = 30;
 const TOTAL = 31;
-const FIRST_PAGE: ICaptionCard[] = [
+const FIRST_PAGE: GalleryImage[] = [
 	{ url: 'one.png', caption: 'One' },
 	{ url: 'two.png', caption: 'Two' }
 ];
-const SECOND_PAGE: ICaptionCard[] = [{ url: 'three.png', caption: 'Three' }];
+const SECOND_PAGE: GalleryImage[] = [{ url: 'three.png', caption: 'Three' }];
 
 describe('GalleryShowcasePageComponent', () => {
 	let fixture: ComponentFixture<GalleryShowcasePageComponent>;
