@@ -105,6 +105,7 @@ Setup:
 
 1. In the Cloudflare dashboard, create a Worker from this repo (Workers Builds).
    Build command: `npm run build`. Deploy command: `npx wrangler deploy`.
+   Production branch: `main`.
 2. Add the build variables `PROD_PUBLIC_API_URL`, `PROD_PUBLIC_BLUEMAP_URL`, and
    `PROD_PUBLIC_SITE_URL` (the exact production URL, with `https://` and no
    trailing slash).
@@ -116,6 +117,15 @@ Setup:
 5. Verify the domain in Google Search Console, submit
    `https://<domain>/sitemap.xml`, and import the site into Bing Webmaster
    Tools.
+
+## CI/CD
+
+- **CI** (`.github/workflows/ci.yml`): every pull request and push to `main`
+  runs lint, the format check, unit tests, and the production build (with
+  placeholder URLs). E2e tests run only locally.
+- **CD**: Workers Builds deploys `main` on every push, without running those
+  checks. Make the CI `check` job a required status check on `main` (GitHub
+  branch protection) so only passing code gets there.
 
 ## API contract
 
