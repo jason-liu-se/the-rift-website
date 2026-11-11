@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Component, PLATFORM_ID, inject } from '@angular/core';
 import { WelcomeCardComponent } from '../../components/welcome-card/welcome-card.component';
 import { MatButton } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
@@ -18,8 +19,10 @@ import { isDesktopWidth } from 'src/app/utilities/viewport.util';
 	host: { '(window:resize)': 'updateWelcomeBackground()' }
 })
 export class HomePageComponent {
-	// the welcome card has its own background only below the desktop breakpoint
-	public showWelcomeComponentBackground = !isDesktopWidth();
+	// The welcome card has its own background only below the desktop
+	// breakpoint. Without a window (server rendering), assume mobile first.
+	public showWelcomeComponentBackground =
+		!isPlatformBrowser(inject(PLATFORM_ID)) || !isDesktopWidth();
 
 	public updateWelcomeBackground(): void {
 		this.showWelcomeComponentBackground = !isDesktopWidth();

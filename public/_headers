@@ -1,0 +1,24 @@
+# Response headers for static assets (Cloudflare Workers static assets).
+# src/server.ts adds the security headers to server-rendered pages.
+
+# Every file
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+
+# Build files with a content hash in their name never change.
+/main-*
+  Cache-Control: public, max-age=31536000, immutable
+/chunk-*
+  Cache-Control: public, max-age=31536000, immutable
+/polyfills-*
+  Cache-Control: public, max-age=31536000, immutable
+/styles-*
+  Cache-Control: public, max-age=31536000, immutable
+/media/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Images keep their names when replaced, so cache them for a day.
+/assets/*
+  Cache-Control: public, max-age=86400

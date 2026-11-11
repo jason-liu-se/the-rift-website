@@ -1,5 +1,7 @@
 // Answers The Rift API and BlueMap requests in the browser, so the suite
 // never needs either service running, and blocks every other outside request.
+// API requests made by the dev server while rendering pages on the server are
+// answered by mock-api-server.ts with the same responses.
 // Paths mirror ../web-server/src/routes.
 import { Page } from '@playwright/test';
 // The suite runs against `npm start`, which serves the development environment.
@@ -29,7 +31,7 @@ const BLUEMAP_PLACEHOLDER =
 const GALLERY_COUNT_PATH = /^\/gallery\/([^/]+)\/count$/;
 const GALLERY_PAGE_PATH = /^\/gallery\/([^/]+)$/;
 
-interface IMockResponse {
+export interface IMockResponse {
 	status: number;
 	json: unknown;
 }
@@ -76,7 +78,8 @@ function galleryCollection(encodedName: string): GalleryImage[] | undefined {
 	return GALLERY_COLLECTIONS[decodeURIComponent(encodedName)];
 }
 
-function respondTo(url: URL): IMockResponse {
+/** The fixture response to an API request; shared with mock-api-server.ts. */
+export function respondTo(url: URL): IMockResponse {
 	const notFound = { status: 404, json: { error: `ERROR: ${url.pathname}` } };
 
 	if (url.pathname === '/news') {

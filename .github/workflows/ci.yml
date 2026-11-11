@@ -1,0 +1,35 @@
+# Checks every pull request and push to main. Cloudflare Workers Builds deploys
+# main without running these, so merge only when this passes (README
+# "Deployment").
+name: CI
+
+on:
+    pull_request:
+    push:
+        branches: [main]
+
+concurrency:
+    group: ci-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    check:
+        runs-on: ubuntu-latest
+        env:
+            # Placeholders, not deployment settings: the build requires production
+            # URLs, but this build only checks that it compiles and is never deployed.
+            # The real URLs are Cloudflare build variables (README "Deployment").
+            PROD_PUBLIC_API_URL: https://api.example.com
+            PROD_PUBLIC_BLUEMAP_URL: https://map.example.com
+            PROD_PUBLIC_SITE_URL: https://example.com
+        steps:
+            - uses: actions/checkout@v7
+            - uses: actions/setup-node@v7
+              with:
+                  node-version-file: .nvmrc
+                  cache: npm
+            - run: npm ci
+            - run: npm run lint
+            - run: npm run format:check
+            - run: npm test -- --watch=false
+            - run: npm run build

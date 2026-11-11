@@ -1,3 +1,4 @@
+import { PLATFORM_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 
@@ -50,6 +51,15 @@ describe('HomePageComponent', () => {
 			setInnerWidth(DESKTOP_BREAKPOINT_PX);
 
 			expect(render().welcomeBackground()).toBe('');
+		});
+
+		it('is shown when rendered on the server, which has no window width', () => {
+			setInnerWidth(DESKTOP_BREAKPOINT_PX);
+			TestBed.overrideProvider(PLATFORM_ID, { useValue: 'server' });
+
+			expect(render().welcomeBackground()).toContain(
+				'spawn-walkway-1.webp'
+			);
 		});
 
 		it('follows the window width as it is resized', () => {

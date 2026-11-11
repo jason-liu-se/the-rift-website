@@ -54,7 +54,7 @@ findings. You are **strictly read-only**.
 **Accessibility and keyboard**
 
 Check changed templates and styles against the accessibility and keyboard
-standards in `CLAUDE.md`, plus what they leave implicit:
+standards in `.claude/docs/ui-standards.md`, plus what they leave implicit:
 
 - Clickable `div`/`span` instead of `button`/`a`; links used as buttons or vice
   versa.
@@ -72,9 +72,9 @@ standards in `CLAUDE.md`, plus what they leave implicit:
 
 **Responsive design**
 
-Check against the responsive standard in `CLAUDE.md`. For each changed view,
-reason about how it behaves at narrow mobile, tablet, and wide desktop widths,
-not only the size it was evidently built for:
+Check against the responsive standard in `.claude/docs/ui-standards.md`. For
+each changed view, reason about how it behaves at narrow mobile, tablet, and
+wide desktop widths, not only the size it was evidently built for:
 
 - Desktop-first styles (`max-width` overrides), new one-off breakpoints instead
   of reusing existing ones, fixed pixel widths/heights that break reflow.

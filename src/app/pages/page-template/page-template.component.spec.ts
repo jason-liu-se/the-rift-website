@@ -1,8 +1,12 @@
-import { Component } from '@angular/core';
+import { ApplicationRef, Component, Type } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, provideRouter } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 
-import { PageTemplateComponent } from './page-template.component';
+import {
+	CHUNK_RELOAD_KEY,
+	PageTemplateComponent
+} from './page-template.component';
 
 @Component({ template: '<p class="stub-page">Stub page</p>' })
 class StubPageComponent {}
@@ -41,7 +45,10 @@ describe('PageTemplateComponent', () => {
 	const mainContent = (): HTMLElement => element.querySelector('main')!;
 	const navbarWrapper = () => element.querySelector('.rift-navbar-wrapper');
 
-	afterEach(() => element.remove());
+	afterEach(() => {
+		element.remove();
+		sessionStorage.clear();
+	});
 
 	it("renders the route's page inside <main>", async () => {
 		await render();
@@ -87,5 +94,79 @@ describe('PageTemplateComponent', () => {
 		await render();
 
 		expect(document.activeElement).toBe(mainContent());
+	});
+
+	it('waits for the page before focusing the main content', async () => {
+		TestBed.inject(Router).navigated = true;
+		let resolvePage!: (page: Type<unknown>) => void;
+		routeData['loadComponent'] = () =>
+			new Promise<Type<unknown>>((resolve) => (resolvePage = resolve));
+		fixture = TestBed.createComponent(PageTemplateComponent);
+		element = fixture.nativeElement;
+		document.body.appendChild(element);
+		fixture.detectChanges();
+		TestBed.tick();
+
+		expect(document.activeElement).not.toBe(mainContent());
+
+		resolvePage(StubPageComponent);
+		await fixture.whenStable();
+		TestBed.tick();
+
+		expect(document.activeElement).toBe(mainContent());
+		expect(mainContent().querySelector('.stub-page')).not.toBeNull();
+	});
+
+	describe('loading the page', () => {
+		const isStable = () =>
+			firstValueFrom(TestBed.inject(ApplicationRef).isStable);
+		const failedLoad = () => Promise.reject(new Error('chunk missing'));
+
+		it('keeps the app unstable until the page has loaded', async () => {
+			let resolvePage!: (page: Type<unknown>) => void;
+			routeData['loadComponent'] = () =>
+				new Promise<Type<unknown>>(
+					(resolve) => (resolvePage = resolve)
+				);
+			fixture = TestBed.createComponent(PageTemplateComponent);
+			element = fixture.nativeElement;
+			fixture.detectChanges();
+
+			expect(await isStable()).toBe(false);
+
+			resolvePage(StubPageComponent);
+			await fixture.whenStable();
+
+			expect(await isStable()).toBe(true);
+			expect(mainContent().querySelector('.stub-page')).not.toBeNull();
+		});
+
+		it('reloads once when the page fails to load', async () => {
+			// jsdom can't navigate or spy on location.reload(), so this checks the
+			// marker set just before reloading and that nothing was rendered.
+			await render({ loadComponent: failedLoad });
+
+			expect(sessionStorage.getItem(CHUNK_RELOAD_KEY)).toBe('true');
+			expect(mainContent().children).toHaveLength(0);
+		});
+
+		it('fails without reloading again when the reload did not help', async () => {
+			sessionStorage.setItem(CHUNK_RELOAD_KEY, 'true');
+			fixture = TestBed.createComponent(PageTemplateComponent);
+			element = fixture.nativeElement;
+			routeData['loadComponent'] = failedLoad;
+
+			await expect(fixture.componentInstance.ngOnInit()).rejects.toThrow(
+				'chunk missing'
+			);
+		});
+
+		it('clears the reload marker once a page loads', async () => {
+			sessionStorage.setItem(CHUNK_RELOAD_KEY, 'true');
+
+			await render();
+
+			expect(sessionStorage.getItem(CHUNK_RELOAD_KEY)).toBeNull();
+		});
 	});
 });
