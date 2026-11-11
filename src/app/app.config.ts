@@ -1,5 +1,9 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withFetch } from '@angular/common/http';
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import {
+	provideClientHydration,
+	withEventReplay
+} from '@angular/platform-browser';
 import {
 	TitleStrategy,
 	provideRouter,
@@ -18,6 +22,10 @@ export const appConfig: ApplicationConfig = {
 			withInMemoryScrolling({ scrollPositionRestoration: 'enabled' })
 		),
 		{ provide: TitleStrategy, useClass: SeoTitleStrategy },
-		provideHttpClient()
+		// fetch, not XHR: the server (Cloudflare Workers) has no XMLHttpRequest.
+		provideHttpClient(withFetch()),
+		// Reuses the server-rendered HTML (and the API responses it fetched)
+		// instead of rendering the page again in the browser.
+		provideClientHydration(withEventReplay())
 	]
 };
