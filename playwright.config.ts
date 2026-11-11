@@ -6,6 +6,8 @@ const isCI = !!process.env['CI'];
 
 export default defineConfig({
 	testDir: 'e2e',
+	// Serves the mock API to the dev server's server-side rendering.
+	globalSetup: './e2e/support/mock-api-server.ts',
 	fullyParallel: true,
 	forbidOnly: isCI,
 	retries: isCI ? 1 : 0,
