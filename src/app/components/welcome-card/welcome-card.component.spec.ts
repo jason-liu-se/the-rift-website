@@ -12,13 +12,13 @@ describe('WelcomeCardComponent', () => {
 		TestBed.configureTestingModule({ imports: [WelcomeCardComponent] });
 	});
 
-	it('shows the header image and description', () => {
+	it('shows the header image, as the page heading, and the description', () => {
 		const element = render({
 			headerUrl: 'assets/logo.png',
 			headerAlt: 'The Rift',
 			desc: 'Welcome to The Rift'
 		});
-		const header = element.querySelector('.image-header img');
+		const header = element.querySelector('h1.image-header img');
 
 		expect(header?.getAttribute('src')).toBe('assets/logo.png');
 		expect(header?.getAttribute('alt')).toBe('The Rift');

@@ -14,33 +14,36 @@ export interface IE2eRoute {
 }
 
 export const ROUTES: readonly IE2eRoute[] = [
-	{ path: '/', title: 'The Rift - Home' },
+	{ path: '/', title: 'Minecraft SMP | The Rift' },
 	{
 		path: '/news',
-		title: 'The Rift - News',
+		title: 'News | The Rift',
 		readyText: NEWS_ITEMS[0].title
 	},
 	{
 		path: '/gallery',
-		title: 'The Rift - Gallery',
+		title: 'Gallery | The Rift',
 		readyText: `${GALLERY_COLLECTIONS['season-5'].length} photos`
 	},
 	{
 		path: '/gallery/season-5',
-		title: 'The Rift - Gallery: Season 5',
+		title: 'Season 5 Gallery | The Rift',
 		readyText: `Results: ${GALLERY_COLLECTIONS['season-5'].length}`
 	},
-	{ path: '/map', title: 'The Rift - Map' },
-	{ path: '/map/season-5-overworld', title: 'The Rift - Map: Season 5' },
+	{ path: '/map', title: 'Maps | The Rift' },
+	{
+		path: '/map/season-5-overworld',
+		title: 'Season 5 Overworld Map | The Rift'
+	},
 	{
 		path: '/downloads',
-		title: 'The Rift - Downloads',
+		title: 'World Downloads | The Rift',
 		readyText: DOWNLOAD_COLLECTIONS[0].items[0].title
 	},
-	{ path: '/about', title: 'The Rift - About' },
-	{ path: '/contact', title: 'The Rift - Contact Us' },
-	{ path: '/join', title: 'The Rift - Join' },
-	{ path: '/not-a-page', title: 'The Rift - Error 404' }
+	{ path: '/about', title: 'About | The Rift' },
+	{ path: '/contact', title: 'Contact Us | The Rift' },
+	{ path: '/join', title: 'Join | The Rift' },
+	{ path: '/not-a-page', title: 'Page Not Found | The Rift' }
 ];
 
 export function routeFor(path: string): IE2eRoute {

@@ -10,7 +10,7 @@ argument-hint: <page name or description>
 Add the page described in: $ARGUMENTS
 
 Follow the architecture in `CLAUDE.md`. Every route renders
-`PageTemplateComponent` and names its page in `data.component`.
+`PageTemplateComponent` and lazy-loads its page from `data.loadComponent`.
 
 ## 1. New component or new route?
 
@@ -37,10 +37,11 @@ npm run ng -- generate component pages/<name>-page
 Add the route to `src/app/app.routes.ts` before the `**` wildcard:
 
 - `component: PageTemplateComponent`
-- `title` in the existing `The Rift - <Page>` format
-- `data.component` set to the page, plus any shell flags it needs. Check
-  `PageTemplateComponent` for the flags and their defaults, and only set flags
-  that differ from the defaults.
+- a unique `title` naming the page (`SeoTitleStrategy` appends " | The Rift")
+  and a `data.description` for search results (README "SEO")
+- `data.loadComponent: () => import('./pages/<name>/<name>.component').then((m) => m.<Name>Component)`,
+  plus any shell flags it needs. Check `PageTemplateComponent` for the flags and
+  their defaults, and only set flags that differ from the defaults.
 
 ## 4. Navigation
 

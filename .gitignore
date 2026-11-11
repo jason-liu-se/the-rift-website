@@ -43,6 +43,10 @@ testem.log
 .env
 /src/environments/
 
+# Crawler files generated from the routes (see scripts/seo/)
+/public/robots.txt
+/public/sitemap.xml
+
 # System files
 .DS_Store
 Thumbs.db

@@ -1,5 +1,6 @@
 import {
 	Component,
+	DestroyRef,
 	ElementRef,
 	OnInit,
 	ViewChild,
@@ -28,11 +29,11 @@ import { FooterComponent } from '../../components/footer/footer.component';
 export class PageTemplateComponent implements OnInit {
 	private route = inject(ActivatedRoute);
 	private router = inject(Router);
+	private destroyRef = inject(DestroyRef);
 	private mainContent =
 		viewChild.required<ElementRef<HTMLElement>>('mainContent');
 
 	public showContactSection: boolean;
-	public mainComponent: Type<unknown>;
 	public isTransparent!: boolean;
 	public showFooter: boolean;
 
@@ -48,7 +49,6 @@ export class PageTemplateComponent implements OnInit {
 
 		this.isTransparent =
 			isTransparentProp == null ? true : isTransparentProp;
-		this.mainComponent = this.route.snapshot.data['component'];
 		this.showContactSection =
 			showContactSectionProp == null ? false : showContactSectionProp;
 		this.showFooter = showFooterProp == null ? true : showFooterProp;
@@ -62,15 +62,16 @@ export class PageTemplateComponent implements OnInit {
 		}
 	}
 
-	// displaying the passed component dynamically
-	displayComponent(): void {
-		const viewContainerRef = this.appPageTemplateHost.viewContainerRef;
-		viewContainerRef.clear();
-
-		viewContainerRef.createComponent(this.mainComponent);
-	}
-
-	ngOnInit(): void {
-		this.displayComponent();
+	// Pages are loaded on demand (their own JS chunks) from data.loadComponent.
+	async ngOnInit(): Promise<void> {
+		const loadComponent: () => Promise<Type<unknown>> =
+			this.route.snapshot.data['loadComponent'];
+		const component = await loadComponent();
+		// The user may have navigated away while the page's chunk was loading.
+		if (!this.destroyRef.destroyed) {
+			this.appPageTemplateHost.viewContainerRef.createComponent(
+				component
+			);
+		}
 	}
 }

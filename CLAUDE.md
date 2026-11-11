@@ -2,9 +2,9 @@
 
 ## Overview
 
-Angular + Angular Material SPA (TypeScript, SCSS) for The Rift Minecraft server
-community. Node/npm requirements are in `README.md`; framework versions in
-`package.json`.
+Angular + Angular Material SPA (TypeScript, SCSS) for The Rift Minecraft SMP
+(A.K.A. The Rift SMP). Node/npm requirements are in `README.md`; framework
+versions in `package.json`.
 
 ## Commands
 
@@ -30,21 +30,25 @@ pre-commit hook lints and formats staged files.
   Selectors use the `app` prefix.
 - Strict TS with `noPropertyAccessFromIndexSignature`: read route data as
   `data['key']`.
-- Production builds enforce style size budgets (`angular.json`); keep component
-  stylesheets small.
+- Production builds enforce bundle and style size budgets (`angular.json`); keep
+  component stylesheets small. `src/theme.scss` themes only the Material
+  components in use: add a component's theme there when you start using one.
+  Pages are lazy-loaded (see Architecture), so keep page-only imports out of
+  shared code and `main.ts`.
 
 ## Architecture
 
 - **Standalone components, no root `NgModule`.** `src/main.ts` bootstraps with
   `provideRouter` and the routes in `src/app/app.routes.ts`. Use `inject()`, not
   constructor injection.
-- **Every route renders `PageTemplateComponent`.** It creates the page named in
-  the route's `data.component` inside the `appPageTemplateHost` directive, in a
-  `<main>` (focused after in-app navigation) wrapped by the shared shell
-  (navbar, optional contact section, footer). Route data flags toggle the shell
-  (flags and defaults in `PageTemplateComponent`). Pages read their own values
-  from route data, so a variant of an existing page (e.g. another gallery
-  collection or map) is usually just a new route.
+- **Every route renders `PageTemplateComponent`.** It lazy-loads the page from
+  the route's `data.loadComponent` (an `import()`, so each page is its own
+  chunk) into the `appPageTemplateHost` directive, in a `<main>` (focused after
+  in-app navigation) wrapped by the shared shell (navbar, optional contact
+  section, footer). Route data flags toggle the shell (flags and defaults in
+  `PageTemplateComponent`). Pages read their own values from route data, so a
+  variant of an existing page (e.g. another gallery collection or map) is
+  usually just a new route.
 - **External services.** The Rift API (news, gallery, downloads) and a BlueMap
   server (embedded maps) run separately from this repo. Endpoints come from the
   gitignored `.env` (see README), which `scripts/environments/generate.mjs`
@@ -76,7 +80,7 @@ Unit tests use Vitest globals in jsdom without zone.js: no `fakeAsync`, and
 the component uses: `provideRouter(...)` for router links (with `ANY_URL_ROUTES`
 to assert navigation), and `provideHttpClient()` plus
 `provideHttpClientTesting()` for HTTP. Anything under `PageTemplateComponent`
-needs a stubbed `ActivatedRoute` with `snapshot.data.component`; see
+needs a stubbed `ActivatedRoute` with `snapshot.data.loadComponent`; see
 `page-template.component.spec.ts`. Use the helpers in `src/app/testing/` before
 defining new ones.
 
@@ -126,6 +130,12 @@ entries there once fixed.
   clickable `div`s; meaningful `alt` (empty if decorative); accessible names on
   icon-only buttons and iframes; AA contrast; motion is pausable and respects
   `prefers-reduced-motion`.
+- **SEO.** Every indexable route has a unique, descriptive `title` (page first;
+  `SeoTitleStrategy` adds the brand) and a `data.description`; mark non-content
+  routes `noindex` (README "SEO"). One `<h1>` per page, a logical heading order,
+  descriptive link text, real `<a routerLink>` links for navigation, and
+  meaningful `alt` text. Keep pages fast: compressed WebP images sized for their
+  use, and nothing render-blocking.
 - **Keyboard.** The whole site works by keyboard alone: logical Tab order, real
   `<button>`/`<a>` elements (no positive `tabindex`), always-visible focus, no
   focus traps outside dialogs/menus (which close on Escape and restore focus),

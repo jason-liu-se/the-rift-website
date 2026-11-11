@@ -12,8 +12,21 @@ $app-theme: mat.m2-define-light-theme(
 			primary: $app-primary,
 			accent: $app-accent,
 			warn: $app-warn
-		)
+		),
+		typography: mat.m2-define-typography-config(),
+		density: 0
 	)
 );
 
-@include mat.all-component-themes($app-theme);
+// Only the Material components the site uses, to keep the global CSS small.
+// Add a component's theme here when you start using it.
+@include mat.core-theme($app-theme);
+@include mat.button-theme($app-theme);
+@include mat.fab-theme($app-theme);
+@include mat.icon-theme($app-theme);
+// The paginator's previous/next buttons and their tooltips.
+@include mat.paginator-theme($app-theme);
+@include mat.icon-button-theme($app-theme);
+@include mat.tooltip-theme($app-theme);
+// Heading and body text styles for the `mat-typography` class on <body>.
+@include mat.typography-hierarchy($app-theme);
