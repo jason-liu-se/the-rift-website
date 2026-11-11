@@ -91,6 +91,15 @@ $hover-animation-text-offset: -0.5rem;
 }
 
 .collection-card:hover .title {
+	text-shadow: none;
+	color: transparent;
+	background: linear-gradient(
+			45deg,
+			$colour-violet 33%,
+			$colour-secondary 67%
+		)
+		right top / 300% 300%;
+	background-clip: text;
 	animation: title-hover-effect $hover-animation-duration ease forwards;
 }
 
@@ -139,250 +148,11 @@ $hover-animation-text-offset: -0.5rem;
 	filter: opacity(0);
 }
 
+// A violet-to-secondary gradient, three times the title's size, slides from
+// its secondary end to its violet end, sweeping violet across the text.
 @keyframes title-hover-effect {
-	0% {
-		text-shadow: none;
-		background-color: $colour-secondary;
-		-webkit-background-clip: text;
-		-moz-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		-moz-text-fill-color: transparent;
-	}
-	5% {
-		text-shadow: none;
-		background-image: linear-gradient(
-			45deg,
-			$colour-violet 0%,
-			$colour-secondary 10%
-		);
-		-webkit-background-clip: text;
-		-moz-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		-moz-text-fill-color: transparent;
-	}
-	10% {
-		text-shadow: none;
-		background-image: linear-gradient(
-			45deg,
-			$colour-violet 0%,
-			$colour-secondary 20%
-		);
-		-webkit-background-clip: text;
-		-moz-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		-moz-text-fill-color: transparent;
-	}
-	15% {
-		text-shadow: none;
-		background-image: linear-gradient(
-			45deg,
-			$colour-violet 0%,
-			$colour-secondary 30%
-		);
-		-webkit-background-clip: text;
-		-moz-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		-moz-text-fill-color: transparent;
-	}
-	20% {
-		text-shadow: none;
-		background-image: linear-gradient(
-			45deg,
-			$colour-violet 0%,
-			$colour-secondary 40%
-		);
-		-webkit-background-clip: text;
-		-moz-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		-moz-text-fill-color: transparent;
-	}
-	25% {
-		text-shadow: none;
-		background-image: linear-gradient(
-			45deg,
-			$colour-violet 0%,
-			$colour-secondary 50%
-		);
-		-webkit-background-clip: text;
-		-moz-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		-moz-text-fill-color: transparent;
-	}
-	30% {
-		text-shadow: none;
-		background-image: linear-gradient(
-			45deg,
-			$colour-violet 0%,
-			$colour-secondary 60%
-		);
-		-webkit-background-clip: text;
-		-moz-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		-moz-text-fill-color: transparent;
-	}
-	35% {
-		text-shadow: none;
-		background-image: linear-gradient(
-			45deg,
-			$colour-violet 0%,
-			$colour-secondary 70%
-		);
-		-webkit-background-clip: text;
-		-moz-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		-moz-text-fill-color: transparent;
-	}
-	40% {
-		text-shadow: none;
-		background-image: linear-gradient(
-			45deg,
-			$colour-violet 0%,
-			$colour-secondary 80%
-		);
-		-webkit-background-clip: text;
-		-moz-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		-moz-text-fill-color: transparent;
-	}
-	45% {
-		text-shadow: none;
-		background-image: linear-gradient(
-			45deg,
-			$colour-violet 0%,
-			$colour-secondary 90%
-		);
-		-webkit-background-clip: text;
-		-moz-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		-moz-text-fill-color: transparent;
-	}
-	50% {
-		text-shadow: none;
-		background-image: linear-gradient(
-			45deg,
-			$colour-violet 0%,
-			$colour-secondary 100%
-		);
-		-webkit-background-clip: text;
-		-moz-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		-moz-text-fill-color: transparent;
-	}
-	55% {
-		text-shadow: none;
-		background-image: linear-gradient(
-			45deg,
-			$colour-violet 10%,
-			$colour-secondary 100%
-		);
-		-webkit-background-clip: text;
-		-moz-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		-moz-text-fill-color: transparent;
-	}
-	60% {
-		text-shadow: none;
-		background-image: linear-gradient(
-			45deg,
-			$colour-violet 20%,
-			$colour-secondary 100%
-		);
-		-webkit-background-clip: text;
-		-moz-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		-moz-text-fill-color: transparent;
-	}
-	65% {
-		text-shadow: none;
-		background-image: linear-gradient(
-			45deg,
-			$colour-violet 30%,
-			$colour-secondary 100%
-		);
-		-webkit-background-clip: text;
-		-moz-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		-moz-text-fill-color: transparent;
-	}
-	70% {
-		text-shadow: none;
-		background-image: linear-gradient(
-			45deg,
-			$colour-violet 40%,
-			$colour-secondary 100%
-		);
-		-webkit-background-clip: text;
-		-moz-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		-moz-text-fill-color: transparent;
-	}
-	75% {
-		text-shadow: none;
-		background-image: linear-gradient(
-			45deg,
-			$colour-violet 50%,
-			$colour-secondary 100%
-		);
-		-webkit-background-clip: text;
-		-moz-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		-moz-text-fill-color: transparent;
-	}
-	80% {
-		text-shadow: none;
-		background-image: linear-gradient(
-			45deg,
-			$colour-violet 60%,
-			$colour-secondary 100%
-		);
-		-webkit-background-clip: text;
-		-moz-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		-moz-text-fill-color: transparent;
-	}
-	85% {
-		text-shadow: none;
-		background-image: linear-gradient(
-			45deg,
-			$colour-violet 70%,
-			$colour-secondary 100%
-		);
-		-webkit-background-clip: text;
-		-moz-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		-moz-text-fill-color: transparent;
-	}
-	90% {
-		text-shadow: none;
-		background-image: linear-gradient(
-			45deg,
-			$colour-violet 80%,
-			$colour-secondary 100%
-		);
-		-webkit-background-clip: text;
-		-moz-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		-moz-text-fill-color: transparent;
-	}
-	95% {
-		text-shadow: none;
-		background-image: linear-gradient(
-			45deg,
-			$colour-violet 90%,
-			$colour-secondary 100%
-		);
-		-webkit-background-clip: text;
-		-moz-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		-moz-text-fill-color: transparent;
-	}
-	100% {
-		text-shadow: none;
-		background-color: $colour-violet;
-		-webkit-background-clip: text;
-		-moz-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		-moz-text-fill-color: transparent;
+	to {
+		background-position: left bottom;
 		transform: translate(0, $hover-animation-text-offset);
 	}
 }

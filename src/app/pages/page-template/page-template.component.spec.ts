@@ -13,7 +13,7 @@ describe('PageTemplateComponent', () => {
 	let routeData: Record<string, unknown>;
 
 	beforeEach(() => {
-		routeData = { component: StubPageComponent };
+		routeData = { loadComponent: () => Promise.resolve(StubPageComponent) };
 		TestBed.configureTestingModule({
 			imports: [PageTemplateComponent],
 			providers: [
@@ -26,14 +26,15 @@ describe('PageTemplateComponent', () => {
 		});
 	});
 
-	function render(data: Record<string, unknown> = {}): void {
+	async function render(data: Record<string, unknown> = {}): Promise<void> {
 		Object.assign(routeData, data);
 		fixture = TestBed.createComponent(PageTemplateComponent);
 		element = fixture.nativeElement;
 		// Attached so the <main> element can receive focus.
 		document.body.appendChild(element);
 		fixture.detectChanges();
-		// Runs afterNextRender hooks, which detectChanges() alone doesn't.
+		// Waits for the page component to load, then runs afterNextRender hooks.
+		await fixture.whenStable();
 		TestBed.tick();
 	}
 
@@ -42,48 +43,48 @@ describe('PageTemplateComponent', () => {
 
 	afterEach(() => element.remove());
 
-	it("renders the route's page inside <main>", () => {
-		render();
+	it("renders the route's page inside <main>", async () => {
+		await render();
 
 		expect(mainContent().querySelector('.stub-page')).not.toBeNull();
 	});
 
-	it('shows a transparent navbar and the footer, without the contact section, by default', () => {
-		render();
+	it('shows a transparent navbar and the footer, without the contact section, by default', async () => {
+		await render();
 
 		expect(navbarWrapper()?.classList).not.toContain('opaque');
 		expect(element.querySelector('app-footer')).not.toBeNull();
 		expect(element.querySelector('app-contact')).toBeNull();
 	});
 
-	it('shows an opaque navbar when isTransparent is false', () => {
-		render({ isTransparent: false });
+	it('shows an opaque navbar when isTransparent is false', async () => {
+		await render({ isTransparent: false });
 
 		expect(navbarWrapper()?.classList).toContain('opaque');
 	});
 
-	it('shows the contact section when showContactSection is true', () => {
-		render({ showContactSection: true });
+	it('shows the contact section when showContactSection is true', async () => {
+		await render({ showContactSection: true });
 
 		expect(element.querySelector('app-contact')).not.toBeNull();
 	});
 
-	it('hides the footer when showFooter is false', () => {
-		render({ showFooter: false });
+	it('hides the footer when showFooter is false', async () => {
+		await render({ showFooter: false });
 
 		expect(element.querySelector('app-footer')).toBeNull();
 	});
 
-	it('leaves focus alone on the first page load', () => {
-		render();
+	it('leaves focus alone on the first page load', async () => {
+		await render();
 
 		expect(document.activeElement).not.toBe(mainContent());
 	});
 
-	it('focuses the main content after an in-app navigation', () => {
+	it('focuses the main content after an in-app navigation', async () => {
 		TestBed.inject(Router).navigated = true;
 
-		render();
+		await render();
 
 		expect(document.activeElement).toBe(mainContent());
 	});

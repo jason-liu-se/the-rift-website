@@ -1,72 +1,104 @@
 import { Routes } from '@angular/router';
-import { HomePageComponent } from './pages/home-page/home-page.component';
-import { NewsPageComponent } from './pages/news-page/news-page.component';
-import { GalleryPageComponent } from './pages/gallery-page/gallery-page.component';
-import { MapPageComponent } from './pages/map-page/map-page.component';
-import { AboutPageComponent } from './pages/about-page/about-page.component';
 import { PageTemplateComponent } from './pages/page-template/page-template.component';
-import { DownloadsPageComponent } from './pages/downloads-page/downloads-page.component';
-import { ErrorPageComponent } from './pages/error-page/error-page.component';
-import { GalleryShowcasePageComponent } from './pages/gallery-showcase-page/gallery-showcase-page.component';
-import { ContactPageComponent } from './pages/contact-page/contact-page.component';
-import { JoinPageComponent } from './pages/join-page/join-page.component';
-import { BlueMapPageComponent } from './pages/blue-map-page/blue-map-page.component';
 
 export const routes: Routes = [
 	{
 		path: '',
 		component: PageTemplateComponent,
-		title: 'The Rift - Home',
-		data: { component: HomePageComponent, showContactSection: true }
+		title: 'Home',
+		data: {
+			loadComponent: () =>
+				import('./pages/home-page/home-page.component').then(
+					(m) => m.HomePageComponent
+				),
+			showContactSection: true
+		}
 	},
 	{
 		path: 'news',
 		component: PageTemplateComponent,
-		title: 'The Rift - News',
-		data: { component: NewsPageComponent, isTransparent: false }
+		title: 'News',
+		data: {
+			description:
+				'The latest news and announcements from The Rift Minecraft SMP.',
+			loadComponent: () =>
+				import('./pages/news-page/news-page.component').then(
+					(m) => m.NewsPageComponent
+				),
+			isTransparent: false
+		}
 	},
 	{
 		path: 'gallery',
 		component: PageTemplateComponent,
-		title: 'The Rift - Gallery',
-		data: { component: GalleryPageComponent }
+		title: 'Gallery',
+		data: {
+			description:
+				'Screenshots of builds from every season of The Rift Minecraft SMP.',
+			loadComponent: () =>
+				import('./pages/gallery-page/gallery-page.component').then(
+					(m) => m.GalleryPageComponent
+				)
+		}
 	},
 	{
 		path: 'gallery/season-5',
 		component: PageTemplateComponent,
-		title: 'The Rift - Gallery: Season 5',
+		title: 'Season 5 Gallery',
 		data: {
-			component: GalleryShowcasePageComponent,
+			description:
+				'Screenshots of builds from Season 5 of The Rift Minecraft SMP.',
+			loadComponent: () =>
+				import('./pages/gallery-showcase-page/gallery-showcase-page.component').then(
+					(m) => m.GalleryShowcasePageComponent
+				),
 			title: 'Gallery: Season 5',
 			imageUrl:
-				'../../../assets/general-background-images/season-5-circle.png',
+				'../../../assets/general-background-images/season-5-circle.webp',
 			collection: 'season-5'
 		}
 	},
 	{
 		path: 'gallery/season-6',
 		component: PageTemplateComponent,
-		title: 'The Rift - Gallery: Season 6',
+		title: 'Season 6 Gallery',
 		data: {
-			component: GalleryShowcasePageComponent,
+			description:
+				'Screenshots of builds from Season 6 of The Rift Minecraft SMP.',
+			loadComponent: () =>
+				import('./pages/gallery-showcase-page/gallery-showcase-page.component').then(
+					(m) => m.GalleryShowcasePageComponent
+				),
 			title: 'Gallery: Season 6',
 			imageUrl:
-				'../../../assets/general-background-images/magic-books-2.jpg',
+				'../../../assets/general-background-images/magic-books-2.webp',
 			collection: 'season-6'
 		}
 	},
 	{
 		path: 'map',
 		component: PageTemplateComponent,
-		title: 'The Rift - Map',
-		data: { component: MapPageComponent }
+		title: 'Maps',
+		data: {
+			description:
+				'Explore interactive maps of the worlds from The Rift Minecraft SMP.',
+			loadComponent: () =>
+				import('./pages/map-page/map-page.component').then(
+					(m) => m.MapPageComponent
+				)
+		}
 	},
 	{
 		path: 'map/season-5-overworld',
 		component: PageTemplateComponent,
-		title: 'The Rift - Map: Season 5',
+		title: 'Season 5 Overworld Map',
 		data: {
-			component: BlueMapPageComponent,
+			description:
+				'Interactive map of the Season 5 overworld on The Rift Minecraft SMP.',
+			loadComponent: () =>
+				import('./pages/blue-map-page/blue-map-page.component').then(
+					(m) => m.BlueMapPageComponent
+				),
 			isTransparent: false,
 			showFooter: false,
 			mapName: 'season_5_overworld'
@@ -75,9 +107,14 @@ export const routes: Routes = [
 	{
 		path: 'map/season-5-nether',
 		component: PageTemplateComponent,
-		title: 'The Rift - Map: Season 5',
+		title: 'Season 5 Nether Map',
 		data: {
-			component: BlueMapPageComponent,
+			description:
+				'Interactive map of the Season 5 Nether on The Rift Minecraft SMP.',
+			loadComponent: () =>
+				import('./pages/blue-map-page/blue-map-page.component').then(
+					(m) => m.BlueMapPageComponent
+				),
 			isTransparent: false,
 			showFooter: false,
 			mapName: 'season_5_nether'
@@ -86,9 +123,14 @@ export const routes: Routes = [
 	{
 		path: 'map/season-5-end',
 		component: PageTemplateComponent,
-		title: 'The Rift - Map: Season 5',
+		title: 'Season 5 End Map',
 		data: {
-			component: BlueMapPageComponent,
+			description:
+				'Interactive map of the Season 5 End on The Rift Minecraft SMP.',
+			loadComponent: () =>
+				import('./pages/blue-map-page/blue-map-page.component').then(
+					(m) => m.BlueMapPageComponent
+				),
 			isTransparent: false,
 			showFooter: false,
 			mapName: 'season_5_end'
@@ -97,36 +139,64 @@ export const routes: Routes = [
 	{
 		path: 'about',
 		component: PageTemplateComponent,
-		title: 'The Rift - About',
-		data: { component: AboutPageComponent }
+		title: 'About',
+		data: {
+			description: 'Learn what The Rift Minecraft SMP is about.',
+			loadComponent: () =>
+				import('./pages/about-page/about-page.component').then(
+					(m) => m.AboutPageComponent
+				)
+		}
 	},
 	{
 		path: 'downloads',
 		component: PageTemplateComponent,
-		title: 'The Rift - Downloads',
-		data: { component: DownloadsPageComponent }
+		title: 'World Downloads',
+		data: {
+			description:
+				'Download the worlds from previous seasons of The Rift Minecraft SMP.',
+			loadComponent: () =>
+				import('./pages/downloads-page/downloads-page.component').then(
+					(m) => m.DownloadsPageComponent
+				)
+		}
 	},
 	{
 		path: 'contact',
 		component: PageTemplateComponent,
-		title: 'The Rift - Contact Us',
-		data: { component: ContactPageComponent }
+		title: 'Contact Us',
+		data: {
+			description:
+				'Get in touch with the team behind The Rift Minecraft SMP.',
+			loadComponent: () =>
+				import('./pages/contact-page/contact-page.component').then(
+					(m) => m.ContactPageComponent
+				)
+		}
 	},
 	{
 		path: 'join',
 		component: PageTemplateComponent,
-		title: 'The Rift - Join',
+		title: 'Join',
 		data: {
-			component: JoinPageComponent,
+			description: 'Apply to join The Rift Minecraft SMP.',
+			loadComponent: () =>
+				import('./pages/join-page/join-page.component').then(
+					(m) => m.JoinPageComponent
+				),
 			isTransparent: false
 		}
 	},
 	{
 		path: '**',
 		component: PageTemplateComponent,
-		title: 'The Rift - Error 404',
+		title: 'Page Not Found',
 		data: {
-			component: ErrorPageComponent,
+			noindex: true,
+			loadComponent: () =>
+				import('./pages/error-page/error-page.component').then(
+					(m) => m.ErrorPageComponent
+				),
 			isTransparent: false
 		}
 	}

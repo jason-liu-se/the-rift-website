@@ -1,5 +1,5 @@
-// Writes src/environments/ from .env, the shell, and NAME=value arguments so
-// URLs stay out of git. Angular swaps environment.development.ts in for
+// Writes src/environments/ (and the crawler files, see ../seo/) from .env, the
+// shell, and NAME=value arguments so URLs stay out of git. Angular swaps environment.development.ts in for
 // development builds via fileReplacements in angular.json.
 //
 // Usage: node scripts/environments/generate.mjs [--require-prod] [NAME=value...]
@@ -12,6 +12,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { parseArgs, parseEnv } from "node:util";
 import { DEV_DEFAULTS, PROCESSORS } from "./config.mjs";
+import { writeCrawlerFiles } from "../seo/crawler-files.mjs";
 
 const ENV_FILE = ".env";
 const OUTPUT_DIR = "src/environments";
@@ -124,3 +125,5 @@ ${names.map((name) => `\treadonly ${name}: string;`).join("\n")}
 );
 writeEnvironment("environment.ts", productionValues);
 writeEnvironment("environment.development.ts", developmentValues);
+// Crawlers only ever see the production site.
+writeCrawlerFiles(productionValues.SITE_URL);

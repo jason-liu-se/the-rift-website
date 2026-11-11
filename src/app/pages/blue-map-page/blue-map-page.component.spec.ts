@@ -1,5 +1,4 @@
 import { provideHttpClient } from '@angular/common/http';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { ActivatedRoute, provideRouter } from '@angular/router';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
@@ -16,7 +15,6 @@ function renderIframeSrc(routeData: Record<string, unknown>): string | null {
 			provideHttpClient(),
 			provideHttpClientTesting(),
 			provideRouter([]),
-			provideNoopAnimations(),
 			{
 				provide: ActivatedRoute,
 				useValue: { snapshot: { data: routeData } }

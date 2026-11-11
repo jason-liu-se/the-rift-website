@@ -7,11 +7,13 @@ import { normaliseUrl } from "./processors.mjs";
 /** Checks or transforms a variable's value; see processors.mjs. */
 export const PROCESSORS = {
 	API_URL: normaliseUrl,
-	BLUEMAP_URL: normaliseUrl
+	BLUEMAP_URL: normaliseUrl,
+	SITE_URL: normaliseUrl
 };
 
 /** Development values used when .env doesn't set them, so a fresh clone works. */
 export const DEV_DEFAULTS = {
 	API_URL: "http://localhost:4000",
-	BLUEMAP_URL: "http://localhost:8100"
+	BLUEMAP_URL: "http://localhost:8100",
+	SITE_URL: "http://localhost:4200"
 };

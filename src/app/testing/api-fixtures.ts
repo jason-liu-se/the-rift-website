@@ -27,13 +27,13 @@ const image = (name: string, caption: string): GalleryImage => ({
 
 export const GALLERY_COLLECTIONS: Record<string, GalleryImage[]> = {
 	'season-5': [
-		image('spawn-walkway-1.jpg', 'Spawn walkway'),
-		image('iron-farm-1.jpg', 'Iron farm'),
-		image('water-tower-1.jpg', 'Water tower')
+		image('spawn-walkway-1.webp', 'Spawn walkway'),
+		image('iron-farm-1.webp', 'Iron farm'),
+		image('water-tower-1.webp', 'Water tower')
 	],
 	'season-6': [
-		image('sunrise-1.jpg', 'Sunrise'),
-		image('fancy-tree-1.jpg', 'Fancy tree')
+		image('sunrise-1.webp', 'Sunrise'),
+		image('fancy-tree-1.webp', 'Fancy tree')
 	]
 };
 
@@ -46,7 +46,7 @@ export const DOWNLOAD_COLLECTIONS: DownloadCollection[] = [
 				desc: 'The full season 5 world.',
 				downloadUrl: 'https://example.com/season-5.zip',
 				backgroundUrl:
-					'/assets/general-background-images/mountain-side-1.jpg'
+					'/assets/general-background-images/mountain-side-1.webp'
 			}
 		]
 	}

@@ -42,7 +42,7 @@ describe('HomePageComponent', () => {
 			setInnerWidth(DESKTOP_BREAKPOINT_PX - 1);
 
 			expect(render().welcomeBackground()).toContain(
-				'spawn-walkway-1.jpg'
+				'spawn-walkway-1.webp'
 			);
 		});
 
@@ -57,7 +57,7 @@ describe('HomePageComponent', () => {
 			const { welcomeBackground, resizeWindow } = render();
 
 			resizeWindow(DESKTOP_BREAKPOINT_PX - 1);
-			expect(welcomeBackground()).toContain('spawn-walkway-1.jpg');
+			expect(welcomeBackground()).toContain('spawn-walkway-1.webp');
 
 			resizeWindow(DESKTOP_BREAKPOINT_PX);
 			expect(welcomeBackground()).toBe('');

@@ -1,7 +1,7 @@
 # The Rift Website
 
-The website for The Rift Minecraft server community: an Angular + Angular
-Material single-page app (versions in [`package.json`](./package.json)).
+The website for The Rift Minecraft SMP: an Angular + Angular Material
+single-page app (versions in [`package.json`](./package.json)).
 
 ## Requirements
 
@@ -29,11 +29,12 @@ Neither service is started by this repo. Static pages work without them.
 
 ## Environment variables
 
-| Variable                | `DEV_`/`PROD_` versions | Required for                                | Sets                                                                                            |
-| ----------------------- | ----------------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `PUBLIC_API_URL`        | Yes                     | `npm run build`, `npm run start:prod`       | The Rift API's base URL (`environment.API_URL`)                                                 |
-| `PUBLIC_BLUEMAP_URL`    | Yes                     | `npm run build`, `npm run start:prod`       | BlueMap's base URL (`environment.BLUEMAP_URL`)                                                  |
-| `LOCAL_WEB_SERVER_PATH` | No                      | `npm run api:sync` (and a real `api:check`) | Your web-server checkout, absolute or relative to this repo (see [API contract](#api-contract)) |
+| Variable                | `DEV_`/`PROD_` versions | Required for                                | Sets                                                                                                |
+| ----------------------- | ----------------------- | ------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `PUBLIC_API_URL`        | Yes                     | `npm run build`, `npm run start:prod`       | The Rift API's base URL (`environment.API_URL`)                                                     |
+| `PUBLIC_BLUEMAP_URL`    | Yes                     | `npm run build`, `npm run start:prod`       | BlueMap's base URL (`environment.BLUEMAP_URL`)                                                      |
+| `PUBLIC_SITE_URL`       | Yes                     | `npm run build`, `npm run start:prod`       | This site's public URL, for canonical links, link previews and the sitemap (`environment.SITE_URL`) |
+| `LOCAL_WEB_SERVER_PATH` | No                      | `npm run api:sync` (and a real `api:check`) | Your web-server checkout, absolute or relative to this repo (see [API contract](#api-contract))     |
 
 The URLs have development defaults (`DEV_DEFAULTS` in
 `scripts/environments/config.mjs`), so only production needs them set. Example:
@@ -43,6 +44,7 @@ DEV_PUBLIC_API_URL=http://localhost:4000
 DEV_PUBLIC_BLUEMAP_URL=http://localhost:8100
 PROD_PUBLIC_API_URL=https://api.example.com
 PROD_PUBLIC_BLUEMAP_URL=https://map.example.com
+PROD_PUBLIC_SITE_URL=https://www.example.com
 LOCAL_WEB_SERVER_PATH=../web-server
 ```
 
@@ -77,18 +79,18 @@ file you need to edit:
 
 ## Commands
 
-| Command                   | What it does                                                |
-| ------------------------- | ----------------------------------------------------------- |
-| `npm start`               | Dev server using the development URLs                       |
-| `npm run start:prod`      | Dev server using the production build and URLs              |
-| `npm run build`           | Production build (output path in `angular.json`)            |
-| `npm run watch`           | Rebuild on change (development)                             |
-| `npm test`                | Unit tests (`-- --watch=false` for one run)                 |
-| `npm run e2e`             | End-to-end and accessibility tests                          |
-| `npm run e2e:ui`          | Same, in the Playwright UI                                  |
-| `npm run lint` / `format` | ESLint / Prettier (`lint:fix`, `format:check` also exist)   |
-| `npm run env`             | Regenerate `src/environments/` from `.env` (see below)      |
-| `npm run ng -- <command>` | Angular CLI, e.g. `npm run ng -- generate component <path>` |
+| Command                   | What it does                                                 |
+| ------------------------- | ------------------------------------------------------------ |
+| `npm start`               | Dev server using the development URLs                        |
+| `npm run start:prod`      | Dev server using the production build and URLs               |
+| `npm run build`           | Production build (output path in `angular.json`)             |
+| `npm run watch`           | Rebuild on change (development)                              |
+| `npm test`                | Unit tests (`-- --watch=false` for one run)                  |
+| `npm run e2e`             | End-to-end and accessibility tests                           |
+| `npm run e2e:ui`          | Same, in the Playwright UI                                   |
+| `npm run lint` / `format` | ESLint / Prettier (`lint:fix`, `format:check` also exist)    |
+| `npm run env`             | Regenerate `src/environments/` and the crawler files (below) |
+| `npm run ng -- <command>` | Angular CLI, e.g. `npm run ng -- generate component <path>`  |
 
 `npm ci` and the `start`, `build`, `watch`, `test`, and `e2e` scripts run
 `npm run env` first. `npm run ng -- ...`, lint, and format don't, so run it
@@ -170,6 +172,7 @@ src/
 │   ├── interfaces/   Data types; api-responses.ts is synced from web-server
 │   ├── directives/   Custom directives
 │   ├── utilities/    Small shared helpers and pipes
+│   ├── seo/          Page titles, meta tags and structured data
 │   └── app.routes.ts
 ├── assets/           Images and icons
 ├── environments/     Generated from .env; don't edit
@@ -178,12 +181,34 @@ e2e/                  Playwright tests and their support files
 scripts/environments/ config.mjs (variable settings), processors.mjs (checks),
                       generate.mjs (writes src/environments/)
 scripts/api-contract/ sync.mjs (copies the API contract from web-server)
+scripts/seo/          crawler-files.mjs (writes robots.txt and sitemap.xml)
+public/               Copied to the site root; robots.txt and sitemap.xml are generated
 ```
 
 **How pages work:** every route in `app.routes.ts` renders
-`PageTemplateComponent`, which wraps the page named in the route's
-`data.component` with the shared navbar and footer. Components are standalone
-(there's no root `NgModule`).
+`PageTemplateComponent`, which wraps the page loaded by the route's
+`data.loadComponent` (lazy-loaded, so each page is its own JS chunk) with the
+shared navbar and footer. Components are standalone (there's no root
+`NgModule`).
+
+## SEO
+
+- **Titles and meta tags:** `SeoTitleStrategy` (`src/app/seo/`) runs after each
+  navigation. It sets the page title (the route's `title` plus " | The Rift"),
+  the meta description (`data.description`, falling back to the site-wide one in
+  `src/index.html`), the canonical URL, Open Graph tags, and the site's
+  structured data. Routes with `data.noindex: true` (e.g. the 404 page) get
+  `robots: noindex` and no canonical URL. Give every new route a `title` and a
+  `description`.
+- **Crawler files:** `npm run env` also writes `public/robots.txt` and
+  `public/sitemap.xml` (gitignored) from the routes and the production
+  `SITE_URL` (`scripts/seo/crawler-files.mjs`). New routes are added
+  automatically unless marked `noindex`. The build copies `public/` to the site
+  root.
+- **Hosting (Cloudflare Pages):** preview deployments already get
+  `X-Robots-Tag: noindex`. Pages are rendered in the browser, so crawlers that
+  don't run JavaScript only see the defaults in `src/index.html`, and unknown
+  URLs return the 404 page with a 200 status.
 
 ## API contract
 

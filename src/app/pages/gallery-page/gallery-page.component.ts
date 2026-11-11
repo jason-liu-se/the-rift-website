@@ -16,7 +16,7 @@ export class GalleryPageComponent {
 	public galleryCollections: IGalleryCardSelection[] = [
 		{
 			imageUrl:
-				'../../../assets/general-background-images/season-5-circle.png',
+				'../../../assets/general-background-images/season-5-circle.webp',
 			routerLink: '/gallery/season-5',
 			title: 'Season 5',
 			desc: '',
@@ -24,7 +24,7 @@ export class GalleryPageComponent {
 		},
 		{
 			imageUrl:
-				'../../../assets/general-background-images/magic-books-2.jpg',
+				'../../../assets/general-background-images/magic-books-2.webp',
 			routerLink: '/gallery/season-6',
 			title: 'Season 6',
 			desc: '',
