@@ -28,10 +28,17 @@ other browser APIs only in event handlers, `afterNextRender`, or behind
 
 - `src/app/app.config.ts` holds the app-wide providers; `app.config.server.ts`
   adds the server ones. `src/main.ts` and `src/main.server.ts` start the app.
-- `src/server.ts` is a web-standard request handler: it serves pre-rendered
-  pages and renders the rest. It only renders requests for the production
-  `SITE_URL` hostname, to prevent request forgery through the `Host` header (the
-  dev server skips this check).
+- `src/server.ts` is a web-standard request handler and the Cloudflare Worker's
+  entry (`wrangler.jsonc`), built as a platform-neutral bundle
+  (`ssr.experimentalPlatform` in `angular.json`), so it can't use Node APIs. On
+  Cloudflare, static assets (including pre-rendered pages) are served before the
+  Worker runs. The handler:
+    - only renders requests for the production `SITE_URL` hostname and
+      `*.workers.dev` (previews), to prevent request forgery through the `Host`
+      header; the dev server skips this check
+    - trusts Cloudflare's `X-Forwarded-For`/`-Proto` (Angular otherwise falls
+      back to browser-only rendering)
+    - adds the security headers that `public/_headers` sets for static files
 - `PageTemplateComponent` lazy-loads each page (`data.loadComponent`). The app
   counts as busy until the page has loaded, so server rendering and hydration
   wait for it. After an in-app navigation it focuses `<main>` once the page is

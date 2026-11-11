@@ -47,15 +47,16 @@ How these become `environment.*`, and how to add one:
 
 ## Commands
 
-| Command                   | What it does                                     |
-| ------------------------- | ------------------------------------------------ |
-| `npm start`               | Dev server with the development URLs             |
-| `npm run start:prod`      | Dev server with the production build and URLs    |
-| `npm run build`           | Production build (output path in `angular.json`) |
-| `npm test`                | Unit tests (`-- --watch=false` for one run)      |
-| `npm run e2e` / `e2e:ui`  | End-to-end and accessibility tests               |
-| `npm run lint` / `format` | ESLint / Prettier                                |
-| `npm run env`             | Regenerate `src/environments/` and crawler files |
+| Command                   | What it does                                                                |
+| ------------------------- | --------------------------------------------------------------------------- |
+| `npm start`               | Dev server with the development URLs                                        |
+| `npm run start:prod`      | Dev server with the production build and URLs                               |
+| `npm run build`           | Production build (output path in `angular.json`)                            |
+| `npm run preview`         | Production build run in the local Cloudflare Worker (http://localhost:8787) |
+| `npm test`                | Unit tests (`-- --watch=false` for one run)                                 |
+| `npm run e2e` / `e2e:ui`  | End-to-end and accessibility tests                                          |
+| `npm run lint` / `format` | ESLint / Prettier                                                           |
+| `npm run env`             | Regenerate `src/environments/` and crawler files                            |
 
 `npm ci`, `start`, `build`, `test`, and `e2e` run `npm run env` first; run it
 yourself after editing `.env` if you call `ng` directly.
@@ -93,6 +94,28 @@ public/               Copied to the site root
 
 Rendering and SEO are explained in [rendering.md](./.claude/docs/rendering.md)
 and [seo.md](./.claude/docs/seo.md).
+
+## Deployment
+
+The site runs as a Cloudflare Worker (`wrangler.jsonc`): pre-rendered pages and
+build files are served as static assets, and `src/server.ts` renders everything
+else. Cache and security headers are in `public/_headers`.
+
+Setup:
+
+1. In the Cloudflare dashboard, create a Worker from this repo (Workers Builds).
+   Build command: `npm run build`. Deploy command: `npx wrangler deploy`.
+2. Add the build variables `PROD_PUBLIC_API_URL`, `PROD_PUBLIC_BLUEMAP_URL`, and
+   `PROD_PUBLIC_SITE_URL` (the exact production URL, with `https://` and no
+   trailing slash).
+3. Add the custom domain to the Worker, and redirect the other host (`www` or
+   the bare domain) to it with a Cloudflare redirect rule.
+4. The API must use HTTPS, be reachable from Cloudflare (pages are rendered
+   there), and allow the site's origin in CORS. BlueMap must use HTTPS and allow
+   the site to embed it (`X-Frame-Options` / `frame-ancestors`).
+5. Verify the domain in Google Search Console, submit
+   `https://<domain>/sitemap.xml`, and import the site into Bing Webmaster
+   Tools.
 
 ## API contract
 

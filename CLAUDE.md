@@ -10,6 +10,7 @@ variables are in `README.md`; framework versions in `package.json`.
 npm start                              # dev server (with server rendering)
 npm run start:prod                     # dev server with PROD_ .env variables
 npm run build                          # production build
+npm run preview                        # production build in the local Cloudflare Worker
 npm test -- --watch=false              # unit tests, single run
 npm test -- --include <path/to/spec>   # one spec file
 npm run e2e                            # Playwright e2e + axe (only when asked)

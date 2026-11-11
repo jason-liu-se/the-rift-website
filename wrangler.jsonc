@@ -1,0 +1,16 @@
+// Cloudflare Worker: serves the browser build as static assets (including
+// prerendered pages) and runs src/server.ts for everything else. Service URLs
+// come from build variables (README "Deployment"), not this file.
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "the-rift-website",
+	"main": "dist/the-rift-site/server/server.mjs",
+	"compatibility_date": "2026-11-11",
+	"assets": {
+		"directory": "dist/the-rift-site/browser",
+		// Serves about/index.html at /about (redirecting /about/ there), matching
+		// the canonical URLs. The default would redirect /about to /about/.
+		"html_handling": "drop-trailing-slash"
+	},
+	"observability": { "enabled": true }
+}
