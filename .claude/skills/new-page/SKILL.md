@@ -38,15 +38,15 @@ Add the route to `src/app/app.routes.ts` before the `**` wildcard:
 
 - `component: PageTemplateComponent`
 - a unique `title` naming the page (`SeoTitleStrategy` appends " | The Rift")
-  and a `data.description` for search results (README "SEO")
+  and a `data.description` for search results (`.claude/docs/seo.md`)
 - `data.loadComponent: () => import('./pages/<name>/<name>.component').then((m) => m.<Name>Component)`,
   plus any shell flags it needs. Check `PageTemplateComponent` for the flags and
   their defaults, and only set flags that differ from the defaults.
 
-Then give it a render mode in `src/app/app.routes.server.ts` (README
-"Rendering"): `RenderMode.Server` if it shows API data, otherwise
-`RenderMode.Prerender`. Keep the page server-safe: read `window` only in event
-handlers, `afterNextRender`, or behind `isPlatformBrowser`.
+Then give it a render mode in `src/app/app.routes.server.ts`
+(`.claude/docs/rendering.md`): `RenderMode.Server` if it shows API data,
+otherwise `RenderMode.Prerender`. Keep the page server-safe: read `window` only
+in event handlers, `afterNextRender`, or behind `isPlatformBrowser`.
 
 ## 4. Navigation
 
@@ -58,7 +58,7 @@ decide this yourself.
 
 Replace the generated "should create" spec with tests of real behaviour:
 rendered content, the requests the page makes, and how it uses route data. Use
-the providers listed under Testing in `CLAUDE.md`. Run:
+the setup in `.claude/docs/testing.md`. Run:
 
 ```bash
 npm test -- --watch=false --include src/app/pages/<name>-page
@@ -69,5 +69,6 @@ Don't run `npm run e2e` unless the user asks for it.
 
 ## 6. Finish
 
-- Update `README.md` if it describes something this page changes.
+- Update `README.md` and `.claude/docs/` if they describe something this page
+  changes.
 - Run `/pre-pr` (or tell the user to run it) before committing.

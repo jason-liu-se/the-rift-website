@@ -17,8 +17,8 @@ read-only inspection (`git diff/log/show`, `ls`, `cat`).
 1. Audit what the caller names. If they name nothing, audit the templates and
    styles changed on this branch (`git diff main...HEAD` plus uncommitted
    changes).
-2. Read `CLAUDE.md`. Its accessibility, keyboard, and responsive standards are
-   the baseline.
+2. Read `CLAUDE.md` and `.claude/docs/ui-standards.md`. The accessibility,
+   keyboard, and responsive standards there are the baseline.
 3. For each component, read its `.html`, `.scss`, and `.ts`, the child
    components it renders, and the global styles it relies on (`src/styles.scss`,
    `src/theme*.scss`, `src/font-sizes.scss`). For pages, also read
