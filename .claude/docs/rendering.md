@@ -45,4 +45,6 @@ other browser APIs only in event handlers, `afterNextRender`, or behind
   in. If a page's chunk fails to load (a tab left open across a deploy), it
   reloads once.
 - Server-rendered pages call the API from the server, and the browser reuses
-  those responses. If the API is down, the page renders without the data.
+  those responses. If the API is down, or doesn't answer within
+  `SERVER_API_TIMEOUT_MS` (`server-api-timeout.interceptor.ts`, server only),
+  the page renders without the data and the browser fetches it after hydration.
