@@ -81,7 +81,7 @@ function finalise(environment, prefix) {
 			(name) => `${prefix}PUBLIC_${name} (or PUBLIC_${name})`
 		);
 		throw new Error(
-			`Not set: ${list.join(", ")}. Set them in .env, the shell, or as arguments (see README "Getting started").`
+			`Not set: ${list.join(", ")}. Set them in .env, the shell, or as arguments (see README "Environment variables").`
 		);
 	}
 	return Object.fromEntries(
