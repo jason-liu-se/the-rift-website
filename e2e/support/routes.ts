@@ -14,7 +14,7 @@ export interface IE2eRoute {
 }
 
 export const ROUTES: readonly IE2eRoute[] = [
-	{ path: '/', title: 'Minecraft SMP | The Rift' },
+	{ path: '/', title: 'Home | The Rift' },
 	{
 		path: '/news',
 		title: 'News | The Rift',
