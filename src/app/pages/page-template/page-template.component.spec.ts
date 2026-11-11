@@ -96,6 +96,27 @@ describe('PageTemplateComponent', () => {
 		expect(document.activeElement).toBe(mainContent());
 	});
 
+	it('waits for the page before focusing the main content', async () => {
+		TestBed.inject(Router).navigated = true;
+		let resolvePage!: (page: Type<unknown>) => void;
+		routeData['loadComponent'] = () =>
+			new Promise<Type<unknown>>((resolve) => (resolvePage = resolve));
+		fixture = TestBed.createComponent(PageTemplateComponent);
+		element = fixture.nativeElement;
+		document.body.appendChild(element);
+		fixture.detectChanges();
+		TestBed.tick();
+
+		expect(document.activeElement).not.toBe(mainContent());
+
+		resolvePage(StubPageComponent);
+		await fixture.whenStable();
+		TestBed.tick();
+
+		expect(document.activeElement).toBe(mainContent());
+		expect(mainContent().querySelector('.stub-page')).not.toBeNull();
+	});
+
 	describe('loading the page', () => {
 		const isStable = () =>
 			firstValueFrom(TestBed.inject(ApplicationRef).isStable);

@@ -3,6 +3,7 @@ import {
 	Component,
 	DestroyRef,
 	ElementRef,
+	Injector,
 	OnInit,
 	PLATFORM_ID,
 	PendingTasks,
@@ -38,6 +39,9 @@ export class PageTemplateComponent implements OnInit {
 	private destroyRef = inject(DestroyRef);
 	private pendingTasks = inject(PendingTasks);
 	private document = inject(DOCUMENT);
+	private injector = inject(Injector);
+	// Read now: by the time the page has loaded, the first navigation has ended.
+	private isInAppNavigation = this.router.navigated;
 	private storage = isPlatformBrowser(inject(PLATFORM_ID))
 		? sessionStorage
 		: null;
@@ -63,14 +67,6 @@ export class PageTemplateComponent implements OnInit {
 		this.showContactSection =
 			showContactSectionProp == null ? false : showContactSectionProp;
 		this.showFooter = showFooterProp == null ? true : showFooterProp;
-
-		// After an in-app navigation (not the first page load), start keyboard
-		// and screen reader users at the new page's content instead of <body>.
-		if (this.router.navigated) {
-			afterNextRender(() =>
-				this.mainContent().nativeElement.focus({ preventScroll: true })
-			);
-		}
 	}
 
 	// Pages are loaded on demand (their own JS chunks) from data.loadComponent.
@@ -85,9 +81,27 @@ export class PageTemplateComponent implements OnInit {
 				this.appPageTemplateHost.viewContainerRef.createComponent(
 					component
 				);
+				this.focusContentAfterNavigation();
 			}
 		} finally {
 			removeTask();
+		}
+	}
+
+	/**
+	 * After an in-app navigation (not the first page load), starts keyboard and
+	 * screen reader users at the new page's content instead of <body>. Waits for
+	 * the page, so Tab from <main> reaches its content.
+	 */
+	private focusContentAfterNavigation(): void {
+		if (this.isInAppNavigation) {
+			afterNextRender(
+				() =>
+					this.mainContent().nativeElement.focus({
+						preventScroll: true
+					}),
+				{ injector: this.injector }
+			);
 		}
 	}
 
