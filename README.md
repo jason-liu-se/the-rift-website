@@ -79,18 +79,18 @@ file you need to edit:
 
 ## Commands
 
-| Command                   | What it does                                                 |
-| ------------------------- | ------------------------------------------------------------ |
-| `npm start`               | Dev server using the development URLs                        |
-| `npm run start:prod`      | Dev server using the production build and URLs               |
-| `npm run build`           | Production build (output path in `angular.json`)             |
-| `npm run watch`           | Rebuild on change (development)                              |
-| `npm test`                | Unit tests (`-- --watch=false` for one run)                  |
-| `npm run e2e`             | End-to-end and accessibility tests                           |
-| `npm run e2e:ui`          | Same, in the Playwright UI                                   |
-| `npm run lint` / `format` | ESLint / Prettier (`lint:fix`, `format:check` also exist)    |
-| `npm run env`             | Regenerate `src/environments/` and the crawler files (below) |
-| `npm run ng -- <command>` | Angular CLI, e.g. `npm run ng -- generate component <path>`  |
+| Command                   | What it does                                                                       |
+| ------------------------- | ---------------------------------------------------------------------------------- |
+| `npm start`               | Dev server (with server rendering) using the development URLs                      |
+| `npm run start:prod`      | Dev server using the production build and URLs                                     |
+| `npm run build`           | Production build: `browser/` and `server/` under the output path in `angular.json` |
+| `npm run watch`           | Rebuild on change (development)                                                    |
+| `npm test`                | Unit tests (`-- --watch=false` for one run)                                        |
+| `npm run e2e`             | End-to-end and accessibility tests                                                 |
+| `npm run e2e:ui`          | Same, in the Playwright UI                                                         |
+| `npm run lint` / `format` | ESLint / Prettier (`lint:fix`, `format:check` also exist)                          |
+| `npm run env`             | Regenerate `src/environments/` and the crawler files (below)                       |
+| `npm run ng -- <command>` | Angular CLI, e.g. `npm run ng -- generate component <path>`                        |
 
 `npm ci` and the `start`, `build`, `watch`, `test`, and `e2e` scripts run
 `npm run env` first. `npm run ng -- ...`, lint, and format don't, so run it
@@ -117,8 +117,11 @@ If you're used to Jasmine:
 
 Playwright tests in `e2e/` run every route on desktop and mobile in Chromium.
 The API and BlueMap are mocked at the development URLs, so you don't need either
-running. Playwright reuses a server already on port 4200, so stop
-`npm run start:prod` before running e2e tests.
+running: in the browser by `e2e/support/mock-api.ts`, and for the dev server's
+server-side rendering by a mock API server on the development `API_URL` port
+(`e2e/support/mock-api-server.ts`). Stop a local API using that port first.
+Playwright reuses a server already on port 4200, so stop `npm run start:prod`
+before running e2e tests.
 
 ```bash
 npx playwright install chromium   # once, and after upgrading Playwright
@@ -173,9 +176,13 @@ src/
 │   ├── directives/   Custom directives
 │   ├── utilities/    Small shared helpers and pipes
 │   ├── seo/          Page titles, meta tags and structured data
-│   └── app.routes.ts
+│   ├── app.routes.ts         Routes (title, description, page, shell flags)
+│   ├── app.routes.server.ts  How each route is rendered (see Rendering)
+│   └── app.config*.ts        App-wide providers (browser; server adds to them)
 ├── assets/           Images and icons
 ├── environments/     Generated from .env; don't edit
+├── main*.ts          Browser and server entry points
+├── server.ts         Server request handler (pre-rendered pages and server rendering)
 └── *.scss            Global styles and Material theme
 e2e/                  Playwright tests and their support files
 scripts/environments/ config.mjs (variable settings), processors.mjs (checks),
@@ -191,6 +198,32 @@ public/               Copied to the site root; robots.txt and sitemap.xml are ge
 shared navbar and footer. Components are standalone (there's no root
 `NgModule`).
 
+## Rendering
+
+Pages are rendered on the server, so crawlers and link previews get full HTML,
+and the browser then takes over the page instead of rendering it again.
+`src/app/app.routes.server.ts` sets how each route is rendered:
+
+| Mode                   | When the HTML is made          | Use for                                        |
+| ---------------------- | ------------------------------ | ---------------------------------------------- |
+| `RenderMode.Prerender` | At build time, saved as a file | Pages whose content only changes with a deploy |
+| `RenderMode.Server`    | On each request                | Pages showing API data (news, gallery, ...)    |
+| `RenderMode.Client`    | In the browser only            | Pages that can't render on a server            |
+
+- **Changing a page's mode** is a one-line edit there; components work in all
+  three. Every route in `app.routes.ts` needs an entry (a unit test checks), or
+  it falls through to the last entry, which serves the 404 page with a 404
+  status.
+- **Server-safe components:** code runs on the server too, where there's no
+  `window` or `document` beyond Angular's own. Read the window only in event
+  handlers, `afterNextRender`, or behind `isPlatformBrowser`.
+- **API data:** server-rendered pages call the API from the server, and the
+  browser reuses those responses instead of fetching them again. If the API is
+  down, the page renders without the data (the error is logged).
+- **Allowed hosts:** the server only renders requests for the production
+  `SITE_URL` hostname (`src/server.ts`), to prevent request forgery through the
+  `Host` header. The dev server doesn't check.
+
 ## SEO
 
 - **Titles and meta tags:** `SeoTitleStrategy` (`src/app/seo/`) runs after each
@@ -205,10 +238,8 @@ shared navbar and footer. Components are standalone (there's no root
   `SITE_URL` (`scripts/seo/crawler-files.mjs`). New routes are added
   automatically unless marked `noindex`. The build copies `public/` to the site
   root.
-- **Hosting (Cloudflare Pages):** preview deployments already get
-  `X-Robots-Tag: noindex`. Pages are rendered in the browser, so crawlers that
-  don't run JavaScript only see the defaults in `src/index.html`, and unknown
-  URLs return the 404 page with a 200 status.
+- **Status codes:** unknown URLs return the 404 page with a 404 status (see
+  [Rendering](#rendering)).
 
 ## API contract
 

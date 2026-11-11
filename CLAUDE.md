@@ -51,6 +51,13 @@ pre-commit hook lints and formats staged files.
   and defaults in `PageTemplateComponent`). Pages read their own values from
   route data, so a variant of an existing page (e.g. another gallery collection
   or map) is usually just a new route.
+- **Server rendering (`@angular/ssr`).** `src/app/app.routes.server.ts` sets
+  each route's render mode (pre-rendered at build, rendered per request, or
+  browser-only; README "Rendering"); every route needs an entry, and unknown
+  URLs get a real 404. `app.config.server.ts` adds the server providers to
+  `app.config.ts`, and `src/server.ts` is a web-standard request handler.
+  Components must be server-safe: touch `window`/browser APIs only in event
+  handlers, `afterNextRender`, or behind `isPlatformBrowser`.
 - **External services.** The Rift API (news, gallery, downloads) and a BlueMap
   server (embedded maps) run separately from this repo. Endpoints come from the
   gitignored `.env` (see README), which `scripts/environments/generate.mjs`
@@ -87,10 +94,11 @@ needs a stubbed `ActivatedRoute` with `snapshot.data.loadComponent`; see
 defining new ones.
 
 E2E specs in `e2e/` import `test`/`expect` from `e2e/support/test.ts`, which
-mocks the API and BlueMap, and open pages with `gotoRoute`
-(`e2e/support/navigation.ts`). New routes go in `e2e/support/routes.ts`. Fix new
-axe violations rather than adding them to `e2e/known-a11y-issues.ts`, and delete
-entries there once fixed.
+mocks the API and BlueMap in the browser (a global-setup mock server answers the
+dev server's server-side API calls with the same fixtures), and open pages with
+`gotoRoute` (`e2e/support/navigation.ts`). New routes go in
+`e2e/support/routes.ts`. Fix new axe violations rather than adding them to
+`e2e/known-a11y-issues.ts`, and delete entries there once fixed.
 
 ## Engineering standards
 

@@ -43,6 +43,11 @@ Add the route to `src/app/app.routes.ts` before the `**` wildcard:
   plus any shell flags it needs. Check `PageTemplateComponent` for the flags and
   their defaults, and only set flags that differ from the defaults.
 
+Then give it a render mode in `src/app/app.routes.server.ts` (README
+"Rendering"): `RenderMode.Server` if it shows API data, otherwise
+`RenderMode.Prerender`. Keep the page server-safe: read `window` only in event
+handlers, `afterNextRender`, or behind `isPlatformBrowser`.
+
 ## 4. Navigation
 
 Ask the user whether the page belongs in the navbar
