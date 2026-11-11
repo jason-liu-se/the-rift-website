@@ -34,21 +34,23 @@ pre-commit hook lints and formats staged files.
   component stylesheets small. `src/theme.scss` themes only the Material
   components in use: add a component's theme there when you start using one.
   Pages are lazy-loaded (see Architecture), so keep page-only imports out of
-  shared code and `main.ts`.
+  shared code and `app.config.ts`.
 
 ## Architecture
 
 - **Standalone components, no root `NgModule`.** `src/main.ts` bootstraps with
-  `provideRouter` and the routes in `src/app/app.routes.ts`. Use `inject()`, not
+  the app-wide providers in `src/app/app.config.ts` (router with the routes in
+  `src/app/app.routes.ts`, HTTP, title strategy). Use `inject()`, not
   constructor injection.
 - **Every route renders `PageTemplateComponent`.** It lazy-loads the page from
   the route's `data.loadComponent` (an `import()`, so each page is its own
   chunk) into the `appPageTemplateHost` directive, in a `<main>` (focused after
-  in-app navigation) wrapped by the shared shell (navbar, optional contact
-  section, footer). Route data flags toggle the shell (flags and defaults in
-  `PageTemplateComponent`). Pages read their own values from route data, so a
-  variant of an existing page (e.g. another gallery collection or map) is
-  usually just a new route.
+  in-app navigation; the app counts as busy until the page loads, and a failed
+  chunk load after a deploy reloads once) wrapped by the shared shell (navbar,
+  optional contact section, footer). Route data flags toggle the shell (flags
+  and defaults in `PageTemplateComponent`). Pages read their own values from
+  route data, so a variant of an existing page (e.g. another gallery collection
+  or map) is usually just a new route.
 - **External services.** The Rift API (news, gallery, downloads) and a BlueMap
   server (embedded maps) run separately from this repo. Endpoints come from the
   gitignored `.env` (see README), which `scripts/environments/generate.mjs`

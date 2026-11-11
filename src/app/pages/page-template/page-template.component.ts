@@ -1,8 +1,11 @@
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import {
 	Component,
 	DestroyRef,
 	ElementRef,
 	OnInit,
+	PLATFORM_ID,
+	PendingTasks,
 	ViewChild,
 	Type,
 	afterNextRender,
@@ -14,6 +17,9 @@ import { PageTemplateDirective } from 'src/app/directives/page-template.directiv
 import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { ContactComponent } from '../../components/contact/contact.component';
 import { FooterComponent } from '../../components/footer/footer.component';
+
+/** sessionStorage key set while reloading after a page chunk failed to load. */
+export const CHUNK_RELOAD_KEY = 'reloaded-after-chunk-error';
 
 @Component({
 	selector: 'app-page-template',
@@ -30,6 +36,11 @@ export class PageTemplateComponent implements OnInit {
 	private route = inject(ActivatedRoute);
 	private router = inject(Router);
 	private destroyRef = inject(DestroyRef);
+	private pendingTasks = inject(PendingTasks);
+	private document = inject(DOCUMENT);
+	private storage = isPlatformBrowser(inject(PLATFORM_ID))
+		? sessionStorage
+		: null;
 	private mainContent =
 		viewChild.required<ElementRef<HTMLElement>>('mainContent');
 
@@ -64,14 +75,41 @@ export class PageTemplateComponent implements OnInit {
 
 	// Pages are loaded on demand (their own JS chunks) from data.loadComponent.
 	async ngOnInit(): Promise<void> {
+		// Keeps the app unstable until the page is in place, so server rendering
+		// and hydration wait for it instead of finishing without it.
+		const removeTask = this.pendingTasks.add();
+		try {
+			const component = await this.loadPage();
+			// The user may have navigated away while the page's chunk was loading.
+			if (component && !this.destroyRef.destroyed) {
+				this.appPageTemplateHost.viewContainerRef.createComponent(
+					component
+				);
+			}
+		} finally {
+			removeTask();
+		}
+	}
+
+	/**
+	 * Loads the page component. A tab opened before a deploy asks for chunk
+	 * files that no longer exist, so on failure the page reloads once to get the
+	 * new build (returning null); a second failure in a row is a real error.
+	 */
+	private async loadPage(): Promise<Type<unknown> | null> {
 		const loadComponent: () => Promise<Type<unknown>> =
 			this.route.snapshot.data['loadComponent'];
-		const component = await loadComponent();
-		// The user may have navigated away while the page's chunk was loading.
-		if (!this.destroyRef.destroyed) {
-			this.appPageTemplateHost.viewContainerRef.createComponent(
-				component
-			);
+		try {
+			const component = await loadComponent();
+			this.storage?.removeItem(CHUNK_RELOAD_KEY);
+			return component;
+		} catch (error) {
+			if (!this.storage || this.storage.getItem(CHUNK_RELOAD_KEY)) {
+				throw error;
+			}
+			this.storage.setItem(CHUNK_RELOAD_KEY, 'true');
+			this.document.location.reload();
+			return null;
 		}
 	}
 }
