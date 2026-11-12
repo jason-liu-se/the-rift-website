@@ -9,7 +9,7 @@ argument-hint: <variable name and purpose>
 
 Add the variable described in: $ARGUMENTS
 
-How the variables work: `.claude/docs/environment-variables.md`.
+How the variables work: `.claude/rules/environment-variables.md`.
 
 ## App setting (read by the app as `environment.<NAME>`)
 

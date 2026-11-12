@@ -1,3 +1,11 @@
+---
+paths:
+    - "src/**/*.spec.ts"
+    - "src/app/testing/**/*"
+    - "e2e/**/*"
+    - "playwright.config.ts"
+---
+
 # Testing
 
 ## Unit tests (Vitest)

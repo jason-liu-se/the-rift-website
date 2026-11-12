@@ -27,9 +27,10 @@ findings. You are **strictly read-only**.
    review that. Otherwise review uncommitted changes (`git diff HEAD` plus
    untracked files from `git status`); if there are none, review the current
    branch against `main` (`git diff main...HEAD`).
-2. Read `CLAUDE.md` first. Its architecture, conventions, testing setup, and
+2. Read `CLAUDE.md` first, then the `.claude/rules/` files for the areas the
+   changes touch. Their architecture, conventions, testing setup, and
    engineering standards are your review criteria; this file only adds what to
-   look for on top of them, so where they overlap, `CLAUDE.md` wins.
+   look for on top of them, so where they overlap, they win.
 3. Read each changed file in full, not just the diff hunks, and open the code it
    calls or that calls it, so findings are grounded in real context.
 
@@ -54,7 +55,7 @@ findings. You are **strictly read-only**.
 **Accessibility and keyboard**
 
 Check changed templates and styles against the accessibility and keyboard
-standards in `.claude/docs/ui-standards.md`, plus what they leave implicit:
+standards in `.claude/rules/ui-standards.md`, plus what they leave implicit:
 
 - Clickable `div`/`span` instead of `button`/`a`; links used as buttons or vice
   versa.
@@ -72,7 +73,7 @@ standards in `.claude/docs/ui-standards.md`, plus what they leave implicit:
 
 **Responsive design**
 
-Check against the responsive standard in `.claude/docs/ui-standards.md`. For
+Check against the responsive standard in `.claude/rules/ui-standards.md`. For
 each changed view, reason about how it behaves at narrow mobile, tablet, and
 wide desktop widths, not only the size it was evidently built for:
 
@@ -93,16 +94,17 @@ wide desktop widths, not only the size it was evidently built for:
   README `.env` example, or a URL setting missing from `PROCESSORS` in
   `scripts/environments/config.mjs`.
 - An interface changed in `src/app/interfaces/` but not every consumer updated.
-- Specs not updated or added for changed behaviour, missing the test setup
-  `CLAUDE.md` requires, or written to pass rather than to catch regressions.
+- Specs not updated or added for changed behaviour, missing the test setup in
+  `.claude/rules/testing.md`, or written to pass rather than to catch
+  regressions.
 - Renamed or removed symbols still referenced elsewhere (grep for them).
 - Dead code, unused imports, `console.log`, commented-out blocks, stray TODOs.
 - Stylesheet growth that risks the style budgets in `angular.json`.
 - New dependencies in `package.json` without the justification `CLAUDE.md`
   requires.
-- `README.md`/`CLAUDE.md` now out of date, or docs that copy values from the
-  code (versions, breakpoints, URLs, flags) instead of pointing to where they
-  live.
+- `README.md`, `CLAUDE.md`, `.claude/docs/`, or `.claude/rules/` now out of
+  date, or docs that copy values from the code (versions, breakpoints, URLs,
+  flags) instead of pointing to where they live.
 
 **Readability and maintainability**
 

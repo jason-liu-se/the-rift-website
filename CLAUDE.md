@@ -21,18 +21,14 @@ npm run env                            # regenerate src/environments/ (before ca
 Scaffold with `npm run ng -- generate component components/<name>`. A Husky
 pre-commit hook lints and formats staged files.
 
-## Docs
+## Docs and rules
 
-Read the relevant file before working in its area:
+`.claude/docs/` holds context every session needs, imported below.
+`.claude/rules/` holds standards for one area (templates and styles, tests, SEO,
+environment variables); each sets `paths` frontmatter so it loads only when
+matching files are read or edited.
 
-- `.claude/docs/ui-standards.md`: colours, accessibility, keyboard, responsive,
-  and SEO rules for templates and styles.
-- `.claude/docs/rendering.md`: render modes, server-safe code, and how pages
-  load.
-- `.claude/docs/seo.md`: route titles, descriptions, `noindex`, and crawler
-  files.
-- `.claude/docs/testing.md`: unit test setup and e2e mocks and conventions.
-- `.claude/docs/environment-variables.md`: how `.env` becomes `environment`.
+@.claude/docs/rendering.md
 
 ## Architecture
 
@@ -45,8 +41,6 @@ Read the relevant file before working in its area:
   variant of a page (e.g. another gallery collection or map) is usually just a
   new route. Every route also needs a `title`, a `data.description`, and a
   render mode in `src/app/app.routes.server.ts`.
-- **Components must be server-safe**: touch `window`/browser APIs only in event
-  handlers, `afterNextRender`, or behind `isPlatformBrowser`.
 - **External services.** The Rift API and BlueMap run separately. Import
   `environment` from `src/environments/` (generated from `.env`); never
   hard-code URLs. Map route data must match BlueMap map ids.
@@ -84,7 +78,7 @@ Read the relevant file before working in its area:
   branches, single-caller abstractions).
 - **UI.** WCAG 2.2 AA, full keyboard support, mobile-first, and colours only
   from the palette in `src/theme-colours.scss`. Details are in
-  `.claude/docs/ui-standards.md`.
+  `.claude/rules/ui-standards.md`.
 - **Dependencies.** Add a package only for substantial, likely-reused, or
   error-prone functionality (e.g. security, date/time, parsing), and justify it
   to the user.
@@ -94,6 +88,7 @@ Read the relevant file before working in its area:
   tests fail when it breaks.
 - **Scope and debt.** Keep changes scoped. Fix minor debt and remove dead code
   in code you touch; raise major debt or unrelated refactors with the user.
-- **Docs.** Update `README.md`, `.claude/docs/`, skills, and `CLAUDE.md` in the
-  same change when what they describe changes. Point to code instead of copying
-  values (versions, breakpoints, URLs), and don't list Claude tooling here.
+- **Docs.** Update `README.md`, `.claude/docs/`, `.claude/rules/`, skills, and
+  `CLAUDE.md` in the same change when what they describe changes. Point to code
+  instead of copying values (versions, breakpoints, URLs), and don't list Claude
+  tooling here.
