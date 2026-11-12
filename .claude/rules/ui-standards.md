@@ -1,6 +1,10 @@
-# UI standards
+---
+paths:
+    - "src/**/*.html"
+    - "src/**/*.scss"
+---
 
-Read before changing templates or styles.
+# UI standards
 
 ## Colours
 

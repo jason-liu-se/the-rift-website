@@ -190,7 +190,7 @@ test.describe('mobile navbar menu', { tag: TAG.mobileOnly }, () => {
 		await expect(newsLink(page)).toBeHidden();
 	});
 
-	// Known gaps against .claude/docs/ui-standards.md ("menus close on Escape and
+	// Known gaps against .claude/rules/ui-standards.md ("menus close on Escape and
 	// restore focus").
 	// test.fail() reports these as passing while they fail, and fails the
 	// suite once they pass, so remove the annotation when fixing them.

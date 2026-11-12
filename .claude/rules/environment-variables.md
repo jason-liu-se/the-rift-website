@@ -1,3 +1,10 @@
+---
+paths:
+    - ".env*"
+    - "scripts/environments/**/*"
+    - "src/environments/**/*"
+---
+
 # Environment variables
 
 The variables themselves are listed in the README. This covers how they work.

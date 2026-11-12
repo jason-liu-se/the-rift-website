@@ -43,7 +43,7 @@ LOCAL_WEB_SERVER_PATH=../web-server
 ```
 
 How these become `environment.*`, and how to add one:
-[environment-variables.md](./.claude/docs/environment-variables.md).
+[environment-variables.md](./.claude/rules/environment-variables.md).
 
 ## Commands
 
@@ -71,7 +71,7 @@ npm run e2e -- e2e/keyboard.spec.ts --project=desktop    # one e2e file, one dev
 
 The e2e tests mock the API and BlueMap, so neither needs to be running. Stop
 anything on port 4200 or the development API port first. Details:
-[testing.md](./.claude/docs/testing.md).
+[testing.md](./.claude/rules/testing.md).
 
 ## Project structure
 
@@ -93,7 +93,7 @@ public/               Copied to the site root
 ```
 
 Rendering and SEO are explained in [rendering.md](./.claude/docs/rendering.md)
-and [seo.md](./.claude/docs/seo.md).
+and [seo.md](./.claude/rules/seo.md).
 
 ## Deployment
 

@@ -1,3 +1,11 @@
+---
+paths:
+    - "src/app/app.routes.ts"
+    - "src/app/seo/**/*"
+    - "scripts/seo/**/*"
+    - "src/index.html"
+---
+
 # SEO
 
 - **Titles and meta tags.** `SeoTitleStrategy` (`src/app/seo/`) runs after each
@@ -16,5 +24,5 @@
   `SITE_URL` (`scripts/seo/crawler-files.mjs`). New routes are added
   automatically unless marked `noindex`.
 - **Status codes.** Unknown URLs return the 404 page with a 404 status (see
-  [rendering.md](./rendering.md)).
+  [rendering.md](../docs/rendering.md)).
 - **Page content.** See the SEO section of [ui-standards.md](./ui-standards.md).
