@@ -34,4 +34,16 @@ export const reqHandler = createRequestHandler(async (request) => {
 	return response;
 });
 
-export default { fetch: reqHandler };
+const API_HEALTH_URL = `${environment.API_URL}/health`;
+
+export default {
+	fetch: reqHandler,
+	// Runs on the Cron Trigger in wrangler.jsonc: keeps the API's free-tier host
+	// from putting it to sleep, which would slow the next page render.
+	async scheduled() {
+		const response = await fetch(API_HEALTH_URL);
+		if (!response.ok) {
+			console.error(`API health check failed: HTTP ${response.status}`);
+		}
+	}
+};
