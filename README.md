@@ -99,7 +99,9 @@ and [seo.md](./.claude/docs/seo.md).
 
 The site runs as a Cloudflare Worker (`wrangler.jsonc`): pre-rendered pages and
 build files are served as static assets, and `src/server.ts` renders everything
-else. Cache and security headers are in `public/_headers`.
+else. Cache and security headers are in `public/_headers`. A Cron Trigger pings
+the API's `/health` endpoint (schedule in `wrangler.jsonc`) so its free-tier
+host doesn't put it to sleep.
 
 Setup:
 
