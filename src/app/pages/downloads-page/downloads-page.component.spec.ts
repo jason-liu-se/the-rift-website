@@ -14,12 +14,14 @@ const COLLECTIONS: DownloadCollection[] = [
 		name: 'Worlds',
 		items: [
 			{
+				id: '1',
 				title: 'Season 5',
 				desc: 'Full world',
 				downloadUrl: 'https://example.com/season-5.zip',
 				backgroundUrl: 'assets/season-5.png'
 			},
 			{
+				id: '2',
 				title: 'Season 4',
 				desc: 'Full world',
 				downloadUrl: 'https://example.com/season-4.zip',
@@ -31,6 +33,7 @@ const COLLECTIONS: DownloadCollection[] = [
 		name: 'Resource packs',
 		items: [
 			{
+				id: '3',
 				title: 'Rift pack',
 				desc: 'Textures',
 				downloadUrl: 'https://example.com/pack.zip',

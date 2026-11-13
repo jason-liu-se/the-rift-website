@@ -12,11 +12,11 @@ import { NewsPageComponent } from './news-page.component';
 const PAGE_SIZE = 10;
 const TOTAL = 25;
 const FIRST_PAGE: NewsItem[] = [
-	{ title: 'Launch', date: '2026-01-01', content: 'Hi' },
-	{ title: 'Patch', date: '2026-01-15', content: 'Fixes' }
+	{ id: '1', title: 'Launch', date: '2026-01-01', content: 'Hi' },
+	{ id: '2', title: 'Patch', date: '2026-01-15', content: 'Fixes' }
 ];
 const SECOND_PAGE: NewsItem[] = [
-	{ title: 'Update', date: '2026-02-01', content: 'More' }
+	{ id: '3', title: 'Update', date: '2026-02-01', content: 'More' }
 ];
 
 describe('NewsPageComponent', () => {

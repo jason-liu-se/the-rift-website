@@ -5,9 +5,9 @@ import { renderComponent } from 'src/app/testing/render-component';
 import { ImageSlideshowComponent } from './image-slideshow.component';
 
 const IMAGES: GalleryImage[] = [
-	{ url: 'assets/one.png', caption: 'One' },
-	{ url: 'assets/two.png', caption: 'Two' },
-	{ url: 'assets/three.png', caption: 'Three' }
+	{ id: '1', url: 'assets/one.png', caption: 'One' },
+	{ id: '2', url: 'assets/two.png', caption: 'Two' },
+	{ id: '3', url: 'assets/three.png', caption: 'Three' }
 ];
 
 function render(inputs: Partial<ImageSlideshowComponent> = {}) {

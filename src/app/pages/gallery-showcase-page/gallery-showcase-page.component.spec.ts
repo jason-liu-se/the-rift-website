@@ -14,10 +14,12 @@ import { GalleryShowcasePageComponent } from './gallery-showcase-page.component'
 const PAGE_SIZE = 30;
 const TOTAL = 31;
 const FIRST_PAGE: GalleryImage[] = [
-	{ url: 'one.png', caption: 'One' },
-	{ url: 'two.png', caption: 'Two' }
+	{ id: '1', url: 'one.png', caption: 'One' },
+	{ id: '2', url: 'two.png', caption: 'Two' }
 ];
-const SECOND_PAGE: GalleryImage[] = [{ url: 'three.png', caption: 'Three' }];
+const SECOND_PAGE: GalleryImage[] = [
+	{ id: '3', url: 'three.png', caption: 'Three' }
+];
 
 describe('GalleryShowcasePageComponent', () => {
 	let fixture: ComponentFixture<GalleryShowcasePageComponent>;
