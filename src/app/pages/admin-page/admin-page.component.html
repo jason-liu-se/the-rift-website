@@ -1,0 +1,40 @@
+<div class="admin-page">
+	<div class="header">
+		<h1>Admin</h1>
+		<button mat-stroked-button type="button" (click)="logout()">
+			<mat-icon>logout</mat-icon>
+			Log out
+		</button>
+	</div>
+	@if (logoutFailed()) {
+		<p role="alert">
+			Couldn't log out. Check your connection and try again.
+		</p>
+	}
+	<nav mat-tab-nav-bar [tabPanel]="toolPanel" aria-label="Admin tools">
+		@for (tool of tools; track tool.id) {
+			<a
+				mat-tab-link
+				routerLink="."
+				[fragment]="tool.id"
+				[active]="tool.id === activeToolId()"
+			>
+				<mat-icon class="tool-icon">{{ tool.icon }}</mat-icon>
+				{{ tool.label }}
+			</a>
+		}
+	</nav>
+	<mat-tab-nav-panel #toolPanel class="tool-panel">
+		@switch (activeToolId()) {
+			@case ("downloads") {
+				<app-downloads-tool />
+			}
+			@case ("gallery") {
+				<app-gallery-tool />
+			}
+			@default {
+				<app-news-tool />
+			}
+		}
+	</mat-tab-nav-panel>
+</div>

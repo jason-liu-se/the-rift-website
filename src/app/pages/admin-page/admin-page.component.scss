@@ -1,0 +1,20 @@
+.admin-page {
+	padding: 24px 16px;
+}
+
+.header {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: center;
+	gap: 16px;
+}
+
+.tool-icon {
+	margin-right: 8px;
+}
+
+.tool-panel {
+	display: block;
+	padding-top: 16px;
+}

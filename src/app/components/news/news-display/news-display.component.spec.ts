@@ -6,13 +6,20 @@ import { NewsDisplayComponent } from './news-display.component';
 
 const NEWS_ITEMS: NewsItem[] = [
 	{
+		id: '1',
 		title: 'Season 6',
 		date: '2026-01-02T12:00:00',
 		content: 'A new season begins.',
 		bannerImg: 'assets/season-6.png'
 	},
-	{ title: 'Maintenance', date: '2026-03-04T12:00:00', content: 'Downtime.' },
 	{
+		id: '2',
+		title: 'Maintenance',
+		date: '2026-03-04T12:00:00',
+		content: 'Downtime.'
+	},
+	{
+		id: '3',
 		title: 'Event',
 		date: '2026-05-06T12:00:00',
 		content: 'Build contest.',

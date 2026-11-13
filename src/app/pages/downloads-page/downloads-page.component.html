@@ -15,7 +15,7 @@
 				[paddingY]="false"
 			>
 				<div class="download-section">
-					@for (item of collection.items; track item) {
+					@for (item of collection.items; track item.id) {
 						<app-download-card
 							[title]="item.title"
 							[desc]="item.desc"

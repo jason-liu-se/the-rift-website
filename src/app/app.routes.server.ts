@@ -1,4 +1,5 @@
 import { RenderMode, ServerRoute } from '@angular/ssr';
+import { NOINDEX_HEADERS } from './config/admin';
 
 /**
  * How each route in app.routes.ts is rendered. Every route must match an entry
@@ -19,6 +20,13 @@ export const serverRoutes: ServerRoute[] = [
 	{ path: 'gallery', renderMode: RenderMode.Server },
 	{ path: 'gallery/*', renderMode: RenderMode.Server },
 	{ path: 'downloads', renderMode: RenderMode.Server },
+	// Admin pages: the API's login cookies only reach the browser.
+	{ path: 'admin', renderMode: RenderMode.Client, headers: NOINDEX_HEADERS },
+	{
+		path: 'admin/login',
+		renderMode: RenderMode.Client,
+		headers: NOINDEX_HEADERS
+	},
 	// Unknown URLs: the app's error page, with a real 404 status.
 	{ path: '**', renderMode: RenderMode.Server, status: 404 }
 ];

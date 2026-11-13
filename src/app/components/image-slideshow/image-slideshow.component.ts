@@ -22,7 +22,7 @@ export class ImageSlideshowComponent implements OnInit {
 
 		// defaulting values for an empty captionedImages array
 		if (this.captionedImages.length <= 0) {
-			this.captionedImages = [{ url: '', caption: '' }];
+			this.captionedImages = [{ id: '', url: '', caption: '' }];
 		}
 
 		// updating button states

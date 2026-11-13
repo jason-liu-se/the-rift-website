@@ -43,6 +43,9 @@ export const ROUTES: readonly IE2eRoute[] = [
 	{ path: '/about', title: 'About | The Rift' },
 	{ path: '/contact', title: 'Contact Us | The Rift' },
 	{ path: '/join', title: 'Join | The Rift' },
+	// The mock API has no session, so this stays on the login page; /admin
+	// redirects here.
+	{ path: '/admin/login', title: 'Admin Login | The Rift' },
 	{ path: '/not-a-page', title: 'Page Not Found | The Rift' }
 ];
 

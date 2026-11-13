@@ -1,6 +1,6 @@
 <div class="news-display">
 	<ul class="news-container">
-		@for (item of newsItems; track item) {
+		@for (item of newsItems; track item.id) {
 			<li class="news-item">
 				@if (item.bannerImg) {
 					<img class="banner-img" [src]="item.bannerImg" alt="" />

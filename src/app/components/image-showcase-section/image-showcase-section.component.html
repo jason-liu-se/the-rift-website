@@ -1,6 +1,6 @@
 <div class="image-showcase-section">
 	<ul class="caption-card-gallery">
-		@for (image of captionedImages; track image; let i = $index) {
+		@for (image of captionedImages; track image.id; let i = $index) {
 			<li class="caption-card">
 				<button class="image-button" (click)="handleImageClick(i)">
 					<app-caption-card
