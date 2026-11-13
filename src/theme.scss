@@ -28,5 +28,7 @@ $app-theme: mat.m2-define-light-theme(
 @include mat.paginator-theme($app-theme);
 @include mat.icon-button-theme($app-theme);
 @include mat.tooltip-theme($app-theme);
+// The admin page's tool switcher.
+@include mat.tabs-theme($app-theme);
 // Heading and body text styles for the `mat-typography` class on <body>.
 @include mat.typography-hierarchy($app-theme);

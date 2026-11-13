@@ -19,6 +19,9 @@ export const serverRoutes: ServerRoute[] = [
 	{ path: 'gallery', renderMode: RenderMode.Server },
 	{ path: 'gallery/*', renderMode: RenderMode.Server },
 	{ path: 'downloads', renderMode: RenderMode.Server },
+	// Admin pages: the API's login cookies only reach the browser.
+	{ path: 'admin', renderMode: RenderMode.Client },
+	{ path: 'admin/login', renderMode: RenderMode.Client },
 	// Unknown URLs: the app's error page, with a real 404 status.
 	{ path: '**', renderMode: RenderMode.Server, status: 404 }
 ];

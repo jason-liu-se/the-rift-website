@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { requireLoggedIn, requireLoggedOut } from './guards/admin-auth.guards';
 import { PageTemplateComponent } from './pages/page-template/page-template.component';
 
 export const routes: Routes = [
@@ -183,6 +184,36 @@ export const routes: Routes = [
 			loadComponent: () =>
 				import('./pages/join-page/join-page.component').then(
 					(m) => m.JoinPageComponent
+				),
+			isTransparent: false
+		}
+	},
+	{
+		path: 'admin',
+		component: PageTemplateComponent,
+		title: 'Admin',
+		canActivate: [requireLoggedIn],
+		data: {
+			description: 'Tools for editors of The Rift website.',
+			noindex: true,
+			loadComponent: () =>
+				import('./pages/admin-page/admin-page.component').then(
+					(m) => m.AdminPageComponent
+				),
+			isTransparent: false
+		}
+	},
+	{
+		path: 'admin/login',
+		component: PageTemplateComponent,
+		title: 'Admin Login',
+		canActivate: [requireLoggedOut],
+		data: {
+			description: 'Log in to edit The Rift website.',
+			noindex: true,
+			loadComponent: () =>
+				import('./pages/admin-page/admin-login-page/admin-login-page.component').then(
+					(m) => m.AdminLoginPageComponent
 				),
 			isTransparent: false
 		}

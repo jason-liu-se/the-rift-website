@@ -8,8 +8,8 @@ server rendering (versions in [`package.json`](./package.json)).
 - **Node.js** at the version in [`.nvmrc`](./.nvmrc) and **npm 11+** (npm 10
   can't resolve the Angular dependencies)
 - [**The Rift API**](https://github.com/jason-liu-se/the-rift-web-server) for
-  news, gallery, and downloads, and **BlueMap** for the map pages. Neither is
-  started by this repo; other pages work without them.
+  news, gallery, downloads, and admin login, and **BlueMap** for the map pages.
+  Neither is started by this repo; other pages work without them.
 
 ## Getting started
 
@@ -80,7 +80,8 @@ src/
 ├── app/
 │   ├── components/   Reusable UI pieces
 │   ├── pages/        One component per routed page
-│   ├── services/     API clients
+│   ├── services/     API clients and HTTP interceptors
+│   ├── guards/       Route guards (admin login)
 │   ├── interfaces/   Data types; api-responses.ts is synced from web-server
 │   ├── seo/          Page titles, meta tags, and structured data
 │   ├── app.routes.ts          Routes
@@ -111,8 +112,10 @@ Setup:
 3. Add the custom domain to the Worker, and redirect the other host (`www` or
    the bare domain) to it with a Cloudflare redirect rule.
 4. The API must use HTTPS, be reachable from Cloudflare (pages are rendered
-   there), and allow the site's origin in CORS. BlueMap must use HTTPS and allow
-   the site to embed it (`X-Frame-Options` / `frame-ancestors`).
+   there), and allow the site's origin in CORS (its `FRONTEND_URL`). For admin
+   login, it must also be on the same site (e.g. `api.<domain>`), since its
+   session cookies are `SameSite=Lax`. BlueMap must use HTTPS and allow the site
+   to embed it (`X-Frame-Options` / `frame-ancestors`).
 5. Verify the domain in Google Search Console, submit
    `https://<domain>/sitemap.xml`, and import the site into Bing Webmaster
    Tools.
