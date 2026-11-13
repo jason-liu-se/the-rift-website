@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
-import { JOIN_FORM_URL, JoinPageComponent } from './join-page.component';
+import { JOIN_FORM_URL } from '../../config/site';
+import { JoinPageComponent } from './join-page.component';
 
 describe('JoinPageComponent', () => {
 	it('links Fill Out Form to the join form in a new tab', () => {

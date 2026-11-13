@@ -46,5 +46,5 @@ other browser APIs only in event handlers, `afterNextRender`, or behind
   reloads once.
 - Server-rendered pages call the API from the server, and the browser reuses
   those responses. If the API is down, or doesn't answer within
-  `SERVER_API_TIMEOUT_MS` (`server-api-timeout.interceptor.ts`, server only),
-  the page renders without the data and the browser fetches it after hydration.
+  `SERVER_API_TIMEOUT_MS` (`src/app/config/api.ts`, server only), the page
+  renders without the data and the browser fetches it after hydration.

@@ -4,6 +4,7 @@ import { WelcomeCardComponent } from '../../components/welcome-card/welcome-card
 import { MatButton } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { SectionCardComponent } from '../../components/section-card/section-card.component';
+import { LOGO_PATH } from 'src/app/config/site';
 import { isDesktopWidth } from 'src/app/utilities/viewport.util';
 
 @Component({
@@ -19,6 +20,8 @@ import { isDesktopWidth } from 'src/app/utilities/viewport.util';
 	host: { '(window:resize)': 'updateWelcomeBackground()' }
 })
 export class HomePageComponent {
+	public readonly logoPath = LOGO_PATH;
+
 	// The welcome card has its own background only below the desktop
 	// breakpoint. Without a window (server rendering), assume mobile first.
 	public showWelcomeComponentBackground =

@@ -5,6 +5,7 @@ import {
 	MatPaginator
 } from '@angular/material/paginator';
 import { ActivatedRoute } from '@angular/router';
+import { GALLERY_PAGE_SIZE } from 'src/app/config/pagination';
 import { GalleryImage } from 'src/app/interfaces/api-responses';
 import { GalleryProviderService } from 'src/app/services/gallery-provider.service';
 import { PaginatorIntlService } from 'src/app/services/paginator-intl.service';
@@ -33,7 +34,7 @@ export class GalleryShowcasePageComponent {
 	public captionedImages: GalleryImage[] = [];
 	public collectionName: string;
 	public paginationLength?: number;
-	public pageSize = 30;
+	public pageSize = GALLERY_PAGE_SIZE;
 	public pageIndex = 0;
 	public pageEvent!: PageEvent;
 

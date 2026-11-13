@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatButton } from '@angular/material/button';
+import { LOGO_PATH } from 'src/app/config/site';
 import { isDesktopWidth } from 'src/app/utilities/viewport.util';
 
 @Component({
@@ -14,6 +15,7 @@ import { isDesktopWidth } from 'src/app/utilities/viewport.util';
 export class NavbarComponent {
 	@Input() public transparent = true;
 
+	public readonly logoPath = LOGO_PATH;
 	public isHamburgerMenuVisible = false;
 
 	public toggleHamburgerMenu(): void {
