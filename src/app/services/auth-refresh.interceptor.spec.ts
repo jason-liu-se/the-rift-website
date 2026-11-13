@@ -35,9 +35,9 @@ describe('authRefreshInterceptor', () => {
 
 	afterEach(() => controller.verify());
 
-	function getMe(withCredentials = true) {
+	function getMe(withCredentials = true, url = ME_URL) {
 		const result: { body?: unknown; error?: HttpErrorResponse } = {};
-		http.get(ME_URL, { withCredentials }).subscribe({
+		http.get(url, { withCredentials }).subscribe({
 			next: (body) => (result.body = body),
 			error: (error: HttpErrorResponse) => (result.error = error)
 		});
@@ -58,6 +58,15 @@ describe('authRefreshInterceptor', () => {
 		controller.expectOne(ME_URL).flush({ id: '1', username: 'editor' });
 
 		expect(result.body).toEqual({ id: '1', username: 'editor' });
+	});
+
+	it('keeps the credentials on the request it retries', () => {
+		getMe();
+		controller.expectOne(ME_URL).flush(null, UNAUTHORIZED);
+		expectRefresh().flush(null, { status: 204, statusText: 'No Content' });
+		const retry = controller.expectOne(ME_URL);
+		expect(retry.request.withCredentials).toBe(true);
+		retry.flush({ id: '1', username: 'editor' });
 	});
 
 	it("passes on the request's 401 when the refresh fails", () => {
@@ -81,6 +90,14 @@ describe('authRefreshInterceptor', () => {
 	it('leaves requests without credentials alone', () => {
 		const result = getMe(false);
 		controller.expectOne(ME_URL).flush(null, UNAUTHORIZED);
+
+		expect(result.error?.status).toBe(401);
+	});
+
+	it('leaves other hosts alone, even ones starting with the API URL', () => {
+		const otherHost = `${environment.API_URL}.example.com/auth/me`;
+		const result = getMe(true, otherHost);
+		controller.expectOne(otherHost).flush(null, UNAUTHORIZED);
 
 		expect(result.error?.status).toBe(401);
 	});
