@@ -1,0 +1,7 @@
+<div class="admin-login-page">
+	<h1>Admin login</h1>
+	@if (errorMessage) {
+		<p class="error" role="alert">{{ errorMessage }}</p>
+	}
+	<a mat-flat-button color="primary" [href]="loginUrl">Log in with Discord</a>
+</div>
