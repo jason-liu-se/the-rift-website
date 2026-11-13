@@ -70,7 +70,8 @@ matching files are read or edited.
   compose. Single responsibility, low coupling, pure functions, side effects
   isolated.
 - **Clarity.** Descriptive names, small functions, guard clauses, named
-  constants (shared ones in `src/app/config/`, otherwise with the owning
+  constants (in `src/app/config/` if shared or likely to be tweaked, like page
+  sizes, links, or seasons, so editors can find them; otherwise with the owning
   feature). Simple over clever; comment a non-obvious version that's worth
   keeping.
 - **Write less code.** Humans review every line. Use what Angular, Material, and

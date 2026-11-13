@@ -9,10 +9,8 @@ import {
 	HttpTestingController,
 	provideHttpClientTesting
 } from '@angular/common/http/testing';
-import {
-	SERVER_API_TIMEOUT_MS,
-	serverApiTimeoutInterceptor
-} from './server-api-timeout.interceptor';
+import { SERVER_API_TIMEOUT_MS } from '../config/api';
+import { serverApiTimeoutInterceptor } from './server-api-timeout.interceptor';
 
 describe('serverApiTimeoutInterceptor', () => {
 	function requestTimeoutOn(platform: 'server' | 'browser') {

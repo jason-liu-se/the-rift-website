@@ -3,9 +3,7 @@ import { BackgroundImageCardComponent } from '../../components/background-image-
 import { SectionCardComponent } from '../../components/section-card/section-card.component';
 import { MatFabButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
-
-/** Google Form that applicants fill out to join the server. */
-export const JOIN_FORM_URL = 'https://exampleform.com';
+import { JOIN_FORM_URL } from '../../config/site';
 
 @Component({
 	selector: 'app-join-page',

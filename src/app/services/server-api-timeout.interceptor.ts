@@ -1,9 +1,7 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
-
-/** How long a server render waits for each API response before giving up. */
-export const SERVER_API_TIMEOUT_MS = 5000;
+import { SERVER_API_TIMEOUT_MS } from '../config/api';
 
 /**
  * Stops a slow API from holding up server-rendered pages: after the timeout the

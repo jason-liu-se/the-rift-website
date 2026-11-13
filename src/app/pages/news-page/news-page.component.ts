@@ -4,6 +4,7 @@ import {
 	PageEvent,
 	MatPaginator
 } from '@angular/material/paginator';
+import { NEWS_PAGE_SIZE } from 'src/app/config/pagination';
 import { NewsItem } from 'src/app/interfaces/api-responses';
 import { NewsItemProviderService } from 'src/app/services/news-item-provider.service';
 import { PaginatorIntlService } from 'src/app/services/paginator-intl.service';
@@ -21,7 +22,7 @@ export class NewsPageComponent {
 	private newsItemProvider = inject(NewsItemProviderService);
 
 	public paginationLength!: number;
-	public pageSize = 10;
+	public pageSize = NEWS_PAGE_SIZE;
 	public pageIndex = 0;
 	public pageEvent!: PageEvent;
 	public newsItems: NewsItem[] = [];

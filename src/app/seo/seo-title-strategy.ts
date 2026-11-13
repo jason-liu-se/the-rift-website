@@ -5,13 +5,9 @@ import {
 	RouterStateSnapshot,
 	TitleStrategy
 } from '@angular/router';
+import { LOGO_PATH, SHARE_IMAGE_PATH, SITE_NAME } from '../config/site';
 import { environment } from 'src/environments/environment';
 
-export const SITE_NAME = 'The Rift';
-/** Shown in link previews; relative to the site root. */
-const SHARE_IMAGE_PATH =
-	'/assets/general-background-images/spawn-walkway-1.webp';
-const LOGO_PATH = '/assets/navbar/rift-logo.png';
 const STRUCTURED_DATA_ID = 'site-structured-data';
 
 /**
