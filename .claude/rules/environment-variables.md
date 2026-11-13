@@ -7,8 +7,6 @@ paths:
 
 # Environment variables
 
-The variables themselves are listed in the README. This covers how they work.
-
 `npm run env` (`scripts/environments/generate.mjs`) turns `.env`, the shell, and
 `NAME=value` arguments into `src/environments/`, including the `IEnvironment`
 type. `npm ci` and the `start`, `build`, `watch`, `test`, and `e2e` scripts run

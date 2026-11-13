@@ -92,3 +92,10 @@ matching files are read or edited.
   `CLAUDE.md` in the same change when what they describe changes. Point to code
   instead of copying values (versions, breakpoints, URLs), and don't list Claude
   tooling here.
+- **Keep docs brief.** The README holds what's needed to set up, run, and manage
+  the project (requirements, environment, commands, operational tasks), plus
+  anything that helps a reader understand the codebase quicker (e.g. project
+  structure). Describe a feature in a sentence and link to the code or
+  `.claude/docs/` for how it works; explain only significant design choices,
+  trade-offs, or edge cases. Prefer tables and short bullets, and cut any
+  sentence a maintainer wouldn't miss.

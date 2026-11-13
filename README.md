@@ -97,11 +97,8 @@ and [seo.md](./.claude/rules/seo.md).
 
 ## Deployment
 
-The site runs as a Cloudflare Worker (`wrangler.jsonc`): pre-rendered pages and
-build files are served as static assets, and `src/server.ts` renders everything
-else. Cache and security headers are in `public/_headers`. A Cron Trigger pings
-the API's `/health` endpoint (schedule in `wrangler.jsonc`) so its free-tier
-host doesn't put it to sleep.
+The site runs as a Cloudflare Worker (`wrangler.jsonc`). A Cron Trigger pings
+the API's `/health` endpoint so its free-tier host doesn't sleep.
 
 Setup:
 
@@ -155,7 +152,6 @@ Without `LOCAL_WEB_SERVER_PATH` (e.g. in CI), `api:check` warns and skips.
 
 ## Claude Code
 
-The repo ships shared [Claude Code](https://claude.com/claude-code) setup:
-[`CLAUDE.md`](./CLAUDE.md), [`.claude/`](./.claude/), and
-[`.mcp.json`](./.mcp.json). Put personal overrides in
+Shared setup is in [`CLAUDE.md`](./CLAUDE.md), [`.claude/`](./.claude/), and
+[`.mcp.json`](./.mcp.json); put personal overrides in
 `.claude/settings.local.json`.
