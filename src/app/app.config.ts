@@ -24,7 +24,12 @@ export const appConfig: ApplicationConfig = {
 		provideZoneChangeDetection(),
 		provideRouter(
 			routes,
-			withInMemoryScrolling({ scrollPositionRestoration: 'enabled' })
+			// A fragment change (e.g. the admin page's tool tabs) scrolls to the
+			// matching id, if any, instead of to the top.
+			withInMemoryScrolling({
+				scrollPositionRestoration: 'enabled',
+				anchorScrolling: 'enabled'
+			})
 		),
 		{ provide: TitleStrategy, useClass: SeoTitleStrategy },
 		// fetch, not XHR: the server (Cloudflare Workers) has no XMLHttpRequest.

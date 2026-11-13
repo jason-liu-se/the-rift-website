@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -7,7 +7,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DownloadsToolComponent } from 'src/app/components/admin/downloads-tool/downloads-tool.component';
 import { GalleryToolComponent } from 'src/app/components/admin/gallery-tool/gallery-tool.component';
 import { NewsToolComponent } from 'src/app/components/admin/news-tool/news-tool.component';
-import { ADMIN_LOGIN_PATH } from 'src/app/guards/admin-auth.guards';
+import { ADMIN_LOGIN_PATH } from 'src/app/config/admin';
 import { AuthService } from 'src/app/services/auth.service';
 
 interface IAdminTool {
@@ -53,9 +53,14 @@ export class AdminPageComponent {
 			this.tools[0].id
 	);
 
+	public readonly logoutFailed = signal(false);
+
 	public logout(): void {
-		// The login page either way: a failed logout's session ends on its own.
-		const toLogin = () => this.router.navigateByUrl(ADMIN_LOGIN_PATH);
-		this.auth.logout().subscribe({ complete: toLogin, error: toLogin });
+		this.logoutFailed.set(false);
+		this.auth.logout().subscribe({
+			complete: () => this.router.navigateByUrl(ADMIN_LOGIN_PATH),
+			// Still logged in: the login page would send the editor straight back.
+			error: () => this.logoutFailed.set(true)
+		});
 	}
 }

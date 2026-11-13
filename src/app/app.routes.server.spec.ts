@@ -27,6 +27,17 @@ describe('serverRoutes', () => {
 		).toBe(true);
 	});
 
+	// Browser-only pages get their robots meta tag from JavaScript, too late for
+	// crawlers that don't run it.
+	it.each(['admin', 'admin/login'])(
+		'tells crawlers not to index "%s"',
+		(path) => {
+			expect(
+				serverRoutes.find((route) => route.path === path)?.headers
+			).toEqual(expect.objectContaining({ 'X-Robots-Tag': 'noindex' }));
+		}
+	);
+
 	it('serves unknown URLs with a 404 status', () => {
 		expect(serverRoutes.at(-1)).toEqual(
 			expect.objectContaining({ path: '**', status: 404 })

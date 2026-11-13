@@ -8,13 +8,10 @@ import {
 	provideRouter
 } from '@angular/router';
 import { Observable, firstValueFrom, of, throwError } from 'rxjs';
+import { routes } from '../app.routes';
+import { ADMIN_LOGIN_PATH, ADMIN_PATH } from '../config/admin';
 import { AuthService } from '../services/auth.service';
-import {
-	ADMIN_LOGIN_PATH,
-	ADMIN_PATH,
-	requireLoggedIn,
-	requireLoggedOut
-} from './admin-auth.guards';
+import { requireLoggedIn, requireLoggedOut } from './admin-auth.guards';
 
 describe('admin auth guards', () => {
 	function runGuard(
@@ -43,6 +40,15 @@ describe('admin auth guards', () => {
 
 	const urlOf = (result: boolean | UrlTree) =>
 		TestBed.inject(Router).serializeUrl(result as UrlTree);
+
+	it.each([ADMIN_PATH, ADMIN_LOGIN_PATH])(
+		'redirects to a real route (%s)',
+		(path) => {
+			expect(routes.some((route) => `/${route.path}` === path)).toBe(
+				true
+			);
+		}
+	);
 
 	describe('requireLoggedIn', () => {
 		it('lets a logged-in editor in', async () => {

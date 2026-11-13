@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 import { ANY_URL_ROUTES } from 'src/app/testing/render-component';
 import { AdminPageComponent } from './admin-page.component';
 
 describe('AdminPageComponent', () => {
-	const logout = vi.fn(() => of(undefined));
+	const logout = vi.fn(() => of<void>(undefined));
 	let harness: RouterTestingHarness;
 
 	async function open(url: string): Promise<HTMLElement> {
@@ -24,6 +24,11 @@ describe('AdminPageComponent', () => {
 		await harness.navigateByUrl(url);
 		return harness.routeNativeElement!;
 	}
+
+	const clickLogout = (element: HTMLElement) =>
+		[...element.querySelectorAll('button')]
+			.find((button) => button.textContent?.includes('Log out'))!
+			.click();
 
 	const activeTab = (element: HTMLElement) =>
 		element.querySelector('[mat-tab-link].mdc-tab--active')?.textContent;
@@ -62,12 +67,23 @@ describe('AdminPageComponent', () => {
 
 	it('logs out and goes to the login page', async () => {
 		const element = await open('/admin');
-		[...element.querySelectorAll('button')]
-			.find((button) => button.textContent?.includes('Log out'))!
-			.click();
+		clickLogout(element);
 		await harness.fixture.whenStable();
 
 		expect(logout).toHaveBeenCalled();
 		expect(TestBed.inject(Router).url).toBe('/admin/login');
+	});
+
+	it('stays and says so when logging out fails', async () => {
+		logout.mockReturnValueOnce(throwError(() => new Error('offline')));
+		const element = await open('/admin');
+		clickLogout(element);
+		await harness.fixture.whenStable();
+		harness.detectChanges();
+
+		expect(TestBed.inject(Router).url).toBe('/admin');
+		expect(element.querySelector('[role="alert"]')?.textContent).toContain(
+			"Couldn't log out"
+		);
 	});
 });

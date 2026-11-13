@@ -17,7 +17,8 @@ rendering it again.
 - Changing a page's mode is a one-line edit; components work in all three.
 - The admin pages (`/admin`, `/admin/login`) use `Client`: their guards
   (`src/app/guards/`) check the login with the API's session cookies, which only
-  the browser has.
+  the browser has. A `Client` page's robots meta tag only appears once
+  JavaScript runs, so these routes also send an `X-Robots-Tag: noindex` header.
 - Every route in `app.routes.ts` needs an entry (a unit test checks), or it
   falls through to the last entry: the 404 page with a 404 status.
 
