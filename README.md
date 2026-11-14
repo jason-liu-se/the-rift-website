@@ -35,7 +35,7 @@ only:
 
 ```bash
 DEV_PUBLIC_API_URL=http://localhost:4000
-DEV_PUBLIC_BLUEMAP_URL=http://localhost:4001
+DEV_PUBLIC_BLUEMAP_URL=http://localhost:4002
 PROD_PUBLIC_API_URL=https://api.example.com
 PROD_PUBLIC_BLUEMAP_URL=https://map.example.com
 PROD_PUBLIC_SITE_URL=https://www.example.com
