@@ -13,6 +13,12 @@
 			"skillPath": "skills/animate/SKILL.md",
 			"computedHash": "c622e29fa956aea703dc4e2b8726d9a017d438beb284a60bc3fdb2540c602102"
 		},
+		"better-colors": {
+			"source": "jakubkrehel/skills",
+			"sourceType": "github",
+			"skillPath": "skills/better-colors/SKILL.md",
+			"computedHash": "d114ace9df09574564a14316882d80501b48bea636017dc7e4c0ad53053d6319"
+		},
 		"color-expert": {
 			"source": "meodai/skill.color-expert",
 			"sourceType": "github",
