@@ -15,5 +15,8 @@
 	"observability": { "enabled": true },
 	// Pings the API's /health every 4 minutes so its host doesn't sleep
 	// (`scheduled` in src/server.ts).
-	"triggers": { "crons": ["*/4 * * * *"] }
+	"triggers": { "crons": ["*/4 * * * *"] },
+	// Settings for pull request preview deployments (`wrangler preview`). The
+	// Worker has no vars or bindings, so it needs none; the block only has to exist.
+	"previews": {}
 }
