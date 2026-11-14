@@ -14,7 +14,9 @@ module.exports = defineConfig([
 			"test-results/",
 			"playwright-report/",
 			// verbatim copy of the web-server's contract (npm run api:sync)
-			"src/app/interfaces/api-responses.ts"
+			"src/app/interfaces/api-responses.ts",
+			".agents/skills/color-expert/*",
+			".agents/skills/stageshow/*"
 		]
 	},
 	{

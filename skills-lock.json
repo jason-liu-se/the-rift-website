@@ -7,6 +7,12 @@
 			"skillPath": "skills/ai-seo/SKILL.md",
 			"computedHash": "5b5dbb143389784211c56e357e20bd44a12c3a0245dbf6dcfbb40348daaaf4ef"
 		},
+		"color-expert": {
+			"source": "meodai/skill.color-expert",
+			"sourceType": "github",
+			"skillPath": "SKILL.md",
+			"computedHash": "3a9c503277b6e29765655879003748019e10a7da1264963813f5268ac0d1f283"
+		},
 		"programmatic-seo": {
 			"source": "coreyhaines31/marketingskills",
 			"sourceType": "github",
@@ -24,6 +30,12 @@
 			"sourceType": "github",
 			"skillPath": "skills/site-architecture/SKILL.md",
 			"computedHash": "b705d5e242192822cdb1aa2efb48f3efc1fe10cdb97f444066c37a5fd629db88"
+		},
+		"stageshow": {
+			"source": "benjitaylor/skills",
+			"sourceType": "github",
+			"skillPath": "stageshow/SKILL.md",
+			"computedHash": "faaf72b41c206b98da5788093eb07fcdceb80dee90b5dc6dd921048196279474"
 		}
 	}
 }
