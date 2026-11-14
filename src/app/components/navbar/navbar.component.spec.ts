@@ -129,6 +129,29 @@ describe('NavbarComponent', () => {
 		]);
 	});
 
+	describe('active link', () => {
+		const activeLinks = () =>
+			[...element.querySelectorAll('.link-active')].map((link) =>
+				link.getAttribute('href')
+			);
+		const navigateTo = async (url: string) => {
+			await TestBed.inject(Router).navigateByUrl(url);
+			fixture.detectChanges();
+		};
+
+		it('highlights only Home on the home page', async () => {
+			await navigateTo('/');
+
+			expect(activeLinks()).toEqual(['/']);
+		});
+
+		it('highlights only the current page elsewhere', async () => {
+			await navigateTo('/news');
+
+			expect(activeLinks()).toEqual(['/news']);
+		});
+	});
+
 	it('navigates to the join page when Join is clicked', async () => {
 		click('.join-button');
 		await fixture.whenStable();
