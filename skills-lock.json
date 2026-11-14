@@ -7,6 +7,12 @@
 			"skillPath": "skills/ai-seo/SKILL.md",
 			"computedHash": "5b5dbb143389784211c56e357e20bd44a12c3a0245dbf6dcfbb40348daaaf4ef"
 		},
+		"animate": {
+			"source": "emilkowalski/skills",
+			"sourceType": "github",
+			"skillPath": "skills/animate/SKILL.md",
+			"computedHash": "c622e29fa956aea703dc4e2b8726d9a017d438beb284a60bc3fdb2540c602102"
+		},
 		"color-expert": {
 			"source": "meodai/skill.color-expert",
 			"sourceType": "github",
