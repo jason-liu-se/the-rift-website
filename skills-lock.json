@@ -7,6 +7,24 @@
 			"skillPath": "skills/ai-seo/SKILL.md",
 			"computedHash": "5b5dbb143389784211c56e357e20bd44a12c3a0245dbf6dcfbb40348daaaf4ef"
 		},
+		"animate": {
+			"source": "emilkowalski/skills",
+			"sourceType": "github",
+			"skillPath": "skills/animate/SKILL.md",
+			"computedHash": "c622e29fa956aea703dc4e2b8726d9a017d438beb284a60bc3fdb2540c602102"
+		},
+		"better-colors": {
+			"source": "jakubkrehel/skills",
+			"sourceType": "github",
+			"skillPath": "skills/better-colors/SKILL.md",
+			"computedHash": "d114ace9df09574564a14316882d80501b48bea636017dc7e4c0ad53053d6319"
+		},
+		"color-expert": {
+			"source": "meodai/skill.color-expert",
+			"sourceType": "github",
+			"skillPath": "SKILL.md",
+			"computedHash": "3a9c503277b6e29765655879003748019e10a7da1264963813f5268ac0d1f283"
+		},
 		"programmatic-seo": {
 			"source": "coreyhaines31/marketingskills",
 			"sourceType": "github",
@@ -24,6 +42,12 @@
 			"sourceType": "github",
 			"skillPath": "skills/site-architecture/SKILL.md",
 			"computedHash": "b705d5e242192822cdb1aa2efb48f3efc1fe10cdb97f444066c37a5fd629db88"
+		},
+		"stageshow": {
+			"source": "benjitaylor/skills",
+			"sourceType": "github",
+			"skillPath": "stageshow/SKILL.md",
+			"computedHash": "faaf72b41c206b98da5788093eb07fcdceb80dee90b5dc6dd921048196279474"
 		}
 	}
 }

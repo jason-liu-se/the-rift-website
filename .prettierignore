@@ -5,3 +5,5 @@ node_modules/
 package-lock.json
 # Verbatim copy of the web-server's contract (npm run api:sync); formatted there.
 src/app/interfaces/api-responses.ts
+.agents/skills/color-expert/*
+.agents/skills/stageshow/*
