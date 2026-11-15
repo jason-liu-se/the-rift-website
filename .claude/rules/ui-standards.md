@@ -21,14 +21,19 @@ Every colour comes from the palette in `src/theme-colours.scss` (which
   colours before the role names that reference them, `$colour-<name>` naming, no
   unused colours.
 
-## Material theme
+## Components
 
-`src/theme.scss` themes only the Material components in use. Add a component's
-theme there when you start using one.
+- Build interactive patterns (menus, tabs, listboxes, selects, accordions, etc.)
+  on [Angular Aria](https://angular.dev/guide/aria): headless directives that
+  handle keyboard, focus, and ARIA, styled with our own SCSS. Use `@angular/cdk`
+  for what Aria doesn't cover (overlays, dialogs, focus traps, drag and drop).
+- Angular Material is only for the admin pages. Don't add it elsewhere.
+- `src/theme.scss` themes only the Material components in use. Add a component's
+  theme there when you start using one.
 
 ## Accessibility (WCAG 2.2 AA)
 
-- Semantic HTML and Material components over clickable `div`s.
+- Semantic HTML and Aria patterns over clickable `div`s.
 - Meaningful `alt` (empty if decorative); accessible names on icon-only buttons
   and iframes.
 - AA contrast.

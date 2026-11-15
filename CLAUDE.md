@@ -1,8 +1,8 @@
 # CLAUDE.md
 
-Angular + Angular Material app (TypeScript, SCSS) with server rendering, for The
-Rift Minecraft SMP (A.K.A. The Rift SMP). Setup, commands, and environment
-variables are in `README.md`; framework versions in `package.json`.
+Angular app (TypeScript, SCSS) with server rendering, for The Rift Minecraft SMP
+(A.K.A. The Rift SMP). Setup, commands, and environment variables are in
+`README.md`; framework versions in `package.json`.
 
 ## Commands
 
@@ -48,6 +48,10 @@ matching files are read or edited.
   of the web-server's contract: never edit it here (README "API contract").
 - **Services** (`src/app/services/`) are thin `HttpClient` wrappers returning
   Observables; caching happens in the consuming component.
+- **UI components.** Build new interactive components on Angular Aria (with
+  `@angular/cdk` for overlays and dialogs), styled with our own SCSS. Angular
+  Material may only be used on admin pages. Details in
+  `.claude/rules/ui-standards.md`.
 
 ## Conventions
 
@@ -79,9 +83,9 @@ matching files are read or edited.
   sizes, links, or seasons, so editors can find them; otherwise with the owning
   feature). Simple over clever; comment a non-obvious version that's worth
   keeping.
-- **Write less code.** Humans review every line. Use what Angular, Material, and
-  RxJS provide, and skip speculative code (unused options, "just in case"
-  branches, wrappers or helpers that add indirection without owning a
+- **Write less code.** Humans review every line. Use what Angular, Aria, the
+  CDK, and RxJS provide, and skip speculative code (unused options, "just in
+  case" branches, wrappers or helpers that add indirection without owning a
   responsibility).
 - **UI.** WCAG 2.2 AA, full keyboard support, mobile-first, and colours only
   from the palette in `src/theme-colours.scss`. Details are in
