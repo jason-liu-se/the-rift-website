@@ -15,9 +15,9 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PageTemplateDirective } from 'src/app/directives/page-template.directive';
-import { NavbarComponent } from '../../components/navbar/navbar.component';
+import { NavbarComponent } from '../navbar/navbar.component';
 import { ContactComponent } from '../../components/contact/contact.component';
-import { FooterComponent } from '../../components/footer/footer.component';
+import { FooterComponent } from '../footer/footer.component';
 
 /** sessionStorage key set while reloading after a page chunk failed to load. */
 export const CHUNK_RELOAD_KEY = 'reloaded-after-chunk-error';

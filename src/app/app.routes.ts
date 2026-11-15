@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { requireLoggedIn, requireLoggedOut } from './guards/admin-auth.guards';
-import { PageTemplateComponent } from './pages/page-template/page-template.component';
+import { PageTemplateComponent } from './layout/page-template/page-template.component';
 
 export const routes: Routes = [
 	{

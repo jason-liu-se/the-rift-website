@@ -56,9 +56,8 @@ in event handlers, `afterNextRender`, or behind `isPlatformBrowser`.
 
 ## 4. Navigation
 
-Ask the user whether the page belongs in the navbar
-(`src/app/components/navbar/`) or should be linked from another page. Don't
-decide this yourself.
+Ask the user whether the page belongs in the navbar (`src/app/layout/navbar/`)
+or should be linked from another page. Don't decide this yourself.
 
 ## 5. Tests
 

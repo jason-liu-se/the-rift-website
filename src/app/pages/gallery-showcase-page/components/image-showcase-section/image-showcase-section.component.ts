@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { GalleryImage } from 'src/app/interfaces/api-responses';
-import { CaptionCardComponent } from '../caption-card/caption-card.component';
+import { CaptionCardComponent } from '../../../../components/caption-card/caption-card.component';
 import { ImageSlideshowComponent } from '../image-slideshow/image-slideshow.component';
 import { MatFabButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';

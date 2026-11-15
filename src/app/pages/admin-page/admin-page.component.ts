@@ -4,9 +4,9 @@ import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatTabLink, MatTabNav, MatTabNavPanel } from '@angular/material/tabs';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { DownloadsToolComponent } from 'src/app/components/admin/downloads-tool/downloads-tool.component';
-import { GalleryToolComponent } from 'src/app/components/admin/gallery-tool/gallery-tool.component';
-import { NewsToolComponent } from 'src/app/components/admin/news-tool/news-tool.component';
+import { DownloadsToolComponent } from './components/downloads-tool/downloads-tool.component';
+import { GalleryToolComponent } from './components/gallery-tool/gallery-tool.component';
+import { NewsToolComponent } from './components/news-tool/news-tool.component';
 import { ADMIN_LOGIN_PATH } from 'src/app/config/admin';
 import { AuthService } from 'src/app/services/auth.service';
 

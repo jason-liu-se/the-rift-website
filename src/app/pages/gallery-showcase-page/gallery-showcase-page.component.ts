@@ -11,7 +11,7 @@ import { GalleryProviderService } from 'src/app/services/gallery-provider.servic
 import { PaginatorIntlService } from 'src/app/services/paginator-intl.service';
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
 import { BackButtonComponent } from '../../components/back-button/back-button.component';
-import { ImageShowcaseSectionComponent } from '../../components/image-showcase-section/image-showcase-section.component';
+import { ImageShowcaseSectionComponent } from './components/image-showcase-section/image-showcase-section.component';
 
 @Component({
 	selector: 'app-gallery-showcase-page',
