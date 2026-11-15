@@ -56,7 +56,8 @@ and the `app` selector prefix comes from the project config.
 - Give it one responsibility. Pass data in through inputs and events out through
   outputs; leave API calls to the page or a service unless the component owns
   that data.
-- Keep its stylesheet small and use only palette colours
+- Build interactive behaviour on Angular Aria, not Material (outside the admin
+  pages). Keep its stylesheet small and use only palette colours
   (`.claude/rules/ui-standards.md`).
 - Keep it server-safe (`.claude/docs/rendering.md`).
 

@@ -1,7 +1,8 @@
 # The Rift Website
 
-The website for The Rift Minecraft SMP: an Angular + Angular Material app with
-server rendering (versions in [`package.json`](./package.json)).
+The website for The Rift Minecraft SMP: an Angular app with server rendering
+(versions in [`package.json`](./package.json)). UI components build on Angular
+Aria.
 
 ## Requirements
 
