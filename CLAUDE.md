@@ -65,10 +65,15 @@ matching files are read or edited.
   current patterns for the exact versions in `package.json`. Where existing code
   is outdated, use the modern pattern in new code and raise a wider migration
   with the user.
-- **Reuse and design.** Check for existing components, services, utilities, and
-  styles before writing new ones; extract duplication into a unit that variants
-  compose. Single responsibility, low coupling, pure functions, side effects
-  isolated.
+- **Reuse and design.** Before writing UI or logic, check for existing
+  components, services, utilities, and styles. Prefer, in order: reuse it;
+  extend it (a new input or variant) when the change fits its purpose; otherwise
+  create a new unit. When new and existing code share markup or logic, extract
+  it into a shared component, service, or pure function and switch both to it,
+  in the same change. Split pages and large components into child components by
+  responsibility (one section or concern each), even with a single caller, so a
+  page mainly composes components. Single responsibility, low coupling, pure
+  functions, side effects isolated.
 - **Clarity.** Descriptive names, small functions, guard clauses, named
   constants (in `src/app/config/` if shared or likely to be tweaked, like page
   sizes, links, or seasons, so editors can find them; otherwise with the owning
@@ -76,7 +81,8 @@ matching files are read or edited.
   keeping.
 - **Write less code.** Humans review every line. Use what Angular, Material, and
   RxJS provide, and skip speculative code (unused options, "just in case"
-  branches, single-caller abstractions).
+  branches, wrappers or helpers that add indirection without owning a
+  responsibility).
 - **UI.** WCAG 2.2 AA, full keyboard support, mobile-first, and colours only
   from the palette in `src/theme-colours.scss`. Details are in
   `.claude/rules/ui-standards.md`.
@@ -84,7 +90,12 @@ matching files are read or edited.
   error-prone functionality (e.g. security, date/time, parsing), and justify it
   to the user.
 - **File scoping.** Group by feature, nesting related files (e.g.
-  `components/news/news-display/`).
+  `components/news/news-display/`). `components/` holds shared components (used
+  by more than one page, or generic UI). A component specific to one page's
+  content lives in that page's folder (`pages/<name>-page/components/`) and
+  moves to `components/`, in the same change, once another page needs it.
+  `layout/` holds the shell every route renders (`PageTemplateComponent`,
+  navbar, footer).
 - **Tests.** Test real behaviour (inputs, outputs, rendered state, requests) so
   tests fail when it breaks.
 - **Scope and debt.** Keep changes scoped. Fix minor debt and remove dead code
