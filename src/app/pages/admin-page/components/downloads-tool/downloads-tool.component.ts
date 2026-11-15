@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { DownloadItem } from 'src/app/interfaces/api-responses';
-import { DownloadCardComponent } from '../../download-card/download-card.component';
+import { DownloadCardComponent } from '../../../../components/download-card/download-card.component';
 
 /** Placeholder: will create downloads. The preview shows sample data. */
 @Component({

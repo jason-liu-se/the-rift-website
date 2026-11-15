@@ -78,8 +78,9 @@ anything on port 4200 or the development API port first. Details:
 ```text
 src/
 ├── app/
-│   ├── components/   Reusable UI pieces
-│   ├── pages/        One component per routed page
+│   ├── components/   Shared UI pieces (used by more than one page, or generic)
+│   ├── layout/       Shell every route renders (page template, navbar, footer)
+│   ├── pages/        One component per routed page; page-only ones in <page>/components/
 │   ├── services/     API clients and HTTP interceptors
 │   ├── guards/       Route guards (admin login)
 │   ├── interfaces/   Data types; api-responses.ts is synced from web-server

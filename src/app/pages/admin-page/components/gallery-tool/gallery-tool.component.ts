@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { GalleryImage } from 'src/app/interfaces/api-responses';
-import { CaptionCardComponent } from '../../caption-card/caption-card.component';
+import { CaptionCardComponent } from '../../../../components/caption-card/caption-card.component';
 
 /** Placeholder: will add gallery images. The preview shows sample data. */
 @Component({

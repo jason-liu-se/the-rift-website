@@ -1,6 +1,6 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Component, PLATFORM_ID, inject } from '@angular/core';
-import { WelcomeCardComponent } from '../../components/welcome-card/welcome-card.component';
+import { WelcomeCardComponent } from './components/welcome-card/welcome-card.component';
 import { MatButton } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { SectionCardComponent } from '../../components/section-card/section-card.component';

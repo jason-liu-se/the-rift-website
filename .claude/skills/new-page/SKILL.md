@@ -25,8 +25,14 @@ skip to step 3. If you're not sure, ask the user.
 npm run ng -- generate component pages/<name>-page
 ```
 
-- Build the page from existing `src/app/components/` before writing new markup.
-  If a piece is reusable, make it its own component under `components/`.
+- Build the page from existing `src/app/components/` before writing new markup,
+  extending one (a new input or variant) when the change fits its purpose.
+- Split the page into child components by section or concern, so the page mainly
+  composes them. Put ones only this page uses in `pages/<name>-page/components/`
+  (`npm run ng -- generate component pages/<name>-page/components/<child>`), and
+  shared ones in `components/`. If a piece another page already has fits, move
+  it to `components/` and use it from both. Follow the `new-component` skill for
+  each.
 - If the page needs API data, add or reuse a service in `src/app/services/` with
   endpoints from `environment`, and handle loading, empty, and error states.
 - If the page reads its own route data, inject `ActivatedRoute` and read it as
@@ -50,9 +56,8 @@ in event handlers, `afterNextRender`, or behind `isPlatformBrowser`.
 
 ## 4. Navigation
 
-Ask the user whether the page belongs in the navbar
-(`src/app/components/navbar/`) or should be linked from another page. Don't
-decide this yourself.
+Ask the user whether the page belongs in the navbar (`src/app/layout/navbar/`)
+or should be linked from another page. Don't decide this yourself.
 
 ## 5. Tests
 

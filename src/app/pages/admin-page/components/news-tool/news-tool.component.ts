@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NewsItem } from 'src/app/interfaces/api-responses';
-import { NewsDisplayComponent } from '../../news/news-display/news-display.component';
+import { NewsDisplayComponent } from '../../../../components/news/news-display/news-display.component';
 
 /** Placeholder: will create news posts. The preview shows sample data. */
 @Component({

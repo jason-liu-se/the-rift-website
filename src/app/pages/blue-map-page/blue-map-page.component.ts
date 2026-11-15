@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { BackButtonComponent } from '../../components/back-button/back-button.component';
-import { MessageCardComponent } from '../../components/message-card/message-card.component';
+import { MessageCardComponent } from './components/message-card/message-card.component';
 import { MatIcon } from '@angular/material/icon';
 import { SafePipe } from '../../utilities/SafePipe.util';
 
