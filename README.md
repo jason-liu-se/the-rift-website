@@ -137,7 +137,7 @@ fragment to the embedding page:
 3. Re-render BlueMap webapp (`java -jar bluemap-cli.jar -g`).
 
 Without it the map still works, but the site's URL keeps the view it opened
-with. The site only accepts these messages from `BLUEMAP_URL`'s exact origin.
+with.
 
 ## CI/CD
 
