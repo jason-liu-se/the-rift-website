@@ -225,10 +225,9 @@ browser's tab order to follow visual coordinates rather than DOM source order:
 ```css
 .task {
 	display: grid;
-	grid-template-columns: auto minmax(
-			0,
-			1fr
-		) auto; /* minmax(0, ...) lets the middle column shrink at narrow widths */
+	grid-template-columns:
+		auto minmax(0, 1fr)
+		auto; /* minmax(0, ...) lets the middle column shrink at narrow widths */
 	reading-flow: grid-rows; /* Follows visual layout and tab order by row */
 }
 ```
