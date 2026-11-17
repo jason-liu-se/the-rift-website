@@ -18,5 +18,9 @@
 	"triggers": { "crons": ["*/4 * * * *"] },
 	// Settings for pull request preview deployments (`wrangler preview`). The
 	// Worker has no vars or bindings, so it needs none; the block only has to exist.
-	"previews": {}
+	"previews": {},
+	"routes": [
+		{ "pattern": "riftsmp.ca", "custom_domain": true },
+		{ "pattern": "www.riftsmp.ca", "custom_domain": true }
+	]
 }
