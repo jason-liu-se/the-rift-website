@@ -1,4 +1,11 @@
-import { Component, afterNextRender, inject, signal } from '@angular/core';
+import {
+	Component,
+	afterNextRender,
+	computed,
+	inject,
+	signal
+} from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { BackButtonComponent } from '../../components/back-button/back-button.component';
@@ -13,22 +20,27 @@ import { SafePipe } from '../../utilities/SafePipe.util';
 	imports: [BackButtonComponent, MessageCardComponent, MatIcon, SafePipe]
 })
 export class BlueMapPageComponent {
-	private route = inject(ActivatedRoute);
+	/** Our fragment is BlueMap's own (map id, camera, view), passed through. */
+	private fragment = toSignal(inject(ActivatedRoute).fragment, {
+		initialValue: null
+	});
+	/** The server never receives the URL fragment, so only the browser shows the map. */
+	private isRendered = signal(false);
 
-	/** Set in the browser only: the server never receives the URL fragment. */
-	public bluemapUrl = signal<string | null>(null);
+	/** Follows the fragment, so editing it in the address bar moves the map. */
+	public bluemapUrl = computed(() => {
+		if (!this.isRendered()) {
+			return null;
+		}
+		const fragment = this.fragment();
+		return `${environment.BLUEMAP_URL}/${fragment ? `#${fragment}` : ''}`;
+	});
 
 	public showHAMsg = true; // HA = Hardware Acceleration
 	public showControlMsg = true;
 
 	constructor() {
-		// Our fragment is BlueMap's own (map id, camera, view), passed through.
-		afterNextRender(() => {
-			const fragment = this.route.snapshot.fragment;
-			this.bluemapUrl.set(
-				`${environment.BLUEMAP_URL}/${fragment ? `#${fragment}` : ''}`
-			);
-		});
+		afterNextRender(() => this.isRendered.set(true));
 	}
 
 	public toggleHAMsg(): void {
