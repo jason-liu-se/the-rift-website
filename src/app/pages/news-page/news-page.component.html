@@ -19,10 +19,10 @@
 			aria-label="Select page"
 		>
 		</mat-paginator>
-		@if (newsItems.length > 0) {
+		@if (newsPosts.length > 0) {
 			<app-news-display
 				class="news-display"
-				[newsItems]="newsItems"
+				[newsPosts]="newsPosts"
 			></app-news-display>
 		}
 		<mat-paginator

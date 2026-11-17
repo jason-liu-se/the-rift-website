@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NewsItem } from 'src/app/interfaces/api-responses';
+import { NewsPost } from 'src/app/interfaces/api-responses';
 import { NewsDisplayComponent } from '../../../../components/news/news-display/news-display.component';
 
 /** Placeholder: will create news posts. The preview shows sample data. */
@@ -9,7 +9,7 @@ import { NewsDisplayComponent } from '../../../../components/news/news-display/n
 	imports: [NewsDisplayComponent]
 })
 export class NewsToolComponent {
-	public readonly preview: NewsItem = {
+	public readonly preview: NewsPost = {
 		id: 'preview',
 		title: 'Sample news post',
 		date: '2026-01-01T00:00:00.000Z',

@@ -3,7 +3,7 @@
 import {
 	DOWNLOAD_COLLECTIONS,
 	GALLERY_COLLECTIONS,
-	NEWS_ITEMS
+	NEWS_POSTS
 } from '../src/app/testing/api-fixtures';
 import { expect, test } from './support/test';
 
@@ -14,11 +14,11 @@ test('the news page shows the first page of items and the page count', async ({
 }) => {
 	await page.goto('/news');
 
-	await expect(page.locator('.news-item-content')).toHaveCount(
+	await expect(page.locator('.news-post-content')).toHaveCount(
 		NEWS_PAGE_SIZE
 	);
 	await expect(
-		page.getByText(NEWS_ITEMS[0].title, { exact: true })
+		page.getByText(NEWS_POSTS[0].title, { exact: true })
 	).toBeVisible();
 	await expect(page.getByText('Page 1 of 2').first()).toBeVisible();
 });

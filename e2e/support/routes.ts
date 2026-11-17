@@ -3,7 +3,7 @@
 import {
 	DOWNLOAD_COLLECTIONS,
 	GALLERY_COLLECTIONS,
-	NEWS_ITEMS
+	NEWS_POSTS
 } from '../../src/app/testing/api-fixtures';
 
 export interface IE2eRoute {
@@ -18,7 +18,7 @@ export const ROUTES: readonly IE2eRoute[] = [
 	{
 		path: '/news',
 		title: 'News | The Rift',
-		readyText: NEWS_ITEMS[0].title
+		readyText: NEWS_POSTS[0].title
 	},
 	{
 		path: '/gallery',

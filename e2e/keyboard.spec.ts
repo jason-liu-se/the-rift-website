@@ -1,5 +1,5 @@
 import { Page } from '@playwright/test';
-import { NEWS_ITEMS } from '../src/app/testing/api-fixtures';
+import { NEWS_POSTS } from '../src/app/testing/api-fixtures';
 import {
 	focused,
 	focusedTabStop,
@@ -148,7 +148,7 @@ test.describe('desktop navbar', { tag: TAG.desktopOnly }, () => {
 		await page.keyboard.press('Enter');
 
 		await expect(
-			page.getByText(NEWS_ITEMS[10].title, { exact: true })
+			page.getByText(NEWS_POSTS[10].title, { exact: true })
 		).toBeVisible();
 		await expect(page.getByText('Page 2 of 2').first()).toBeVisible();
 	});

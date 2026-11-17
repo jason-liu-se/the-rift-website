@@ -1,7 +1,7 @@
 @use "../../../../font-sizes" as *;
 
 $news-container-margin: 20px;
-$news-item-padding: 15px;
+$news-post-padding: 15px;
 
 .news-display {
 	display: flex;
@@ -18,12 +18,12 @@ $news-item-padding: 15px;
 	list-style: none;
 }
 
-.news-container > .news-item {
+.news-container > .news-post {
 	margin: $news-container-margin 0;
 }
 
-.news-item {
-	width: calc(100% - 2 * $news-item-padding);
+.news-post {
+	width: calc(100% - 2 * $news-post-padding);
 	outline: 1px solid rgba(0, 0, 0, 0.124);
 	border-radius: 5px;
 	box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.15);
@@ -35,8 +35,8 @@ $news-item-padding: 15px;
 	max-height: 100%;
 }
 
-.news-item-content {
-	padding: $news-item-padding;
+.news-post-content {
+	padding: $news-post-padding;
 }
 
 .title,

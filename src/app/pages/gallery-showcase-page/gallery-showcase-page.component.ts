@@ -61,7 +61,7 @@ export class GalleryShowcasePageComponent {
 		this.pageSize = e.pageSize;
 		this.pageIndex = e.pageIndex;
 
-		// updating the displayed news items
+		// updating the displayed images
 		this.captionedImages = [];
 
 		// grabbing images from cache, if they have been cached
