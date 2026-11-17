@@ -2,8 +2,8 @@
 name: new-page
 description:
     Add a new routed page to The Rift website, or a variant of an existing page
-    (e.g. another gallery collection or BlueMap map). Use when asked to add,
-    create, or scaffold a page or route.
+    (e.g. another gallery collection). Use when asked to add, create, or
+    scaffold a page or route.
 argument-hint: <page name or description>
 ---
 
@@ -16,8 +16,8 @@ Follow the architecture in `CLAUDE.md`. Every route renders
 
 Read `src/app/app.routes.ts` and `src/app/pages/`. If an existing page already
 does this from route data (e.g. `GalleryShowcasePageComponent` with
-`collection`, `BlueMapPageComponent` with `mapName`), **add a route only** and
-skip to step 3. If you're not sure, ask the user.
+`collection`), **add a route only** and skip to step 3. If you're not sure, ask
+the user.
 
 ## 2. Generate the page
 

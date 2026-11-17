@@ -36,10 +36,7 @@ export const ROUTES: readonly IE2eRoute[] = [
 		title: 'Maps | The Rift',
 		readyText: `Season ${MAP_SEASONS[0].season}`
 	},
-	{
-		path: '/map/season-5-overworld',
-		title: 'Season 5 Overworld Map | The Rift'
-	},
+	{ path: '/map/viewer', title: 'Map Viewer | The Rift' },
 	{
 		path: '/downloads',
 		title: 'World Downloads | The Rift',

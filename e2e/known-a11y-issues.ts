@@ -13,7 +13,7 @@ export interface IKnownA11yIssue extends Omit<IA11yViolation, 'help'> {
 	note: string;
 }
 
-const BLUEMAP_ROUTE = '/map/season-5-overworld';
+const BLUEMAP_ROUTE = '/map/viewer';
 const OPAQUE_NAVBAR_NOTE =
 	'Nav link text fails 4.5:1 contrast on the opaque navbar background.';
 
@@ -35,12 +35,6 @@ export const KNOWN_A11Y_ISSUES: readonly IKnownA11yIssue[] = [
 		target: '.control-pop-up > .message-exit-button',
 		routes: [BLUEMAP_ROUTE],
 		note: 'Icon-only close button on the BlueMap controls tip needs an aria-label.'
-	},
-	{
-		ruleId: 'frame-title',
-		target: 'iframe',
-		routes: [BLUEMAP_ROUTE],
-		note: 'BlueMap iframe needs a title.'
 	},
 	{
 		ruleId: 'color-contrast',

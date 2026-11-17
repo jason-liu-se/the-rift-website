@@ -13,13 +13,21 @@ interface ISeasonCards {
 	cards: ICardSelection[];
 }
 
-/** One card per dimension, linking to its BlueMap route (`/map/season-5-nether`). */
+const MAP_VIEWER_ROUTE = '/map/viewer';
+/** Camera mode at the end of every BlueMap URL fragment. */
+const BLUEMAP_CAMERA_MODE = 'perspective';
+
+/**
+ * One card per dimension, opening the map viewer with the same fragment
+ * BlueMap uses (`#s6_overworld:0:0:0:1500:0:0:0:0:perspective`).
+ */
 function toSeasonCards({ season, dimensions }: MapSeason): ISeasonCards {
 	return {
 		title: `Season ${season}`,
-		cards: dimensions.map(({ name, imageUrl }) => ({
+		cards: dimensions.map(({ name, imageUrl, worldId, perspective }) => ({
 			imageUrl,
-			routerLink: `/map/season-${season}-${name.toLowerCase()}`,
+			routerLink: MAP_VIEWER_ROUTE,
+			fragment: `${worldId}${perspective}${BLUEMAP_CAMERA_MODE}`,
 			title: name
 		}))
 	};

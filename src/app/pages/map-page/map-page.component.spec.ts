@@ -28,7 +28,7 @@ describe('MapPageComponent', () => {
 
 	afterEach(() => httpTesting.verify());
 
-	it("renders a section per season linking each dimension's map route", () => {
+	it('renders a section per season opening each dimension in the map viewer', () => {
 		const fixture = TestBed.createComponent(MapPageComponent);
 		fixture.detectChanges();
 
@@ -52,10 +52,10 @@ describe('MapPageComponent', () => {
 			cards.map((card) => card.querySelector('h3')?.textContent)
 		).toEqual(['Overworld', 'Nether', 'End']);
 		expect(hrefs).toEqual([
-			'/map/season-5-overworld',
-			'/map/season-5-nether',
-			'/map/season-5-end'
+			'/map/viewer#season_5_overworld:0:0:0:1500:0:0:0:0:perspective',
+			'/map/viewer#season_5_nether:0:0:0:1500:0:0:0:0:perspective',
+			'/map/viewer#season_5_end:0:0:0:1500:0:0:0:0:perspective'
 		]);
-		hrefs.forEach((href) => expect(routePaths).toContain(href));
+		expect(routePaths).toContain('/map/viewer');
 	});
 });

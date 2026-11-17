@@ -6,9 +6,9 @@ import { environment } from 'src/environments/environment';
 
 import { BlueMapPageComponent } from './blue-map-page.component';
 
-const CAMERA_HASH = ':0:0:0:1500:0:0:0:0:perspective';
+const BLUEMAP_FRAGMENT = 's6_overworld:0:0:0:1500:0:0:0:0:perspective';
 
-function renderIframeSrc(routeData: Record<string, unknown>): string | null {
+function renderIframeSrc(fragment: string | null): string | null {
 	TestBed.configureTestingModule({
 		imports: [BlueMapPageComponent],
 		providers: [
@@ -17,12 +17,14 @@ function renderIframeSrc(routeData: Record<string, unknown>): string | null {
 			provideRouter([]),
 			{
 				provide: ActivatedRoute,
-				useValue: { snapshot: { data: routeData } }
+				useValue: { snapshot: { data: {}, fragment } }
 			}
 		]
 	});
 	const fixture = TestBed.createComponent(BlueMapPageComponent);
 	fixture.detectChanges();
+	// Runs the afterNextRender hook, then renders the iframe it enables.
+	TestBed.tick();
 
 	const iframe: HTMLIFrameElement | null =
 		fixture.nativeElement.querySelector('iframe');
@@ -30,15 +32,13 @@ function renderIframeSrc(routeData: Record<string, unknown>): string | null {
 }
 
 describe('BlueMapPageComponent', () => {
-	it('embeds the BlueMap map named in the route data', () => {
-		expect(renderIframeSrc({ mapName: 'world' })).toBe(
-			`${environment.BLUEMAP_URL}/#world${CAMERA_HASH}`
+	it('opens BlueMap at the view in the URL fragment', () => {
+		expect(renderIframeSrc(BLUEMAP_FRAGMENT)).toBe(
+			`${environment.BLUEMAP_URL}/#${BLUEMAP_FRAGMENT}`
 		);
 	});
 
-	it('embeds the default BlueMap map when the route names none', () => {
-		expect(renderIframeSrc({})).toBe(
-			`${environment.BLUEMAP_URL}/#${CAMERA_HASH}`
-		);
+	it("opens BlueMap's default view when the URL has no fragment", () => {
+		expect(renderIframeSrc(null)).toBe(`${environment.BLUEMAP_URL}/`);
 	});
 });

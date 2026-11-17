@@ -38,12 +38,12 @@ matching files are read or edited.
   from `data.loadComponent` into a `<main>` inside the shared shell (navbar,
   optional contact section, footer). Route data flags toggle the shell (defaults
   in `PageTemplateComponent`). Pages read their own values from route data, so a
-  variant of a page (e.g. another gallery collection or map) is usually just a
-  new route. Every route also needs a `title`, a `data.description`, and a
-  render mode in `src/app/app.routes.server.ts`.
+  variant of a page (e.g. another gallery collection) is usually just a new
+  route. Every route also needs a `title`, a `data.description`, and a render
+  mode in `src/app/app.routes.server.ts`.
 - **External services.** The Rift API and BlueMap run separately. Import
   `environment` from `src/environments/` (generated from `.env`); never
-  hard-code URLs. Map route data must match BlueMap map ids.
+  hard-code URLs.
 - **API types** come from `src/app/interfaces/api-responses.ts`, a verbatim copy
   of the web-server's contract: never edit it here (README "API contract").
 - **Services** (`src/app/services/`) are thin `HttpClient` wrappers returning

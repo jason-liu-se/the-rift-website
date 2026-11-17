@@ -5,9 +5,14 @@
 				<div
 					class="background-content"
 					[style.background-image]="'url(' + item.imageUrl + ')'"
-					routerLink="{{ item.routerLink }}"
+					[routerLink]="item.routerLink"
+					[fragment]="item.fragment"
 				></div>
-				<a class="overlay-content" routerLink="{{ item.routerLink }}">
+				<a
+					class="overlay-content"
+					[routerLink]="item.routerLink"
+					[fragment]="item.fragment"
+				>
 					<hr class="top-bar" />
 					<h3 class="title">{{ item.title }}</h3>
 					@if (item.desc) {

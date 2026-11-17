@@ -147,13 +147,13 @@ Without `LOCAL_WEB_SERVER_PATH` (e.g. in CI), `api:check` warns and skips.
 
 ## Troubleshooting
 
-| Problem                       | Check                                                                        |
-| ----------------------------- | ---------------------------------------------------------------------------- |
-| News or gallery is empty      | The API is running at the development `API_URL`                              |
-| Map pages are blank           | BlueMap is running at the development `BLUEMAP_URL` and map ids match routes |
-| `Not set: ...`                | A variable is set for one environment only, or a production one is missing   |
-| A `.env` value is ignored     | Its name must start with `PUBLIC_`, `DEV_PUBLIC_`, or `PROD_PUBLIC_`         |
-| `api-contract: ... not found` | `LOCAL_WEB_SERVER_PATH` points to the web-server repo's root folder          |
+| Problem                       | Check                                                                                          |
+| ----------------------------- | ---------------------------------------------------------------------------------------------- |
+| News or gallery is empty      | The API is running at the development `API_URL`                                                |
+| Map pages are blank           | BlueMap is running at the development `BLUEMAP_URL` and its map ids match the API's `worldId`s |
+| `Not set: ...`                | A variable is set for one environment only, or a production one is missing                     |
+| A `.env` value is ignored     | Its name must start with `PUBLIC_`, `DEV_PUBLIC_`, or `PROD_PUBLIC_`                           |
+| `api-contract: ... not found` | `LOCAL_WEB_SERVER_PATH` points to the web-server repo's root folder                            |
 
 ## Claude Code
 

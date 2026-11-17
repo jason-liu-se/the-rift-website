@@ -1,13 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, afterNextRender, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { BackButtonComponent } from '../../components/back-button/back-button.component';
 import { MessageCardComponent } from './components/message-card/message-card.component';
 import { MatIcon } from '@angular/material/icon';
 import { SafePipe } from '../../utilities/SafePipe.util';
-
-/** BlueMap URL hash suffix after the map id: the initial camera position and view. */
-const BLUEMAP_CAMERA_HASH = ':0:0:0:1500:0:0:0:0:perspective';
 
 @Component({
 	selector: 'app-blue-map-page',
@@ -18,14 +15,20 @@ const BLUEMAP_CAMERA_HASH = ':0:0:0:1500:0:0:0:0:perspective';
 export class BlueMapPageComponent {
 	private route = inject(ActivatedRoute);
 
-	public bluemapUrl: string;
+	/** Set in the browser only: the server never receives the URL fragment. */
+	public bluemapUrl = signal<string | null>(null);
 
 	public showHAMsg = true; // HA = Hardware Acceleration
 	public showControlMsg = true;
 
 	constructor() {
-		const mapName = this.route.snapshot.data['mapName'] ?? '';
-		this.bluemapUrl = `${environment.BLUEMAP_URL}/#${mapName}${BLUEMAP_CAMERA_HASH}`;
+		// Our fragment is BlueMap's own (map id, camera, view), passed through.
+		afterNextRender(() => {
+			const fragment = this.route.snapshot.fragment;
+			this.bluemapUrl.set(
+				`${environment.BLUEMAP_URL}/${fragment ? `#${fragment}` : ''}`
+			);
+		});
 	}
 
 	public toggleHAMsg(): void {
