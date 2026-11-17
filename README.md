@@ -9,8 +9,8 @@ Aria.
 - **Node.js** at the version in [`.nvmrc`](./.nvmrc) and **npm 11+** (npm 10
   can't resolve the Angular dependencies)
 - [**The Rift API**](https://github.com/jason-liu-se/the-rift-web-server) for
-  news, gallery, downloads, and admin login, and **BlueMap** for the map pages.
-  Neither is started by this repo; other pages work without them.
+  news, gallery, downloads, map seasons, and admin login, and **BlueMap** for
+  the map pages. Neither is started by this repo; other pages work without them.
 
 ## Getting started
 

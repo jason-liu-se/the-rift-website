@@ -5,6 +5,7 @@
 import {
 	DownloadCollection,
 	GalleryImage,
+	MapSeason,
 	NewsPost,
 	PaginatedResponse
 } from '../interfaces/api-responses';
@@ -52,6 +53,22 @@ export const DOWNLOAD_COLLECTIONS: DownloadCollection[] = [
 					'/assets/general-background-images/mountain-side-1.webp'
 			}
 		]
+	}
+];
+
+const SEASON_5_IMAGE = '/assets/general-background-images/season-5-circle.webp';
+
+export const MAP_SEASONS: MapSeason[] = [
+	{
+		id: 'season-5',
+		season: 5,
+		imageUrl: SEASON_5_IMAGE,
+		dimensions: ['Overworld', 'Nether', 'End'].map((name) => ({
+			name,
+			imageUrl: SEASON_5_IMAGE,
+			worldId: `season_5_${name.toLowerCase()}`,
+			perspective: ':0:0:0:1500:0:0:0:0:'
+		}))
 	}
 ];
 

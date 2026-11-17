@@ -13,6 +13,7 @@ import {
 import {
 	DOWNLOAD_COLLECTIONS,
 	GALLERY_COLLECTIONS,
+	MAP_SEASONS,
 	NEWS_POSTS,
 	paginate
 } from '../../src/app/testing/api-fixtures';
@@ -87,6 +88,9 @@ export function respondTo(url: URL): IMockResponse {
 	}
 	if (url.pathname === '/downloads') {
 		return ok(DOWNLOAD_COLLECTIONS);
+	}
+	if (url.pathname === '/maps/seasons') {
+		return ok(MAP_SEASONS);
 	}
 
 	const countMatch = GALLERY_COUNT_PATH.exec(url.pathname);
