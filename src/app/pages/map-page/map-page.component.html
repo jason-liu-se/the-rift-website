@@ -5,8 +5,17 @@
 		[title]="'Maps'"
 		[desc]="'Select one of the cards to view the associated map!'"
 	></app-background-image-card>
-	<app-card-selection-section
-		[items]="mapItems"
-		[alwaysShowDesc]="true"
-	></app-card-selection-section>
+	<div class="seasons">
+		@for (season of seasons(); track season.title) {
+			<app-section-card
+				[backgroundType]="'light'"
+				[title]="season.title"
+				[paddingY]="false"
+			>
+				<app-card-selection-section
+					[items]="season.cards"
+				></app-card-selection-section>
+			</app-section-card>
+		}
+	</div>
 </div>

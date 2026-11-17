@@ -3,6 +3,7 @@
 import {
 	DOWNLOAD_COLLECTIONS,
 	GALLERY_COLLECTIONS,
+	MAP_SEASONS,
 	NEWS_POSTS
 } from '../src/app/testing/api-fixtures';
 import { expect, test } from './support/test';
@@ -46,5 +47,17 @@ test('the downloads page lists each collection', async ({ page }) => {
 
 	for (const collection of DOWNLOAD_COLLECTIONS) {
 		await expect(page.getByText(collection.items[0].title)).toBeVisible();
+	}
+});
+
+test("the map page links each season's dimensions", async ({ page }) => {
+	await page.goto('/map');
+
+	for (const { dimensions } of MAP_SEASONS) {
+		for (const { name } of dimensions) {
+			await expect(
+				page.getByRole('link', { name, exact: true })
+			).toBeVisible();
+		}
 	}
 });

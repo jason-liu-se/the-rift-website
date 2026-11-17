@@ -9,8 +9,8 @@ Aria.
 - **Node.js** at the version in [`.nvmrc`](./.nvmrc) and **npm 11+** (npm 10
   can't resolve the Angular dependencies)
 - [**The Rift API**](https://github.com/jason-liu-se/the-rift-web-server) for
-  news, gallery, downloads, and admin login, and **BlueMap** for the map pages.
-  Neither is started by this repo; other pages work without them.
+  news, gallery, downloads, map seasons, and admin login, and **BlueMap** for
+  the map pages. Neither is started by this repo; other pages work without them.
 
 ## Getting started
 
@@ -92,6 +92,7 @@ src/
 └── server.ts         Server request handler
 e2e/                  Playwright tests
 scripts/              Environment, API contract, and crawler file scripts
+bluemap/              Script to install in BlueMap (see BlueMap)
 public/               Copied to the site root
 ```
 
@@ -122,6 +123,21 @@ Setup:
    `https://<domain>/sitemap.xml`, and import the site into Bing Webmaster
    Tools.
 
+## BlueMap
+
+The map viewer (`/map/viewer`) embeds BlueMap with BlueMap's own URL fragment.
+For the site's URL to follow the map as visitors move around or switch maps,
+BlueMap must run [`bluemap/url-sync.js`](./bluemap/url-sync.js), which sends its
+fragment to the embedding page:
+
+1. Copy `url-sync.js` into BlueMap's web root (`webroot` in `webapp.conf`,
+   `bluemap/web` by default).
+2. List it in `webapp.conf`: `scripts: ["url-sync.js"]`.
+3. Re-render BlueMap webapp (`java -jar bluemap-cli.jar -g`).
+
+Without it the map still works, but the site's URL keeps the view it opened
+with.
+
 ## CI/CD
 
 - **CI** (`.github/workflows/ci.yml`): every pull request and push to `main`
@@ -147,13 +163,14 @@ Without `LOCAL_WEB_SERVER_PATH` (e.g. in CI), `api:check` warns and skips.
 
 ## Troubleshooting
 
-| Problem                       | Check                                                                        |
-| ----------------------------- | ---------------------------------------------------------------------------- |
-| News or gallery is empty      | The API is running at the development `API_URL`                              |
-| Map pages are blank           | BlueMap is running at the development `BLUEMAP_URL` and map ids match routes |
-| `Not set: ...`                | A variable is set for one environment only, or a production one is missing   |
-| A `.env` value is ignored     | Its name must start with `PUBLIC_`, `DEV_PUBLIC_`, or `PROD_PUBLIC_`         |
-| `api-contract: ... not found` | `LOCAL_WEB_SERVER_PATH` points to the web-server repo's root folder          |
+| Problem                               | Check                                                                                                                |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| News or gallery is empty              | The API is running at the development `API_URL`                                                                      |
+| Map pages are blank                   | BlueMap is running at the development `BLUEMAP_URL` and its map ids match the API's `worldId`s                       |
+| Map viewer URL doesn't follow the map | `url-sync.js` is installed in BlueMap (see BlueMap) and `BLUEMAP_URL` has BlueMap's exact origin (`https` vs `http`) |
+| `Not set: ...`                        | A variable is set for one environment only, or a production one is missing                                           |
+| A `.env` value is ignored             | Its name must start with `PUBLIC_`, `DEV_PUBLIC_`, or `PROD_PUBLIC_`                                                 |
+| `api-contract: ... not found`         | `LOCAL_WEB_SERVER_PATH` points to the web-server repo's root folder                                                  |
 
 ## Claude Code
 

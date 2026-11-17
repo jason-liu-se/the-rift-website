@@ -3,6 +3,7 @@
 import {
 	DOWNLOAD_COLLECTIONS,
 	GALLERY_COLLECTIONS,
+	MAP_SEASONS,
 	NEWS_POSTS
 } from '../../src/app/testing/api-fixtures';
 
@@ -30,11 +31,12 @@ export const ROUTES: readonly IE2eRoute[] = [
 		title: 'Season 5 Gallery | The Rift',
 		readyText: `Results: ${GALLERY_COLLECTIONS['season-5'].length}`
 	},
-	{ path: '/map', title: 'Maps | The Rift' },
 	{
-		path: '/map/season-5-overworld',
-		title: 'Season 5 Overworld Map | The Rift'
+		path: '/map',
+		title: 'Maps | The Rift',
+		readyText: `Season ${MAP_SEASONS[0].season}`
 	},
+	{ path: '/map/viewer', title: 'Map Viewer | The Rift' },
 	{
 		path: '/downloads',
 		title: 'World Downloads | The Rift',

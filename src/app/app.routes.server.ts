@@ -12,14 +12,15 @@ export const serverRoutes: ServerRoute[] = [
 	{ path: 'about', renderMode: RenderMode.Prerender },
 	{ path: 'join', renderMode: RenderMode.Prerender },
 	{ path: 'contact', renderMode: RenderMode.Prerender },
-	{ path: 'map', renderMode: RenderMode.Prerender },
-	// Only the page around the BlueMap iframe; the map loads in the browser.
-	{ path: 'map/*', renderMode: RenderMode.Prerender },
+	// Only the page around the BlueMap iframe; the map (picked by the URL
+	// fragment, which never reaches the server) loads in the browser.
+	{ path: 'map/viewer', renderMode: RenderMode.Prerender },
 	// API data: rendered on each request, so new content appears straight away.
 	{ path: 'news', renderMode: RenderMode.Server },
 	{ path: 'gallery', renderMode: RenderMode.Server },
 	{ path: 'gallery/*', renderMode: RenderMode.Server },
 	{ path: 'downloads', renderMode: RenderMode.Server },
+	{ path: 'map', renderMode: RenderMode.Server },
 	// Admin pages: the API's login cookies only reach the browser.
 	{ path: 'admin', renderMode: RenderMode.Client, headers: NOINDEX_HEADERS },
 	{

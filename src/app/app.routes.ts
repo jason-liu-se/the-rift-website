@@ -90,51 +90,18 @@ export const routes: Routes = [
 		}
 	},
 	{
-		path: 'map/season-5-overworld',
+		path: 'map/viewer',
 		component: PageTemplateComponent,
-		title: 'Season 5 Overworld Map',
+		title: 'Map Viewer',
 		data: {
 			description:
-				'Interactive map of the Season 5 overworld on The Rift Minecraft SMP.',
+				'Interactive maps of the worlds on The Rift Minecraft SMP.',
 			loadComponent: () =>
 				import('./pages/blue-map-page/blue-map-page.component').then(
 					(m) => m.BlueMapPageComponent
 				),
 			isTransparent: false,
-			showFooter: false,
-			mapName: 'season_5_overworld'
-		}
-	},
-	{
-		path: 'map/season-5-nether',
-		component: PageTemplateComponent,
-		title: 'Season 5 Nether Map',
-		data: {
-			description:
-				'Interactive map of the Season 5 Nether on The Rift Minecraft SMP.',
-			loadComponent: () =>
-				import('./pages/blue-map-page/blue-map-page.component').then(
-					(m) => m.BlueMapPageComponent
-				),
-			isTransparent: false,
-			showFooter: false,
-			mapName: 'season_5_nether'
-		}
-	},
-	{
-		path: 'map/season-5-end',
-		component: PageTemplateComponent,
-		title: 'Season 5 End Map',
-		data: {
-			description:
-				'Interactive map of the Season 5 End on The Rift Minecraft SMP.',
-			loadComponent: () =>
-				import('./pages/blue-map-page/blue-map-page.component').then(
-					(m) => m.BlueMapPageComponent
-				),
-			isTransparent: false,
-			showFooter: false,
-			mapName: 'season_5_end'
+			showFooter: false
 		}
 	},
 	{
