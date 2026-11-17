@@ -21,6 +21,11 @@ const BLUEMAP_HASH_MESSAGE = 'bluemap:hash';
 /** Marks our navigations that copy BlueMap's fragment into our URL. */
 const FROM_BLUEMAP = 'from-bluemap';
 
+/** The map id at the start of a BlueMap fragment (`s6_nether:0:0:...`). */
+function mapIdOf(fragment: string | null): string | undefined {
+	return fragment?.split(':')[0];
+}
+
 @Component({
 	selector: 'app-blue-map-page',
 	templateUrl: './blue-map-page.component.html',
@@ -44,6 +49,10 @@ export class BlueMapPageComponent {
 	});
 	/** The server never receives the URL fragment, so only the browser shows the map. */
 	public isRendered = signal(false);
+	/** The map BlueMap last reported showing; unset until its first report. */
+	private shownMapId?: string;
+	/** The fragment last sent to BlueMap, which url-sync.js echoes straight back. */
+	private sentFragment: string | null = null;
 
 	public showHAMsg = true; // HA = Hardware Acceleration
 	public showControlMsg = true;
@@ -61,13 +70,18 @@ export class BlueMapPageComponent {
 			.subscribe((fragment) => this.requestedFragment.set(fragment));
 		afterNextRender(() => this.isRendered.set(true));
 
-		// Set directly, as a [src] binding skips a value equal to the last one.
+		// location.replace, not src: setting src adds a hidden Back/Forward entry
+		// for the iframe, and a [src] binding skips a value equal to the last one.
 		effect(() => {
 			const fragment = this.requestedFragment();
-			const iframe = this.iframe()?.nativeElement;
-			if (iframe) {
-				iframe.src = `${environment.BLUEMAP_URL}/${fragment ? `#${fragment}` : ''}`;
+			const blueMapWindow = this.iframe()?.nativeElement.contentWindow;
+			if (!blueMapWindow) {
+				return;
 			}
+			this.sentFragment = fragment;
+			blueMapWindow.location.replace(
+				`${environment.BLUEMAP_URL}/${fragment ? `#${fragment}` : ''}`
+			);
 		});
 	}
 
@@ -85,12 +99,26 @@ export class BlueMapPageComponent {
 			return;
 		}
 
-		// Replaces the history entry, so Back leaves the map instead of retracing it.
+		// Only switching to another map earns a Back/Forward entry; camera and
+		// perspective changes replace it. A map that matches our URL is BlueMap
+		// showing what it was sent, and one it already showed is BlueMap swapping
+		// an unknown map for its default again: pushing either would trap Back.
+		const mapId = mapIdOf(data.hash);
+		const isMapSwitch =
+			this.shownMapId !== undefined &&
+			mapId !== this.shownMapId &&
+			mapId !== mapIdOf(this.route.snapshot.fragment);
+		// An echo of what we sent isn't what BlueMap shows (it may not know that map).
+		const isEcho = data.hash === this.sentFragment;
+		if (!isEcho || this.shownMapId === undefined) {
+			this.shownMapId = mapId;
+		}
+
 		this.router.navigate([], {
 			relativeTo: this.route,
 			fragment: data.hash,
 			queryParamsHandling: 'preserve',
-			replaceUrl: true,
+			replaceUrl: !isMapSwitch,
 			info: FROM_BLUEMAP
 		});
 	}
