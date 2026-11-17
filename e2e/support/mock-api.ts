@@ -13,7 +13,7 @@ import {
 import {
 	DOWNLOAD_COLLECTIONS,
 	GALLERY_COLLECTIONS,
-	NEWS_ITEMS,
+	NEWS_POSTS,
 	paginate
 } from '../../src/app/testing/api-fixtures';
 
@@ -83,7 +83,7 @@ export function respondTo(url: URL): IMockResponse {
 	const notFound = { status: 404, json: { error: `ERROR: ${url.pathname}` } };
 
 	if (url.pathname === '/news') {
-		return paginateByQuery(NEWS_ITEMS, url.searchParams);
+		return paginateByQuery(NEWS_POSTS, url.searchParams);
 	}
 	if (url.pathname === '/downloads') {
 		return ok(DOWNLOAD_COLLECTIONS);

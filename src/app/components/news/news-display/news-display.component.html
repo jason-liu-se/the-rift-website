@@ -1,15 +1,15 @@
 <div class="news-display">
 	<ul class="news-container">
-		@for (item of newsItems; track item.id) {
-			<li class="news-item">
-				@if (item.bannerImg) {
-					<img class="banner-img" [src]="item.bannerImg" alt="" />
+		@for (post of newsPosts; track post.id) {
+			<li class="news-post">
+				@if (post.bannerImg) {
+					<img class="banner-img" [src]="post.bannerImg" alt="" />
 				}
-				<div class="news-item-content">
-					<h2 class="title">{{ item.title }}</h2>
-					<h3 class="date">{{ newsItemToDateString(item) }}</h3>
+				<div class="news-post-content">
+					<h2 class="title">{{ post.title }}</h2>
+					<h3 class="date">{{ newsPostToDateString(post) }}</h3>
 					<hr class="separator" />
-					<p class="content">{{ item.content }}</p>
+					<p class="content">{{ post.content }}</p>
 				</div>
 			</li>
 		}

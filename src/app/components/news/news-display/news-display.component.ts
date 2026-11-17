@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { NewsItem } from 'src/app/interfaces/api-responses';
+import { NewsPost } from 'src/app/interfaces/api-responses';
 
 @Component({
 	selector: 'app-news-display',
@@ -7,9 +7,9 @@ import { NewsItem } from 'src/app/interfaces/api-responses';
 	styleUrls: ['./news-display.component.scss']
 })
 export class NewsDisplayComponent {
-	@Input({ required: true }) public newsItems!: NewsItem[];
+	@Input({ required: true }) public newsPosts!: NewsPost[];
 
-	public newsItemToDateString(item: NewsItem): string {
-		return new Date(item.date).toDateString();
+	public newsPostToDateString(post: NewsPost): string {
+		return new Date(post.date).toDateString();
 	}
 }

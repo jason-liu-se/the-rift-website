@@ -5,8 +5,8 @@ import {
 	MatPaginator
 } from '@angular/material/paginator';
 import { NEWS_PAGE_SIZE } from 'src/app/config/pagination';
-import { NewsItem } from 'src/app/interfaces/api-responses';
-import { NewsItemProviderService } from 'src/app/services/news-item-provider.service';
+import { NewsPost } from 'src/app/interfaces/api-responses';
+import { NewsPostProviderService } from 'src/app/services/news-post-provider.service';
 import { PaginatorIntlService } from 'src/app/services/paginator-intl.service';
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
 import { NewsDisplayComponent } from '../../components/news/news-display/news-display.component';
@@ -19,18 +19,18 @@ import { NewsDisplayComponent } from '../../components/news/news-display/news-di
 	imports: [BackgroundImageCardComponent, MatPaginator, NewsDisplayComponent]
 })
 export class NewsPageComponent {
-	private newsItemProvider = inject(NewsItemProviderService);
+	private newsPostProvider = inject(NewsPostProviderService);
 
 	public paginationLength!: number;
 	public pageSize = NEWS_PAGE_SIZE;
 	public pageIndex = 0;
 	public pageEvent!: PageEvent;
-	public newsItems: NewsItem[] = [];
+	public newsPosts: NewsPost[] = [];
 
-	private newsItemCache: Record<string, NewsItem[]> = {};
+	private newsPostCache: Record<string, NewsPost[]> = {};
 
 	constructor() {
-		this.populateNewsItems();
+		this.populateNewsPosts();
 	}
 
 	public handlePageEvent(e: PageEvent) {
@@ -39,31 +39,31 @@ export class NewsPageComponent {
 		this.pageSize = e.pageSize;
 		this.pageIndex = e.pageIndex;
 
-		// updating the displayed news items
-		this.newsItems = [];
+		// updating the displayed news posts
+		this.newsPosts = [];
 
 		// grabbing images from cache, if they have been cached
-		if (this.newsItemCache[`${this.pageIndex}`]) {
-			this.newsItems = this.newsItemCache[`${this.pageIndex}`];
+		if (this.newsPostCache[`${this.pageIndex}`]) {
+			this.newsPosts = this.newsPostCache[`${this.pageIndex}`];
 		} else {
-			this.populateNewsItems();
+			this.populateNewsPosts();
 		}
 
 		window.scrollTo(0, 0);
 	}
 
-	private populateNewsItems(): void {
+	private populateNewsPosts(): void {
 		// the user may change page before this response arrives
 		const requestedPageIndex = this.pageIndex;
 
-		this.newsItemProvider
-			.getNewsItems(requestedPageIndex * this.pageSize, this.pageSize)
+		this.newsPostProvider
+			.getNewsPosts(requestedPageIndex * this.pageSize, this.pageSize)
 			.subscribe(({ items, total }) => {
-				this.newsItemCache[`${requestedPageIndex}`] = items;
+				this.newsPostCache[`${requestedPageIndex}`] = items;
 				this.paginationLength = total;
 
 				if (requestedPageIndex === this.pageIndex) {
-					this.newsItems = items;
+					this.newsPosts = items;
 				}
 			});
 	}

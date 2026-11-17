@@ -5,19 +5,19 @@
 import {
 	DownloadCollection,
 	GalleryImage,
-	NewsItem,
+	NewsPost,
 	PaginatedResponse
 } from '../interfaces/api-responses';
 
-const NEWS_ITEM_COUNT = 12; // more than one page of 10
+const NEWS_POST_COUNT = 12; // more than one page of 10
 
-export const NEWS_ITEMS: NewsItem[] = Array.from(
-	{ length: NEWS_ITEM_COUNT },
-	(_, index): NewsItem => ({
+export const NEWS_POSTS: NewsPost[] = Array.from(
+	{ length: NEWS_POST_COUNT },
+	(_, index): NewsPost => ({
 		id: `news-${index + 1}`,
-		title: `News item ${index + 1}`,
+		title: `News post ${index + 1}`,
 		date: '2026-01-01T00:00:00.000Z',
-		content: `Content of news item ${index + 1}.`
+		content: `Content of news post ${index + 1}.`
 	})
 );
 
