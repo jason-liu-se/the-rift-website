@@ -1,6 +1,7 @@
 <div class="bluemap-page">
 	@if (bluemapUrl(); as url) {
 		<iframe
+			#mapIframe
 			class="mapIframe"
 			[src]="url | safe"
 			title="Interactive world map"

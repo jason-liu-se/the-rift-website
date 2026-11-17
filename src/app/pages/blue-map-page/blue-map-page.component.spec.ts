@@ -1,62 +1,104 @@
 import { provideHttpClient } from '@angular/common/http';
-import { ActivatedRoute, provideRouter } from '@angular/router';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { BehaviorSubject } from 'rxjs';
+import { Router, provideRouter } from '@angular/router';
+import { RouterTestingHarness } from '@angular/router/testing';
 import { environment } from 'src/environments/environment';
 
 import { BlueMapPageComponent } from './blue-map-page.component';
 
-const BLUEMAP_FRAGMENT = 's6_overworld:0:0:0:1500:0:0:0:0:perspective';
+const VIEWER = '/map/viewer';
+const OVERWORLD = 's6_overworld:0:0:0:1500:0:0:0:0:perspective';
+const NETHER = 's6_nether:0:0:0:1500:0:0:0:0:perspective';
+const BLUEMAP_ORIGIN = new URL(environment.BLUEMAP_URL).origin;
 
 describe('BlueMapPageComponent', () => {
-	let fragment: BehaviorSubject<string | null>;
-	let iframeSrc: () => string | null;
+	let harness: RouterTestingHarness;
+	let router: Router;
 
-	function render(initialFragment: string | null): void {
-		fragment = new BehaviorSubject(initialFragment);
+	beforeEach(async () => {
 		TestBed.configureTestingModule({
-			imports: [BlueMapPageComponent],
 			providers: [
 				provideHttpClient(),
 				provideHttpClientTesting(),
-				provideRouter([]),
-				{ provide: ActivatedRoute, useValue: { fragment } }
+				provideRouter([
+					{ path: 'map/viewer', component: BlueMapPageComponent }
+				])
 			]
 		});
-		const fixture = TestBed.createComponent(BlueMapPageComponent);
-		fixture.detectChanges();
-		// Runs the afterNextRender hook, then renders the iframe it enables.
-		TestBed.tick();
-		iframeSrc = () =>
-			fixture.nativeElement
-				.querySelector('iframe')
-				?.getAttribute('src') ?? null;
-	}
-
-	it('opens BlueMap at the view in the URL fragment', () => {
-		render(BLUEMAP_FRAGMENT);
-
-		expect(iframeSrc()).toBe(
-			`${environment.BLUEMAP_URL}/#${BLUEMAP_FRAGMENT}`
-		);
+		router = TestBed.inject(Router);
+		harness = await RouterTestingHarness.create();
+		// Attached so the iframe gets a contentWindow to send messages from.
+		document.body.appendChild(harness.fixture.nativeElement);
 	});
 
-	it("opens BlueMap's default view when the URL has no fragment", () => {
-		render(null);
+	afterEach(() => harness.fixture.nativeElement.remove());
+
+	/** Navigates as the address bar would, then lets the iframe render. */
+	async function open(url: string): Promise<void> {
+		await harness.navigateByUrl(url);
+		TestBed.tick();
+	}
+
+	const iframe = () =>
+		harness.routeNativeElement?.querySelector('iframe') ?? null;
+	const iframeSrc = () => iframe()?.getAttribute('src') ?? null;
+
+	async function sendFromBlueMap(
+		data: unknown,
+		{ origin = BLUEMAP_ORIGIN, source = iframe()?.contentWindow } = {}
+	): Promise<void> {
+		window.dispatchEvent(
+			new MessageEvent('message', { data, origin, source })
+		);
+		await harness.fixture.whenStable();
+		TestBed.tick();
+	}
+
+	it('opens BlueMap at the view in the URL fragment', async () => {
+		await open(`${VIEWER}#${OVERWORLD}`);
+
+		expect(iframeSrc()).toBe(`${environment.BLUEMAP_URL}/#${OVERWORLD}`);
+	});
+
+	it("opens BlueMap's default view when the URL has no fragment", async () => {
+		await open(VIEWER);
 
 		expect(iframeSrc()).toBe(`${environment.BLUEMAP_URL}/`);
 	});
 
-	it('moves BlueMap to a new view when the URL fragment changes', () => {
-		const netherFragment = 's6_nether:0:0:0:1500:0:0:0:0:perspective';
-		render(BLUEMAP_FRAGMENT);
+	it('moves BlueMap to a new view when the URL fragment changes', async () => {
+		await open(`${VIEWER}#${OVERWORLD}`);
+		await open(`${VIEWER}#${NETHER}`);
 
-		fragment.next(netherFragment);
-		TestBed.tick();
+		expect(iframeSrc()).toBe(`${environment.BLUEMAP_URL}/#${NETHER}`);
+	});
 
-		expect(iframeSrc()).toBe(
-			`${environment.BLUEMAP_URL}/#${netherFragment}`
-		);
+	describe('when BlueMap reports a new view', () => {
+		beforeEach(() => open(`${VIEWER}#${OVERWORLD}`));
+
+		it('copies it into the URL without sending it back to BlueMap', async () => {
+			await sendFromBlueMap({ type: 'bluemap:hash', hash: NETHER });
+
+			expect(router.url).toBe(`${VIEWER}#${NETHER}`);
+			expect(iframeSrc()).toBe(
+				`${environment.BLUEMAP_URL}/#${OVERWORLD}`
+			);
+		});
+
+		it('ignores messages from another origin or window', async () => {
+			const message = { type: 'bluemap:hash', hash: NETHER };
+			await sendFromBlueMap(message, { origin: 'https://evil.example' });
+			await sendFromBlueMap(message, { source: window });
+
+			expect(router.url).toBe(`${VIEWER}#${OVERWORLD}`);
+		});
+
+		it('ignores other messages from BlueMap', async () => {
+			await sendFromBlueMap({ type: 'other', hash: NETHER });
+			await sendFromBlueMap({ type: 'bluemap:hash', hash: '' });
+
+			expect(router.url).toBe(`${VIEWER}#${OVERWORLD}`);
+		});
 	});
 });
