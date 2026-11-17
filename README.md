@@ -125,10 +125,9 @@ Setup:
 
 ## BlueMap
 
-The map viewer (`/map/viewer`) embeds BlueMap with BlueMap's own URL fragment
-(`#<worldId><perspective>perspective`, from the API's map seasons). For the
-site's URL to follow the map as visitors move around or switch maps, BlueMap
-must run [`bluemap/url-sync.js`](./bluemap/url-sync.js), which sends its
+The map viewer (`/map/viewer`) embeds BlueMap with BlueMap's own URL fragment.
+For the site's URL to follow the map as visitors move around or switch maps,
+BlueMap must run [`bluemap/url-sync.js`](./bluemap/url-sync.js), which sends its
 fragment to the embedding page:
 
 1. Copy `url-sync.js` into BlueMap's web root (`webroot` in `webapp.conf`,
