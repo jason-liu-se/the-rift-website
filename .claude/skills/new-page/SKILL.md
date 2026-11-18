@@ -69,8 +69,8 @@ the setup in `.claude/rules/testing.md`. Run:
 npm test -- --watch=false --include src/app/pages/<name>-page
 ```
 
-Add the route to `e2e/support/routes.ts` so the e2e and axe tests cover it.
-Don't run `npm run e2e` unless the user asks for it.
+Add the route to `e2e/support/routes.ts` so the e2e and axe tests cover it. Run
+the e2e specs for the new route only (`.claude/rules/testing.md` "When to run").
 
 ## 6. Finish
 

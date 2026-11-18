@@ -1,7 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
 import { PROJECT, TAG } from './e2e/support/projects';
 
-const BASE_URL = 'http://localhost:4200';
+// E2E_PORT lets parallel worktrees run the suite side by side (with their own
+// DEV_PUBLIC_API_URL port for the mock API, see .claude/rules/testing.md).
+const PORT = process.env['E2E_PORT'] ?? '4200';
+const BASE_URL = `http://localhost:${PORT}`;
 const isCI = !!process.env['CI'];
 
 export default defineConfig({
@@ -26,7 +29,7 @@ export default defineConfig({
 		}
 	],
 	webServer: {
-		command: 'npm start',
+		command: `npm start -- --port ${PORT}`,
 		url: BASE_URL,
 		reuseExistingServer: !isCI,
 		timeout: 120_000

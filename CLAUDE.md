@@ -13,7 +13,7 @@ npm run build                          # production build
 npm run preview                        # production build in the local Cloudflare Worker
 npm test -- --watch=false              # unit tests, single run
 npm test -- --include <path/to/spec>   # one spec file
-npm run e2e                            # Playwright e2e + axe (only when asked)
+npm run e2e                            # Playwright e2e + axe (targeted; see Conventions)
 npm run lint / format                  # angular-eslint / prettier
 npm run env                            # regenerate src/environments/ (before calling `ng` directly)
 ```
@@ -60,8 +60,26 @@ matching files are read or edited.
 - Production builds enforce bundle and style size budgets (`angular.json`). Keep
   component stylesheets small, and keep page-only imports out of shared code and
   `app.config.ts`.
-- Run unit tests whenever useful; they're fast. Never run e2e tests unless the
-  user asks; they're slow.
+- Run unit tests whenever useful; they're fast. E2e tests are slow: run only the
+  specs, routes, and device a UI, keyboard, routing, or data-display change
+  touches, and the full suite only before merging high-risk or integration work
+  (`.claude/rules/testing.md`).
+
+## Git workflow
+
+- Work on a branch, never `main`: `<type>/<issue>-<slug>`, `fix/…`,
+  `refactor/…`. Sub-issues branch from, and open PRs into, the parent issue's
+  branch.
+- When a task is done and verified, commit in logical steps, push, and open a PR
+  (`Closes #<n>`, summary, decisions, testing with what wasn't run, risk). Open
+  it as a draft when unsure. Don't wait to be asked; the PR is the review.
+- Merge your own PR only when it's low risk and you're confident (the
+  `orchestrate` skill's tiers), CI passed, and review left nothing Critical or
+  Important. Everything else waits for the user. **Auto-merge into `main` (which
+  deploys): off.** Merging into feature branches is fine.
+- Never force-push or push to `main` directly.
+- Several independent tasks can run in parallel agents and worktrees
+  (`.worktreeinclude` copies `.env`; run `npm ci` in a new worktree).
 
 ## Engineering standards
 

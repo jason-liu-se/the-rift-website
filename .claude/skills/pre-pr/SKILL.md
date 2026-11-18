@@ -22,8 +22,10 @@ npm run build
 The build enforces the style budgets in `angular.json`, so report any budget
 warnings too.
 
-Don't run `npm run e2e` unless the user asks for it; it's slow. Instead, remind
-the user to run it themselves before opening the PR.
+If the branch changes templates, styles, routing, or how API data is shown, run
+the targeted e2e specs for the affected routes (`.claude/rules/testing.md` "When
+to run"). Run the full suite only for high-risk changes (see the `orchestrate`
+skill's tiers) or when the user asks.
 
 ## 2. Code review
 
@@ -40,4 +42,6 @@ Give one short summary:
 - **Review:** the agents' findings, most severe first.
 - **Verdict:** ready for a PR, or the list of things to fix first.
 
-Don't fix anything yourself. Ask the user which findings to address.
+Fix failing checks and Critical or Important findings that are in the branch's
+scope, then re-run the affected checks. List the rest in the report (and the PR)
+for the user to decide.

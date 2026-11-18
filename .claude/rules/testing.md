@@ -41,6 +41,29 @@ Specs in `e2e/` run every route on desktop and mobile in Chromium.
   fixtures from `src/app/testing/api-fixtures.ts`.
 
 Stop anything using that port, and any server on port 4200, before running.
+Playwright reuses a server already on its port, so a stale server (e.g. from the
+main checkout) gets tested instead of your code.
+
+**When to run.** The full suite is slow; run it before merging High-risk or
+integration work (see the `orchestrate` skill). Otherwise run only what the
+change touches, on one device unless layout differs:
+
+```bash
+npm run e2e -- e2e/accessibility.spec.ts e2e/keyboard.spec.ts --project=desktop -g "/news"
+```
+
+**Parallel worktrees.** Give each worktree its own dev server and mock API
+ports, so runs don't collide or test another checkout:
+
+```bash
+E2E_PORT=4301 DEV_PUBLIC_API_URL=http://localhost:4101 npm run e2e -- ...
+```
+
+**Quick visual check** (no suite): start `npm start -- --port <port>` in the
+background, then
+`npx playwright screenshot --device="Pixel 7" http://localhost:<port>/<route> <file>.png`
+(drop `--device` for desktop) and read the image. Without the mock API, pages
+show their API-failure state.
 
 **Writing a spec**
 

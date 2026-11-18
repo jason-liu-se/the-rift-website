@@ -71,8 +71,12 @@ npm run e2e -- e2e/keyboard.spec.ts --project=desktop    # one e2e file, one dev
 ```
 
 The e2e tests mock the API and BlueMap, so neither needs to be running. Stop
-anything on port 4200 or the development API port first. Details:
+anything on port 4200 or the development API port first, or pick other ports
+with `E2E_PORT` and `DEV_PUBLIC_API_URL`. Details:
 [testing.md](./.claude/rules/testing.md).
+
+New git worktrees get `.env` copied in by Claude Code (`.worktreeinclude`); run
+`npm ci` in each.
 
 ## Project structure
 
