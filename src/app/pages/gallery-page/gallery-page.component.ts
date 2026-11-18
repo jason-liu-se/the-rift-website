@@ -1,14 +1,21 @@
 import { Component, inject } from '@angular/core';
+import { forkJoin } from 'rxjs';
 import { IGalleryCardSelection } from 'src/app/interfaces/gallery-card-selection.interface';
 import { GalleryProviderService } from 'src/app/services/gallery-provider.service';
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
 import { CardSelectionSectionComponent } from '../../components/card-selection-section/card-selection-section.component';
+import { ErrorStateComponent } from '../../components/error-state/error-state.component';
+import { LoadState } from '../../components/error-state/load-state';
 
 @Component({
 	selector: 'app-page-gallery',
 	templateUrl: './gallery-page.component.html',
 	styleUrls: ['./gallery-page.component.scss'],
-	imports: [BackgroundImageCardComponent, CardSelectionSectionComponent]
+	imports: [
+		BackgroundImageCardComponent,
+		CardSelectionSectionComponent,
+		ErrorStateComponent
+	]
 })
 export class GalleryPageComponent {
 	private galleryProvider = inject(GalleryProviderService);
@@ -31,18 +38,29 @@ export class GalleryPageComponent {
 			dbCollectionName: 'season-6'
 		}
 	];
+	protected readonly loadState = new LoadState();
 
 	constructor() {
 		this.setGalleryCollections();
 	}
 
-	private setGalleryCollections(): void {
-		for (const collection of this.galleryCollections) {
-			this.galleryProvider
-				.getCollectionImageCountObservable(collection.dbCollectionName)
-				.subscribe((data) => {
-					collection.desc = `${data.total} photos`;
+	/** Loads every collection's photo count; one failure fails the page. */
+	public setGalleryCollections(): void {
+		this.loadState.start();
+		forkJoin(
+			this.galleryCollections.map((collection) =>
+				this.galleryProvider.getCollectionImageCountObservable(
+					collection.dbCollectionName
+				)
+			)
+		).subscribe({
+			next: (counts) => {
+				counts.forEach(({ total }, i) => {
+					this.galleryCollections[i].desc = `${total} photos`;
 				});
-		}
+				this.loadState.succeed();
+			},
+			error: () => this.loadState.fail()
+		});
 	}
 }

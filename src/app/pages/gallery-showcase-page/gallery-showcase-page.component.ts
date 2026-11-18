@@ -12,6 +12,8 @@ import { PaginatorIntlService } from 'src/app/services/paginator-intl.service';
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
 import { BackButtonComponent } from '../../components/back-button/back-button.component';
 import { ImageShowcaseSectionComponent } from './components/image-showcase-section/image-showcase-section.component';
+import { ErrorStateComponent } from '../../components/error-state/error-state.component';
+import { LoadState } from '../../components/error-state/load-state';
 
 @Component({
 	selector: 'app-gallery-showcase-page',
@@ -22,7 +24,8 @@ import { ImageShowcaseSectionComponent } from './components/image-showcase-secti
 		BackgroundImageCardComponent,
 		BackButtonComponent,
 		MatPaginator,
-		ImageShowcaseSectionComponent
+		ImageShowcaseSectionComponent,
+		ErrorStateComponent
 	]
 })
 export class GalleryShowcasePageComponent {
@@ -37,6 +40,8 @@ export class GalleryShowcasePageComponent {
 	public pageSize = GALLERY_PAGE_SIZE;
 	public pageIndex = 0;
 	public pageEvent!: PageEvent;
+
+	protected readonly loadState = new LoadState();
 
 	private imageCache: Record<string, GalleryImage[]> = {};
 
@@ -74,26 +79,37 @@ export class GalleryShowcasePageComponent {
 		window.scrollTo(0, 0);
 	}
 
-	private populateCaptionedImages(): void {
+	/** Requests the current page; also the error state's retry. */
+	public populateCaptionedImages(): void {
 		if (!this.collectionName) {
 			return;
 		}
 
 		// the user may change page before this response arrives
 		const requestedPageIndex = this.pageIndex;
+		const isCurrentPage = () => requestedPageIndex === this.pageIndex;
 
+		this.loadState.start();
 		this.galleryProvider
 			.getCollectionImagesObservable(
 				this.collectionName,
 				requestedPageIndex * this.pageSize,
 				this.pageSize
 			)
-			.subscribe(({ items, total }) => {
-				this.imageCache[`${requestedPageIndex}`] = items;
-				this.paginationLength = total;
+			.subscribe({
+				next: ({ items, total }) => {
+					this.imageCache[`${requestedPageIndex}`] = items;
+					this.paginationLength = total;
 
-				if (requestedPageIndex === this.pageIndex) {
-					this.captionedImages = items;
+					if (isCurrentPage()) {
+						this.captionedImages = items;
+						this.loadState.succeed();
+					}
+				},
+				error: () => {
+					if (isCurrentPage()) {
+						this.loadState.fail();
+					}
 				}
 			});
 	}

@@ -171,6 +171,31 @@ describe('GalleryShowcasePageComponent', () => {
 		);
 	});
 
+	it('shows an error state when the page fails, and loads it again on Try again', () => {
+		render({ collection: 'season-5' });
+		httpTesting
+			.expectOne(pageUrl('season-5', 0))
+			.flush(null, { status: 500, statusText: 'Server Error' });
+		fixture.detectChanges();
+
+		expect(element.querySelector('app-error-state h2')?.textContent).toBe(
+			"Couldn't load these photos"
+		);
+		expect(element.querySelector('mat-paginator')).toBeNull();
+		expect(element.querySelector('.back-button')).not.toBeNull();
+
+		element
+			.querySelector<HTMLButtonElement>('app-error-state button')!
+			.click();
+		httpTesting
+			.expectOne(pageUrl('season-5', 0))
+			.flush({ items: FIRST_PAGE, total: TOTAL });
+		fixture.detectChanges();
+
+		expect(element.querySelector('app-error-state')).toBeNull();
+		expect(captions()).toEqual(['One', 'Two']);
+	});
+
 	it('shows a generic title and requests nothing when the route has no data', () => {
 		render({});
 

@@ -1,23 +1,28 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { TestBed } from '@angular/core/testing';
+import { Router, provideRouter } from '@angular/router';
 
+import { ANY_URL_ROUTES } from 'src/app/testing/render-component';
 import { ErrorPageComponent } from './error-page.component';
 
 describe('ErrorPageComponent', () => {
-	let component: ErrorPageComponent;
-	let fixture: ComponentFixture<ErrorPageComponent>;
-
-	beforeEach(() => {
+	it('says the page was not found and links home', async () => {
 		TestBed.configureTestingModule({
-			imports: [ErrorPageComponent],
-			providers: [provideRouter([])]
+			providers: [provideRouter(ANY_URL_ROUTES)]
 		});
-		fixture = TestBed.createComponent(ErrorPageComponent);
-		component = fixture.componentInstance;
+		const router = TestBed.inject(Router);
+		await router.navigateByUrl('/not-a-page');
+		const fixture = TestBed.createComponent(ErrorPageComponent);
 		fixture.detectChanges();
-	});
+		const element: HTMLElement = fixture.nativeElement;
+		const link = element.querySelector('a')!;
 
-	it('should create', () => {
-		expect(component).toBeTruthy();
+		expect(element.querySelector('h1')?.textContent).toBe('Page not found');
+		expect(element.querySelector('button')).toBeNull();
+		expect(link.textContent?.trim()).toBe('Back to Home');
+
+		link.click();
+		await fixture.whenStable();
+
+		expect(router.url).toBe('/');
 	});
 });

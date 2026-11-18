@@ -10,13 +10,20 @@ import { NewsPostProviderService } from 'src/app/services/news-post-provider.ser
 import { PaginatorIntlService } from 'src/app/services/paginator-intl.service';
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
 import { NewsDisplayComponent } from '../../components/news/news-display/news-display.component';
+import { ErrorStateComponent } from '../../components/error-state/error-state.component';
+import { LoadState } from '../../components/error-state/load-state';
 
 @Component({
 	selector: 'app-page-news',
 	templateUrl: './news-page.component.html',
 	styleUrls: ['./news-page.component.scss'],
 	providers: [{ provide: MatPaginatorIntl, useClass: PaginatorIntlService }],
-	imports: [BackgroundImageCardComponent, MatPaginator, NewsDisplayComponent]
+	imports: [
+		BackgroundImageCardComponent,
+		MatPaginator,
+		NewsDisplayComponent,
+		ErrorStateComponent
+	]
 })
 export class NewsPageComponent {
 	private newsPostProvider = inject(NewsPostProviderService);
@@ -26,6 +33,7 @@ export class NewsPageComponent {
 	public pageIndex = 0;
 	public pageEvent!: PageEvent;
 	public newsPosts: NewsPost[] = [];
+	protected readonly loadState = new LoadState();
 
 	private newsPostCache: Record<string, NewsPost[]> = {};
 
@@ -52,18 +60,29 @@ export class NewsPageComponent {
 		window.scrollTo(0, 0);
 	}
 
-	private populateNewsPosts(): void {
+	/** Requests the current page again after a failure. */
+	public populateNewsPosts(): void {
 		// the user may change page before this response arrives
 		const requestedPageIndex = this.pageIndex;
+		const isCurrentPage = () => requestedPageIndex === this.pageIndex;
 
+		this.loadState.start();
 		this.newsPostProvider
 			.getNewsPosts(requestedPageIndex * this.pageSize, this.pageSize)
-			.subscribe(({ items, total }) => {
-				this.newsPostCache[`${requestedPageIndex}`] = items;
-				this.paginationLength = total;
+			.subscribe({
+				next: ({ items, total }) => {
+					this.newsPostCache[`${requestedPageIndex}`] = items;
+					this.paginationLength = total;
 
-				if (requestedPageIndex === this.pageIndex) {
-					this.newsPosts = items;
+					if (isCurrentPage()) {
+						this.newsPosts = items;
+						this.loadState.succeed();
+					}
+				},
+				error: () => {
+					if (isCurrentPage()) {
+						this.loadState.fail();
+					}
 				}
 			});
 	}

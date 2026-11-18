@@ -65,4 +65,26 @@ describe('GalleryPageComponent', () => {
 
 		expect(descriptions()).toEqual(['12 photos', '7 photos']);
 	});
+
+	it('shows an error state when a count fails, and loads again on Try again', () => {
+		httpTesting
+			.expectOne(`${galleryUrl}/season-5/count`)
+			.flush(null, { status: 500, statusText: 'Server Error' });
+		httpTesting.expectOne(`${galleryUrl}/season-6/count`);
+		fixture.detectChanges();
+
+		expect(element.querySelector('app-error-state h2')?.textContent).toBe(
+			"Couldn't load the gallery"
+		);
+		expect(element.querySelector('.collection-card')).toBeNull();
+
+		element
+			.querySelector<HTMLButtonElement>('app-error-state button')!
+			.click();
+		fixture.detectChanges();
+		flushCounts(3, 4);
+
+		expect(element.querySelector('app-error-state')).toBeNull();
+		expect(descriptions()).toEqual(['3 photos', '4 photos']);
+	});
 });

@@ -111,4 +111,70 @@ describe('NewsPageComponent', () => {
 		clickPaginator('Next page');
 		expect(titles()).toEqual(['Update']);
 	});
+
+	describe('when a page fails to load', () => {
+		const failPage = (startIndex: number) => {
+			httpTesting
+				.expectOne(pageUrl(startIndex))
+				.flush(null, { status: 500, statusText: 'Server Error' });
+			fixture.detectChanges();
+		};
+		const errorState = () => element.querySelector('app-error-state');
+		const retryButton = () =>
+			element.querySelector<HTMLButtonElement>('app-error-state button')!;
+
+		it('shows an error state in place of the news and paginators', () => {
+			failPage(0);
+
+			expect(errorState()?.querySelector('h2')?.textContent).toBe(
+				"Couldn't load the news"
+			);
+			expect(element.querySelector('mat-paginator')).toBeNull();
+		});
+
+		it('keeps the error state up while retrying, then shows the news', () => {
+			failPage(0);
+
+			retryButton().click();
+			fixture.detectChanges();
+			expect(retryButton().getAttribute('aria-disabled')).toBe('true');
+
+			flushPage(0, FIRST_PAGE);
+			expect(errorState()).toBeNull();
+			expect(titles()).toEqual(['Launch', 'Patch']);
+		});
+
+		it('shows the error state again when the retry fails', () => {
+			failPage(0);
+			retryButton().click();
+			fixture.detectChanges();
+
+			failPage(0);
+
+			expect(errorState()).not.toBeNull();
+			expect(retryButton().hasAttribute('aria-disabled')).toBe(false);
+		});
+
+		it('retries the page the user was on', () => {
+			flushPage(0, FIRST_PAGE);
+			clickPaginator('Next page');
+			failPage(PAGE_SIZE);
+
+			retryButton().click();
+			flushPage(PAGE_SIZE, SECOND_PAGE);
+
+			expect(titles()).toEqual(['Update']);
+		});
+
+		it('ignores a failure for a page the user has already left', () => {
+			flushPage(0, FIRST_PAGE);
+			clickPaginator('Next page');
+			clickPaginator('Previous page');
+
+			failPage(PAGE_SIZE);
+
+			expect(errorState()).toBeNull();
+			expect(titles()).toEqual(['Launch', 'Patch']);
+		});
+	});
 });
