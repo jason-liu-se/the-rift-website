@@ -76,7 +76,8 @@
 }
 
 .discord-button {
-	height: 48px;
+	height: auto;
+	min-height: 48px;
 	margin-top: 8px;
 
 	&:focus-visible {

@@ -29,7 +29,7 @@ describe('AdminLoginPageComponent', () => {
 		const element = render();
 		const link = element.querySelector('a');
 		expect(element.querySelector('h1')?.textContent).toBe(
-			'Sign in to The Rift admin'
+			'Log in to The Rift admin'
 		);
 		expect(link?.textContent).toContain('Continue with Discord');
 		expect(link?.getAttribute('href')).toBe(LOGIN_URL);
