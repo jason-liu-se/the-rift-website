@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, provideRouter } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
+import { stubResizeObserver } from '../testing/resize-observer';
 import {
 	CHUNK_RELOAD_KEY,
 	PageTemplateComponent
@@ -17,6 +18,7 @@ describe('PageTemplateComponent', () => {
 	let routeData: Record<string, unknown>;
 
 	beforeEach(() => {
+		stubResizeObserver();
 		routeData = { loadComponent: () => Promise.resolve(StubPageComponent) };
 		TestBed.configureTestingModule({
 			imports: [PageTemplateComponent],
@@ -48,6 +50,7 @@ describe('PageTemplateComponent', () => {
 	afterEach(() => {
 		element.remove();
 		sessionStorage.clear();
+		vi.unstubAllGlobals();
 	});
 
 	it("renders the route's page inside <main>", async () => {

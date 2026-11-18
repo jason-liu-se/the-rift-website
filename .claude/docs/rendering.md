@@ -51,7 +51,9 @@ other browser APIs only in event handlers, `afterNextRender`, or behind
 - Server-rendered pages call the API from the server, and the browser reuses
   those responses. If the API is down, or doesn't answer within
   `SERVER_API_TIMEOUT_MS` (`src/app/config/api.ts`, server only), the page
-  renders without the data and the browser fetches it after hydration.
+  renders without the data and the browser fetches it after hydration. Only a
+  failure in the browser shows the page's error state and retry button
+  (`LoadState` in `src/app/components/error-state/`).
 - Logged-in API requests send the API's httpOnly session cookies
   (`withCredentials`). When one answers 401 because the short-lived access token
   expired, `authRefreshInterceptor` (`src/app/services/`) calls

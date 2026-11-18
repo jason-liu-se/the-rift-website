@@ -4,6 +4,8 @@ import { Component, inject } from '@angular/core';
 import { DownloadCollection } from 'src/app/interfaces/api-responses';
 import { SectionCardComponent } from '../../components/section-card/section-card.component';
 import { DownloadCardComponent } from '../../components/download-card/download-card.component';
+import { ErrorStateComponent } from '../../components/error-state/error-state.component';
+import { LoadState } from '../../components/error-state/load-state';
 
 @Component({
 	selector: 'app-downloads-page',
@@ -12,20 +14,28 @@ import { DownloadCardComponent } from '../../components/download-card/download-c
 	imports: [
 		BackgroundImageCardComponent,
 		SectionCardComponent,
-		DownloadCardComponent
+		DownloadCardComponent,
+		ErrorStateComponent
 	]
 })
 export class DownloadsPageComponent {
 	private downloadsProvider = inject(DownloadsProviderService);
 
-	public downloadCollections!: DownloadCollection[];
+	public downloadCollections: DownloadCollection[] = [];
+	protected readonly loadState = new LoadState();
 
 	constructor() {
-		this.downloadsProvider
-			.getDownloadCollections()
-			.subscribe(
-				(data: DownloadCollection[]) =>
-					(this.downloadCollections = data)
-			);
+		this.loadDownloadCollections();
+	}
+
+	public loadDownloadCollections(): void {
+		this.loadState.start();
+		this.downloadsProvider.getDownloadCollections().subscribe({
+			next: (collections) => {
+				this.downloadCollections = collections;
+				this.loadState.succeed();
+			},
+			error: () => this.loadState.fail()
+		});
 	}
 }

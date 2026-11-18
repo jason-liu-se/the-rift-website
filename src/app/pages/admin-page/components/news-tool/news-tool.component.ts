@@ -6,6 +6,7 @@ import { NewsDisplayComponent } from '../../../../components/news/news-display/n
 @Component({
 	selector: 'app-news-tool',
 	templateUrl: './news-tool.component.html',
+	styleUrls: ['../admin-tool.scss'],
 	imports: [NewsDisplayComponent]
 })
 export class NewsToolComponent {

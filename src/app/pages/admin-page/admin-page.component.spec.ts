@@ -1,7 +1,8 @@
 import { TestBed } from '@angular/core/testing';
+import { Title } from '@angular/platform-browser';
 import { Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { of, throwError } from 'rxjs';
+import { NEVER, of, throwError } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 import { ANY_URL_ROUTES } from 'src/app/testing/render-component';
 import { AdminPageComponent } from './admin-page.component';
@@ -10,6 +11,8 @@ describe('AdminPageComponent', () => {
 	const logout = vi.fn(() => of<void>(undefined));
 	let harness: RouterTestingHarness;
 
+	beforeEach(() => logout.mockClear());
+
 	async function open(url: string): Promise<HTMLElement> {
 		TestBed.configureTestingModule({
 			providers: [
@@ -17,7 +20,13 @@ describe('AdminPageComponent', () => {
 					{ path: 'admin', component: AdminPageComponent },
 					...ANY_URL_ROUTES
 				]),
-				{ provide: AuthService, useValue: { logout } }
+				{
+					provide: AuthService,
+					useValue: {
+						logout,
+						getMe: () => of({ id: '1', username: 'editor' })
+					}
+				}
 			]
 		});
 		harness = await RouterTestingHarness.create();
@@ -30,39 +39,67 @@ describe('AdminPageComponent', () => {
 			.find((button) => button.textContent?.includes('Log out'))!
 			.click();
 
-	const activeTab = (element: HTMLElement) =>
-		element.querySelector('[mat-tab-link].mdc-tab--active')?.textContent;
+	const currentLink = (element: HTMLElement) =>
+		element.querySelector('nav [aria-current="page"]')?.textContent;
+
+	const heading = (element: HTMLElement) =>
+		element.querySelector('h1')?.textContent?.replace(/\s+/g, ' ').trim();
+
+	const documentTitle = () => TestBed.inject(Title).getTitle();
 
 	it('opens the news tool by default', async () => {
 		const element = await open('/admin');
-		expect(activeTab(element)).toContain('News');
+		expect(currentLink(element)).toContain('News');
+		expect(heading(element)).toBe('News – Admin');
+		expect(documentTitle()).toBe('News · Admin | The Rift');
 		expect(element.querySelector('app-news-tool')).not.toBeNull();
 	});
 
 	it('opens the tool named by the URL fragment', async () => {
 		const element = await open('/admin#gallery');
-		expect(activeTab(element)).toContain('Gallery');
+		expect(currentLink(element)).toContain('Gallery');
+		expect(heading(element)).toBe('Gallery – Admin');
+		expect(element.querySelectorAll('nav [aria-current]')).toHaveLength(1);
 		expect(element.querySelector('app-gallery-tool')).not.toBeNull();
 		expect(element.querySelector('app-news-tool')).toBeNull();
 	});
 
 	it('falls back to the news tool for an unknown fragment', async () => {
 		const element = await open('/admin#nope');
+		expect(currentLink(element)).toContain('News');
 		expect(element.querySelector('app-news-tool')).not.toBeNull();
+	});
+
+	it('leaves focus alone on first load', async () => {
+		const element = await open('/admin');
+		await harness.fixture.whenStable();
+		expect(document.activeElement).not.toBe(element.querySelector('h1'));
 	});
 
 	it('switches tools by changing the URL fragment', async () => {
 		const element = await open('/admin');
-		const downloadsTab = [
-			...element.querySelectorAll<HTMLAnchorElement>('[mat-tab-link]')
-		].find((tab) => tab.textContent?.includes('Downloads'))!;
+		const downloadsLink = [
+			...element.querySelectorAll<HTMLAnchorElement>('nav a')
+		].find((link) => link.textContent?.includes('Downloads'))!;
+		expect(downloadsLink.getAttribute('href')).toBe('/admin#downloads');
 
-		downloadsTab.click();
+		downloadsLink.click();
 		await harness.fixture.whenStable();
 		harness.detectChanges();
 
 		expect(TestBed.inject(Router).url).toBe('/admin#downloads');
 		expect(element.querySelector('app-downloads-tool')).not.toBeNull();
+		expect(heading(element)).toBe('Downloads – Admin');
+		expect(documentTitle()).toBe('Downloads · Admin | The Rift');
+		// Announces the switch by moving focus to the new heading.
+		expect(document.activeElement).toBe(element.querySelector('h1'));
+	});
+
+	it('shows the logged-in editor in the top bar', async () => {
+		const element = await open('/admin');
+		expect(
+			element.querySelector('header app-admin-user')?.textContent
+		).toContain('editor');
 	});
 
 	it('logs out and goes to the login page', async () => {
@@ -72,6 +109,19 @@ describe('AdminPageComponent', () => {
 
 		expect(logout).toHaveBeenCalled();
 		expect(TestBed.inject(Router).url).toBe('/admin/login');
+	});
+
+	it('marks Log out busy and ignores presses while logging out', async () => {
+		logout.mockReturnValueOnce(NEVER);
+		const element = await open('/admin');
+		clickLogout(element);
+		clickLogout(element);
+		harness.detectChanges();
+
+		expect(logout).toHaveBeenCalledTimes(1);
+		const button = element.querySelector('.account button');
+		expect(button?.getAttribute('aria-busy')).toBe('true');
+		expect(button?.getAttribute('aria-disabled')).toBe('true');
 	});
 
 	it('stays and says so when logging out fails', async () => {
@@ -85,5 +135,9 @@ describe('AdminPageComponent', () => {
 		expect(element.querySelector('[role="alert"]')?.textContent).toContain(
 			"Couldn't log out"
 		);
+		// Ready to try again.
+		expect(
+			element.querySelector('.account button')?.hasAttribute('aria-busy')
+		).toBe(false);
 	});
 });

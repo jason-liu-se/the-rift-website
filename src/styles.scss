@@ -29,6 +29,12 @@ body {
 	height: 100%;
 }
 
+// Keeps focused or linked-to content clear of the fixed navbar (its height is
+// published by NavbarComponent).
+html {
+	scroll-padding-top: var(--navbar-height, 0px);
+}
+
 body {
 	margin: 0;
 	scrollbar-color: #999 #333;

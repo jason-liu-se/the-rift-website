@@ -167,7 +167,8 @@ export const routes: Routes = [
 				import('./pages/admin-page/admin-page.component').then(
 					(m) => m.AdminPageComponent
 				),
-			isTransparent: false
+			isTransparent: false,
+			showFooter: false
 		}
 	},
 	{
@@ -182,13 +183,14 @@ export const routes: Routes = [
 				import('./pages/admin-page/admin-login-page/admin-login-page.component').then(
 					(m) => m.AdminLoginPageComponent
 				),
-			isTransparent: false
+			isTransparent: false,
+			showFooter: false
 		}
 	},
 	{
 		path: '**',
 		component: PageTemplateComponent,
-		title: 'Page Not Found',
+		title: '404: Page Not Found',
 		data: {
 			noindex: true,
 			loadComponent: () =>

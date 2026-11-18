@@ -1,7 +1,31 @@
 <div class="admin-login-page">
-	<h1>Admin login</h1>
-	@if (errorMessage) {
-		<p class="error" role="alert">{{ errorMessage }}</p>
-	}
-	<a mat-flat-button color="primary" [href]="loginUrl">Log in with Discord</a>
+	<div class="sign-in-panel">
+		<img
+			class="logo"
+			src="/assets/navbar/rift-logo.png"
+			alt=""
+			width="1200"
+			height="274"
+		/>
+		<h1 class="heading">Log in to The Rift admin</h1>
+		<p class="intro">Editors log in with their Discord account.</p>
+		@if (errorMessage) {
+			<p class="error" role="alert">{{ errorMessage }}</p>
+		}
+		<a
+			mat-flat-button
+			color="primary"
+			class="discord-button"
+			[href]="loginUrl"
+		>
+			Continue with Discord
+		</a>
+	</div>
+	<img
+		class="photo"
+		src="/assets/general-background-images/fancy-tree-1.webp"
+		alt=""
+		width="1920"
+		height="1080"
+	/>
 </div>

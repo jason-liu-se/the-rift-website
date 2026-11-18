@@ -10,13 +10,20 @@ import { NewsPostProviderService } from 'src/app/services/news-post-provider.ser
 import { PaginatorIntlService } from 'src/app/services/paginator-intl.service';
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
 import { NewsDisplayComponent } from '../../components/news/news-display/news-display.component';
+import { ErrorStateComponent } from '../../components/error-state/error-state.component';
+import { LoadState } from '../../components/error-state/load-state';
 
 @Component({
 	selector: 'app-page-news',
 	templateUrl: './news-page.component.html',
 	styleUrls: ['./news-page.component.scss'],
 	providers: [{ provide: MatPaginatorIntl, useClass: PaginatorIntlService }],
-	imports: [BackgroundImageCardComponent, MatPaginator, NewsDisplayComponent]
+	imports: [
+		BackgroundImageCardComponent,
+		MatPaginator,
+		NewsDisplayComponent,
+		ErrorStateComponent
+	]
 })
 export class NewsPageComponent {
 	private newsPostProvider = inject(NewsPostProviderService);
@@ -26,7 +33,10 @@ export class NewsPageComponent {
 	public pageIndex = 0;
 	public pageEvent!: PageEvent;
 	public newsPosts: NewsPost[] = [];
+	protected readonly loadState = new LoadState();
 
+	/** Counts requests, so only the latest one updates the page. */
+	private latestRequest = 0;
 	private newsPostCache: Record<string, NewsPost[]> = {};
 
 	constructor() {
@@ -41,6 +51,8 @@ export class NewsPageComponent {
 
 		// updating the displayed news posts
 		this.newsPosts = [];
+		// Any response still on its way is for a page the user has left.
+		this.latestRequest++;
 
 		// grabbing images from cache, if they have been cached
 		if (this.newsPostCache[`${this.pageIndex}`]) {
@@ -52,18 +64,31 @@ export class NewsPageComponent {
 		window.scrollTo(0, 0);
 	}
 
-	private populateNewsPosts(): void {
-		// the user may change page before this response arrives
+	/** Requests the current page again after a failure. */
+	public populateNewsPosts(): void {
 		const requestedPageIndex = this.pageIndex;
+		// The user may change page (and come back) before this response
+		// arrives, so compare requests, not page indexes.
+		const request = ++this.latestRequest;
+		const isLatestRequest = () => request === this.latestRequest;
 
+		this.loadState.start();
 		this.newsPostProvider
 			.getNewsPosts(requestedPageIndex * this.pageSize, this.pageSize)
-			.subscribe(({ items, total }) => {
-				this.newsPostCache[`${requestedPageIndex}`] = items;
-				this.paginationLength = total;
+			.subscribe({
+				next: ({ items, total }) => {
+					this.newsPostCache[`${requestedPageIndex}`] = items;
+					this.paginationLength = total;
 
-				if (requestedPageIndex === this.pageIndex) {
-					this.newsPosts = items;
+					if (isLatestRequest()) {
+						this.newsPosts = items;
+						this.loadState.succeed();
+					}
+				},
+				error: () => {
+					if (isLatestRequest()) {
+						this.loadState.fail();
+					}
 				}
 			});
 	}
