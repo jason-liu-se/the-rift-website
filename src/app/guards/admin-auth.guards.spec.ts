@@ -10,7 +10,7 @@ import {
 import { Observable, firstValueFrom, of, throwError } from 'rxjs';
 import { routes } from '../app.routes';
 import { ADMIN_LOGIN_PATH, ADMIN_PATH } from '../config/admin';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from '../services/auth/auth.service';
 import { requireLoggedIn, requireLoggedOut } from './admin-auth.guards';
 
 describe('admin auth guards', () => {

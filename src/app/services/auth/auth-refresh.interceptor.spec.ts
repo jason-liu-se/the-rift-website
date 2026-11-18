@@ -9,7 +9,7 @@ import {
 	HttpTestingController,
 	provideHttpClientTesting
 } from '@angular/common/http/testing';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 import {
 	AUTH_REFRESH_URL,
 	authRefreshInterceptor

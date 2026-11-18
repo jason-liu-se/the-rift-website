@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { Observable, of, throwError } from 'rxjs';
 import { SessionUser } from 'src/app/interfaces/api-responses';
-import { AuthService } from 'src/app/services/auth.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { renderComponent } from 'src/app/testing/render-component';
 import { AdminUserComponent } from './admin-user.component';
 

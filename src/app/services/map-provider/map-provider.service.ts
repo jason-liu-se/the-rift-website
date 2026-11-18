@@ -1,8 +1,8 @@
 import { Observable } from 'rxjs';
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { MapSeason } from '../interfaces/api-responses';
-import { environment } from '../../environments/environment';
+import { MapSeason } from '../../interfaces/api-responses';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
 	providedIn: 'root'

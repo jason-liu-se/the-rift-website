@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { forkJoin } from 'rxjs';
 import { IGalleryCardSelection } from 'src/app/interfaces/gallery-card-selection.interface';
-import { GalleryProviderService } from 'src/app/services/gallery-provider.service';
+import { GalleryProviderService } from 'src/app/services/gallery-provider/gallery-provider.service';
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
 import { CardSelectionSectionComponent } from '../../components/card-selection-section/card-selection-section.component';
 import { FallbackPanelComponent } from '../../components/fallback-panel/fallback-panel.component';

@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
-import { SessionUser } from '../interfaces/api-responses';
+import { environment } from '../../../environments/environment';
+import { SessionUser } from '../../interfaces/api-responses';
 
 /**
  * The editor's login session. The API keeps it in httpOnly cookies, so every

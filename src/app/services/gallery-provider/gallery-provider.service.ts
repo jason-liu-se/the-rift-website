@@ -1,12 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 import {
 	CountResponse,
 	GalleryImage,
 	PaginatedResponse
-} from '../interfaces/api-responses';
+} from '../../interfaces/api-responses';
 
 @Injectable({
 	providedIn: 'root'

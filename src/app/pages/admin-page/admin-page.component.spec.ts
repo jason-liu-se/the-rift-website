@@ -3,7 +3,7 @@ import { Title } from '@angular/platform-browser';
 import { Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { NEVER, of, throwError } from 'rxjs';
-import { AuthService } from 'src/app/services/auth.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { ANY_URL_ROUTES } from 'src/app/testing/render-component';
 import { AdminPageComponent } from './admin-page.component';
 
