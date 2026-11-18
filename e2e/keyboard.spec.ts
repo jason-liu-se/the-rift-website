@@ -134,6 +134,8 @@ test.describe('desktop navbar', { tag: TAG.desktopOnly }, () => {
 		await expect(page).toHaveURL(news.path);
 		await expect(page).toHaveTitle(news.title);
 		await expect(page.locator('main')).toBeFocused();
+		// Until the posts render, <main> has nothing focusable and Tab leaves it.
+		await expect(page.getByText(news.readyText!).first()).toBeVisible();
 		await page.keyboard.press('Tab');
 		await expect(page.locator('main :focus')).toHaveCount(1);
 	});
@@ -155,11 +157,8 @@ test.describe('desktop navbar', { tag: TAG.desktopOnly }, () => {
 });
 
 test.describe('mobile navbar menu', { tag: TAG.mobileOnly }, () => {
-	// Located by class because the buttons have no accessible name yet (see
-	// known-a11y-issues.ts); switch to getByRole once they do.
-	const menuButton = (page: Page) => page.locator('.hamburger-menu-button');
-	const closeButton = (page: Page) =>
-		page.locator('.close-hamburger-menu-button');
+	const menuButton = (page: Page) =>
+		page.locator('nav').getByRole('button', { name: 'Menu' });
 	const newsLink = (page: Page) =>
 		page.locator('nav').getByRole('link', { name: 'News' });
 
@@ -169,46 +168,39 @@ test.describe('mobile navbar menu', { tag: TAG.mobileOnly }, () => {
 
 		await page.keyboard.press('Tab');
 		await expect(menuButton(page)).toBeFocused();
+		await expect(menuButton(page)).toHaveAttribute(
+			'aria-expanded',
+			'false'
+		);
 		await page.keyboard.press('Enter');
 		await expect(newsLink(page)).toBeVisible();
+		await expect(menuButton(page)).toHaveAttribute('aria-expanded', 'true');
 	}
 
-	test('Tab reaches the menu button and Enter opens the menu', async ({
+	test('Tab reaches the menu button and Enter opens the menu, keeping focus', async ({
 		page
 	}) => {
 		await openMenuByKeyboard(page);
+
+		await expect(menuButton(page)).toBeFocused();
 	});
 
-	test('Tab reaches the close button and Enter closes the menu', async ({
-		page
-	}) => {
+	test('Enter on the menu button again closes the menu', async ({ page }) => {
 		await openMenuByKeyboard(page);
 
-		await page.keyboard.press('Tab');
-		await expect(closeButton(page)).toBeFocused();
 		await page.keyboard.press('Enter');
 		await expect(newsLink(page)).toBeHidden();
+		await expect(menuButton(page)).toBeFocused();
 	});
 
-	// Known gaps against .claude/rules/ui-standards.md ("menus close on Escape and
-	// restore focus").
-	// test.fail() reports these as passing while they fail, and fails the
-	// suite once they pass, so remove the annotation when fixing them.
-	test.fail('Escape closes the menu', async ({ page }) => {
+	test('Escape closes the menu and returns focus to the menu button', async ({
+		page
+	}) => {
 		await openMenuByKeyboard(page);
+		await page.keyboard.press('Tab');
 
 		await page.keyboard.press('Escape');
-		await expect(newsLink(page)).toBeHidden({ timeout: 1000 });
+		await expect(newsLink(page)).toBeHidden();
+		await expect(menuButton(page)).toBeFocused();
 	});
-
-	test.fail(
-		'closing the menu returns focus to the menu button',
-		async ({ page }) => {
-			await openMenuByKeyboard(page);
-			await page.keyboard.press('Tab');
-			await page.keyboard.press('Enter');
-
-			await expect(menuButton(page)).toBeFocused({ timeout: 1000 });
-		}
-	);
 });

@@ -86,33 +86,68 @@ describe('NavbarComponent', () => {
 		});
 	});
 
+	it('labels the site navigation', () => {
+		expect(element.querySelector('nav')?.getAttribute('aria-label')).toBe(
+			'Main'
+		);
+	});
+
 	describe('hamburger menu', () => {
+		const menuButton = () =>
+			element.querySelector<HTMLButtonElement>('.hamburger-menu-button')!;
+
 		it('starts closed with the links hidden', () => {
 			expect(menuLinks()?.classList).toContain('hidden');
-			expect(
-				element.querySelector('.hamburger-menu-button')
-			).not.toBeNull();
-			expect(
-				element.querySelector('.close-hamburger-menu-button')
-			).toBeNull();
+			expect(menuButton().getAttribute('aria-label')).toBe('Menu');
+			expect(menuButton().getAttribute('aria-expanded')).toBe('false');
+			expect(menuButton().getAttribute('aria-controls')).toBe(
+				menuLinks()?.id
+			);
 		});
 
-		it('opens when the menu button is clicked', () => {
+		it('opens when the menu button is clicked, keeping the same button', () => {
+			const button = menuButton();
+
 			click('.hamburger-menu-button');
 
 			expect(menuLinks()?.classList).not.toContain('hidden');
 			expect(element.querySelector('nav')?.classList).toContain('expand');
-			expect(element.querySelector('.hamburger-menu-button')).toBeNull();
+			expect(menuButton()).toBe(button);
+			expect(button.getAttribute('aria-expanded')).toBe('true');
+			expect(button.textContent?.trim()).toBe('close');
 		});
 
-		it('closes when the close button is clicked', () => {
+		it('closes when the menu button is clicked again', () => {
 			click('.hamburger-menu-button');
-			click('.close-hamburger-menu-button');
+			click('.hamburger-menu-button');
 
 			expect(menuLinks()?.classList).toContain('hidden');
-			expect(
-				element.querySelector('.hamburger-menu-button')
-			).not.toBeNull();
+			expect(menuButton().getAttribute('aria-expanded')).toBe('false');
+		});
+
+		it('closes on Escape and focuses the menu button', () => {
+			click('.hamburger-menu-button');
+			// jsdom applies the desktop media query that hides the button, and
+			// won't focus hidden elements; e2e checks real focus on mobile.
+			const focusSpy = vi.spyOn(menuButton(), 'focus');
+
+			document.dispatchEvent(
+				new KeyboardEvent('keydown', { key: 'Escape' })
+			);
+			fixture.detectChanges();
+
+			expect(menuLinks()?.classList).toContain('hidden');
+			expect(focusSpy).toHaveBeenCalled();
+		});
+
+		it('leaves focus alone on Escape while closed', () => {
+			const focusSpy = vi.spyOn(menuButton(), 'focus');
+
+			document.dispatchEvent(
+				new KeyboardEvent('keydown', { key: 'Escape' })
+			);
+
+			expect(focusSpy).not.toHaveBeenCalled();
 		});
 
 		describe('on window resize', () => {

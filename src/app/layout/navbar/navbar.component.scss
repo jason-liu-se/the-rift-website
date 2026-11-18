@@ -62,16 +62,14 @@ $navbar-height: 3rem;
 	min-height: $navbar-height;
 }
 
-.hamburger-menu-button,
-.close-hamburger-menu-button {
+.hamburger-menu-button {
 	border: none;
 	background-color: transparent;
 	color: white;
 	height: 100%;
 }
 
-.hamburger-menu-button:active,
-.close-hamburger-menu-button:active {
+.hamburger-menu-button:active {
 	filter: opacity(0.7);
 }
 
