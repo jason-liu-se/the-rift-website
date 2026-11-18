@@ -1,9 +1,8 @@
 ---
 name: new-page
 description:
-    Add a new routed page to The Rift website, or a variant of an existing page
-    (e.g. another gallery collection). Use when asked to add, create, or
-    scaffold a page or route.
+    Add a new routed page to The Rift website, or a variant of an existing page.
+    Use when asked to add, create, or scaffold a page or route.
 argument-hint: <page name or description>
 ---
 
@@ -15,9 +14,9 @@ Follow the architecture in `CLAUDE.md`. Every route renders
 ## 1. New component or new route?
 
 Read `src/app/app.routes.ts` and `src/app/pages/`. If an existing page already
-does this from route data (e.g. `GalleryShowcasePageComponent` with
-`collection`), **add a route only** and skip to step 3. If you're not sure, ask
-the user.
+does this from route data or a parameter, **add a route only** and skip to
+step 3. Gallery collections need nothing: `gallery/:collection` shows whatever
+the API lists. If you're not sure, ask the user.
 
 ## 2. Generate the page
 

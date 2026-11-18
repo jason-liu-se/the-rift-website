@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
-	CountResponse,
+	GalleryCollectionNames,
 	GalleryImage,
 	PaginatedResponse
 } from '../../interfaces/api-responses';
@@ -13,6 +13,11 @@ import {
 })
 export class GalleryProviderService {
 	private http = inject(HttpClient);
+	private galleryUrl = `${environment.API_URL}/gallery`;
+
+	public getCollectionNamesObservable(): Observable<GalleryCollectionNames> {
+		return this.http.get<GalleryCollectionNames>(this.galleryUrl);
+	}
 
 	public getCollectionImagesObservable(
 		collectionName: string,
@@ -20,20 +25,8 @@ export class GalleryProviderService {
 		limit: number
 	): Observable<PaginatedResponse<GalleryImage>> {
 		return this.http.get<PaginatedResponse<GalleryImage>>(
-			this.collectionUrl(collectionName),
+			`${this.galleryUrl}/${encodeURIComponent(collectionName)}`,
 			{ params: { startIndex, limit } }
 		);
-	}
-
-	public getCollectionImageCountObservable(
-		collectionName: string
-	): Observable<CountResponse> {
-		return this.http.get<CountResponse>(
-			`${this.collectionUrl(collectionName)}/count`
-		);
-	}
-
-	private collectionUrl(collectionName: string): string {
-		return `${environment.API_URL}/gallery/${encodeURIComponent(collectionName)}`;
 	}
 }

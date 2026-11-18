@@ -19,7 +19,7 @@ const targets = (process.env['PR_SCREENSHOTS'] ?? '')
 		return { path, selector };
 	});
 
-/** `/gallery/season-5` → `gallery-season-5`, `.navbar` → `navbar`, `/` → `home`. */
+/** `/gallery/season5` → `gallery-season5`, `.navbar` → `navbar`, `/` → `home`. */
 const slug = (text: string) =>
 	text.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '') || 'home';
 

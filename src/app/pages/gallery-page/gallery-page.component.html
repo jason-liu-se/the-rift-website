@@ -13,9 +13,11 @@
 		>
 			The server didn't answer. Check your connection and try again.
 		</app-fallback-panel>
+	} @else if (collectionCards()?.length === 0) {
+		<p class="empty-message">No galleries yet. Check back soon!</p>
 	} @else {
 		<app-card-selection-section
-			[items]="galleryCollections"
+			[items]="collectionCards() ?? []"
 		></app-card-selection-section>
 	}
 </div>

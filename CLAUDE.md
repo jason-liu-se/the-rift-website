@@ -37,10 +37,11 @@ matching files are read or edited.
 - **Every route renders `PageTemplateComponent`**, which lazy-loads the page
   from `data.loadComponent` into a `<main>` inside the shared shell (navbar,
   optional contact section, footer). Route data flags toggle the shell (defaults
-  in `PageTemplateComponent`). Pages read their own values from route data, so a
-  variant of a page (e.g. another gallery collection) is usually just a new
-  route. Every route also needs a `title`, a `data.description`, and a render
-  mode in `src/app/app.routes.server.ts`.
+  in `PageTemplateComponent`). Pages read their own values from route data or
+  parameters, so a variant of a page is usually just a new route, or none (new
+  gallery collections come from the API through `gallery/:collection`). Every
+  route also needs a `title`, a `data.description`, and a render mode in
+  `src/app/app.routes.server.ts`.
 - **External services.** The Rift API and BlueMap run separately. Import
   `environment` from `src/environments/` (generated from `.env`); never
   hard-code URLs.

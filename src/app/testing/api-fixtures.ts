@@ -29,12 +29,12 @@ const image = (name: string, caption: string): GalleryImage => ({
 });
 
 export const GALLERY_COLLECTIONS: Record<string, GalleryImage[]> = {
-	'season-5': [
+	season5: [
 		image('spawn-walkway-1.webp', 'Spawn walkway'),
 		image('iron-farm-1.webp', 'Iron farm'),
 		image('water-tower-1.webp', 'Water tower')
 	],
-	'season-6': [
+	season6: [
 		image('sunrise-1.webp', 'Sunrise'),
 		image('fancy-tree-1.webp', 'Fancy tree')
 	]

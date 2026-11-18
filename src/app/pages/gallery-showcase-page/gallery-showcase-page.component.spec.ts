@@ -6,6 +6,7 @@ import {
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, provideRouter, Router } from '@angular/router';
 
+import { GALLERY_FALLBACK_IMAGE } from 'src/app/config/gallery';
 import { GalleryImage } from 'src/app/interfaces/api-responses';
 import { ANY_URL_ROUTES } from 'src/app/testing/render-component';
 import { environment } from 'src/environments/environment';
@@ -25,7 +26,7 @@ describe('GalleryShowcasePageComponent', () => {
 	let fixture: ComponentFixture<GalleryShowcasePageComponent>;
 	let element: HTMLElement;
 	let httpTesting: HttpTestingController;
-	let routeData: Record<string, unknown>;
+	let routeParams: Record<string, string>;
 
 	const pageUrl = (collection: string, startIndex: number) =>
 		`${environment.API_URL}/gallery/${collection}?startIndex=${startIndex}&limit=${PAGE_SIZE}`;
@@ -44,15 +45,15 @@ describe('GalleryShowcasePageComponent', () => {
 		fixture.detectChanges();
 	};
 
-	function render(data: Record<string, unknown>): void {
-		Object.assign(routeData, data);
+	function render(collection: string): void {
+		routeParams['collection'] = collection;
 		fixture = TestBed.createComponent(GalleryShowcasePageComponent);
 		element = fixture.nativeElement;
 		fixture.detectChanges();
 	}
 
 	beforeEach(() => {
-		routeData = {};
+		routeParams = {};
 		TestBed.configureTestingModule({
 			imports: [GalleryShowcasePageComponent],
 			providers: [
@@ -61,7 +62,7 @@ describe('GalleryShowcasePageComponent', () => {
 				provideRouter(ANY_URL_ROUTES),
 				{
 					provide: ActivatedRoute,
-					useFactory: () => ({ snapshot: { data: routeData } })
+					useFactory: () => ({ snapshot: { params: routeParams } })
 				}
 			]
 		});
@@ -70,20 +71,16 @@ describe('GalleryShowcasePageComponent', () => {
 
 	afterEach(() => httpTesting.verify());
 
-	describe('with a collection in the route data', () => {
+	describe('with a collection in the URL', () => {
 		beforeEach(() => {
-			render({
-				title: 'Gallery: Season 5',
-				imageUrl: 'assets/season-5.png',
-				collection: 'season-5'
-			});
+			render('season5');
 			httpTesting
-				.expectOne(pageUrl('season-5', 0))
+				.expectOne(pageUrl('season5', 0))
 				.flush({ items: FIRST_PAGE, total: TOTAL });
 			fixture.detectChanges();
 		});
 
-		it('shows the route title and background as the page header', () => {
+		it("shows the collection's name and first photo as the page header", () => {
 			const header = element.querySelector<HTMLElement>(
 				'.background-image-card'
 			);
@@ -91,9 +88,7 @@ describe('GalleryShowcasePageComponent', () => {
 			expect(element.querySelector('h1')?.textContent).toBe(
 				'Gallery: Season 5'
 			);
-			expect(header?.style.backgroundImage).toContain(
-				'assets/season-5.png'
-			);
+			expect(header?.style.backgroundImage).toContain(FIRST_PAGE[0].url);
 		});
 
 		it('shows the first page of the collection and its total', () => {
@@ -109,7 +104,7 @@ describe('GalleryShowcasePageComponent', () => {
 
 			clickPaginator('Next page');
 			httpTesting
-				.expectOne(pageUrl('season-5', PAGE_SIZE))
+				.expectOne(pageUrl('season5', PAGE_SIZE))
 				.flush({ items: SECOND_PAGE, total: TOTAL });
 			fixture.detectChanges();
 
@@ -122,7 +117,7 @@ describe('GalleryShowcasePageComponent', () => {
 			vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined);
 			clickPaginator('Next page');
 			httpTesting
-				.expectOne(pageUrl('season-5', PAGE_SIZE))
+				.expectOne(pageUrl('season5', PAGE_SIZE))
 				.flush({ items: SECOND_PAGE, total: TOTAL });
 			fixture.detectChanges();
 
@@ -138,7 +133,7 @@ describe('GalleryShowcasePageComponent', () => {
 			clickPaginator('Previous page');
 
 			httpTesting
-				.expectOne(pageUrl('season-5', PAGE_SIZE))
+				.expectOne(pageUrl('season5', PAGE_SIZE))
 				.flush({ items: SECOND_PAGE, total: TOTAL });
 			fixture.detectChanges();
 			expect(captions()).toEqual(['One', 'Two']);
@@ -154,7 +149,7 @@ describe('GalleryShowcasePageComponent', () => {
 			clickPaginator('Previous page');
 			clickPaginator('Next page');
 			const [stale, latest] = httpTesting.match(
-				pageUrl('season-5', PAGE_SIZE)
+				pageUrl('season5', PAGE_SIZE)
 			);
 
 			stale.flush(null, { status: 500, statusText: 'Server Error' });
@@ -175,12 +170,12 @@ describe('GalleryShowcasePageComponent', () => {
 	});
 
 	it('hides the result count until the first page loads', () => {
-		render({ collection: 'season-5' });
+		render('season5');
 
 		expect(element.querySelector('.page-caption')).toBeNull();
 
 		httpTesting
-			.expectOne(pageUrl('season-5', 0))
+			.expectOne(pageUrl('season5', 0))
 			.flush({ items: FIRST_PAGE, total: TOTAL });
 		fixture.detectChanges();
 
@@ -190,9 +185,9 @@ describe('GalleryShowcasePageComponent', () => {
 	});
 
 	it('shows an error state when the page fails, and loads it again on Try again', () => {
-		render({ collection: 'season-5' });
+		render('season5');
 		httpTesting
-			.expectOne(pageUrl('season-5', 0))
+			.expectOne(pageUrl('season5', 0))
 			.flush(null, { status: 500, statusText: 'Server Error' });
 		fixture.detectChanges();
 
@@ -206,7 +201,7 @@ describe('GalleryShowcasePageComponent', () => {
 			.querySelector<HTMLButtonElement>('app-fallback-panel button')!
 			.click();
 		httpTesting
-			.expectOne(pageUrl('season-5', 0))
+			.expectOne(pageUrl('season5', 0))
 			.flush({ items: FIRST_PAGE, total: TOTAL });
 		fixture.detectChanges();
 
@@ -214,13 +209,16 @@ describe('GalleryShowcasePageComponent', () => {
 		expect(captions()).toEqual(['One', 'Two']);
 	});
 
-	it('shows a generic title and requests nothing when the route has no data', () => {
-		render({});
+	it('uses the fallback header image for a collection with no photos', () => {
+		render('season5');
+		httpTesting
+			.expectOne(pageUrl('season5', 0))
+			.flush({ items: [], total: 0 });
+		fixture.detectChanges();
 
-		// afterEach's verify() fails if any request was made.
-		expect(element.querySelector('h1')?.textContent).toBe(
-			'Gallery Showcase Page'
-		);
-		expect(element.querySelector('.page-caption')).toBeNull();
+		expect(
+			element.querySelector<HTMLElement>('.background-image-card')?.style
+				.backgroundImage
+		).toContain(GALLERY_FALLBACK_IMAGE);
 	});
 });

@@ -1,6 +1,8 @@
-import { Routes } from '@angular/router';
+import { ActivatedRouteSnapshot, Routes } from '@angular/router';
 import { requireLoggedIn, requireLoggedOut } from './guards/admin-auth.guards';
+import { requireGalleryCollection } from './guards/gallery-collection.guard';
 import { PageTemplateComponent } from './layout/page-template/page-template.component';
+import { galleryCollectionTitle } from './services/gallery-provider/gallery-collection-title';
 
 export const routes: Routes = [
 	{
@@ -43,37 +45,21 @@ export const routes: Routes = [
 		}
 	},
 	{
-		path: 'gallery/season-5',
+		// One page per collection the API lists; other names get the 404 page.
+		path: 'gallery/:collection',
+		canMatch: [requireGalleryCollection],
 		component: PageTemplateComponent,
-		title: 'Season 5 Gallery',
+		title: (route) =>
+			`${galleryCollectionTitle(route.params['collection'])} Gallery`,
+		resolve: {
+			description: (route: ActivatedRouteSnapshot) =>
+				`Screenshots of builds from ${galleryCollectionTitle(route.params['collection'])} of The Rift Minecraft SMP.`
+		},
 		data: {
-			description:
-				'Screenshots of builds from Season 5 of The Rift Minecraft SMP.',
 			loadComponent: () =>
 				import('./pages/gallery-showcase-page/gallery-showcase-page.component').then(
 					(m) => m.GalleryShowcasePageComponent
-				),
-			title: 'Gallery: Season 5',
-			imageUrl:
-				'../../../assets/general-background-images/season-5-circle.webp',
-			collection: 'season-5'
-		}
-	},
-	{
-		path: 'gallery/season-6',
-		component: PageTemplateComponent,
-		title: 'Season 6 Gallery',
-		data: {
-			description:
-				'Screenshots of builds from Season 6 of The Rift Minecraft SMP.',
-			loadComponent: () =>
-				import('./pages/gallery-showcase-page/gallery-showcase-page.component').then(
-					(m) => m.GalleryShowcasePageComponent
-				),
-			title: 'Gallery: Season 6',
-			imageUrl:
-				'../../../assets/general-background-images/magic-books-2.webp',
-			collection: 'season-6'
+				)
 		}
 	},
 	{

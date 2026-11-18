@@ -6,10 +6,7 @@
 import { Page } from '@playwright/test';
 // The suite runs against `npm start`, which serves the development environment.
 import { environment } from '../../src/environments/environment.development';
-import {
-	CountResponse,
-	GalleryImage
-} from '../../src/app/interfaces/api-responses';
+import { GalleryImage } from '../../src/app/interfaces/api-responses';
 import {
 	DOWNLOAD_COLLECTIONS,
 	GALLERY_COLLECTIONS,
@@ -29,7 +26,6 @@ const ALLOWED_EXTERNAL_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com'];
 const BLUEMAP_PLACEHOLDER =
 	'<!doctype html><html lang="en"><title>BlueMap</title></html>';
 
-const GALLERY_COUNT_PATH = /^\/gallery\/([^/]+)\/count$/;
 const GALLERY_PAGE_PATH = /^\/gallery\/([^/]+)$/;
 
 export interface IMockResponse {
@@ -89,17 +85,11 @@ export function respondTo(url: URL): IMockResponse {
 	if (url.pathname === '/downloads') {
 		return ok(DOWNLOAD_COLLECTIONS);
 	}
+	if (url.pathname === '/gallery') {
+		return ok(Object.keys(GALLERY_COLLECTIONS));
+	}
 	if (url.pathname === '/maps/seasons') {
 		return ok(MAP_SEASONS);
-	}
-
-	const countMatch = GALLERY_COUNT_PATH.exec(url.pathname);
-	if (countMatch) {
-		const images = galleryCollection(countMatch[1]);
-		const count: CountResponse | undefined = images && {
-			total: images.length
-		};
-		return count ? ok(count) : notFound;
 	}
 
 	const pageMatch = GALLERY_PAGE_PATH.exec(url.pathname);

@@ -5,7 +5,6 @@ import {
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { CountResponse } from 'src/app/interfaces/api-responses';
 import { GALLERY_COLLECTIONS, paginate } from 'src/app/testing/api-fixtures';
 import { expectGet, flushServerError } from 'src/app/testing/http';
 import { environment } from 'src/environments/environment';
@@ -13,10 +12,9 @@ import { GalleryProviderService } from './gallery-provider.service';
 
 describe('GalleryProviderService', () => {
 	const galleryUrl = `${environment.API_URL}/gallery`;
-	const images = GALLERY_COLLECTIONS['season-5'];
+	const images = GALLERY_COLLECTIONS['season5'];
 	// offset and limit differ, so swapping them changes the URL
-	const pageUrl = `${galleryUrl}/season-5?startIndex=1&limit=2`;
-	const countUrl = `${galleryUrl}/season-5/count`;
+	const pageUrl = `${galleryUrl}/season5?startIndex=1&limit=2`;
 	let service: GalleryProviderService;
 
 	beforeEach(() => {
@@ -28,13 +26,36 @@ describe('GalleryProviderService', () => {
 
 	afterEach(() => TestBed.inject(HttpTestingController).verify());
 
+	describe('collection names', () => {
+		it('GETs every collection name and returns the response', () => {
+			const names = Object.keys(GALLERY_COLLECTIONS);
+
+			expect(
+				expectGet(
+					service.getCollectionNamesObservable(),
+					galleryUrl,
+					names
+				)
+			).toEqual(names);
+		});
+
+		it('passes server errors to the subscriber', () => {
+			const error = flushServerError(
+				service.getCollectionNamesObservable(),
+				galleryUrl
+			);
+
+			expect(error?.status).toBe(500);
+		});
+	});
+
 	describe('collection page', () => {
 		it('GETs a page of a collection by offset and limit and returns the response', () => {
 			const response = paginate(images, 1, 2);
 
 			expect(
 				expectGet(
-					service.getCollectionImagesObservable('season-5', 1, 2),
+					service.getCollectionImagesObservable('season5', 1, 2),
 					pageUrl,
 					response
 				)
@@ -43,55 +64,23 @@ describe('GalleryProviderService', () => {
 
 		it('passes server errors to the subscriber', () => {
 			const error = flushServerError(
-				service.getCollectionImagesObservable('season-5', 1, 2),
+				service.getCollectionImagesObservable('season5', 1, 2),
 				pageUrl
 			);
 
 			expect(error?.status).toBe(500);
 		});
-	});
 
-	describe('collection count', () => {
-		it('GETs the image count of a collection and returns the response', () => {
-			const response: CountResponse = { total: images.length };
+		it('encodes the collection name as a single path segment', () => {
+			const page = paginate(images, 0, 30);
 
 			expect(
 				expectGet(
-					service.getCollectionImageCountObservable('season-5'),
-					countUrl,
-					response
+					service.getCollectionImagesObservable('a/b c', 0, 30),
+					`${galleryUrl}/a%2Fb%20c?startIndex=0&limit=30`,
+					page
 				)
-			).toEqual(response);
+			).toEqual(page);
 		});
-
-		it('passes server errors to the subscriber', () => {
-			const error = flushServerError(
-				service.getCollectionImageCountObservable('season-5'),
-				countUrl
-			);
-
-			expect(error?.status).toBe(500);
-		});
-	});
-
-	it('encodes the collection name as a single path segment', () => {
-		const encodedUrl = `${galleryUrl}/a%2Fb%20c`;
-		const page = paginate(images, 0, 30);
-		const count: CountResponse = { total: images.length };
-
-		expect(
-			expectGet(
-				service.getCollectionImagesObservable('a/b c', 0, 30),
-				`${encodedUrl}?startIndex=0&limit=30`,
-				page
-			)
-		).toEqual(page);
-		expect(
-			expectGet(
-				service.getCollectionImageCountObservable('a/b c'),
-				`${encodedUrl}/count`,
-				count
-			)
-		).toEqual(count);
 	});
 });

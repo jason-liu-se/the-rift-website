@@ -57,3 +57,14 @@ test('the 404 page says so and links home', async ({ page }) => {
 
 	await expect(page).toHaveURL('/');
 });
+
+test('an unknown gallery collection gets the 404 page and status', async ({
+	page
+}) => {
+	const response = await page.goto('/gallery/season-5');
+
+	expect(response?.status()).toBe(404);
+	await expect(
+		page.getByRole('heading', { level: 1, name: '404: Page not found' })
+	).toBeVisible();
+});

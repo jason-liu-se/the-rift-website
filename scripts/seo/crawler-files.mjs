@@ -1,6 +1,7 @@
 // Writes public/robots.txt and public/sitemap.xml for search engines, listing
 // every route in src/app/app.routes.ts except those marked `noindex: true`
-// (such as the catch-all 404 route). Called by scripts/environments/generate.mjs with the
+// (such as the catch-all 404 route) and those with a parameter (such as
+// `gallery/:collection`, whose pages crawlers find through links). Called by scripts/environments/generate.mjs with the
 // production site URL, so the files stay in step with the routes and .env.
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
@@ -25,7 +26,8 @@ function indexablePaths() {
 				);
 			}
 			return path;
-		});
+		})
+		.filter((path) => !path.includes(":"));
 }
 
 /** Escapes text for an XML element. */

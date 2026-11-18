@@ -5,8 +5,10 @@ import {
 	MatPaginator
 } from '@angular/material/paginator';
 import { ActivatedRoute } from '@angular/router';
+import { GALLERY_FALLBACK_IMAGE } from 'src/app/config/gallery';
 import { GALLERY_PAGE_SIZE } from 'src/app/config/pagination';
 import { GalleryImage } from 'src/app/interfaces/api-responses';
+import { galleryCollectionTitle } from 'src/app/services/gallery-provider/gallery-collection-title';
 import { GalleryProviderService } from 'src/app/services/gallery-provider/gallery-provider.service';
 import { PaginatorIntlService } from 'src/app/services/paginator-intl/paginator-intl.service';
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
@@ -33,7 +35,8 @@ export class GalleryShowcasePageComponent {
 	private galleryProvider = inject(GalleryProviderService);
 
 	public title: string;
-	public imageUrl: string;
+	/** The collection's first photo, once the first page has loaded. */
+	public imageUrl = '';
 	public captionedImages: GalleryImage[] = [];
 	public collectionName: string;
 	public paginationLength?: number;
@@ -47,18 +50,9 @@ export class GalleryShowcasePageComponent {
 	private latestRequest = 0;
 	private imageCache: Record<string, GalleryImage[]> = {};
 
-	// the title and imageUrl must be passed via the app.routes.ts file as
-	// 'data' elements
 	constructor() {
-		// parsing route data
-		const title = this.route.snapshot.data['title'];
-		const imageUrl = this.route.snapshot.data['imageUrl'];
-		const collectionName = this.route.snapshot.data['collection'];
-
-		this.title = title == null ? 'Gallery Showcase Page' : title;
-		this.imageUrl = imageUrl == null ? '' : imageUrl;
-		this.collectionName = collectionName == null ? '' : collectionName;
-
+		this.collectionName = this.route.snapshot.params['collection'];
+		this.title = `Gallery: ${galleryCollectionTitle(this.collectionName)}`;
 		this.populateCaptionedImages();
 	}
 
@@ -85,10 +79,6 @@ export class GalleryShowcasePageComponent {
 
 	/** Requests the current page; also the error state's retry. */
 	public populateCaptionedImages(): void {
-		if (!this.collectionName) {
-			return;
-		}
-
 		const requestedPageIndex = this.pageIndex;
 		// The user may change page (and come back) before this response
 		// arrives, so compare requests, not page indexes.
@@ -106,6 +96,9 @@ export class GalleryShowcasePageComponent {
 				next: ({ items, total }) => {
 					this.imageCache[`${requestedPageIndex}`] = items;
 					this.paginationLength = total;
+					if (requestedPageIndex === 0) {
+						this.imageUrl = items[0]?.url ?? GALLERY_FALLBACK_IMAGE;
+					}
 
 					if (isLatestRequest()) {
 						this.captionedImages = items;
