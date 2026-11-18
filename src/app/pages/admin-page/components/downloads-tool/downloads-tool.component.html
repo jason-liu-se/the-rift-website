@@ -1,8 +1,11 @@
 <p class="tool-intro">Creating downloads is coming soon.</p>
-<h2 class="preview-heading">Preview</h2>
-<app-download-card
-	[title]="preview.title"
-	[desc]="preview.desc"
-	[src]="preview.downloadUrl"
-	[imgSrc]="preview.backgroundUrl"
-></app-download-card>
+<p class="preview-label">Preview</p>
+<!-- Sample data: shown, but not usable. -->
+<div inert>
+	<app-download-card
+		[title]="preview.title"
+		[desc]="preview.desc"
+		[src]="preview.downloadUrl"
+		[imgSrc]="preview.backgroundUrl"
+	></app-download-card>
+</div>

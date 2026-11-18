@@ -24,7 +24,9 @@ describe('AdminUserComponent', () => {
 		expect(element.querySelector('img')?.getAttribute('src')).toBe(
 			AVATAR_URL
 		);
-		expect(element.querySelector('.username')?.textContent).toBe('steve');
+		const username = element.querySelector('.username');
+		expect(username?.textContent?.trim()).toBe('Signed in as steve');
+		expect(username?.getAttribute('title')).toBe('steve');
 	});
 
 	it('shows the editor’s initial without an avatar', () => {

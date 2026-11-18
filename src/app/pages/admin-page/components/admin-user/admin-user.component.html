@@ -8,5 +8,8 @@
 	}
 </div>
 @if (user(); as currentUser) {
-	<span class="username">{{ currentUser.username }}</span>
+	<span class="username" [title]="currentUser.username">
+		<span class="cdk-visually-hidden">Signed in as</span>
+		{{ currentUser.username }}
+	</span>
 }

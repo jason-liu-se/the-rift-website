@@ -1,7 +1,8 @@
 import { TestBed } from '@angular/core/testing';
+import { Title } from '@angular/platform-browser';
 import { Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { of, throwError } from 'rxjs';
+import { NEVER, of, throwError } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 import { ANY_URL_ROUTES } from 'src/app/testing/render-component';
 import { AdminPageComponent } from './admin-page.component';
@@ -9,6 +10,8 @@ import { AdminPageComponent } from './admin-page.component';
 describe('AdminPageComponent', () => {
 	const logout = vi.fn(() => of<void>(undefined));
 	let harness: RouterTestingHarness;
+
+	beforeEach(() => logout.mockClear());
 
 	async function open(url: string): Promise<HTMLElement> {
 		TestBed.configureTestingModule({
@@ -39,20 +42,23 @@ describe('AdminPageComponent', () => {
 	const currentLink = (element: HTMLElement) =>
 		element.querySelector('nav [aria-current="page"]')?.textContent;
 
-	const title = (element: HTMLElement) =>
-		element.querySelector('h1')?.textContent;
+	const heading = (element: HTMLElement) =>
+		element.querySelector('h1')?.textContent?.replace(/\s+/g, ' ').trim();
+
+	const documentTitle = () => TestBed.inject(Title).getTitle();
 
 	it('opens the news tool by default', async () => {
 		const element = await open('/admin');
 		expect(currentLink(element)).toContain('News');
-		expect(title(element)).toBe('News');
+		expect(heading(element)).toBe('News – Admin');
+		expect(documentTitle()).toBe('News · Admin | The Rift');
 		expect(element.querySelector('app-news-tool')).not.toBeNull();
 	});
 
 	it('opens the tool named by the URL fragment', async () => {
 		const element = await open('/admin#gallery');
 		expect(currentLink(element)).toContain('Gallery');
-		expect(title(element)).toBe('Gallery');
+		expect(heading(element)).toBe('Gallery – Admin');
 		expect(element.querySelectorAll('nav [aria-current]')).toHaveLength(1);
 		expect(element.querySelector('app-gallery-tool')).not.toBeNull();
 		expect(element.querySelector('app-news-tool')).toBeNull();
@@ -62,6 +68,12 @@ describe('AdminPageComponent', () => {
 		const element = await open('/admin#nope');
 		expect(currentLink(element)).toContain('News');
 		expect(element.querySelector('app-news-tool')).not.toBeNull();
+	});
+
+	it('leaves focus alone on first load', async () => {
+		const element = await open('/admin');
+		await harness.fixture.whenStable();
+		expect(document.activeElement).not.toBe(element.querySelector('h1'));
 	});
 
 	it('switches tools by changing the URL fragment', async () => {
@@ -77,7 +89,10 @@ describe('AdminPageComponent', () => {
 
 		expect(TestBed.inject(Router).url).toBe('/admin#downloads');
 		expect(element.querySelector('app-downloads-tool')).not.toBeNull();
-		expect(title(element)).toBe('Downloads');
+		expect(heading(element)).toBe('Downloads – Admin');
+		expect(documentTitle()).toBe('Downloads · Admin | The Rift');
+		// Announces the switch by moving focus to the new heading.
+		expect(document.activeElement).toBe(element.querySelector('h1'));
 	});
 
 	it('shows the logged-in editor in the top bar', async () => {
@@ -96,6 +111,19 @@ describe('AdminPageComponent', () => {
 		expect(TestBed.inject(Router).url).toBe('/admin/login');
 	});
 
+	it('marks Log out busy and ignores presses while logging out', async () => {
+		logout.mockReturnValueOnce(NEVER);
+		const element = await open('/admin');
+		clickLogout(element);
+		clickLogout(element);
+		harness.detectChanges();
+
+		expect(logout).toHaveBeenCalledTimes(1);
+		const button = element.querySelector('.account button');
+		expect(button?.getAttribute('aria-busy')).toBe('true');
+		expect(button?.getAttribute('aria-disabled')).toBe('true');
+	});
+
 	it('stays and says so when logging out fails', async () => {
 		logout.mockReturnValueOnce(throwError(() => new Error('offline')));
 		const element = await open('/admin');
@@ -107,5 +135,9 @@ describe('AdminPageComponent', () => {
 		expect(element.querySelector('[role="alert"]')?.textContent).toContain(
 			"Couldn't log out"
 		);
+		// Ready to try again.
+		expect(
+			element.querySelector('.account button')?.hasAttribute('aria-busy')
+		).toBe(false);
 	});
 });

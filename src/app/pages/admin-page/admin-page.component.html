@@ -1,31 +1,44 @@
 <div class="admin-page">
 	<nav class="tool-nav" aria-label="Admin tools">
-		<p class="tool-nav-label" aria-hidden="true">Admin</p>
-		<ul class="tool-list">
-			@for (tool of tools; track tool.id) {
-				<li>
-					<a
-						class="tool-link"
-						routerLink="."
-						[fragment]="tool.id"
-						[class.active]="tool.id === activeToolId()"
-						[attr.aria-current]="
-							tool.id === activeToolId() ? 'page' : null
-						"
-					>
-						<mat-icon aria-hidden="true">{{ tool.icon }}</mat-icon>
-						{{ tool.label }}
-					</a>
-				</li>
-			}
-		</ul>
+		<div class="tool-nav-content">
+			<p class="tool-nav-label" aria-hidden="true">Admin</p>
+			<ul class="tool-list">
+				@for (tool of tools; track tool.id) {
+					<li>
+						<a
+							class="tool-link"
+							routerLink="."
+							[fragment]="tool.id"
+							[class.active]="tool === activeTool()"
+							[attr.aria-current]="
+								tool === activeTool() ? 'page' : null
+							"
+						>
+							<mat-icon aria-hidden="true">{{
+								tool.icon
+							}}</mat-icon>
+							{{ tool.label }}
+						</a>
+					</li>
+				}
+			</ul>
+		</div>
 	</nav>
 	<div class="workspace">
 		<header class="top-bar">
-			<h1 class="tool-title">{{ activeTool().label }}</h1>
+			<h1 class="tool-title" tabindex="-1" #toolTitle>
+				{{ activeTool().label
+				}}<span class="cdk-visually-hidden"> – Admin</span>
+			</h1>
 			<div class="account">
 				<app-admin-user />
-				<button mat-stroked-button type="button" (click)="logout()">
+				<button
+					mat-stroked-button
+					type="button"
+					[attr.aria-disabled]="loggingOut() || null"
+					[attr.aria-busy]="loggingOut() || null"
+					(click)="logout()"
+				>
 					<mat-icon>logout</mat-icon>
 					Log out
 				</button>
@@ -37,7 +50,7 @@
 			</p>
 		}
 		<div class="tool-card">
-			@switch (activeToolId()) {
+			@switch (activeTool().id) {
 				@case ("downloads") {
 					<app-downloads-tool />
 				}

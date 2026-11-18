@@ -13,5 +13,7 @@ describe('DownloadsToolComponent', () => {
 		expect(card.querySelector('a')?.getAttribute('href')).toBe(
 			preview.downloadUrl
 		);
+		// Sample data can't be tabbed into or used.
+		expect(card.closest('[inert]')).not.toBeNull();
 	});
 });

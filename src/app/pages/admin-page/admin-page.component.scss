@@ -2,6 +2,8 @@
 @use "../../../font-sizes" as *;
 
 $radius: 12px;
+// The fixed site navbar's height on desktop (layout/navbar).
+$navbar-height: 3rem;
 
 // Fills the space below the navbar (the footer is hidden on admin pages).
 :host {
@@ -37,6 +39,7 @@ $radius: 12px;
 
 	li {
 		flex: 1;
+		min-width: 0;
 	}
 }
 
@@ -49,6 +52,7 @@ $radius: 12px;
 	border-radius: 8px;
 	color: $colour-soft-silver;
 	font-size: $font-size-small;
+	overflow-wrap: anywhere;
 	text-decoration: none;
 	transition:
 		background-color 0.15s ease-out,
@@ -100,6 +104,11 @@ $radius: 12px;
 	gap: 16px;
 }
 
+.account button {
+	flex: none;
+	white-space: nowrap;
+}
+
 .account button:focus-visible {
 	outline: 2px solid $colour-primary;
 	outline-offset: 2px;
@@ -133,7 +142,14 @@ $radius: 12px;
 
 	.tool-nav {
 		flex: 0 0 15rem;
-		padding: 24px 12px;
+		padding: 0 12px;
+	}
+
+	// Keeps the links in view below the fixed navbar on long tools.
+	.tool-nav-content {
+		position: sticky;
+		top: $navbar-height;
+		padding: 24px 0;
 	}
 
 	.tool-nav-label {
