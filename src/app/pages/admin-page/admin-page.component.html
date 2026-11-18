@@ -45,9 +45,9 @@
 			</div>
 		</header>
 		@if (logoutFailed()) {
-			<p class="logout-error" role="alert">
-				Couldn't log out. Check your connection and try again.
-			</p>
+			<app-error-card title="Couldn't log out">
+				Check your connection and try again.
+			</app-error-card>
 		}
 		<div class="tool-card">
 			@switch (activeTool().id) {
