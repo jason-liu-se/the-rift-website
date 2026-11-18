@@ -56,5 +56,5 @@ other browser APIs only in event handlers, `afterNextRender`, or behind
   (`LoadState` in `src/app/components/fallback-panel/`).
 - Logged-in API requests send the API's httpOnly session cookies
   (`withCredentials`). When one answers 401 because the short-lived access token
-  expired, `authRefreshInterceptor` (`src/app/services/`) calls
+  expired, `authRefreshInterceptor` (`src/app/services/auth/`) calls
   `POST /auth/refresh` once and retries it.
