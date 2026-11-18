@@ -53,9 +53,10 @@ output through `tail` or `grep` for the summary and failures.
    fix real findings.
 3. The e2e runs your risk tier requires (see the brief), with your assigned
    `E2E_PORT` and `DEV_PUBLIC_API_URL` (`.claude/rules/testing.md`).
-4. For a new layout, or when a check fails and you need to see why, screenshot
-   the page at mobile and desktop width and look once (images are expensive).
-   Leave the PNGs out of git.
+4. For a UI-facing change, capture the affected feature for the PR
+   (`.claude/rules/testing.md` "PR screenshots") and check one image shows it.
+   Look at the rest only for a new layout or when a check fails and you need to
+   see why (images are expensive). Leave the PNGs out of git.
 5. If an e2e test fails in a way your change can't explain (another page, a
    flaky timing test), don't investigate: list it in the PR and your report; the
    orchestrator checks it against the base.
@@ -90,6 +91,11 @@ output through `tail` or `grep` for the summary and failures.
 
     - **Ran:** <each check, pass/fail>
     - **Not run:** <and why>
+
+    ## Screenshots
+
+    <for UI-facing changes: the upload script's image links, labelled by
+    feature, device, and before/after>
 
     ## Risk
 

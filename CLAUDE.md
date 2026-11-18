@@ -71,8 +71,10 @@ matching files are read or edited.
   `refactor/…`. Sub-issues branch from, and open PRs into, the parent issue's
   branch.
 - When a task is done and verified, commit in logical steps, push, and open a PR
-  (`Closes #<n>`, summary, decisions, testing with what wasn't run, risk). Open
-  it as a draft when unsure. Don't wait to be asked; the PR is the review.
+  (`Closes #<n>`, summary, decisions, testing with what wasn't run, risk, and
+  screenshots of the affected feature for any UI-facing change; see
+  `.claude/rules/testing.md`). Open it as a draft when unsure. Don't wait to be
+  asked; the PR is the review.
 - Merge your own PR only when it's low risk and you're confident (the
   `orchestrate` skill's tiers), CI passed, and review left nothing Critical or
   Important. Everything else waits for the user. **Auto-merge into `main` (which

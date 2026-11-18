@@ -65,6 +65,22 @@ background, then
 (drop `--device` for desktop) and read the image. Without the mock API, pages
 show their API-failure state.
 
+**PR screenshots.** Any UI-facing change shows the affected feature in its PR,
+on desktop and mobile, before and after where it changed something existing
+(capture "before" from the base branch). Capture with the mocks applied:
+
+```bash
+PR_SCREENSHOTS='/news, /admin|.admin-sidebar' npm run e2e -- e2e/pr-screenshots.spec.ts
+node scripts/pr-screenshots/upload.mjs test-results/pr-screenshots/*.png
+```
+
+Each entry is a route, optionally `|<CSS selector>` to crop to the feature. For
+a state that needs interaction (an open menu, an error state), take it in a
+temporary spec and don't commit it. The upload prints Markdown image links for a
+`## Screenshots` section in the PR description (the images live on the
+`pr-screenshots` branch, never in the PR's commits). Open one image to check it
+shows the feature; you don't need to look at the rest.
+
 **Writing a spec**
 
 - Import `test`/`expect` from `e2e/support/test.ts`, which applies the mocks.

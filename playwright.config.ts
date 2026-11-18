@@ -9,6 +9,8 @@ const isCI = !!process.env['CI'];
 
 export default defineConfig({
 	testDir: 'e2e',
+	// PR screenshots, not a test: run only on request (see the spec).
+	testIgnore: process.env['PR_SCREENSHOTS'] ? [] : ['pr-screenshots.spec.ts'],
 	// Serves the mock API to the dev server's server-side rendering.
 	globalSetup: './e2e/support/mock-api-server.ts',
 	fullyParallel: true,

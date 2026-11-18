@@ -42,11 +42,11 @@ The highest factor sets the **risk tier**. After the work is done, the agent's
 behaviour, screenshots looked at, e2e run) can only move a task up a tier, never
 down.
 
-| Tier   | Human before launch | Agent's checks                                               | Automated review                                       | Human before merge                          |
-| ------ | ------------------- | ------------------------------------------------------------ | ------------------------------------------------------ | ------------------------------------------- |
-| Low    | —                   | lint, format, unit tests, build                              | `code-reviewer`                                        | None: you merge it once CI and review pass  |
-| Medium | —                   | + targeted e2e on changed routes, screenshots of new layouts | `code-reviewer` only                                   | Reviews the PR (ready for review)           |
-| High   | Approves the plan   | + full e2e                                                   | + `a11y-auditor` if UI, your own read of the full diff | Reviews the draft PR and approves the merge |
+| Tier   | Human before launch | Agent's checks                                                | Automated review                                       | Human before merge                          |
+| ------ | ------------------- | ------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------- |
+| Low    | —                   | lint, format, unit tests, build, PR screenshots of UI changes | `code-reviewer`                                        | None: you merge it once CI and review pass  |
+| Medium | —                   | + targeted e2e on changed routes                              | `code-reviewer` only                                   | Reviews the PR (ready for review)           |
+| High   | Approves the plan   | + full e2e                                                    | + `a11y-auditor` if UI, your own read of the full diff | Reviews the draft PR and approves the merge |
 
 - **Low, High confidence**: merge with `gh pr merge --squash --delete-branch`
   once CI passes and no Critical or Important finding is open. A PR into `main`

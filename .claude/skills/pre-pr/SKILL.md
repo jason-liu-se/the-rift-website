@@ -27,6 +27,9 @@ the targeted e2e specs for the affected routes (`.claude/rules/testing.md` "When
 to run"). Run the full suite only for high-risk changes (see the `orchestrate`
 skill's tiers) or when the user asks.
 
+If the change is UI-facing, capture and upload screenshots of the affected
+feature for the PR description (`.claude/rules/testing.md` "PR screenshots").
+
 ## 2. Code review
 
 Use the `code-reviewer` agent to review the current branch against `main`,
@@ -40,6 +43,7 @@ Give one short summary:
 - **Checks:** pass or fail for each command. For failures, quote the relevant
   error lines.
 - **Review:** the agents' findings, most severe first.
+- **Screenshots:** the image links for the PR, or why there are none.
 - **Verdict:** ready for a PR, or the list of things to fix first.
 
 Fix failing checks and Critical or Important findings that are in the branch's
