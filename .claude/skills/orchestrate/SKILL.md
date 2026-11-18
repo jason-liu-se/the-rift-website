@@ -81,8 +81,7 @@ High-tier plans always need the user's approval.
 - Base: `main`, or the parent issue's branch for sub-issues (each sub-issue's PR
   targets it). Create the base branch if needed and check it out before
   launching: worktrees start from your `HEAD` (`worktree.baseRef: "head"`).
-- Names follow the repo: `feature/<n>-<slug>`, `fix/<n>-<slug>`,
-  `refactor/<slug>`.
+- Names follow the repo. E.g. `<issue-stype>/<n>-<slug>`.
 - Assign each agent unique e2e ports: `E2E_PORT=43<k>0`,
   `DEV_PUBLIC_API_URL=http://localhost:41<k>0` for agent `k`.
 
