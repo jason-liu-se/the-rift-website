@@ -41,9 +41,11 @@ Specs in `e2e/` run every route on desktop and mobile in Chromium.
   server-side API calls on the development `API_URL` port, with the same
   fixtures from `src/app/testing/api-fixtures.ts`.
 
-Stop anything using that port, and any server on port 4200, before running.
-Playwright reuses a server already on its port, so a stale server (e.g. from the
-main checkout) gets tested instead of your code.
+Stop anything using that port, and any server on port 4200, before running. That
+includes a local web-server (`node --watch ... src/index.ts`) holding the API
+port: stop it, run the specs, then tell the user so they can restart it. Don't
+stop other processes. Playwright reuses a server already on its port, so a stale
+server (e.g. from the main checkout) gets tested instead of your code.
 
 **When to run.** The full suite is slow; run it before merging High-risk or
 integration work (see the `orchestrate` skill). Otherwise run only what the
