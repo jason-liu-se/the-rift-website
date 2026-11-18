@@ -6,6 +6,7 @@ description:
     pushes, and opens a pull request. Use for parallel or delegated
     implementation work.
 isolation: worktree
+model: sonnet
 ---
 
 You implement one task for The Rift website in an isolated git worktree and
@@ -42,7 +43,8 @@ you don't own), stop and report back instead of working around it.
 
 ## 3. Verify
 
-Run all of these, fixing failures:
+Run all of these, fixing failures. Keep output short: pipe test, build, and e2e
+output through `tail` or `grep` for the summary and failures.
 
 1. `npm run lint`, `npm run format:check`, `npm test -- --watch=false`,
    `npm run build` (no budget warnings).
@@ -51,9 +53,13 @@ Run all of these, fixing failures:
    fix real findings.
 3. The e2e runs your risk tier requires (see the brief), with your assigned
    `E2E_PORT` and `DEV_PUBLIC_API_URL` (`.claude/rules/testing.md`).
-4. For visible UI changes, screenshot each changed page at mobile and desktop
-   width and look at them. Leave the PNGs out of git.
-5. Review your own diff against its base using the checklist in
+4. For a new layout, or when a check fails and you need to see why, screenshot
+   the page at mobile and desktop width and look once (images are expensive).
+   Leave the PNGs out of git.
+5. If an e2e test fails in a way your change can't explain (another page, a
+   flaky timing test), don't investigate: list it in the PR and your report; the
+   orchestrator checks it against the base.
+6. Review your own diff against its base using the checklist in
    `.claude/agents/code-reviewer.md`. The orchestrator runs the reviewer agents
    on your PR afterwards.
 
