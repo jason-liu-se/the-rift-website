@@ -26,7 +26,8 @@ findings. You are **strictly read-only**.
 1. Determine what to review. If the caller names files, a commit, or a branch,
    review that. Otherwise review uncommitted changes (`git diff HEAD` plus
    untracked files from `git status`); if there are none, review the current
-   branch against `main` (`git diff main...HEAD`).
+   branch against its base: the caller's, else its PR's
+   (`gh pr view --json baseRefName`), else `main` (`git diff <base>...HEAD`).
 2. Read `CLAUDE.md` first, then the `.claude/rules/` files for the areas the
    changes touch. Their architecture, conventions, testing setup, and
    engineering standards are your review criteria; this file only adds what to
