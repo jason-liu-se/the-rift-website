@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { ActivatedRoute } from '@angular/router';
 import { LoginErrorCode } from 'src/app/interfaces/api-responses';
-import { AuthService } from 'src/app/services/auth.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { FeedbackCardComponent } from 'src/app/components/feedback-card/feedback-card.component';
 
 const LOGIN_ERROR_MESSAGES: Record<LoginErrorCode, string> = {

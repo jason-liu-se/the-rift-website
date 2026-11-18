@@ -46,8 +46,9 @@ matching files are read or edited.
   hard-code URLs.
 - **API types** come from `src/app/interfaces/api-responses.ts`, a verbatim copy
   of the web-server's contract: never edit it here (README "API contract").
-- **Services** (`src/app/services/`) are thin `HttpClient` wrappers returning
-  Observables; caching happens in the consuming component.
+- **Services** live in `src/app/services/<name>/`, one folder per service (with
+  its spec and any closely tied interceptor). API services are thin `HttpClient`
+  wrappers returning Observables; caching happens in the consuming component.
 - **UI components.** Build new interactive components on Angular Aria (with
   `@angular/cdk` for overlays and dialogs), styled with our own SCSS. Angular
   Material may only be used on admin pages. Details in

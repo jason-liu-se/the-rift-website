@@ -6,8 +6,8 @@ import {
 } from '@angular/material/paginator';
 import { NEWS_PAGE_SIZE } from 'src/app/config/pagination';
 import { NewsPost } from 'src/app/interfaces/api-responses';
-import { NewsPostProviderService } from 'src/app/services/news-post-provider.service';
-import { PaginatorIntlService } from 'src/app/services/paginator-intl.service';
+import { NewsPostProviderService } from 'src/app/services/news-post-provider/news-post-provider.service';
+import { PaginatorIntlService } from 'src/app/services/paginator-intl/paginator-intl.service';
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
 import { NewsDisplayComponent } from '../../components/news/news-display/news-display.component';
 import { FallbackPanelComponent } from '../../components/fallback-panel/fallback-panel.component';

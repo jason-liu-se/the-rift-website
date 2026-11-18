@@ -16,8 +16,8 @@ import {
 
 import { routes } from './app.routes';
 import { SeoTitleStrategy } from './seo/seo-title-strategy';
-import { authRefreshInterceptor } from './services/auth-refresh.interceptor';
-import { serverApiTimeoutInterceptor } from './services/server-api-timeout.interceptor';
+import { authRefreshInterceptor } from './services/auth/auth-refresh.interceptor';
+import { serverApiTimeoutInterceptor } from './services/server-api-timeout/server-api-timeout.interceptor';
 
 /** App-wide providers, shared by the browser and server builds. */
 export const appConfig: ApplicationConfig = {

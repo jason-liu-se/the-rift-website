@@ -1,4 +1,4 @@
-import { DownloadsProviderService } from './../../services/downloads-provider.service';
+import { DownloadsProviderService } from 'src/app/services/downloads-provider/downloads-provider.service';
 import { BackgroundImageCardComponent } from './../../components/background-image-card/background-image-card.component';
 import { Component, inject } from '@angular/core';
 import { DownloadCollection } from 'src/app/interfaces/api-responses';

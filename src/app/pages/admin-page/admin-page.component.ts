@@ -21,7 +21,7 @@ import { GalleryToolComponent } from './components/gallery-tool/gallery-tool.com
 import { NewsToolComponent } from './components/news-tool/news-tool.component';
 import { ADMIN_LOGIN_PATH } from 'src/app/config/admin';
 import { SITE_NAME } from 'src/app/config/site';
-import { AuthService } from 'src/app/services/auth.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 interface IAdminTool {
 	/** The URL fragment that opens the tool, e.g. /admin#news. */

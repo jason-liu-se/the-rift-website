@@ -33,8 +33,9 @@ npm run ng -- generate component pages/<name>-page
   shared ones in `components/`. If a piece another page already has fits, move
   it to `components/` and use it from both. Follow the `new-component` skill for
   each.
-- If the page needs API data, add or reuse a service in `src/app/services/` with
-  endpoints from `environment`, and handle loading, empty, and error states.
+- If the page needs API data, add or reuse a service in
+  `src/app/services/<name>/` with endpoints from `environment`, and handle
+  loading, empty, and error states.
 - If the page reads its own route data, inject `ActivatedRoute` and read it as
   `snapshot.data['key']`.
 

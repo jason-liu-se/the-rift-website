@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { MapSeason } from 'src/app/interfaces/api-responses';
 import { ICardSelection } from 'src/app/interfaces/card-selection.interface';
-import { MapProviderService } from 'src/app/services/map-provider.service';
+import { MapProviderService } from 'src/app/services/map-provider/map-provider.service';
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
 import { CardSelectionSectionComponent } from '../../components/card-selection-section/card-selection-section.component';
 import { SectionCardComponent } from '../../components/section-card/section-card.component';

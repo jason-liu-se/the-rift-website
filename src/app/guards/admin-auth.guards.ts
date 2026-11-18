@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { catchError, map, of } from 'rxjs';
 import { ADMIN_LOGIN_PATH, ADMIN_PATH } from '../config/admin';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from '../services/auth/auth.service';
 
 /** Lets in a logged-in editor; sends anyone else to the login page. */
 export const requireLoggedIn: CanActivateFn = () => {

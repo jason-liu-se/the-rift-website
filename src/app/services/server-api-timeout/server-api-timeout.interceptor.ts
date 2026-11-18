@@ -1,7 +1,7 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
-import { SERVER_API_TIMEOUT_MS } from '../config/api';
+import { SERVER_API_TIMEOUT_MS } from '../../config/api';
 
 /**
  * Stops a slow API from holding up server-rendered pages: after the timeout the

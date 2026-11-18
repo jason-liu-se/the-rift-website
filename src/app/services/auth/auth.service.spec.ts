@@ -4,8 +4,8 @@ import {
 	provideHttpClientTesting
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { environment } from '../../environments/environment';
-import { SessionUser } from '../interfaces/api-responses';
+import { environment } from '../../../environments/environment';
+import { SessionUser } from '../../interfaces/api-responses';
 import { AuthService } from './auth.service';
 
 describe('AuthService', () => {

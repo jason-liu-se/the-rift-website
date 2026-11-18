@@ -86,7 +86,7 @@ src/
 │   ├── components/   Shared UI pieces (used by more than one page, or generic)
 │   ├── layout/       Shell every route renders (page template, navbar, footer)
 │   ├── pages/        One component per routed page; page-only ones in <page>/components/
-│   ├── services/     API clients and HTTP interceptors
+│   ├── services/     Injectable services and HTTP interceptors, one folder each
 │   ├── guards/       Route guards (admin login)
 │   ├── interfaces/   Data types; api-responses.ts is synced from web-server
 │   ├── seo/          Page titles, meta tags, and structured data
