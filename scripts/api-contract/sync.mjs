@@ -5,13 +5,15 @@
 // Usage: node scripts/api-contract/sync.mjs [--check]
 //
 // The server's checkout is found through LOCAL_WEB_SERVER_PATH, read from the
-// shell or .env (the shell wins), absolute or relative to this repo.
+// shell or .env (the shell wins), absolute or relative to this repo. A relative
+// path is resolved from the main checkout, so it also works in git worktrees.
 //
 // --check fails if the copy differs from the server's file instead of copying.
 // It only warns when LOCAL_WEB_SERVER_PATH isn't set (e.g. in CI), since
 // there's nothing to compare against.
+import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { dirname, resolve } from "node:path";
 import { parseArgs } from "node:util";
 
 const ENV_FILE = ".env";
@@ -42,7 +44,7 @@ if (!serverPath) {
 	process.exit(1);
 }
 
-const source = resolve(serverPath, CONTRACT_IN_SERVER);
+const source = resolve(mainCheckout(), serverPath, CONTRACT_IN_SERVER);
 
 if (!existsSync(source)) {
 	console.error(
@@ -61,4 +63,18 @@ if (!options.check) {
 		`api-contract: ${COPY} is out of date with the web-server's contract. Run \`npm run api:sync\`.`
 	);
 	process.exit(1);
+}
+
+/** The main checkout's root, even from a worktree; this folder outside git. */
+function mainCheckout() {
+	try {
+		const commonDir = execFileSync(
+			"git",
+			["rev-parse", "--path-format=absolute", "--git-common-dir"],
+			{ encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }
+		).trim();
+		return dirname(commonDir);
+	} catch {
+		return process.cwd();
+	}
 }

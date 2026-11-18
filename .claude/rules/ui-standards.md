@@ -47,6 +47,20 @@ The whole site works by keyboard alone:
 - Always-visible focus.
 - No focus traps outside dialogs/menus, which close on Escape and restore focus.
 - Sensible focus on route changes.
+- When the focused element is removed (a dismissed notice, a retry that
+  succeeds, content swapped for an error), move focus somewhere sensible
+  (`<main>` or the new content's heading); never let it fall to `<body>`.
+
+## Dynamic content
+
+- Announce changes with a live region that's already in the DOM, or the CDK
+  `LiveAnnouncer`. A `role="alert"`/`status` element inserted with its text
+  already in it often isn't read, and one re-created on every navigation is read
+  again each time.
+- Put `role="alert"` on the message only, not on a container with buttons, so
+  changing a button label doesn't re-read everything.
+- Async results: ignore any response but the latest request's (a request counter
+  or `switchMap`), not "is this still the current page".
 
 ## Responsive
 

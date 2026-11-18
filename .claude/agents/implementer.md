@@ -6,6 +6,7 @@ description:
     pushes, and opens a pull request. Use for parallel or delegated
     implementation work.
 isolation: worktree
+model: sonnet
 ---
 
 You implement one task for The Rift website in an isolated git worktree and
@@ -20,14 +21,16 @@ you don't own), stop and report back instead of working around it.
 
 ## 1. Set up
 
-1. Move to your branch: `git branch -m <branch>` (the worktree starts on a
-   temporary branch, from the orchestrator's `HEAD`). Check `git log -1` is on
-   the base branch's tip.
+1. Move to your branch: `git branch -m <branch>`, or `git switch -c <branch>` if
+   that fails (the worktree starts on a temporary branch, from the
+   orchestrator's `HEAD`). Check `git log -1` is on the base branch's tip.
 2. Install: `npm ci --prefer-offline --no-audit --no-fund` (this also generates
    `src/environments/`).
 3. `.env` is copied in automatically (`.worktreeinclude`). If it's missing, the
    production build needs CI's placeholder URLs; copy the `PROD_PUBLIC_*` values
    from `.github/workflows/ci.yml` into the shell for `npm run build`.
+4. Before any e2e run or screenshot: `npx playwright install chromium` (the
+   cached browser can be older than the installed Playwright).
 
 ## 2. Implement
 
@@ -40,7 +43,8 @@ you don't own), stop and report back instead of working around it.
 
 ## 3. Verify
 
-Run all of these, fixing failures:
+Run all of these, fixing failures. Keep output short: pipe test, build, and e2e
+output through `tail` or `grep` for the summary and failures.
 
 1. `npm run lint`, `npm run format:check`, `npm test -- --watch=false`,
    `npm run build` (no budget warnings).
@@ -49,9 +53,14 @@ Run all of these, fixing failures:
    fix real findings.
 3. The e2e runs your risk tier requires (see the brief), with your assigned
    `E2E_PORT` and `DEV_PUBLIC_API_URL` (`.claude/rules/testing.md`).
-4. For visible UI changes, screenshot each changed page at mobile and desktop
-   width and look at them. Leave the PNGs out of git.
-5. Review your own diff against its base using the checklist in
+4. For a UI-facing change, capture the affected feature for the PR
+   (`.claude/rules/testing.md` "PR screenshots") and check one image shows it.
+   Look at the rest only for a new layout or when a check fails and you need to
+   see why (images are expensive). Leave the PNGs out of git.
+5. If an e2e test fails in a way your change can't explain (another page, a
+   flaky timing test), don't investigate: list it in the PR and your report; the
+   orchestrator checks it against the base.
+6. Review your own diff against its base using the checklist in
    `.claude/agents/code-reviewer.md`. The orchestrator runs the reviewer agents
    on your PR afterwards.
 
@@ -62,7 +71,9 @@ Run all of these, fixing failures:
   commit attribution trailer from your instructions, if any.
 - `git push -u origin <branch>`, then
   `gh pr create --base <base> --title "<title>" --body-file <file>`. Open it as
-  a draft (`--draft`) when the tier is High or your confidence is Low.
+  a draft (`--draft`) when the tier is High or your confidence is Low. Other
+  agents share your scratchpad and git stash: name the body file after your
+  branch (`pr-body-28.md`), and never `git stash` without a unique message.
 - PR body:
 
     ```markdown
@@ -80,6 +91,11 @@ Run all of these, fixing failures:
 
     - **Ran:** <each check, pass/fail>
     - **Not run:** <and why>
+
+    ## Screenshots
+
+    <for UI-facing changes: the upload script's image links, labelled by
+    feature, device, and before/after>
 
     ## Risk
 

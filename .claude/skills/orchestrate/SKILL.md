@@ -42,11 +42,11 @@ The highest factor sets the **risk tier**. After the work is done, the agent's
 behaviour, screenshots looked at, e2e run) can only move a task up a tier, never
 down.
 
-| Tier   | Human before launch | Agent's checks                                | Automated review                 | Human before merge                          |
-| ------ | ------------------- | --------------------------------------------- | -------------------------------- | ------------------------------------------- |
-| Low    | —                   | lint, format, unit tests, build               | `code-reviewer`                  | None: you merge it once CI and review pass  |
-| Medium | —                   | + targeted e2e on changed routes, screenshots | + `a11y-auditor` if UI           | Reviews the PR (ready for review)           |
-| High   | Approves the plan   | + full e2e                                    | + your own read of the full diff | Reviews the draft PR and approves the merge |
+| Tier   | Human before launch | Agent's checks                                                | Automated review                                       | Human before merge                          |
+| ------ | ------------------- | ------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------- |
+| Low    | —                   | lint, format, unit tests, build, PR screenshots of UI changes | `code-reviewer`                                        | None: you merge it once CI and review pass  |
+| Medium | —                   | + targeted e2e on changed routes                              | `code-reviewer` only                                   | Reviews the PR (ready for review)           |
+| High   | Approves the plan   | + full e2e                                                    | + `a11y-auditor` if UI, your own read of the full diff | Reviews the draft PR and approves the merge |
 
 - **Low, High confidence**: merge with `gh pr merge --squash --delete-branch`
   once CI passes and no Critical or Important finding is open. A PR into `main`
@@ -111,20 +111,31 @@ Decisions that outlive the work (a new shared pattern, a convention) go into
 
 For each finished agent:
 
-1. Read its report and PR. Run `code-reviewer` (and `a11y-auditor` for UI) on
-   the PR branch against its base, plus anything the tier adds.
+1. Read its report and PR. Run the reviewers the tier lists on the PR branch
+   against its base. Point them at the agent's worktree (its completion notice
+   gives the path), and wait for all of them before sending fixes, so the agent
+   gets one list.
 2. Send fixes back to the same agent (`SendMessage`), which keeps its context,
-   rather than fixing them yourself. Fix only trivial issues directly.
+   rather than fixing them yourself. A fix round replays the agent's whole
+   context, so send Critical and Important findings and only the cheap Minor
+   ones; list the rest in the PR or a follow-up. Fix only trivial issues
+   directly. If a fix needs files the task doesn't own, update ownership in the
+   plan first. Findings outside every task's files go into a follow-up issue.
+3. Before blaming a PR for an e2e failure, run the same spec on the base.
 
 ## 7. Integrate
 
 - Merge order: the contract owner first, then dependants in dependency order.
   Each later branch rebases onto the new base and resolves conflicts there,
   using the plan of record and both PRs to keep both sides' intent.
-- Before the first merge, rehearse: merge all branches into a scratch branch,
-  run the checks (and the e2e the highest tier needs), then delete it. Work that
-  only becomes possible once both land (e.g. adopting a new shared component)
-  gets its own follow-up task.
+- Before the first merge, check for overlap:
+  `git diff --name-only <base>...<branch>` for each branch, and
+  `git merge-tree --write-tree <branch-a> <branch-b>` for conflicts. If the
+  branches share files, or both touch shared code (`layout/`, `components/`,
+  styles, routes), rehearse: merge them into a scratch branch, run the checks
+  and the e2e the highest tier needs, then delete it. Otherwise skip it. Work
+  that only becomes possible once both land (e.g. adopting a new shared
+  component) gets its own follow-up task.
 - Merge only what section 2 allows; never push to `main` directly.
 
 ## 8. Report
