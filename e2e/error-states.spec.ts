@@ -28,7 +28,7 @@ test('a data page that fails to load shows an error state, and Try again loads i
 	const restoreApi = await failApiRequests(page, '/news');
 	await clickNavLink(page, 'News');
 
-	const errorState = page.locator('app-error-state');
+	const fallbackPanel = page.locator('app-fallback-panel');
 	await expect(
 		page
 			.getByRole('alert')
@@ -36,13 +36,13 @@ test('a data page that fails to load shows an error state, and Try again loads i
 	).toBeVisible();
 
 	await restoreApi();
-	await errorState.getByRole('button', { name: 'Try again' }).focus();
+	await fallbackPanel.getByRole('button', { name: 'Try again' }).focus();
 	await page.keyboard.press('Enter');
 
 	await expect(
 		page.getByText(NEWS_POSTS[0].title, { exact: true })
 	).toBeVisible();
-	await expect(errorState).toHaveCount(0);
+	await expect(fallbackPanel).toHaveCount(0);
 	// The button went away with the error state; focus mustn't fall to <body>.
 	await expect.poll(() => focusedTag(page)).not.toBe('BODY');
 });

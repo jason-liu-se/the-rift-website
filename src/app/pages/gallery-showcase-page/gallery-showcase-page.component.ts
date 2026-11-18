@@ -12,8 +12,8 @@ import { PaginatorIntlService } from 'src/app/services/paginator-intl.service';
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
 import { BackButtonComponent } from '../../components/back-button/back-button.component';
 import { ImageShowcaseSectionComponent } from './components/image-showcase-section/image-showcase-section.component';
-import { ErrorStateComponent } from '../../components/error-state/error-state.component';
-import { LoadState } from '../../components/error-state/load-state';
+import { FallbackPanelComponent } from '../../components/fallback-panel/fallback-panel.component';
+import { LoadState } from '../../components/fallback-panel/load-state';
 
 @Component({
 	selector: 'app-gallery-showcase-page',
@@ -25,7 +25,7 @@ import { LoadState } from '../../components/error-state/load-state';
 		BackButtonComponent,
 		MatPaginator,
 		ImageShowcaseSectionComponent,
-		ErrorStateComponent
+		FallbackPanelComponent
 	]
 })
 export class GalleryShowcasePageComponent {

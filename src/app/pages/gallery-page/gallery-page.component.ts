@@ -4,8 +4,8 @@ import { IGalleryCardSelection } from 'src/app/interfaces/gallery-card-selection
 import { GalleryProviderService } from 'src/app/services/gallery-provider.service';
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
 import { CardSelectionSectionComponent } from '../../components/card-selection-section/card-selection-section.component';
-import { ErrorStateComponent } from '../../components/error-state/error-state.component';
-import { LoadState } from '../../components/error-state/load-state';
+import { FallbackPanelComponent } from '../../components/fallback-panel/fallback-panel.component';
+import { LoadState } from '../../components/fallback-panel/load-state';
 
 @Component({
 	selector: 'app-page-gallery',
@@ -14,7 +14,7 @@ import { LoadState } from '../../components/error-state/load-state';
 	imports: [
 		BackgroundImageCardComponent,
 		CardSelectionSectionComponent,
-		ErrorStateComponent
+		FallbackPanelComponent
 	]
 })
 export class GalleryPageComponent {

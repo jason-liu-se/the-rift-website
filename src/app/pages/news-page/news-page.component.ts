@@ -10,8 +10,8 @@ import { NewsPostProviderService } from 'src/app/services/news-post-provider.ser
 import { PaginatorIntlService } from 'src/app/services/paginator-intl.service';
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
 import { NewsDisplayComponent } from '../../components/news/news-display/news-display.component';
-import { ErrorStateComponent } from '../../components/error-state/error-state.component';
-import { LoadState } from '../../components/error-state/load-state';
+import { FallbackPanelComponent } from '../../components/fallback-panel/fallback-panel.component';
+import { LoadState } from '../../components/fallback-panel/load-state';
 
 @Component({
 	selector: 'app-page-news',
@@ -22,7 +22,7 @@ import { LoadState } from '../../components/error-state/load-state';
 		BackgroundImageCardComponent,
 		MatPaginator,
 		NewsDisplayComponent,
-		ErrorStateComponent
+		FallbackPanelComponent
 	]
 })
 export class NewsPageComponent {

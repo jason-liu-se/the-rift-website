@@ -4,8 +4,8 @@ import { Component, inject } from '@angular/core';
 import { DownloadCollection } from 'src/app/interfaces/api-responses';
 import { SectionCardComponent } from '../../components/section-card/section-card.component';
 import { DownloadCardComponent } from '../../components/download-card/download-card.component';
-import { ErrorStateComponent } from '../../components/error-state/error-state.component';
-import { LoadState } from '../../components/error-state/load-state';
+import { FallbackPanelComponent } from '../../components/fallback-panel/fallback-panel.component';
+import { LoadState } from '../../components/fallback-panel/load-state';
 
 @Component({
 	selector: 'app-downloads-page',
@@ -15,7 +15,7 @@ import { LoadState } from '../../components/error-state/load-state';
 		BackgroundImageCardComponent,
 		SectionCardComponent,
 		DownloadCardComponent,
-		ErrorStateComponent
+		FallbackPanelComponent
 	]
 })
 export class DownloadsPageComponent {

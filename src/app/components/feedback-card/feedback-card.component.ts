@@ -11,9 +11,9 @@ import { FeedbackVariant, feedbackRole } from './feedback-variant';
  * submit) to move the user there. Doing both reads it out twice.
  */
 @Component({
-	selector: 'app-error-card',
-	templateUrl: './error-card.component.html',
-	styleUrl: './error-card.component.scss',
+	selector: 'app-feedback-card',
+	templateUrl: './feedback-card.component.html',
+	styleUrl: './feedback-card.component.scss',
 	host: {
 		tabindex: '-1',
 		'[class]': 'variant()',
@@ -22,7 +22,7 @@ import { FeedbackVariant, feedbackRole } from './feedback-variant';
 		'[attr.title]': 'null'
 	}
 })
-export class ErrorCardComponent {
+export class FeedbackCardComponent {
 	public readonly variant = input<FeedbackVariant>('error');
 	public readonly title = input.required<string>();
 	/** A Material Icons ligature, e.g. `error`; leave out for a text-only card. */

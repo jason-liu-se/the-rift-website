@@ -10,9 +10,9 @@
 		<h1 class="heading">Log in to The Rift admin</h1>
 		<p class="intro">Editors log in with their Discord account.</p>
 		@if (errorMessage) {
-			<app-error-card title="Couldn't log you in">
+			<app-feedback-card title="Couldn't log you in">
 				{{ errorMessage }}
-			</app-error-card>
+			</app-feedback-card>
 		}
 		<a
 			mat-flat-button

@@ -1,4 +1,4 @@
-/** The kinds of feedback an error card shows. */
+/** The kinds of feedback a feedback card shows. */
 export type FeedbackVariant = 'error' | 'warning' | 'success';
 
 /**

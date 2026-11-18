@@ -7,13 +7,13 @@
 		[desc]="'Check out what\'s going on with The Rift'"
 	></app-background-image-card>
 	@if (loadState.failed()) {
-		<app-error-state
+		<app-fallback-panel
 			heading="Couldn't load the news"
 			[busy]="loadState.retrying()"
 			(action)="populateNewsPosts()"
 		>
 			The server didn't answer. Check your connection and try again.
-		</app-error-state>
+		</app-fallback-panel>
 	} @else {
 		<div class="paginated-news-display-container">
 			<mat-paginator

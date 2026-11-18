@@ -119,14 +119,16 @@ describe('NewsPageComponent', () => {
 				.flush(null, { status: 500, statusText: 'Server Error' });
 			fixture.detectChanges();
 		};
-		const errorState = () => element.querySelector('app-error-state');
+		const fallbackPanel = () => element.querySelector('app-fallback-panel');
 		const retryButton = () =>
-			element.querySelector<HTMLButtonElement>('app-error-state button')!;
+			element.querySelector<HTMLButtonElement>(
+				'app-fallback-panel button'
+			)!;
 
 		it('shows an error state in place of the news and paginators', () => {
 			failPage(0);
 
-			expect(errorState()?.querySelector('h2')?.textContent).toBe(
+			expect(fallbackPanel()?.querySelector('h2')?.textContent).toBe(
 				"Couldn't load the news"
 			);
 			expect(element.querySelector('mat-paginator')).toBeNull();
@@ -140,7 +142,7 @@ describe('NewsPageComponent', () => {
 			expect(retryButton().getAttribute('aria-disabled')).toBe('true');
 
 			flushPage(0, FIRST_PAGE);
-			expect(errorState()).toBeNull();
+			expect(fallbackPanel()).toBeNull();
 			expect(titles()).toEqual(['Launch', 'Patch']);
 		});
 
@@ -151,7 +153,7 @@ describe('NewsPageComponent', () => {
 
 			failPage(0);
 
-			expect(errorState()).not.toBeNull();
+			expect(fallbackPanel()).not.toBeNull();
 			expect(retryButton().hasAttribute('aria-disabled')).toBe(false);
 		});
 
@@ -175,7 +177,7 @@ describe('NewsPageComponent', () => {
 
 			stale.flush(null, { status: 500, statusText: 'Server Error' });
 			fixture.detectChanges();
-			expect(errorState()).toBeNull();
+			expect(fallbackPanel()).toBeNull();
 
 			latest.flush({ items: SECOND_PAGE, total: TOTAL });
 			fixture.detectChanges();
@@ -189,7 +191,7 @@ describe('NewsPageComponent', () => {
 
 			failPage(PAGE_SIZE);
 
-			expect(errorState()).toBeNull();
+			expect(fallbackPanel()).toBeNull();
 			expect(titles()).toEqual(['Launch', 'Patch']);
 		});
 	});

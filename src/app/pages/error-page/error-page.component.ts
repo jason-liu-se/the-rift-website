@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { ErrorStateComponent } from '../../components/error-state/error-state.component';
+import { FallbackPanelComponent } from '../../components/fallback-panel/fallback-panel.component';
 
 @Component({
 	selector: 'app-error-page',
 	templateUrl: './error-page.component.html',
 	styleUrls: ['./error-page.component.scss'],
-	imports: [ErrorStateComponent]
+	imports: [FallbackPanelComponent]
 })
 export class ErrorPageComponent {}
