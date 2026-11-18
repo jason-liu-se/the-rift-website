@@ -4,6 +4,9 @@ Copy this, fill in every field (write "none" rather than deleting one), and pass
 it as the `implementer` agent's prompt. Check every path exists first.
 
 ```markdown
+Plan of record: <link to the plan comment>. It wins over this brief if they
+differ; re-read it before changing anything shared.
+
 ## Task
 
 <Issue #n: title, link.> <One paragraph: the outcome, in user terms.>

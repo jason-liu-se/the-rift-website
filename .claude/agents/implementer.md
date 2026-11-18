@@ -33,8 +33,9 @@ you don't own), stop and report back instead of working around it.
 
 - Edit only the files you own. Shared files the brief marks append-only (e.g.
   `app.routes.ts`) get additions only, no reordering or reformatting.
-- Implement the shared contract exactly as written; if it needs to change, stop
-  and report.
+- Implement the shared contract exactly as the plan of record (linked in the
+  brief) states it; if it needs to change, stop and report. Only the
+  orchestrator edits the plan.
 - Write tests with the code (`.claude/rules/testing.md`).
 
 ## 3. Verify

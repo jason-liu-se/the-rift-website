@@ -12,15 +12,17 @@ agents write the code. Keep your own context for decisions, not file dumps.
 
 ## 1. Intake
 
-1. Read every linked issue in full with comments
+1. Look for an existing plan of record (section 5) on the issue; if there is
+   one, resume from it instead of re-planning.
+2. Read every linked issue in full with comments
    (`gh issue view <n> --comments`), its sub-issues
    (`gh api repos/{owner}/{repo}/issues/<n>/sub_issues`), and any linked PRs.
-2. Rate each issue as a plan:
+3. Rate each issue as a plan:
     - **Ready**: concrete scope, acceptance criteria, and no open design
       choices. Use it as the plan.
     - **Partial**: clear goal, open details. Draft the missing parts.
     - **Vague**: a list of ideas. Draft a plan with scope cuts.
-3. Read the code each task touches, enough to name real files. Check every path
+4. Read the code each task touches, enough to name real files. Check every path
    you'll put in a brief exists.
 
 ## 2. Decide how much human attention each task needs
@@ -84,11 +86,27 @@ High-tier plans always need the user's approval.
 - Assign each agent unique e2e ports: `E2E_PORT=43<k>0`,
   `DEV_PUBLIC_API_URL=http://localhost:41<k>0` for agent `k`.
 
-## 5. Brief and launch
+## 5. Record the plan, then launch
 
-Fill in [brief-template.md](brief-template.md) for each task and launch the
-`implementer` agents in one message, in the background. Don't poll; you're
-notified when each finishes.
+Nothing you decide may live only in your context or an agent's prompt.
+
+1. Post the **plan of record** as one comment on the issue (for work spanning
+   several issues, on a new tracking issue that links them), starting with
+   `<!-- orchestration-plan -->` so it can be found again:
+    - tasks with their branch, base, tier, and owned files
+    - shared contracts, written exactly
+    - order and merge order
+    - decisions, marked as the user's or your assumptions
+    - a checklist of tasks, filled in with each PR link
+2. Fill in [brief-template.md](brief-template.md) for each task, linking the
+   plan comment, and launch the `implementer` agents in one message, in the
+   background. Don't poll; you're notified when each finishes.
+3. Keep the comment current (`gh api -X PATCH` on the comment): contract
+   changes, new decisions, PR links, merges. If a contract changes, update the
+   comment before telling any agent.
+
+Decisions that outlive the work (a new shared pattern, a convention) go into
+`.claude/docs/` or code comments in the PR that introduces them.
 
 ## 6. Review
 
@@ -102,8 +120,8 @@ For each finished agent:
 ## 7. Integrate
 
 - Merge order: the contract owner first, then dependants in dependency order.
-  Each later branch rebases onto the new base and resolves conflicts there, with
-  both briefs in hand so it keeps both sides' intent.
+  Each later branch rebases onto the new base and resolves conflicts there,
+  using the plan of record and both PRs to keep both sides' intent.
 - Before the first merge, rehearse: merge all branches into a scratch branch,
   run the checks (and the e2e the highest tier needs), then delete it. Work that
   only becomes possible once both land (e.g. adopting a new shared component)
@@ -112,7 +130,7 @@ For each finished agent:
 
 ## 8. Report
 
-A table per task: PR link, tier, the agent's confidence, checks (ran / not run),
-review findings left open. Then decisions made on the user's behalf, follow-ups,
-and anything about this process that went wrong (fix this skill if it caused
-it).
+Link the plan comment, then a table per task: PR link, tier, the agent's
+confidence, checks (ran / not run), review findings left open. Then decisions
+made on the user's behalf, follow-ups, and anything about this process that went
+wrong (fix this skill if it caused it).
