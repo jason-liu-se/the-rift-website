@@ -5,8 +5,8 @@ import { MapProviderService } from 'src/app/services/map-provider.service';
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
 import { CardSelectionSectionComponent } from '../../components/card-selection-section/card-selection-section.component';
 import { SectionCardComponent } from '../../components/section-card/section-card.component';
-import { ErrorStateComponent } from '../../components/error-state/error-state.component';
-import { LoadState } from '../../components/error-state/load-state';
+import { FallbackPanelComponent } from '../../components/fallback-panel/fallback-panel.component';
+import { LoadState } from '../../components/fallback-panel/load-state';
 
 interface ISeasonCards {
 	title: string;
@@ -41,7 +41,7 @@ function toSeasonCards({ season, dimensions }: MapSeason): ISeasonCards {
 		BackgroundImageCardComponent,
 		CardSelectionSectionComponent,
 		SectionCardComponent,
-		ErrorStateComponent
+		FallbackPanelComponent
 	]
 })
 export class MapPageComponent {

@@ -1,16 +1,16 @@
 import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-import { ErrorCardComponent } from './error-card.component';
+import { FeedbackCardComponent } from './feedback-card.component';
 import { FeedbackVariant } from './feedback-variant';
 
 @Component({
-	imports: [ErrorCardComponent],
-	template: `<app-error-card
+	imports: [FeedbackCardComponent],
+	template: `<app-feedback-card
 		title="Couldn't save"
 		[variant]="variant()"
 		[icon]="icon()"
-		>Check your connection.</app-error-card
+		>Check your connection.</app-feedback-card
 	>`
 })
 class HostComponent {
@@ -18,7 +18,7 @@ class HostComponent {
 	public readonly icon = signal<string | undefined>(undefined);
 }
 
-describe('ErrorCardComponent', () => {
+describe('FeedbackCardComponent', () => {
 	function render(
 		variant: FeedbackVariant = 'error',
 		icon?: string
@@ -27,7 +27,7 @@ describe('ErrorCardComponent', () => {
 		fixture.componentInstance.variant.set(variant);
 		fixture.componentInstance.icon.set(icon);
 		fixture.detectChanges();
-		return fixture.nativeElement.querySelector('app-error-card');
+		return fixture.nativeElement.querySelector('app-feedback-card');
 	}
 
 	it('shows the title and the projected message', () => {
@@ -53,7 +53,7 @@ describe('ErrorCardComponent', () => {
 
 	it('defaults to the error variant', () => {
 		TestBed.configureTestingModule({});
-		const fixture = TestBed.createComponent(ErrorCardComponent);
+		const fixture = TestBed.createComponent(FeedbackCardComponent);
 		fixture.componentRef.setInput('title', 'Failed');
 		fixture.detectChanges();
 

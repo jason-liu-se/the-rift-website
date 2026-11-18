@@ -2,7 +2,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID, inject, signal } from '@angular/core';
 
 /**
- * Whether a page's API request failed, for showing `app-error-state` in place
+ * Whether a page's API request failed, for showing `app-fallback-panel` in place
  * of its content. Create it in an injection context (a field initializer).
  *
  * Failures are only shown in the browser. A failed or timed-out request

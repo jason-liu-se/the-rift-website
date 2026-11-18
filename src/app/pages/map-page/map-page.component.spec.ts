@@ -70,18 +70,18 @@ describe('MapPageComponent', () => {
 			.flush(null, { status: 503, statusText: 'Unavailable' });
 		fixture.detectChanges();
 
-		expect(element.querySelector('app-error-state h2')?.textContent).toBe(
-			"Couldn't load the maps"
-		);
+		expect(
+			element.querySelector('app-fallback-panel h2')?.textContent
+		).toBe("Couldn't load the maps");
 
 		element
-			.querySelector<HTMLButtonElement>('app-error-state button')!
+			.querySelector<HTMLButtonElement>('app-fallback-panel button')!
 			.click();
 		fixture.detectChanges();
 		httpTesting.expectOne(url).flush(MAP_SEASONS);
 		fixture.detectChanges();
 
-		expect(element.querySelector('app-error-state')).toBeNull();
+		expect(element.querySelector('app-fallback-panel')).toBeNull();
 		expect(element.querySelectorAll('app-section-card')).toHaveLength(1);
 	});
 });

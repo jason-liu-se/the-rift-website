@@ -98,19 +98,19 @@ describe('DownloadsPageComponent', () => {
 			.flush(null, { status: 500, statusText: 'Server Error' });
 		fixture.detectChanges();
 
-		expect(element.querySelector('app-error-state h2')?.textContent).toBe(
-			"Couldn't load the downloads"
-		);
+		expect(
+			element.querySelector('app-fallback-panel h2')?.textContent
+		).toBe("Couldn't load the downloads");
 		expect(element.querySelector('app-section-card')).toBeNull();
 
 		element
-			.querySelector<HTMLButtonElement>('app-error-state button')!
+			.querySelector<HTMLButtonElement>('app-fallback-panel button')!
 			.click();
 		fixture.detectChanges();
 		httpTesting.expectOne(url).flush(COLLECTIONS);
 		fixture.detectChanges();
 
-		expect(element.querySelector('app-error-state')).toBeNull();
+		expect(element.querySelector('app-fallback-panel')).toBeNull();
 		expect(element.querySelectorAll('app-section-card')).toHaveLength(
 			COLLECTIONS.length
 		);

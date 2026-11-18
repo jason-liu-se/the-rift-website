@@ -159,7 +159,7 @@ describe('GalleryShowcasePageComponent', () => {
 
 			stale.flush(null, { status: 500, statusText: 'Server Error' });
 			fixture.detectChanges();
-			expect(element.querySelector('app-error-state')).toBeNull();
+			expect(element.querySelector('app-fallback-panel')).toBeNull();
 
 			latest.flush({ items: SECOND_PAGE, total: TOTAL });
 			fixture.detectChanges();
@@ -196,21 +196,21 @@ describe('GalleryShowcasePageComponent', () => {
 			.flush(null, { status: 500, statusText: 'Server Error' });
 		fixture.detectChanges();
 
-		expect(element.querySelector('app-error-state h2')?.textContent).toBe(
-			"Couldn't load these photos"
-		);
+		expect(
+			element.querySelector('app-fallback-panel h2')?.textContent
+		).toBe("Couldn't load these photos");
 		expect(element.querySelector('mat-paginator')).toBeNull();
 		expect(element.querySelector('.back-button')).not.toBeNull();
 
 		element
-			.querySelector<HTMLButtonElement>('app-error-state button')!
+			.querySelector<HTMLButtonElement>('app-fallback-panel button')!
 			.click();
 		httpTesting
 			.expectOne(pageUrl('season-5', 0))
 			.flush({ items: FIRST_PAGE, total: TOTAL });
 		fixture.detectChanges();
 
-		expect(element.querySelector('app-error-state')).toBeNull();
+		expect(element.querySelector('app-fallback-panel')).toBeNull();
 		expect(captions()).toEqual(['One', 'Two']);
 	});
 

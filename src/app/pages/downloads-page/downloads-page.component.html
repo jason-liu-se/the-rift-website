@@ -6,13 +6,13 @@
 		[desc]="'Check out the previous Rift seasons'"
 	></app-background-image-card>
 	@if (loadState.failed()) {
-		<app-error-state
+		<app-fallback-panel
 			heading="Couldn't load the downloads"
 			[busy]="loadState.retrying()"
 			(action)="loadDownloadCollections()"
 		>
 			The server didn't answer. Check your connection and try again.
-		</app-error-state>
+		</app-fallback-panel>
 	} @else {
 		<div class="downloads-container">
 			@for (collection of downloadCollections; track collection) {

@@ -12,13 +12,13 @@
 			}
 		</div>
 		@if (loadState.failed()) {
-			<app-error-state
+			<app-fallback-panel
 				heading="Couldn't load these photos"
 				[busy]="loadState.retrying()"
 				(action)="populateCaptionedImages()"
 			>
 				The server didn't answer. Check your connection and try again.
-			</app-error-state>
+			</app-fallback-panel>
 		} @else {
 			<mat-paginator
 				#paginator

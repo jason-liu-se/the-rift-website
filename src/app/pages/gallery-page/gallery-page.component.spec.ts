@@ -73,18 +73,18 @@ describe('GalleryPageComponent', () => {
 		httpTesting.expectOne(`${galleryUrl}/season-6/count`);
 		fixture.detectChanges();
 
-		expect(element.querySelector('app-error-state h2')?.textContent).toBe(
-			"Couldn't load the gallery"
-		);
+		expect(
+			element.querySelector('app-fallback-panel h2')?.textContent
+		).toBe("Couldn't load the gallery");
 		expect(element.querySelector('.collection-card')).toBeNull();
 
 		element
-			.querySelector<HTMLButtonElement>('app-error-state button')!
+			.querySelector<HTMLButtonElement>('app-fallback-panel button')!
 			.click();
 		fixture.detectChanges();
 		flushCounts(3, 4);
 
-		expect(element.querySelector('app-error-state')).toBeNull();
+		expect(element.querySelector('app-fallback-panel')).toBeNull();
 		expect(descriptions()).toEqual(['3 photos', '4 photos']);
 	});
 });

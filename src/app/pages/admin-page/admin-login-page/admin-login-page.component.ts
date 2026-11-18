@@ -3,7 +3,7 @@ import { MatButton } from '@angular/material/button';
 import { ActivatedRoute } from '@angular/router';
 import { LoginErrorCode } from 'src/app/interfaces/api-responses';
 import { AuthService } from 'src/app/services/auth.service';
-import { ErrorCardComponent } from 'src/app/components/error-card/error-card.component';
+import { FeedbackCardComponent } from 'src/app/components/feedback-card/feedback-card.component';
 
 const LOGIN_ERROR_MESSAGES: Record<LoginErrorCode, string> = {
 	'access-denied': 'Login was cancelled on Discord.',
@@ -21,7 +21,7 @@ const UNKNOWN_ERROR_MESSAGE = 'Login failed. Try again.';
 	selector: 'app-admin-login-page',
 	templateUrl: './admin-login-page.component.html',
 	styleUrls: ['./admin-login-page.component.scss'],
-	imports: [ErrorCardComponent, MatButton]
+	imports: [FeedbackCardComponent, MatButton]
 })
 export class AdminLoginPageComponent {
 	public readonly loginUrl = inject(AuthService).loginUrl;

@@ -26,14 +26,14 @@ export const RETRY_FAILED_MESSAGE =
  * <main>.
  */
 @Component({
-	selector: 'app-error-state',
+	selector: 'app-fallback-panel',
 	imports: [RouterLink],
-	templateUrl: './error-state.component.html',
-	styleUrl: './error-state.component.scss'
+	templateUrl: './fallback-panel.component.html',
+	styleUrl: './fallback-panel.component.scss'
 })
-export class ErrorStateComponent {
+export class FallbackPanelComponent {
 	public readonly heading = input.required<string>();
-	/** 1 when the error state is the whole page; 2 under a page's own <h1>. */
+	/** 1 when the panel is the whole page; 2 under a page's own <h1>. */
 	public readonly headingLevel = input<1 | 2>(2);
 	public readonly actionLabel = input('Try again');
 	public readonly actionLink = input<string>();

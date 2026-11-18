@@ -6,19 +6,19 @@ import { Router, provideRouter } from '@angular/router';
 import { ANY_URL_ROUTES } from 'src/app/testing/render-component';
 import { FocusRecoveryService } from 'src/app/layout/page-template/focus-recovery.service';
 import {
-	ErrorStateComponent,
+	FallbackPanelComponent,
 	RETRY_FAILED_MESSAGE
-} from './error-state.component';
+} from './fallback-panel.component';
 
 @Component({
-	imports: [ErrorStateComponent],
-	template: `<app-error-state
+	imports: [FallbackPanelComponent],
+	template: `<app-fallback-panel
 		heading="Couldn't load the news"
 		[headingLevel]="headingLevel()"
 		[actionLink]="actionLink()"
 		[busy]="busy()"
 		(action)="actions = actions + 1"
-		>The server didn't answer.</app-error-state
+		>The server didn't answer.</app-fallback-panel
 	>`
 })
 class HostComponent {
@@ -28,7 +28,7 @@ class HostComponent {
 	public actions = 0;
 }
 
-describe('ErrorStateComponent', () => {
+describe('FallbackPanelComponent', () => {
 	beforeEach(() => {
 		TestBed.configureTestingModule({
 			providers: [provideRouter(ANY_URL_ROUTES)]
@@ -48,7 +48,7 @@ describe('ErrorStateComponent', () => {
 		attached = document.body.appendChild(fixture.nativeElement);
 		fixture.detectChanges();
 		const element: HTMLElement =
-			fixture.nativeElement.querySelector('app-error-state');
+			fixture.nativeElement.querySelector('app-fallback-panel');
 		return { fixture, host, element };
 	}
 
@@ -156,7 +156,7 @@ describe('ErrorStateComponent', () => {
 			expect(document.activeElement).toBe(document.body);
 		});
 
-		it('is recovered when the error state goes away', () => {
+		it('is recovered when the panel goes away', () => {
 			const recover = vi
 				.spyOn(focusRecovery, 'recoverAfterRender')
 				.mockImplementation(() => undefined);

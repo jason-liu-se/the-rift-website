@@ -1,4 +1,4 @@
-import { ErrorCardComponent } from 'src/app/components/error-card/error-card.component';
+import { FeedbackCardComponent } from 'src/app/components/feedback-card/feedback-card.component';
 import {
 	Component,
 	ElementRef,
@@ -45,7 +45,7 @@ export const ADMIN_TOOLS: readonly IAdminTool[] = [
 	templateUrl: './admin-page.component.html',
 	styleUrls: ['./admin-page.component.scss'],
 	imports: [
-		ErrorCardComponent,
+		FeedbackCardComponent,
 		MatButton,
 		MatIcon,
 		RouterLink,
