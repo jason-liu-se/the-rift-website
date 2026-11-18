@@ -13,32 +13,9 @@
 	color: $colour-dark-text;
 }
 
-.block {
-	width: clamp(6rem, 25vw, 8rem);
-	height: auto;
-}
-
-.edge {
-	fill: $colour-dark-background;
-}
-
-.light {
-	fill: $colour-light-grey;
-}
-
-.mid {
-	fill: $colour-soft-silver;
-}
-
-.shade {
-	fill: $colour-blue-grey;
-}
-
-.crack {
-	fill: $colour-dark-text;
-}
-
-.glow {
+.face {
+	width: auto;
+	height: clamp(5rem, 20vw, 6rem);
 	fill: $colour-primary;
 }
 
