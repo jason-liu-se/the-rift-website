@@ -9,7 +9,6 @@ $navbar-height: 3rem;
 
 .rift-navbar-wrapper {
 	position: fixed;
-	top: 0;
 	left: 0;
 	display: flex;
 	width: 100%;
@@ -32,13 +31,14 @@ $navbar-height: 3rem;
 	transition: background-color 0.1s ease;
 }
 
+// --banner-height: the banners fixed above the navbar (BannerComponent).
 .expand {
-	height: 100vh;
+	height: calc(100vh - var(--banner-height, 0px));
 }
 
 .always-visible {
 	position: fixed;
-	top: 0px;
+	top: var(--banner-height, 0px);
 	z-index: 10;
 }
 
