@@ -20,14 +20,16 @@ you don't own), stop and report back instead of working around it.
 
 ## 1. Set up
 
-1. Move to your branch: `git branch -m <branch>` (the worktree starts on a
-   temporary branch, from the orchestrator's `HEAD`). Check `git log -1` is on
-   the base branch's tip.
+1. Move to your branch: `git branch -m <branch>`, or `git switch -c <branch>` if
+   that fails (the worktree starts on a temporary branch, from the
+   orchestrator's `HEAD`). Check `git log -1` is on the base branch's tip.
 2. Install: `npm ci --prefer-offline --no-audit --no-fund` (this also generates
    `src/environments/`).
 3. `.env` is copied in automatically (`.worktreeinclude`). If it's missing, the
    production build needs CI's placeholder URLs; copy the `PROD_PUBLIC_*` values
    from `.github/workflows/ci.yml` into the shell for `npm run build`.
+4. Before any e2e run or screenshot: `npx playwright install chromium` (the
+   cached browser can be older than the installed Playwright).
 
 ## 2. Implement
 
@@ -62,7 +64,9 @@ Run all of these, fixing failures:
   commit attribution trailer from your instructions, if any.
 - `git push -u origin <branch>`, then
   `gh pr create --base <base> --title "<title>" --body-file <file>`. Open it as
-  a draft (`--draft`) when the tier is High or your confidence is Low.
+  a draft (`--draft`) when the tier is High or your confidence is Low. Other
+  agents share your scratchpad and git stash: name the body file after your
+  branch (`pr-body-28.md`), and never `git stash` without a unique message.
 - PR body:
 
     ```markdown

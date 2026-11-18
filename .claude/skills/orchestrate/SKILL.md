@@ -112,9 +112,14 @@ Decisions that outlive the work (a new shared pattern, a convention) go into
 For each finished agent:
 
 1. Read its report and PR. Run `code-reviewer` (and `a11y-auditor` for UI) on
-   the PR branch against its base, plus anything the tier adds.
+   the PR branch against its base, plus anything the tier adds. Point them at
+   the agent's worktree (its completion notice gives the path), and wait for
+   both before sending fixes, so the agent gets one list.
 2. Send fixes back to the same agent (`SendMessage`), which keeps its context,
-   rather than fixing them yourself. Fix only trivial issues directly.
+   rather than fixing them yourself. Fix only trivial issues directly. If a fix
+   needs files the task doesn't own, update ownership in the plan first.
+   Findings outside every task's files go into a follow-up issue.
+3. Before blaming a PR for an e2e failure, run the same spec on the base.
 
 ## 7. Integrate
 
