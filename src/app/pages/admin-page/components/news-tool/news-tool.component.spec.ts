@@ -10,5 +10,7 @@ describe('NewsToolComponent', () => {
 			'app-news-display .title'
 		);
 		expect(post?.textContent).toBe(fixture.componentInstance.preview.title);
+		// Sample data can't be tabbed into or used.
+		expect(post.closest('[inert]')).not.toBeNull();
 	});
 });

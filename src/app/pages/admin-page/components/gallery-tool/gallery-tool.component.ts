@@ -6,7 +6,7 @@ import { CaptionCardComponent } from '../../../../components/caption-card/captio
 @Component({
 	selector: 'app-gallery-tool',
 	templateUrl: './gallery-tool.component.html',
-	styleUrls: ['./gallery-tool.component.scss'],
+	styleUrls: ['../admin-tool.scss', './gallery-tool.component.scss'],
 	imports: [CaptionCardComponent]
 })
 export class GalleryToolComponent {

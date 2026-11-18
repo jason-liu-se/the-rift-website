@@ -6,6 +6,7 @@ import { DownloadCardComponent } from '../../../../components/download-card/down
 @Component({
 	selector: 'app-downloads-tool',
 	templateUrl: './downloads-tool.component.html',
+	styleUrls: ['../admin-tool.scss'],
 	imports: [DownloadCardComponent]
 })
 export class DownloadsToolComponent {

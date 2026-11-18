@@ -15,5 +15,7 @@ describe('GalleryToolComponent', () => {
 		expect(card.querySelector('.caption-text')?.textContent).toBe(
 			preview.caption
 		);
+		// Sample data can't be tabbed into or used.
+		expect(card.closest('[inert]')).not.toBeNull();
 	});
 });
