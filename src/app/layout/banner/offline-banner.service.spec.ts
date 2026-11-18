@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 
 import { BannerService } from './banner.service';
 import {
@@ -9,6 +10,10 @@ import {
 
 describe('OfflineBannerService', () => {
 	let banners: BannerService;
+
+	beforeEach(() =>
+		TestBed.configureTestingModule({ providers: [provideRouter([])] })
+	);
 
 	function watch(): void {
 		TestBed.inject(OfflineBannerService).watch();

@@ -1,18 +1,23 @@
-@for (banner of bannerService.banners(); track banner) {
-	<div
-		class="banner {{ banner.variant }}"
-		[attr.role]="feedbackRole(banner.variant)"
-	>
-		<p class="message">{{ banner.message }}</p>
-		<button
-			type="button"
-			class="dismiss"
-			aria-label="Dismiss"
-			(click)="bannerService.dismiss(banner.id)"
-		>
-			<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-				<path d="M3 3l10 10M13 3L3 13" />
-			</svg>
-		</button>
-	</div>
+@if (bannerService.banners().length > 0) {
+	<section class="banners" aria-label="Site notices">
+		@for (banner of bannerService.banners(); track banner.id) {
+			<div class="banner {{ banner.variant }}">
+				<p class="message">{{ banner.message }}</p>
+				<button
+					type="button"
+					class="dismiss"
+					[attr.aria-label]="'Dismiss: ' + banner.message"
+					(click)="dismiss(banner.id)"
+				>
+					<svg
+						viewBox="0 0 16 16"
+						aria-hidden="true"
+						focusable="false"
+					>
+						<path d="M3 3l10 10M13 3L3 13" />
+					</svg>
+				</button>
+			</div>
+		}
+	</section>
 }

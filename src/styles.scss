@@ -1,5 +1,6 @@
 @use "@angular/cdk";
 @use "./font-sizes" as *;
+@use "./app/layout/viewport" as *;
 
 @include cdk.a11y-visually-hidden();
 
@@ -27,6 +28,20 @@ body {
 html,
 body {
 	height: 100%;
+}
+
+// Keeps focused or linked-to content clear of the fixed banners and navbar
+// (their heights are published by BannerComponent and NavbarComponent).
+html {
+	scroll-padding-top: calc(
+		var(--banner-height, 0px) + var(--navbar-height, 0px)
+	);
+}
+
+@media #{$short-viewport} {
+	html {
+		scroll-padding-top: var(--navbar-height, 0px);
+	}
 }
 
 body {

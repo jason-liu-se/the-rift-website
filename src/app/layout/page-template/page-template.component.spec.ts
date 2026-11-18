@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, provideRouter } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
+import { stubResizeObserver } from '../testing/resize-observer';
 import {
 	CHUNK_RELOAD_KEY,
 	PageTemplateComponent
@@ -17,14 +18,7 @@ describe('PageTemplateComponent', () => {
 	let routeData: Record<string, unknown>;
 
 	beforeEach(() => {
-		// jsdom has no ResizeObserver, which the banner uses.
-		vi.stubGlobal(
-			'ResizeObserver',
-			class {
-				observe = vi.fn();
-				disconnect = vi.fn();
-			}
-		);
+		stubResizeObserver();
 		routeData = { loadComponent: () => Promise.resolve(StubPageComponent) };
 		TestBed.configureTestingModule({
 			imports: [PageTemplateComponent],
@@ -64,17 +58,6 @@ describe('PageTemplateComponent', () => {
 
 		expect(mainContent().querySelector('.stub-page')).not.toBeNull();
 	});
-
-	it.each([true, false])(
-		'renders the banners before the navbar (transparent: %s)',
-		async (isTransparent) => {
-			await render({ isTransparent });
-
-			const banner = element.querySelector('app-banner');
-			const navbar = element.querySelector('app-navbar')!;
-			expect(banner?.nextElementSibling).toBe(navbar);
-		}
-	);
 
 	it('shows a transparent navbar and the footer, without the contact section, by default', async () => {
 		await render();

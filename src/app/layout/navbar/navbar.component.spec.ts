@@ -11,7 +11,8 @@ import {
 	setInnerWidth,
 	useRootFontSize
 } from 'src/app/testing/viewport';
-import { NavbarComponent } from './navbar.component';
+import { stubResizeObserver } from '../testing/resize-observer';
+import { NAVBAR_HEIGHT_VARIABLE, NavbarComponent } from './navbar.component';
 
 describe('NavbarComponent', () => {
 	let fixture: ComponentFixture<NavbarComponent>;
@@ -32,7 +33,10 @@ describe('NavbarComponent', () => {
 		fixture.detectChanges();
 	};
 
+	let resize: () => void;
+
 	beforeEach(() => {
+		resize = stubResizeObserver();
 		TestBed.configureTestingModule({
 			imports: [NavbarComponent],
 			providers: [provideRouter(ANY_URL_ROUTES)]
@@ -41,7 +45,26 @@ describe('NavbarComponent', () => {
 		element = fixture.nativeElement;
 	});
 
-	afterEach(resetViewport);
+	afterEach(() => {
+		resetViewport();
+		vi.unstubAllGlobals();
+		document.documentElement.style.removeProperty(NAVBAR_HEIGHT_VARIABLE);
+	});
+
+	it('publishes its height for scroll padding and the banners', () => {
+		const wrapper = element.querySelector<HTMLElement>(
+			'.rift-navbar-wrapper'
+		)!;
+		vi.spyOn(wrapper, 'offsetHeight', 'get').mockReturnValue(64);
+
+		resize();
+
+		expect(
+			document.documentElement.style.getPropertyValue(
+				NAVBAR_HEIGHT_VARIABLE
+			)
+		).toBe('64px');
+	});
 
 	describe('transparent', () => {
 		it('is see-through with no spacer by default', () => {

@@ -1,5 +1,5 @@
 import { DOCUMENT } from '@angular/common';
-import { Injectable, inject } from '@angular/core';
+import { DestroyRef, Injectable, inject } from '@angular/core';
 import { BannerService } from './banner.service';
 
 export const CONNECTIVITY_BANNER_ID = 'connectivity';
@@ -12,6 +12,7 @@ export const BACK_ONLINE_MESSAGE = 'Back online.';
 export class OfflineBannerService {
 	private readonly banners = inject(BannerService);
 	private readonly window = inject(DOCUMENT).defaultView;
+	private readonly destroyRef = inject(DestroyRef);
 	private isWatching = false;
 
 	/** Starts listening; browser only (call from `afterNextRender`). Idempotent. */
@@ -21,14 +22,20 @@ export class OfflineBannerService {
 		}
 		this.isWatching = true;
 
-		this.window.addEventListener('offline', () => this.showOffline());
-		this.window.addEventListener('online', () =>
+		const window = this.window;
+		const onOffline = () => this.showOffline();
+		const onOnline = () =>
 			this.banners.show({
 				id: CONNECTIVITY_BANNER_ID,
 				variant: 'success',
 				message: BACK_ONLINE_MESSAGE
-			})
-		);
+			});
+		window.addEventListener('offline', onOffline);
+		window.addEventListener('online', onOnline);
+		this.destroyRef.onDestroy(() => {
+			window.removeEventListener('offline', onOffline);
+			window.removeEventListener('online', onOnline);
+		});
 		if (!this.window.navigator.onLine) {
 			this.showOffline();
 		}

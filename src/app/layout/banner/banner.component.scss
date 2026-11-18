@@ -1,4 +1,5 @@
 @use "../../components/error-card/feedback-variants" as *;
+@use "../viewport" as *;
 
 // Above the navbar (z-index 10), below full-screen overlays.
 :host {
@@ -7,6 +8,15 @@
 	left: 0;
 	z-index: 11;
 	width: 100%;
+}
+
+// Scrolls away under the navbar, in the space the page template leaves.
+@media #{$short-viewport} {
+	:host {
+		position: absolute;
+		top: var(--navbar-height, 0px);
+		z-index: 9;
+	}
 }
 
 .banner {

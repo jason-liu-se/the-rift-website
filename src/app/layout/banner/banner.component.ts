@@ -1,22 +1,17 @@
-import { DOCUMENT } from '@angular/common';
-import {
-	Component,
-	DestroyRef,
-	ElementRef,
-	afterNextRender,
-	inject
-} from '@angular/core';
-import { feedbackRole } from 'src/app/components/error-card/feedback-variant';
+import { Component, ElementRef, afterNextRender, inject } from '@angular/core';
+import { FocusRecoveryService } from '../page-template/focus-recovery.service';
+import { publishHeight } from '../publish-height';
 import { BannerService } from './banner.service';
 import { OfflineBannerService } from './offline-banner.service';
 
-/** CSS variable the navbar and page template offset themselves by. */
+/** CSS variable the navbar, page template and scroll padding offset by. */
 export const BANNER_HEIGHT_VARIABLE = '--banner-height';
 
 /**
- * Shows BannerService's banners, fixed above the navbar. Publishes its height
- * as `--banner-height` on <html>, so the fixed navbar sits below it and the
- * page is pushed down instead of covered.
+ * Shows BannerService's banners, fixed above the navbar, once for the whole
+ * app (outside the routed page template, so they aren't re-created and read
+ * out again on every navigation). BannerService announces them, so the
+ * banners themselves aren't live regions.
  */
 @Component({
 	selector: 'app-banner',
@@ -25,24 +20,18 @@ export const BANNER_HEIGHT_VARIABLE = '--banner-height';
 })
 export class BannerComponent {
 	protected readonly bannerService = inject(BannerService);
-	protected readonly feedbackRole = feedbackRole;
+	private readonly focusRecovery = inject(FocusRecoveryService);
 
 	constructor() {
 		const host: HTMLElement = inject(ElementRef).nativeElement;
-		const root = inject(DOCUMENT).documentElement;
 		const offlineBanner = inject(OfflineBannerService);
-		const destroyRef = inject(DestroyRef);
 
-		afterNextRender(() => {
-			offlineBanner.watch();
-			const observer = new ResizeObserver(() =>
-				root.style.setProperty(
-					BANNER_HEIGHT_VARIABLE,
-					`${host.offsetHeight}px`
-				)
-			);
-			observer.observe(host);
-			destroyRef.onDestroy(() => observer.disconnect());
-		});
+		publishHeight(BANNER_HEIGHT_VARIABLE, () => host);
+		afterNextRender(() => offlineBanner.watch());
+	}
+
+	protected dismiss(id: string): void {
+		this.bannerService.dismiss(id);
+		this.focusRecovery.recoverAfterRender();
 	}
 }
