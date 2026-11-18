@@ -26,7 +26,9 @@
 			"Bash(gh pr create:*)",
 			"Bash(npm ci:*)",
 			"Bash(npm run e2e:*)",
-			"Bash(npx playwright screenshot:*)"
+			"Bash(npx playwright screenshot:*)",
+			"Bash(gh issue comment:*)",
+			"Bash(gh api -X PATCH repos/jason-liu-se/the-rift-website/issues/comments/:*)"
 		],
 		"deny": [
 			"Bash(git push --force:*)",
