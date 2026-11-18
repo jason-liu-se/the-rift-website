@@ -1,6 +1,8 @@
-import { Component, inject } from '@angular/core';
-import { forkJoin } from 'rxjs';
-import { IGalleryCardSelection } from 'src/app/interfaces/gallery-card-selection.interface';
+import { Component, inject, signal } from '@angular/core';
+import { forkJoin, map, Observable, of, switchMap } from 'rxjs';
+import { GALLERY_FALLBACK_IMAGE } from 'src/app/config/gallery';
+import { ICardSelection } from 'src/app/interfaces/card-selection.interface';
+import { galleryCollectionTitle } from 'src/app/services/gallery-provider/gallery-collection-title';
 import { GalleryProviderService } from 'src/app/services/gallery-provider/gallery-provider.service';
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
 import { CardSelectionSectionComponent } from '../../components/card-selection-section/card-selection-section.component';
@@ -20,47 +22,51 @@ import { LoadState } from '../../components/fallback-panel/load-state';
 export class GalleryPageComponent {
 	private galleryProvider = inject(GalleryProviderService);
 
-	public galleryCollections: IGalleryCardSelection[] = [
-		{
-			imageUrl:
-				'../../../assets/general-background-images/season-5-circle.webp',
-			routerLink: '/gallery/season-5',
-			title: 'Season 5',
-			desc: '',
-			dbCollectionName: 'season-5'
-		},
-		{
-			imageUrl:
-				'../../../assets/general-background-images/magic-books-2.webp',
-			routerLink: '/gallery/season-6',
-			title: 'Season 6',
-			desc: '',
-			dbCollectionName: 'season-6'
-		}
-	];
+	/** Undefined until loaded, so "no collections" isn't shown while loading. */
+	protected readonly collectionCards = signal<ICardSelection[] | undefined>(
+		undefined
+	);
 	protected readonly loadState = new LoadState();
 
 	constructor() {
 		this.setGalleryCollections();
 	}
 
-	/** Loads every collection's photo count; one failure fails the page. */
+	/** Loads a card for every collection; one failure fails the page. */
 	public setGalleryCollections(): void {
 		this.loadState.start();
-		forkJoin(
-			this.galleryCollections.map((collection) =>
-				this.galleryProvider.getCollectionImageCountObservable(
-					collection.dbCollectionName
+		this.galleryProvider
+			.getCollectionNamesObservable()
+			.pipe(
+				switchMap((names) =>
+					// forkJoin([]) completes without emitting.
+					names.length
+						? forkJoin([...names].sort(bySeason).map(this.toCard))
+						: of<ICardSelection[]>([])
 				)
 			)
-		).subscribe({
-			next: (counts) => {
-				counts.forEach(({ total }, i) => {
-					this.galleryCollections[i].desc = `${total} photos`;
-				});
-				this.loadState.succeed();
-			},
-			error: () => this.loadState.fail()
-		});
+			.subscribe({
+				next: (cards) => {
+					this.collectionCards.set(cards);
+					this.loadState.succeed();
+				},
+				error: () => this.loadState.fail()
+			});
 	}
+
+	/** A collection's card, using its first photo and photo count. */
+	private toCard = (name: string): Observable<ICardSelection> =>
+		this.galleryProvider.getCollectionImagesObservable(name, 0, 1).pipe(
+			map(({ items, total }) => ({
+				imageUrl: items[0]?.url ?? GALLERY_FALLBACK_IMAGE,
+				routerLink: `/gallery/${encodeURIComponent(name)}`,
+				title: galleryCollectionTitle(name),
+				desc: `${total} photos`
+			}))
+		);
+}
+
+/** `season5` before `season10`, which a plain string sort gets wrong. */
+function bySeason(a: string, b: string): number {
+	return a.localeCompare(b, undefined, { numeric: true });
 }

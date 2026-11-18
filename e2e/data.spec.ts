@@ -35,10 +35,10 @@ test('the gallery shows how many photos each collection has', async ({
 });
 
 test("a gallery showcase shows its collection's total", async ({ page }) => {
-	await page.goto('/gallery/season-5');
+	await page.goto('/gallery/season5');
 
 	await expect(
-		page.getByText(`Results: ${GALLERY_COLLECTIONS['season-5'].length}`)
+		page.getByText(`Results: ${GALLERY_COLLECTIONS['season5'].length}`)
 	).toBeVisible();
 });
 
