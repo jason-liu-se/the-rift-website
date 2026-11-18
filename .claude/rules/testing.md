@@ -26,13 +26,13 @@ zone.js:
 
 Specs in `e2e/` run every route on desktop and mobile in Chromium.
 
-| Spec                    | Checks                                                          |
-| ----------------------- | --------------------------------------------------------------- |
-| `accessibility.spec.ts` | axe scan for WCAG 2.2 A/AA                                      |
-| `keyboard.spec.ts`      | Tab order, visible focus, focus on navigation                   |
-| `responsive.spec.ts`    | No horizontal scroll at narrow widths / 200% zoom               |
-| `data.spec.ts`          | API data appears on screen                                      |
-| `error-states.spec.ts`  | Error state and retry, 404 page, offline banner (layout, focus) |
+| Spec                    | Checks                                            |
+| ----------------------- | ------------------------------------------------- |
+| `accessibility.spec.ts` | axe scan for WCAG 2.2 A/AA                        |
+| `keyboard.spec.ts`      | Tab order, visible focus, focus on navigation     |
+| `responsive.spec.ts`    | No horizontal scroll at narrow widths / 200% zoom |
+| `data.spec.ts`          | API data appears on screen                        |
+| `error-states.spec.ts`  | Error state and retry (focus), 404 page           |
 
 **Mocks.** No API or BlueMap is needed:
 
