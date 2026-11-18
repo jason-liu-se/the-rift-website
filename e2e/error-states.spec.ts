@@ -16,6 +16,9 @@ async function clickNavLink(page: Page, name: string): Promise<void> {
 	await page.locator('nav').getByRole('link', { name, exact: true }).click();
 }
 
+const focusedTag = (page: Page) =>
+	page.evaluate(() => document.activeElement?.tagName);
+
 test('a data page that fails to load shows an error state, and Try again loads it', async ({
 	page
 }) => {
@@ -25,18 +28,23 @@ test('a data page that fails to load shows an error state, and Try again loads i
 	const restoreApi = await failApiRequests(page, '/news');
 	await clickNavLink(page, 'News');
 
-	const errorState = page.getByRole('alert');
+	const errorState = page.locator('app-error-state');
 	await expect(
-		errorState.getByRole('heading', { name: "Couldn't load the news" })
+		page
+			.getByRole('alert')
+			.getByRole('heading', { name: "Couldn't load the news" })
 	).toBeVisible();
 
 	await restoreApi();
-	await errorState.getByRole('button', { name: 'Try again' }).click();
+	await errorState.getByRole('button', { name: 'Try again' }).focus();
+	await page.keyboard.press('Enter');
 
 	await expect(
 		page.getByText(NEWS_POSTS[0].title, { exact: true })
 	).toBeVisible();
 	await expect(errorState).toHaveCount(0);
+	// The button went away with the error state; focus mustn't fall to <body>.
+	await expect.poll(() => focusedTag(page)).not.toBe('BODY');
 });
 
 test('the 404 page says so and links home', async ({ page }) => {
@@ -62,15 +70,20 @@ test('going offline shows a banner above the navbar, without covering the page',
 	const banner = page.locator('app-banner .banner');
 	await expect(banner).toHaveText(/You're offline/);
 	const bannerBox = (await banner.boundingBox())!;
+	const bannerBottom = bannerBox.y + bannerBox.height;
 	await expect
 		.poll(async () => (await navbar.boundingBox())!.y)
 		.toBe(navbarTopOnline + bannerBox.height);
+	const contentTop = (await page.locator('main').boundingBox())!.y;
+	expect(contentTop).toBeGreaterThanOrEqual(bannerBottom);
 
 	await page.context().setOffline(false);
 	await expect(banner).toHaveText(/Back online/);
 
-	await banner.getByRole('button', { name: 'Dismiss' }).click();
+	await banner.getByRole('button', { name: 'Dismiss: Back online.' }).focus();
+	await page.keyboard.press('Enter');
 	await expect(banner).toHaveCount(0);
+	await expect.poll(() => focusedTag(page)).not.toBe('BODY');
 	await expect
 		.poll(async () => (await navbar.boundingBox())!.y)
 		.toBe(navbarTopOnline);
