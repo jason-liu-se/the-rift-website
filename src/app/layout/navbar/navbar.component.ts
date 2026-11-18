@@ -6,7 +6,7 @@ import { LOGO_PATH } from 'src/app/config/site';
 import { isDesktopWidth } from 'src/app/utilities/viewport.util';
 import { publishHeight } from '../publish-height';
 
-/** CSS variable for `scroll-padding-top` and the short-viewport banners. */
+/** CSS variable for `scroll-padding-top`, so focus isn't hidden under the navbar. */
 export const NAVBAR_HEIGHT_VARIABLE = '--navbar-height';
 
 @Component({

@@ -18,7 +18,6 @@ import { PageTemplateDirective } from 'src/app/directives/page-template.directiv
 import { NavbarComponent } from '../navbar/navbar.component';
 import { ContactComponent } from '../../components/contact/contact.component';
 import { FooterComponent } from '../footer/footer.component';
-import { OfflineBannerService } from '../banner/offline-banner.service';
 
 /** sessionStorage key set while reloading after a page chunk failed to load. */
 export const CHUNK_RELOAD_KEY = 'reloaded-after-chunk-error';
@@ -41,7 +40,6 @@ export class PageTemplateComponent implements OnInit {
 	private pendingTasks = inject(PendingTasks);
 	private document = inject(DOCUMENT);
 	private injector = inject(Injector);
-	private connectivity = inject(OfflineBannerService);
 	// Read now: by the time the page has loaded, the first navigation has ended.
 	private isInAppNavigation = this.router.navigated;
 	private storage = isPlatformBrowser(inject(PLATFORM_ID))
@@ -111,8 +109,6 @@ export class PageTemplateComponent implements OnInit {
 	 * Loads the page component. A tab opened before a deploy asks for chunk
 	 * files that no longer exist, so on failure the page reloads once to get the
 	 * new build (returning null); a second failure in a row is a real error.
-	 * Offline, a reload would only show the browser's error page, so it warns
-	 * and leaves the current page empty instead.
 	 */
 	private async loadPage(): Promise<Type<unknown> | null> {
 		const loadComponent: () => Promise<Type<unknown>> =
@@ -124,9 +120,6 @@ export class PageTemplateComponent implements OnInit {
 		} catch (error) {
 			if (!this.storage || this.storage.getItem(CHUNK_RELOAD_KEY)) {
 				throw error;
-			}
-			if (!(await this.connectivity.checkConnection())) {
-				return null;
 			}
 			this.storage.setItem(CHUNK_RELOAD_KEY, 'true');
 			this.document.location.reload();

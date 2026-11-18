@@ -3,8 +3,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, provideRouter } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
-import { BannerService } from '../banner/banner.service';
-import { CONNECTIVITY_BANNER_ID } from '../banner/offline-banner.service';
 import { stubResizeObserver } from '../testing/resize-observer';
 import {
 	CHUNK_RELOAD_KEY,
@@ -147,28 +145,12 @@ describe('PageTemplateComponent', () => {
 		});
 
 		it('reloads once when the page fails to load', async () => {
-			vi.stubGlobal('fetch', () => Promise.resolve(new Response()));
 			// jsdom can't navigate or spy on location.reload(), so this checks the
 			// marker set just before reloading and that nothing was rendered.
 			await render({ loadComponent: failedLoad });
 
 			expect(sessionStorage.getItem(CHUNK_RELOAD_KEY)).toBe('true');
 			expect(mainContent().children).toHaveLength(0);
-		});
-
-		it('warns instead of reloading when the page failed to load offline', async () => {
-			vi.stubGlobal('fetch', () =>
-				Promise.reject(new TypeError('Failed to fetch'))
-			);
-
-			await render({ loadComponent: failedLoad });
-
-			expect(sessionStorage.getItem(CHUNK_RELOAD_KEY)).toBeNull();
-			expect(
-				TestBed.inject(BannerService)
-					.banners()
-					.map(({ id, variant }) => ({ id, variant }))
-			).toEqual([{ id: CONNECTIVITY_BANNER_ID, variant: 'warning' }]);
 		});
 
 		it('fails without reloading again when the reload did not help', async () => {

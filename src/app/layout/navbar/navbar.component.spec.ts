@@ -51,7 +51,7 @@ describe('NavbarComponent', () => {
 		document.documentElement.style.removeProperty(NAVBAR_HEIGHT_VARIABLE);
 	});
 
-	it('publishes its height for scroll padding and the banners', () => {
+	it('publishes its height for scroll padding', () => {
 		const wrapper = element.querySelector<HTMLElement>(
 			'.rift-navbar-wrapper'
 		)!;

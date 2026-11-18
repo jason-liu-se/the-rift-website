@@ -15,7 +15,6 @@ import {
 } from '@angular/router';
 
 import { routes } from './app.routes';
-import { connectivityInterceptor } from './layout/banner/connectivity.interceptor';
 import { SeoTitleStrategy } from './seo/seo-title-strategy';
 import { authRefreshInterceptor } from './services/auth-refresh.interceptor';
 import { serverApiTimeoutInterceptor } from './services/server-api-timeout.interceptor';
@@ -39,8 +38,7 @@ export const appConfig: ApplicationConfig = {
 			withFetch(),
 			withInterceptors([
 				serverApiTimeoutInterceptor,
-				authRefreshInterceptor,
-				connectivityInterceptor
+				authRefreshInterceptor
 			])
 		),
 		// Reuses the server-rendered HTML (and the API responses it fetched)

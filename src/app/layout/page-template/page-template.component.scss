@@ -1,11 +1,7 @@
-// Pushed down by the banners' height (set by BannerComponent), so the fixed
-// banners never cover the page.
 .page-template {
 	display: flex;
 	flex-direction: column;
-	box-sizing: border-box;
 	min-height: 100vh;
-	padding-top: var(--banner-height, 0px);
 }
 
 .template {

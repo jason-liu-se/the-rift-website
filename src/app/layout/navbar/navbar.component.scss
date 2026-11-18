@@ -1,5 +1,4 @@
 @use "../../../theme-colours" as *;
-@use "../viewport" as *;
 
 $h-logo-edge-padding: 1rem;
 $navbar-height: 3rem;
@@ -10,6 +9,7 @@ $navbar-height: 3rem;
 
 .rift-navbar-wrapper {
 	position: fixed;
+	top: 0;
 	left: 0;
 	display: flex;
 	width: 100%;
@@ -32,26 +32,14 @@ $navbar-height: 3rem;
 	transition: background-color 0.1s ease;
 }
 
-// --banner-height: the banners fixed above the navbar (BannerComponent).
 .expand {
-	height: calc(100vh - var(--banner-height, 0px));
+	height: 100vh;
 }
 
 .always-visible {
 	position: fixed;
-	top: var(--banner-height, 0px);
+	top: 0px;
 	z-index: 10;
-}
-
-// The banners scroll away below the navbar instead (BannerComponent).
-@media #{$short-viewport} {
-	.expand {
-		height: 100vh;
-	}
-
-	.always-visible {
-		top: 0;
-	}
 }
 
 .opaque {

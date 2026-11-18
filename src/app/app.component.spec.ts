@@ -1,18 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { AppComponent } from './app.component';
-import { stubResizeObserver } from './layout/testing/resize-observer';
 
 describe('AppComponent', () => {
-	beforeEach(() => {
-		stubResizeObserver();
+	beforeEach(() =>
 		TestBed.configureTestingModule({
 			imports: [AppComponent],
 			providers: [provideRouter([])]
-		});
-	});
-
-	afterEach(() => vi.unstubAllGlobals());
+		})
+	);
 
 	it('should create the app', () => {
 		const fixture = TestBed.createComponent(AppComponent);
@@ -31,14 +27,5 @@ describe('AppComponent', () => {
 		fixture.detectChanges();
 		const compiled = fixture.nativeElement as HTMLElement;
 		expect(compiled.querySelector('router-outlet')).toBeTruthy();
-	});
-
-	it('renders the banners once, before the routed pages', () => {
-		const fixture = TestBed.createComponent(AppComponent);
-		fixture.detectChanges();
-		const compiled = fixture.nativeElement as HTMLElement;
-
-		expect(compiled.querySelectorAll('app-banner')).toHaveLength(1);
-		expect(compiled.firstElementChild?.tagName).toBe('APP-BANNER');
 	});
 });

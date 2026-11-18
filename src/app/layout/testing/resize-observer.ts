@@ -1,6 +1,6 @@
 /**
- * jsdom has no ResizeObserver, which the banner and navbar use to publish
- * their heights. Stubs it for the current test (undo with
+ * jsdom has no ResizeObserver, which the navbar uses to publish
+ * its height. Stubs it for the current test (undo with
  * `vi.unstubAllGlobals()`) and returns a function that fires the last
  * observer's callback, as a resize would.
  */

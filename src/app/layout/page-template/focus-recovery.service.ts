@@ -9,8 +9,8 @@ import {
 
 /**
  * Puts keyboard focus somewhere sensible when the element holding it is
- * removed (a retried error state, a dismissed banner, a paginator swapped
- * for an error state), instead of leaving it on <body>.
+ * removed (a retried error state, a paginator swapped for an error state),
+ * instead of leaving it on <body>.
  */
 @Injectable({ providedIn: 'root' })
 export class FocusRecoveryService {
