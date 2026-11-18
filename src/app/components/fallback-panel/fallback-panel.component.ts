@@ -17,7 +17,7 @@ export const RETRY_FAILED_MESSAGE =
 	"Still couldn't load. Try again in a moment.";
 
 /**
- * Full-width failure screen: a cracked block, a heading, the projected
+ * Full-width failure screen: a pixel sad face, a heading, the projected
  * message, and one action. With `actionLink` the action is a link (e.g. home
  * from the 404 page); otherwise it's a button that emits `action` (e.g. retry).
  *
