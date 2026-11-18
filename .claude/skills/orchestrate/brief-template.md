@@ -20,7 +20,7 @@ the plan you drafted.>
 
 ## Branch
 
-- Branch: `<feature/n-slug>`, base: `<base>` (PR targets the base)
+- Branch: `<type>/<n>-<slug>`, base: `<base>` (PR targets the base)
 - Risk tier: <Low | Medium | High>, because <reason>
 - E2E ports: `E2E_PORT=<port>`, `DEV_PUBLIC_API_URL=http://localhost:<port>`
 
