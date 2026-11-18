@@ -67,7 +67,7 @@ matching files are read or edited.
 
 ## Git workflow
 
-- Work on a branch, never `main`: `feature/<issue>-<slug>`, `fix/…`,
+- Work on a branch, never `main`: `<type>/<issue>-<slug>`, `fix/…`,
   `refactor/…`. Sub-issues branch from, and open PRs into, the parent issue's
   branch.
 - When a task is done and verified, commit in logical steps, push, and open a PR
