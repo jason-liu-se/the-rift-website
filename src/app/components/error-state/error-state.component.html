@@ -1,0 +1,48 @@
+<!-- A cracked stone block with the Rift's violet glowing through, 16×16 px. -->
+<svg
+	class="block"
+	viewBox="0 0 16 16"
+	shape-rendering="crispEdges"
+	aria-hidden="true"
+	focusable="false"
+>
+	<path class="edge" d="M0 0h16v16h-16z" />
+	<path class="light" d="M1 1h14v14h-14z" />
+	<path
+		class="mid"
+		d="M4 1h1v1h-1zM12 1h1v1h-1zM2 2h2v1h-2zM8 2h1v1h-1zM14 2h1v1h-1zM9 3h1v1h-1zM1 4h1v1h-1zM5 4h1v1h-1zM9 4h1v1h-1zM6 5h1v1h-1zM12 5h1v1h-1zM14 6h1v1h-1zM3 7h1v1h-1zM8 8h1v1h-1zM1 9h1v1h-1zM7 9h1v1h-1zM11 9h1v1h-1zM7 10h1v1h-1zM5 11h1v1h-1zM13 12h1v1h-1zM1 13h1v1h-1zM4 13h1v1h-1zM10 13h1v1h-1z"
+	/>
+	<path
+		class="shade"
+		d="M14 1h1v1h-1zM7 2h1v1h-1zM3 3h1v1h-1zM12 3h1v1h-1zM14 4h1v1h-1zM1 6h1v1h-1zM10 7h2v1h-2zM14 8h1v1h-1zM4 9h1v1h-1zM13 10h1v1h-1zM2 11h1v1h-1zM7 13h1v1h-1zM14 13h1v1h-1zM1 14h11v1h-11zM13 14h2v1h-2z"
+	/>
+	<path
+		class="crack"
+		d="M8 1h1v1h-1zM9 2h1v1h-1zM8 3h1v1h-1zM7 4h1v1h-1zM7 5h1v1h-1zM6 6h1v1h-1zM9 6h2v1h-2zM6 7h1v1h-1zM12 7h1v1h-1zM6 8h2v1h-2zM13 8h1v1h-1zM8 9h1v1h-1zM8 10h2v1h-2zM10 11h1v1h-1zM9 12h1v1h-1zM11 12h1v1h-1zM11 13h1v1h-1zM12 14h1v1h-1z"
+	/>
+	<path
+		class="glow"
+		d="M8 4h1v1h-1zM8 5h1v1h-1zM7 6h2v1h-2zM7 7h1v1h-1zM9 11h1v1h-1zM10 12h1v1h-1z"
+	/>
+</svg>
+<!-- A failure that replaces content is announced; a 404 page is just a page. -->
+<div class="text" [attr.role]="actionLink() ? null : 'alert'">
+	@if (headingLevel() === 1) {
+		<h1 #headingElement class="heading" tabindex="-1">{{ heading() }}</h1>
+	} @else {
+		<h2 #headingElement class="heading" tabindex="-1">{{ heading() }}</h2>
+	}
+	<p class="message"><ng-content /></p>
+</div>
+@if (actionLink(); as link) {
+	<a class="action" [routerLink]="link">{{ actionLabel() }}</a>
+} @else {
+	<button
+		type="button"
+		class="action"
+		[attr.aria-disabled]="busy() || null"
+		(click)="onAction()"
+	>
+		{{ busy() ? "Trying again…" : actionLabel() }}
+	</button>
+}

@@ -12,6 +12,8 @@ import { PaginatorIntlService } from 'src/app/services/paginator-intl.service';
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
 import { BackButtonComponent } from '../../components/back-button/back-button.component';
 import { ImageShowcaseSectionComponent } from './components/image-showcase-section/image-showcase-section.component';
+import { ErrorStateComponent } from '../../components/error-state/error-state.component';
+import { LoadState } from '../../components/error-state/load-state';
 
 @Component({
 	selector: 'app-gallery-showcase-page',
@@ -22,7 +24,8 @@ import { ImageShowcaseSectionComponent } from './components/image-showcase-secti
 		BackgroundImageCardComponent,
 		BackButtonComponent,
 		MatPaginator,
-		ImageShowcaseSectionComponent
+		ImageShowcaseSectionComponent,
+		ErrorStateComponent
 	]
 })
 export class GalleryShowcasePageComponent {
@@ -38,6 +41,10 @@ export class GalleryShowcasePageComponent {
 	public pageIndex = 0;
 	public pageEvent!: PageEvent;
 
+	protected readonly loadState = new LoadState();
+
+	/** Counts requests, so only the latest one updates the page. */
+	private latestRequest = 0;
 	private imageCache: Record<string, GalleryImage[]> = {};
 
 	// the title and imageUrl must be passed via the app.routes.ts file as
@@ -63,6 +70,8 @@ export class GalleryShowcasePageComponent {
 
 		// updating the displayed images
 		this.captionedImages = [];
+		// Any response still on its way is for a page the user has left.
+		this.latestRequest++;
 
 		// grabbing images from cache, if they have been cached
 		if (this.imageCache[`${this.pageIndex}`]) {
@@ -74,26 +83,39 @@ export class GalleryShowcasePageComponent {
 		window.scrollTo(0, 0);
 	}
 
-	private populateCaptionedImages(): void {
+	/** Requests the current page; also the error state's retry. */
+	public populateCaptionedImages(): void {
 		if (!this.collectionName) {
 			return;
 		}
 
-		// the user may change page before this response arrives
 		const requestedPageIndex = this.pageIndex;
+		// The user may change page (and come back) before this response
+		// arrives, so compare requests, not page indexes.
+		const request = ++this.latestRequest;
+		const isLatestRequest = () => request === this.latestRequest;
 
+		this.loadState.start();
 		this.galleryProvider
 			.getCollectionImagesObservable(
 				this.collectionName,
 				requestedPageIndex * this.pageSize,
 				this.pageSize
 			)
-			.subscribe(({ items, total }) => {
-				this.imageCache[`${requestedPageIndex}`] = items;
-				this.paginationLength = total;
+			.subscribe({
+				next: ({ items, total }) => {
+					this.imageCache[`${requestedPageIndex}`] = items;
+					this.paginationLength = total;
 
-				if (requestedPageIndex === this.pageIndex) {
-					this.captionedImages = items;
+					if (isLatestRequest()) {
+						this.captionedImages = items;
+						this.loadState.succeed();
+					}
+				},
+				error: () => {
+					if (isLatestRequest()) {
+						this.loadState.fail();
+					}
 				}
 			});
 	}

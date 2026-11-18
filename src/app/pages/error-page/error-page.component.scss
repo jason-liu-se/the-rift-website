@@ -1,33 +1,4 @@
-@use "../../../font-sizes" as *;
-
 :host {
 	display: flex;
 	flex: 1;
-}
-
-.error-page {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	flex: 1;
-}
-
-.error-page > * {
-	margin: 20px 0;
-	text-align: center;
-}
-
-.text-components > * {
-	margin: 10px 0;
-}
-
-.title {
-	font-size: $font-size-large;
-	font-weight: 800;
-}
-
-.message {
-	font-size: $font-size-medium;
-	text-align: center;
 }

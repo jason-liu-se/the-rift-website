@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
-import { MatButton } from '@angular/material/button';
-import { RouterLink } from '@angular/router';
+import { ErrorStateComponent } from '../../components/error-state/error-state.component';
 
 @Component({
 	selector: 'app-error-page',
 	templateUrl: './error-page.component.html',
 	styleUrls: ['./error-page.component.scss'],
-	imports: [MatButton, RouterLink]
+	imports: [ErrorStateComponent]
 })
 export class ErrorPageComponent {}

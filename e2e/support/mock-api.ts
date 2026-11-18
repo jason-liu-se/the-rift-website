@@ -134,3 +134,19 @@ export async function mockExternalServices(
 		route.fulfill({ contentType: 'text/html', body: BLUEMAP_PLACEHOLDER })
 	);
 }
+
+/**
+ * Makes the in-browser API fail (500) for requests to `path` until the
+ * returned function is called. Server-side requests still succeed, so open
+ * the page by in-app navigation to see the browser's failure state.
+ */
+export async function failApiRequests(
+	page: Page,
+	path: string
+): Promise<() => Promise<void>> {
+	const url = `${API_URL}${path}**`;
+	await page.route(url, (route) =>
+		route.fulfill({ status: 500, json: { error: 'ERROR: mock failure' } })
+	);
+	return () => page.unroute(url);
+}

@@ -6,36 +6,46 @@
 		[title]="'News'"
 		[desc]="'Check out what\'s going on with The Rift'"
 	></app-background-image-card>
-	<div class="paginated-news-display-container">
-		<mat-paginator
-			#paginator
-			class="paginator"
-			(page)="handlePageEvent($event)"
-			[length]="paginationLength"
-			[pageSize]="pageSize"
-			[showFirstLastButtons]="true"
-			[pageIndex]="pageIndex"
-			[hidePageSize]="true"
-			aria-label="Select page"
+	@if (loadState.failed()) {
+		<app-error-state
+			heading="Couldn't load the news"
+			[busy]="loadState.retrying()"
+			(action)="populateNewsPosts()"
 		>
-		</mat-paginator>
-		@if (newsPosts.length > 0) {
-			<app-news-display
-				class="news-display"
-				[newsPosts]="newsPosts"
-			></app-news-display>
-		}
-		<mat-paginator
-			#paginator
-			class="paginator"
-			(page)="handlePageEvent($event)"
-			[length]="paginationLength"
-			[pageSize]="pageSize"
-			[showFirstLastButtons]="true"
-			[pageIndex]="pageIndex"
-			[hidePageSize]="true"
-			aria-label="Select page"
-		>
-		</mat-paginator>
-	</div>
+			The server didn't answer. Check your connection and try again.
+		</app-error-state>
+	} @else {
+		<div class="paginated-news-display-container">
+			<mat-paginator
+				#paginator
+				class="paginator"
+				(page)="handlePageEvent($event)"
+				[length]="paginationLength"
+				[pageSize]="pageSize"
+				[showFirstLastButtons]="true"
+				[pageIndex]="pageIndex"
+				[hidePageSize]="true"
+				aria-label="Select page"
+			>
+			</mat-paginator>
+			@if (newsPosts.length > 0) {
+				<app-news-display
+					class="news-display"
+					[newsPosts]="newsPosts"
+				></app-news-display>
+			}
+			<mat-paginator
+				#paginator
+				class="paginator"
+				(page)="handlePageEvent($event)"
+				[length]="paginationLength"
+				[pageSize]="pageSize"
+				[showFirstLastButtons]="true"
+				[pageIndex]="pageIndex"
+				[hidePageSize]="true"
+				aria-label="Select page"
+			>
+			</mat-paginator>
+		</div>
+	}
 </div>

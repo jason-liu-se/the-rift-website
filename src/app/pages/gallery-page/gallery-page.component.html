@@ -5,7 +5,17 @@
 		[title]="'Gallery'"
 		[desc]="'Select one of the cards to view more!'"
 	></app-background-image-card>
-	<app-card-selection-section
-		[items]="galleryCollections"
-	></app-card-selection-section>
+	@if (loadState.failed()) {
+		<app-error-state
+			heading="Couldn't load the gallery"
+			[busy]="loadState.retrying()"
+			(action)="setGalleryCollections()"
+		>
+			The server didn't answer. Check your connection and try again.
+		</app-error-state>
+	} @else {
+		<app-card-selection-section
+			[items]="galleryCollections"
+		></app-card-selection-section>
+	}
 </div>
