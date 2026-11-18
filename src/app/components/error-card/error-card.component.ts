@@ -1,15 +1,17 @@
 import { Component, computed, input } from '@angular/core';
-import { MatIcon } from '@angular/material/icon';
 import { FeedbackVariant, feedbackRole } from './feedback-variant';
 
 /**
  * Inline feedback (a failed form submit, a warning, a success) with a title
- * and the projected message. Focusable by script (`tabindex="-1"`), so a form
- * can move focus to it after a failed submit.
+ * and the projected message.
+ *
+ * It's a live region (`alert`, or `status` for success), and focusable by
+ * script (`tabindex="-1"`). Callers do one or the other, not both: either
+ * render it and let the role announce it, or focus it (e.g. after a failed
+ * submit) to move the user there. Doing both reads it out twice.
  */
 @Component({
 	selector: 'app-error-card',
-	imports: [MatIcon],
 	templateUrl: './error-card.component.html',
 	styleUrl: './error-card.component.scss',
 	host: {
@@ -23,7 +25,7 @@ import { FeedbackVariant, feedbackRole } from './feedback-variant';
 export class ErrorCardComponent {
 	public readonly variant = input<FeedbackVariant>('error');
 	public readonly title = input.required<string>();
-	/** A Material Icons name, e.g. `error`; leave out for a text-only card. */
+	/** A Material Icons ligature, e.g. `error`; leave out for a text-only card. */
 	public readonly icon = input<string>();
 
 	protected readonly role = computed(() => feedbackRole(this.variant()));

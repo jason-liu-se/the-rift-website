@@ -10,8 +10,9 @@
 	@include feedback-surface;
 }
 
-// Focused by script only, but a keyboard user should still see where they are.
-:host(:focus-visible) {
+// Focused by script only, often after a mouse click (which doesn't trigger
+// :focus-visible), so always show where focus went.
+:host(:focus) {
 	outline: 2px solid var(--feedback-colour);
 	outline-offset: 2px;
 }

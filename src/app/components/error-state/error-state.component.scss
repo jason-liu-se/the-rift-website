@@ -42,12 +42,25 @@
 	fill: $colour-primary;
 }
 
+.text {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem;
+}
+
 .heading {
 	margin: 0;
 	font-size: $font-size-large;
 	font-weight: 800;
 	line-height: 1.3;
 	text-wrap: balance;
+}
+
+// Focused by script when focus was in the content this replaced; it isn't
+// interactive, so no focus ring (as with <main>).
+.heading:focus {
+	outline: none;
 }
 
 .message {

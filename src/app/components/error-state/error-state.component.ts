@@ -1,18 +1,35 @@
-import { Component, input, output } from '@angular/core';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
+import {
+	Component,
+	DestroyRef,
+	ElementRef,
+	afterNextRender,
+	effect,
+	inject,
+	input,
+	output,
+	viewChild
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { FocusRecoveryService } from 'src/app/layout/page-template/focus-recovery.service';
+
+export const RETRY_FAILED_MESSAGE =
+	"Still couldn't load. Try again in a moment.";
 
 /**
  * Full-width failure screen: a cracked block, a heading, the projected
  * message, and one action. With `actionLink` the action is a link (e.g. home
  * from the 404 page); otherwise it's a button that emits `action` (e.g. retry).
+ *
+ * Keyboard focus: if focus was in the content this replaced, it moves to the
+ * heading; when this goes away (e.g. a retry worked), lost focus moves to
+ * <main>.
  */
 @Component({
 	selector: 'app-error-state',
 	imports: [RouterLink],
 	templateUrl: './error-state.component.html',
-	styleUrl: './error-state.component.scss',
-	// A failure that replaces content is announced; a 404 page is just a page.
-	host: { '[attr.role]': 'actionLink() ? null : "alert"' }
+	styleUrl: './error-state.component.scss'
 })
 export class ErrorStateComponent {
 	public readonly heading = input.required<string>();
@@ -24,6 +41,32 @@ export class ErrorStateComponent {
 	public readonly busy = input(false);
 
 	public readonly action = output<void>();
+
+	private readonly headingElement =
+		viewChild.required<ElementRef<HTMLElement>>('headingElement');
+
+	constructor() {
+		const focusRecovery = inject(FocusRecoveryService);
+		const announcer = inject(LiveAnnouncer);
+
+		afterNextRender(() => {
+			if (focusRecovery.wasFocusLost()) {
+				this.headingElement().nativeElement.focus();
+			}
+		});
+		inject(DestroyRef).onDestroy(() => focusRecovery.recoverAfterRender());
+
+		// The alert was read when this appeared; a failed retry only changes
+		// the button back, so say so.
+		let wasBusy = false;
+		effect(() => {
+			const busy = this.busy();
+			if (wasBusy && !busy) {
+				void announcer.announce(RETRY_FAILED_MESSAGE, 'assertive');
+			}
+			wasBusy = busy;
+		});
+	}
 
 	protected onAction(): void {
 		if (!this.busy()) {

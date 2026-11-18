@@ -25,12 +25,15 @@
 		d="M8 4h1v1h-1zM8 5h1v1h-1zM7 6h2v1h-2zM7 7h1v1h-1zM9 11h1v1h-1zM10 12h1v1h-1z"
 	/>
 </svg>
-@if (headingLevel() === 1) {
-	<h1 class="heading">{{ heading() }}</h1>
-} @else {
-	<h2 class="heading">{{ heading() }}</h2>
-}
-<p class="message"><ng-content /></p>
+<!-- A failure that replaces content is announced; a 404 page is just a page. -->
+<div class="text" [attr.role]="actionLink() ? null : 'alert'">
+	@if (headingLevel() === 1) {
+		<h1 #headingElement class="heading" tabindex="-1">{{ heading() }}</h1>
+	} @else {
+		<h2 #headingElement class="heading" tabindex="-1">{{ heading() }}</h2>
+	}
+	<p class="message"><ng-content /></p>
+</div>
 @if (actionLink(); as link) {
 	<a class="action" [routerLink]="link">{{ actionLabel() }}</a>
 } @else {

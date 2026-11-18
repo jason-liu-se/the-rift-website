@@ -72,9 +72,10 @@ describe('ErrorCardComponent', () => {
 	});
 
 	it('shows the icon only when one is given', () => {
-		expect(render().querySelector('mat-icon')).toBeNull();
+		expect(render().querySelector('.material-icons')).toBeNull();
 		expect(
-			render('error', 'wifi_off').querySelector('mat-icon')?.textContent
+			render('error', 'wifi_off').querySelector('.material-icons')
+				?.textContent
 		).toBe('wifi_off');
 	});
 });
