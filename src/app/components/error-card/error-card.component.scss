@@ -1,0 +1,36 @@
+@use "feedback-variants" as *;
+
+:host {
+	display: flex;
+	gap: 0.75rem;
+	align-items: flex-start;
+	padding: 0.75rem 1rem;
+	border-radius: 4px;
+
+	@include feedback-surface;
+}
+
+// Focused by script only, but a keyboard user should still see where they are.
+:host(:focus-visible) {
+	outline: 2px solid var(--feedback-colour);
+	outline-offset: 2px;
+}
+
+.icon {
+	flex-shrink: 0;
+	color: var(--feedback-colour);
+}
+
+.text {
+	min-width: 0;
+}
+
+.title {
+	margin: 0;
+	font-weight: 700;
+	color: var(--feedback-colour);
+}
+
+.message:not(:empty) {
+	margin-top: 0.25rem;
+}
