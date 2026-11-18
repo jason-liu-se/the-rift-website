@@ -22,7 +22,8 @@ paths:
 - **Crawler files.** `npm run env` writes `public/robots.txt` and
   `public/sitemap.xml` (gitignored) from the routes and the production
   `SITE_URL` (`scripts/seo/crawler-files.mjs`). New routes are added
-  automatically unless marked `noindex`.
+  automatically unless marked `noindex` or they have a parameter (e.g.
+  `gallery/:collection`, whose pages are linked from `/gallery`).
 - **Status codes.** Unknown URLs return the 404 page with a 404 status (see
   [rendering.md](../docs/rendering.md)).
 - **Page content.** See the SEO section of [ui-standards.md](./ui-standards.md).

@@ -20,7 +20,9 @@ rendering it again.
   the browser has. A `Client` page's robots meta tag only appears once
   JavaScript runs, so these routes also send an `X-Robots-Tag: noindex` header.
 - Every route in `app.routes.ts` needs an entry (a unit test checks), or it
-  falls through to the last entry: the 404 page with a 404 status.
+  falls through to the last entry: the 404 page with a 404 status. The 404 page
+  also sets that status itself (`RESPONSE_INIT`), for URLs a `canMatch` guard
+  turns away under another entry (an unknown `gallery/:collection`).
 
 ## Server-safe code
 
