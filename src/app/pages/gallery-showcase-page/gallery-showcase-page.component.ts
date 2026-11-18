@@ -43,6 +43,8 @@ export class GalleryShowcasePageComponent {
 
 	protected readonly loadState = new LoadState();
 
+	/** Counts requests, so only the latest one updates the page. */
+	private latestRequest = 0;
 	private imageCache: Record<string, GalleryImage[]> = {};
 
 	// the title and imageUrl must be passed via the app.routes.ts file as
@@ -68,6 +70,8 @@ export class GalleryShowcasePageComponent {
 
 		// updating the displayed images
 		this.captionedImages = [];
+		// Any response still on its way is for a page the user has left.
+		this.latestRequest++;
 
 		// grabbing images from cache, if they have been cached
 		if (this.imageCache[`${this.pageIndex}`]) {
@@ -85,9 +89,11 @@ export class GalleryShowcasePageComponent {
 			return;
 		}
 
-		// the user may change page before this response arrives
 		const requestedPageIndex = this.pageIndex;
-		const isCurrentPage = () => requestedPageIndex === this.pageIndex;
+		// The user may change page (and come back) before this response
+		// arrives, so compare requests, not page indexes.
+		const request = ++this.latestRequest;
+		const isLatestRequest = () => request === this.latestRequest;
 
 		this.loadState.start();
 		this.galleryProvider
@@ -101,13 +107,13 @@ export class GalleryShowcasePageComponent {
 					this.imageCache[`${requestedPageIndex}`] = items;
 					this.paginationLength = total;
 
-					if (isCurrentPage()) {
+					if (isLatestRequest()) {
 						this.captionedImages = items;
 						this.loadState.succeed();
 					}
 				},
 				error: () => {
-					if (isCurrentPage()) {
+					if (isLatestRequest()) {
 						this.loadState.fail();
 					}
 				}

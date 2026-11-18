@@ -148,6 +148,24 @@ describe('GalleryShowcasePageComponent', () => {
 			expect(captions()).toEqual(['Three']);
 		});
 
+		it('shows only the latest request after leaving a page and coming back', () => {
+			vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined);
+			clickPaginator('Next page');
+			clickPaginator('Previous page');
+			clickPaginator('Next page');
+			const [stale, latest] = httpTesting.match(
+				pageUrl('season-5', PAGE_SIZE)
+			);
+
+			stale.flush(null, { status: 500, statusText: 'Server Error' });
+			fixture.detectChanges();
+			expect(element.querySelector('app-error-state')).toBeNull();
+
+			latest.flush({ items: SECOND_PAGE, total: TOTAL });
+			fixture.detectChanges();
+			expect(captions()).toEqual(['Three']);
+		});
+
 		it('goes back to the gallery when the back button is clicked', async () => {
 			element.querySelector<HTMLButtonElement>('.back-button')!.click();
 			await fixture.whenStable();

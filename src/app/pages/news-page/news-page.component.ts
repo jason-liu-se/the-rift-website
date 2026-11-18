@@ -35,6 +35,8 @@ export class NewsPageComponent {
 	public newsPosts: NewsPost[] = [];
 	protected readonly loadState = new LoadState();
 
+	/** Counts requests, so only the latest one updates the page. */
+	private latestRequest = 0;
 	private newsPostCache: Record<string, NewsPost[]> = {};
 
 	constructor() {
@@ -49,6 +51,8 @@ export class NewsPageComponent {
 
 		// updating the displayed news posts
 		this.newsPosts = [];
+		// Any response still on its way is for a page the user has left.
+		this.latestRequest++;
 
 		// grabbing images from cache, if they have been cached
 		if (this.newsPostCache[`${this.pageIndex}`]) {
@@ -62,9 +66,11 @@ export class NewsPageComponent {
 
 	/** Requests the current page again after a failure. */
 	public populateNewsPosts(): void {
-		// the user may change page before this response arrives
 		const requestedPageIndex = this.pageIndex;
-		const isCurrentPage = () => requestedPageIndex === this.pageIndex;
+		// The user may change page (and come back) before this response
+		// arrives, so compare requests, not page indexes.
+		const request = ++this.latestRequest;
+		const isLatestRequest = () => request === this.latestRequest;
 
 		this.loadState.start();
 		this.newsPostProvider
@@ -74,13 +80,13 @@ export class NewsPageComponent {
 					this.newsPostCache[`${requestedPageIndex}`] = items;
 					this.paginationLength = total;
 
-					if (isCurrentPage()) {
+					if (isLatestRequest()) {
 						this.newsPosts = items;
 						this.loadState.succeed();
 					}
 				},
 				error: () => {
-					if (isCurrentPage()) {
+					if (isLatestRequest()) {
 						this.loadState.fail();
 					}
 				}

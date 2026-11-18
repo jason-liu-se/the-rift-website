@@ -166,6 +166,22 @@ describe('NewsPageComponent', () => {
 			expect(titles()).toEqual(['Update']);
 		});
 
+		it('ignores a stale request after the user left the page and came back', () => {
+			flushPage(0, FIRST_PAGE);
+			clickPaginator('Next page');
+			clickPaginator('Previous page');
+			clickPaginator('Next page');
+			const [stale, latest] = httpTesting.match(pageUrl(PAGE_SIZE));
+
+			stale.flush(null, { status: 500, statusText: 'Server Error' });
+			fixture.detectChanges();
+			expect(errorState()).toBeNull();
+
+			latest.flush({ items: SECOND_PAGE, total: TOTAL });
+			fixture.detectChanges();
+			expect(titles()).toEqual(['Update']);
+		});
+
 		it('ignores a failure for a page the user has already left', () => {
 			flushPage(0, FIRST_PAGE);
 			clickPaginator('Next page');
