@@ -1,0 +1,12 @@
+<div class="avatar" aria-hidden="true">
+	@if (avatarUrl(); as url) {
+		<img [src]="url" alt="" (error)="avatarFailed.set(true)" />
+	} @else if (initial(); as letter) {
+		{{ letter }}
+	} @else {
+		<mat-icon>person</mat-icon>
+	}
+</div>
+@if (user(); as currentUser) {
+	<span class="username">{{ currentUser.username }}</span>
+}

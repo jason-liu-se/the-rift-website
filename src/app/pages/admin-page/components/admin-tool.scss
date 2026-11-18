@@ -1,0 +1,23 @@
+// Shared by the admin tools, so each one looks the same inside its card.
+@use "../../../../theme-colours" as *;
+@use "../../../../font-sizes" as *;
+
+:host {
+	display: block;
+}
+
+.tool-intro {
+	margin: 0 0 24px;
+	font-size: $font-size-small;
+}
+
+.preview-heading {
+	margin: 0 0 12px;
+	padding-top: 20px;
+	border-top: 1px solid $colour-light-grey;
+	color: rgba($colour-dark-text, 0.75);
+	font-size: $font-size-x-small;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}

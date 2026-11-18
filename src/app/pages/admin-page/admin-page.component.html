@@ -1,40 +1,53 @@
 <div class="admin-page">
-	<div class="header">
-		<h1>Admin</h1>
-		<button mat-stroked-button type="button" (click)="logout()">
-			<mat-icon>logout</mat-icon>
-			Log out
-		</button>
-	</div>
-	@if (logoutFailed()) {
-		<p role="alert">
-			Couldn't log out. Check your connection and try again.
-		</p>
-	}
-	<nav mat-tab-nav-bar [tabPanel]="toolPanel" aria-label="Admin tools">
-		@for (tool of tools; track tool.id) {
-			<a
-				mat-tab-link
-				routerLink="."
-				[fragment]="tool.id"
-				[active]="tool.id === activeToolId()"
-			>
-				<mat-icon class="tool-icon">{{ tool.icon }}</mat-icon>
-				{{ tool.label }}
-			</a>
-		}
+	<nav class="tool-nav" aria-label="Admin tools">
+		<p class="tool-nav-label" aria-hidden="true">Admin</p>
+		<ul class="tool-list">
+			@for (tool of tools; track tool.id) {
+				<li>
+					<a
+						class="tool-link"
+						routerLink="."
+						[fragment]="tool.id"
+						[class.active]="tool.id === activeToolId()"
+						[attr.aria-current]="
+							tool.id === activeToolId() ? 'page' : null
+						"
+					>
+						<mat-icon aria-hidden="true">{{ tool.icon }}</mat-icon>
+						{{ tool.label }}
+					</a>
+				</li>
+			}
+		</ul>
 	</nav>
-	<mat-tab-nav-panel #toolPanel class="tool-panel">
-		@switch (activeToolId()) {
-			@case ("downloads") {
-				<app-downloads-tool />
-			}
-			@case ("gallery") {
-				<app-gallery-tool />
-			}
-			@default {
-				<app-news-tool />
-			}
+	<div class="workspace">
+		<header class="top-bar">
+			<h1 class="tool-title">{{ activeTool().label }}</h1>
+			<div class="account">
+				<app-admin-user />
+				<button mat-stroked-button type="button" (click)="logout()">
+					<mat-icon>logout</mat-icon>
+					Log out
+				</button>
+			</div>
+		</header>
+		@if (logoutFailed()) {
+			<p class="logout-error" role="alert">
+				Couldn't log out. Check your connection and try again.
+			</p>
 		}
-	</mat-tab-nav-panel>
+		<div class="tool-card">
+			@switch (activeToolId()) {
+				@case ("downloads") {
+					<app-downloads-tool />
+				}
+				@case ("gallery") {
+					<app-gallery-tool />
+				}
+				@default {
+					<app-news-tool />
+				}
+			}
+		</div>
+	</div>
 </div>

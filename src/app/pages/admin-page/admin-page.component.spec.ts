@@ -17,7 +17,13 @@ describe('AdminPageComponent', () => {
 					{ path: 'admin', component: AdminPageComponent },
 					...ANY_URL_ROUTES
 				]),
-				{ provide: AuthService, useValue: { logout } }
+				{
+					provide: AuthService,
+					useValue: {
+						logout,
+						getMe: () => of({ id: '1', username: 'editor' })
+					}
+				}
 			]
 		});
 		harness = await RouterTestingHarness.create();
@@ -30,39 +36,55 @@ describe('AdminPageComponent', () => {
 			.find((button) => button.textContent?.includes('Log out'))!
 			.click();
 
-	const activeTab = (element: HTMLElement) =>
-		element.querySelector('[mat-tab-link].mdc-tab--active')?.textContent;
+	const currentLink = (element: HTMLElement) =>
+		element.querySelector('nav [aria-current="page"]')?.textContent;
+
+	const title = (element: HTMLElement) =>
+		element.querySelector('h1')?.textContent;
 
 	it('opens the news tool by default', async () => {
 		const element = await open('/admin');
-		expect(activeTab(element)).toContain('News');
+		expect(currentLink(element)).toContain('News');
+		expect(title(element)).toBe('News');
 		expect(element.querySelector('app-news-tool')).not.toBeNull();
 	});
 
 	it('opens the tool named by the URL fragment', async () => {
 		const element = await open('/admin#gallery');
-		expect(activeTab(element)).toContain('Gallery');
+		expect(currentLink(element)).toContain('Gallery');
+		expect(title(element)).toBe('Gallery');
+		expect(element.querySelectorAll('nav [aria-current]')).toHaveLength(1);
 		expect(element.querySelector('app-gallery-tool')).not.toBeNull();
 		expect(element.querySelector('app-news-tool')).toBeNull();
 	});
 
 	it('falls back to the news tool for an unknown fragment', async () => {
 		const element = await open('/admin#nope');
+		expect(currentLink(element)).toContain('News');
 		expect(element.querySelector('app-news-tool')).not.toBeNull();
 	});
 
 	it('switches tools by changing the URL fragment', async () => {
 		const element = await open('/admin');
-		const downloadsTab = [
-			...element.querySelectorAll<HTMLAnchorElement>('[mat-tab-link]')
-		].find((tab) => tab.textContent?.includes('Downloads'))!;
+		const downloadsLink = [
+			...element.querySelectorAll<HTMLAnchorElement>('nav a')
+		].find((link) => link.textContent?.includes('Downloads'))!;
+		expect(downloadsLink.getAttribute('href')).toBe('/admin#downloads');
 
-		downloadsTab.click();
+		downloadsLink.click();
 		await harness.fixture.whenStable();
 		harness.detectChanges();
 
 		expect(TestBed.inject(Router).url).toBe('/admin#downloads');
 		expect(element.querySelector('app-downloads-tool')).not.toBeNull();
+		expect(title(element)).toBe('Downloads');
+	});
+
+	it('shows the logged-in editor in the top bar', async () => {
+		const element = await open('/admin');
+		expect(
+			element.querySelector('header app-admin-user')?.textContent
+		).toContain('editor');
 	});
 
 	it('logs out and goes to the login page', async () => {

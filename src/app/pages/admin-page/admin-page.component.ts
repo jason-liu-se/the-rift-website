@@ -2,8 +2,8 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
-import { MatTabLink, MatTabNav, MatTabNavPanel } from '@angular/material/tabs';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { AdminUserComponent } from './components/admin-user/admin-user.component';
 import { DownloadsToolComponent } from './components/downloads-tool/downloads-tool.component';
 import { GalleryToolComponent } from './components/gallery-tool/gallery-tool.component';
 import { NewsToolComponent } from './components/news-tool/news-tool.component';
@@ -23,7 +23,10 @@ export const ADMIN_TOOLS: readonly IAdminTool[] = [
 	{ id: 'gallery', label: 'Gallery', icon: 'photo_library' }
 ];
 
-/** Tools for creating site content, one at a time, picked by URL fragment. */
+/**
+ * A dashboard of tools for creating site content, one at a time, picked by URL
+ * fragment from the sidebar (a tab bar on mobile).
+ */
 @Component({
 	selector: 'app-admin-page',
 	templateUrl: './admin-page.component.html',
@@ -31,10 +34,8 @@ export const ADMIN_TOOLS: readonly IAdminTool[] = [
 	imports: [
 		MatButton,
 		MatIcon,
-		MatTabNav,
-		MatTabLink,
-		MatTabNavPanel,
 		RouterLink,
+		AdminUserComponent,
 		NewsToolComponent,
 		DownloadsToolComponent,
 		GalleryToolComponent
@@ -47,11 +48,12 @@ export class AdminPageComponent {
 
 	public readonly tools = ADMIN_TOOLS;
 	/** An unknown or missing fragment opens the first tool. */
-	public readonly activeToolId = computed(
+	public readonly activeTool = computed(
 		() =>
-			this.tools.find((tool) => tool.id === this.fragment())?.id ??
-			this.tools[0].id
+			this.tools.find((tool) => tool.id === this.fragment()) ??
+			this.tools[0]
 	);
+	public readonly activeToolId = computed(() => this.activeTool().id);
 
 	public readonly logoutFailed = signal(false);
 
