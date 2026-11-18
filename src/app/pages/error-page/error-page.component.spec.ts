@@ -16,7 +16,9 @@ describe('ErrorPageComponent', () => {
 		const element: HTMLElement = fixture.nativeElement;
 		const link = element.querySelector('a')!;
 
-		expect(element.querySelector('h1')?.textContent).toBe('Page not found');
+		expect(element.querySelector('h1')?.textContent).toBe(
+			'404: Page not found'
+		);
 		expect(element.querySelector('button')).toBeNull();
 		expect(link.textContent?.trim()).toBe('Back to Home');
 

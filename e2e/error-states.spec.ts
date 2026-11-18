@@ -51,7 +51,7 @@ test('the 404 page says so and links home', async ({ page }) => {
 	await gotoRoute(page, routeFor('/not-a-page'));
 
 	await expect(
-		page.getByRole('heading', { level: 1, name: 'Page not found' })
+		page.getByRole('heading', { level: 1, name: '404: Page not found' })
 	).toBeVisible();
 	await page.getByRole('link', { name: 'Back to Home' }).click();
 

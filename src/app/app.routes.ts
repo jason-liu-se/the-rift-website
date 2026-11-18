@@ -188,7 +188,7 @@ export const routes: Routes = [
 	{
 		path: '**',
 		component: PageTemplateComponent,
-		title: 'Page Not Found',
+		title: '404: Page Not Found',
 		data: {
 			noindex: true,
 			loadComponent: () =>
