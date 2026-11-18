@@ -54,6 +54,12 @@
 
 .download-button {
 	border-radius: 1px;
+
+	// Material's button removes the outline; light, so it shows on the dark card.
+	&:focus-visible {
+		outline: 2px solid $colour-light-text;
+		outline-offset: 2px;
+	}
 }
 
 @media only screen and (min-width: 60rem) {

@@ -6,26 +6,25 @@
 	class="rift-navbar-wrapper always-visible {{ transparent ? '' : 'opaque' }}"
 >
 	<nav
+		aria-label="Main"
 		class="rift-navbar {{ isHamburgerMenuVisible ? 'expand opaque' : '' }}"
 	>
 		<div class="hamburger-menu">
 			<div class="hamburger-menu-buttons">
-				@if (!isHamburgerMenuVisible) {
-					<button
-						class="hamburger-menu-button"
-						(click)="toggleHamburgerMenu()"
-					>
-						<mat-icon class="hamburger-icon">menu</mat-icon>
-					</button>
-				}
-				@if (isHamburgerMenuVisible) {
-					<button
-						class="close-hamburger-menu-button"
-						(click)="toggleHamburgerMenu()"
-					>
-						<mat-icon class="close-icon">close</mat-icon>
-					</button>
-				}
+				<!-- One button opens and closes the menu, so focus stays on it. -->
+				<button
+					#menuButton
+					type="button"
+					class="hamburger-menu-button"
+					aria-label="Menu"
+					aria-controls="site-menu-links"
+					[attr.aria-expanded]="isHamburgerMenuVisible"
+					(click)="toggleHamburgerMenu()"
+				>
+					<mat-icon aria-hidden="true">{{
+						isHamburgerMenuVisible ? "close" : "menu"
+					}}</mat-icon>
+				</button>
 			</div>
 		</div>
 		<ul class="menu-links left-align">
@@ -40,6 +39,7 @@
 			</li>
 		</ul>
 		<ul
+			id="site-menu-links"
 			class="menu-links center-align {{
 				isHamburgerMenuVisible ? '' : 'hidden'
 			}}"

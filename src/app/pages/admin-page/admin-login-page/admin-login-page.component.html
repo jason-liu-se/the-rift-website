@@ -23,11 +23,23 @@
 			Continue with Discord
 		</a>
 	</div>
-	<img
-		class="photo"
-		src="/assets/general-background-images/fancy-tree-1.webp"
-		alt=""
-		width="1920"
-		height="1080"
-	/>
+	<!-- Portrait screens get a crop around the tree: the photo covers the
+	whole page there, so most of the wide image would be cut off anyway. -->
+	<picture class="photo-frame">
+		<source
+			media="(max-width: 59.99rem) and (orientation: portrait)"
+			srcset="
+				/assets/general-background-images/fancy-tree-1-portrait.webp
+			"
+			width="810"
+			height="1080"
+		/>
+		<img
+			class="photo"
+			src="/assets/general-background-images/fancy-tree-1.webp"
+			alt=""
+			width="1920"
+			height="1080"
+		/>
+	</picture>
 </div>

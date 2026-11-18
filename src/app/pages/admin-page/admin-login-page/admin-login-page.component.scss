@@ -20,6 +20,11 @@
 	overflow: hidden;
 }
 
+// Not a grid item: the image inside is positioned against the page.
+.photo-frame {
+	display: contents;
+}
+
 .photo {
 	position: absolute;
 	inset: 0;
@@ -28,6 +33,13 @@
 	object-fit: cover;
 	// The tree sits just left of centre.
 	object-position: 40% 50%;
+}
+
+// The portrait crop (see the template) is already centred on the tree.
+@media (max-width: 59.99rem) and (orientation: portrait) {
+	.photo {
+		object-position: center;
+	}
 }
 
 .sign-in-panel {

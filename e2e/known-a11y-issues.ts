@@ -20,12 +20,6 @@ const OPAQUE_NAVBAR_NOTE =
 export const KNOWN_A11Y_ISSUES: readonly IKnownA11yIssue[] = [
 	{
 		ruleId: 'button-name',
-		target: '.hamburger-menu-button',
-		projects: [PROJECT.mobile],
-		note: 'Icon-only menu button needs an aria-label.'
-	},
-	{
-		ruleId: 'button-name',
 		target: '.tip-pop-up > .message-exit-button',
 		routes: [BLUEMAP_ROUTE],
 		note: 'Icon-only close button on the BlueMap tip needs an aria-label.'
@@ -39,28 +33,8 @@ export const KNOWN_A11Y_ISSUES: readonly IKnownA11yIssue[] = [
 	{
 		ruleId: 'color-contrast',
 		target: '.link-active > p',
-		routes: ['/join', '/not-a-page'],
-		projects: [PROJECT.desktop],
-		note: OPAQUE_NAVBAR_NOTE
-	},
-	{
-		ruleId: 'color-contrast',
-		target: '.link-active[routerlink="/"][href="/"] > p',
+		// Where the active nav link sits on the opaque navbar.
 		routes: ['/news', BLUEMAP_ROUTE],
-		projects: [PROJECT.desktop],
-		note: `${OPAQUE_NAVBAR_NOTE} Also, the Home link is marked active on every page because its routerLinkActive lacks exact matching.`
-	},
-	{
-		ruleId: 'color-contrast',
-		target: 'a[routerlink="/news"] > p',
-		routes: ['/news'],
-		projects: [PROJECT.desktop],
-		note: OPAQUE_NAVBAR_NOTE
-	},
-	{
-		ruleId: 'color-contrast',
-		target: 'a[routerlink="/map"] > p',
-		routes: [BLUEMAP_ROUTE],
 		projects: [PROJECT.desktop],
 		note: OPAQUE_NAVBAR_NOTE
 	}

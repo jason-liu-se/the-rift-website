@@ -25,7 +25,7 @@ export const appConfig: ApplicationConfig = {
 		provideZoneChangeDetection(),
 		provideRouter(
 			routes,
-			// A fragment change (e.g. the admin page's tool tabs) scrolls to the
+			// A fragment change (e.g. the admin page's tool links) scrolls to the
 			// matching id, if any, instead of to the top.
 			withInMemoryScrolling({
 				scrollPositionRestoration: 'enabled',

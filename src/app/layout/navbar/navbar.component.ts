@@ -14,7 +14,10 @@ export const NAVBAR_HEIGHT_VARIABLE = '--navbar-height';
 	templateUrl: './navbar.component.html',
 	styleUrls: ['./navbar.component.scss'],
 	imports: [MatIcon, RouterLink, RouterLinkActive, MatButton],
-	host: { '(window:resize)': 'onResize()' }
+	host: {
+		'(window:resize)': 'onResize()',
+		'(document:keydown.escape)': 'closeHamburgerMenu()'
+	}
 })
 export class NavbarComponent {
 	@Input() public transparent = true;
@@ -22,6 +25,8 @@ export class NavbarComponent {
 	public readonly logoPath = LOGO_PATH;
 	public isHamburgerMenuVisible = false;
 
+	private readonly menuButton =
+		viewChild.required<ElementRef<HTMLButtonElement>>('menuButton');
 	private readonly wrapper =
 		viewChild.required<ElementRef<HTMLElement>>('wrapper');
 
@@ -34,6 +39,15 @@ export class NavbarComponent {
 
 	public toggleHamburgerMenu(): void {
 		this.isHamburgerMenuVisible = !this.isHamburgerMenuVisible;
+	}
+
+	/** Escape closes an open menu and returns focus to its button. */
+	public closeHamburgerMenu(): void {
+		if (!this.isHamburgerMenuVisible) {
+			return;
+		}
+		this.isHamburgerMenuVisible = false;
+		this.menuButton().nativeElement.focus();
 	}
 
 	// the hamburger menu only exists below the desktop breakpoint

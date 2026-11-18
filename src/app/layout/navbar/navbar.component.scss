@@ -62,16 +62,14 @@ $navbar-height: 3rem;
 	min-height: $navbar-height;
 }
 
-.hamburger-menu-button,
-.close-hamburger-menu-button {
+.hamburger-menu-button {
 	border: none;
 	background-color: transparent;
 	color: white;
 	height: 100%;
 }
 
-.hamburger-menu-button:active,
-.close-hamburger-menu-button:active {
+.hamburger-menu-button:active {
 	filter: opacity(0.7);
 }
 
@@ -133,6 +131,11 @@ $navbar-height: 3rem;
 	padding: 2px 10px;
 	border-radius: 1px;
 	margin: 2rem 0;
+
+	&:focus-visible {
+		outline: 2px solid $colour-light-text;
+		outline-offset: 2px;
+	}
 }
 
 .join-button.mat-button-active {
