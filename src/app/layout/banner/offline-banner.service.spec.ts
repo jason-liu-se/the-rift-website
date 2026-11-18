@@ -23,7 +23,10 @@ describe('OfflineBannerService', () => {
 	const shown = () =>
 		banners.banners().map(({ variant, message }) => ({ variant, message }));
 
-	afterEach(() => vi.restoreAllMocks());
+	afterEach(() => {
+		vi.restoreAllMocks();
+		vi.unstubAllGlobals();
+	});
 
 	it('shows nothing while online', () => {
 		watch();
@@ -63,5 +66,44 @@ describe('OfflineBannerService', () => {
 		window.dispatchEvent(new Event('offline'));
 
 		expect(show).toHaveBeenCalledTimes(1);
+	});
+
+	it('says nothing about a working connection that was never lost', () => {
+		watch();
+
+		TestBed.inject(OfflineBannerService).reportOnline();
+
+		expect(shown()).toEqual([]);
+	});
+
+	it('warns once however many requests fail', () => {
+		watch();
+		const show = vi.spyOn(banners, 'show');
+		const connectivity = TestBed.inject(OfflineBannerService);
+
+		connectivity.reportOffline();
+		connectivity.reportOffline();
+
+		expect(show).toHaveBeenCalledTimes(1);
+	});
+
+	it('reports offline when its own server is unreachable, then back online', async () => {
+		watch();
+		const connectivity = TestBed.inject(OfflineBannerService);
+		vi.stubGlobal('fetch', () =>
+			Promise.reject(new TypeError('Failed to fetch'))
+		);
+
+		expect(await connectivity.checkConnection()).toBe(false);
+		expect(shown()).toEqual([
+			{ variant: 'warning', message: OFFLINE_MESSAGE }
+		]);
+
+		vi.stubGlobal('fetch', () => Promise.resolve(new Response()));
+
+		expect(await connectivity.checkConnection()).toBe(true);
+		expect(shown()).toEqual([
+			{ variant: 'success', message: BACK_ONLINE_MESSAGE }
+		]);
 	});
 });

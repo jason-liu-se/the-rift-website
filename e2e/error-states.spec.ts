@@ -68,7 +68,7 @@ test('going offline shows a banner above the navbar, without covering the page',
 	await page.context().setOffline(true);
 
 	const banner = page.locator('app-banner .banner');
-	await expect(banner).toHaveText(/You're offline/);
+	await expect(banner).toHaveText(/Can't connect/);
 	const bannerBox = (await banner.boundingBox())!;
 	const bannerBottom = bannerBox.y + bannerBox.height;
 	await expect
@@ -87,4 +87,29 @@ test('going offline shows a banner above the navbar, without covering the page',
 	await expect
 		.poll(async () => (await navbar.boundingBox())!.y)
 		.toBe(navbarTopOnline);
+});
+
+test('losing the connection while the browser still thinks it is online warns on the next navigation, without reloading', async ({
+	page
+}) => {
+	await gotoRoute(page, routeFor('/'));
+	// Everything fails to get through (like airplane mode on a machine whose
+	// VM adapter stays connected), but navigator.onLine stays true.
+	const disconnect = (route: { abort: (code: string) => Promise<void> }) =>
+		route.abort('internetdisconnected');
+	await page.route('**/*', disconnect);
+	let reloaded = false;
+	page.on('load', () => (reloaded = true));
+
+	await clickNavLink(page, 'News');
+
+	const banner = page.locator('app-banner .banner');
+	await expect(banner).toHaveText(/Can't connect/);
+	expect(await page.evaluate(() => navigator.onLine)).toBe(true);
+	expect(reloaded).toBe(false);
+
+	await page.unroute('**/*', disconnect);
+	await clickNavLink(page, 'Gallery');
+
+	await expect(banner).toHaveText(/Back online/);
 });
