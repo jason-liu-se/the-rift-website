@@ -1,8 +1,104 @@
-.admin-login-page {
+@use "../../../../theme-colours" as *;
+@use "../../../../font-sizes" as *;
+
+// Fills the space below the navbar (the footer is hidden on admin pages).
+:host {
 	display: flex;
 	flex-direction: column;
+	flex: 1;
+}
+
+// Mobile: the photo fills the background behind a centred sign-in card.
+// Desktop: the photo shows on the left, behind a frosted panel on the right.
+.admin-login-page {
+	position: relative;
+	display: grid;
+	flex: 1;
 	align-items: center;
-	gap: 20px;
-	padding: 40px 16px;
-	text-align: center;
+	min-height: 34rem;
+	padding: 32px 16px;
+	overflow: hidden;
+}
+
+.photo {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	// The tree sits just left of centre.
+	object-position: 40% 50%;
+}
+
+.sign-in-panel {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	box-sizing: border-box;
+	width: 100%;
+	max-width: 26rem;
+	margin-inline: auto;
+	padding: 32px 24px;
+	border-radius: 16px;
+	background-color: rgba($colour-dark-background, 0.88);
+	backdrop-filter: blur(12px);
+	color: $colour-light-text;
+}
+
+.logo {
+	width: 9rem;
+	height: auto;
+	margin-bottom: 8px;
+}
+
+.heading {
+	margin: 0;
+	font-size: $font-size-medium-plus;
+	font-weight: 600;
+	line-height: 1.25;
+}
+
+.intro {
+	margin: 0;
+	color: $colour-soft-silver;
+	font-size: $font-size-small;
+}
+
+.error {
+	margin: 0;
+	padding: 12px 16px;
+	border: 1px solid $colour-secondary;
+	border-radius: 8px;
+	background-color: rgba($colour-secondary, 0.2);
+	font-size: $font-size-small;
+}
+
+.discord-button {
+	height: 48px;
+	margin-top: 8px;
+
+	&:focus-visible {
+		outline: 2px solid $colour-light-text;
+		outline-offset: 2px;
+	}
+}
+
+@media (min-width: 60rem) {
+	.admin-login-page {
+		grid-template-columns: 1fr minmax(24rem, 36%);
+		align-items: stretch;
+		padding: 0;
+	}
+
+	.sign-in-panel {
+		grid-column: 2;
+		justify-content: center;
+		max-width: none;
+		margin: 0;
+		padding: 48px clamp(32px, 4vw, 64px);
+		border-radius: 0;
+		background-color: rgba($colour-dark-background, 0.8);
+	}
 }
