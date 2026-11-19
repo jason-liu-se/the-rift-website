@@ -15,6 +15,6 @@ export class NewsToolComponent {
 		title: 'Sample news post',
 		date: '2026-01-01T00:00:00.000Z',
 		content: 'The body of the news post will appear here.',
-		bannerImg: '/assets/general-background-images/spawn-walkway-1.webp'
+		imageUrl: '/assets/general-background-images/spawn-walkway-1.webp'
 	};
 }

@@ -15,6 +15,6 @@ export class DownloadsToolComponent {
 		title: 'Sample download',
 		desc: 'A description of the download will appear here.',
 		downloadUrl: 'https://example.com/world.zip',
-		backgroundUrl: '/assets/general-background-images/iron-farm-1.webp'
+		imageUrl: '/assets/general-background-images/iron-farm-1.webp'
 	};
 }

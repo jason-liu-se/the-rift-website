@@ -2,9 +2,9 @@
 	<ul class="news-container">
 		@for (post of newsPosts; track post.id) {
 			<li class="news-post">
-				@if (post.bannerImg) {
+				@if (post.imageUrl) {
 					<div class="banner">
-						<app-optimized-image [src]="post.bannerImg" />
+						<app-optimized-image [src]="post.imageUrl" />
 					</div>
 				}
 				<div class="news-post-content">

@@ -10,7 +10,7 @@ describe('GalleryToolComponent', () => {
 		const card: HTMLElement =
 			fixture.nativeElement.querySelector('app-caption-card');
 		expect(card.querySelector('img')?.getAttribute('src')).toBe(
-			preview.url
+			preview.imageUrl
 		);
 		expect(card.querySelector('.caption-text')?.textContent).toBe(
 			preview.caption

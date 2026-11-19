@@ -12,7 +12,7 @@ import { CaptionCardComponent } from '../../../../components/caption-card/captio
 export class GalleryToolComponent {
 	public readonly preview: GalleryImage = {
 		id: 'preview',
-		url: '/assets/general-background-images/fancy-tree-1.webp',
+		imageUrl: '/assets/general-background-images/fancy-tree-1.webp',
 		caption: 'Sample caption'
 	};
 }
