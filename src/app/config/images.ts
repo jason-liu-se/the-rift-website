@@ -1,6 +1,10 @@
 /**
- * Widths (px) that optimised images are offered at in their `srcset`. Each
- * image and width the browser asks for is one Cloudflare transformation (5,000
- * unique a month on the Free plan), so keep this list short.
+ * The only widths (px) optimised images are resized to. Each image and width
+ * a browser asks for is one Cloudflare transformation (5,000 unique a month on
+ * the Free plan), so keep this list short.
  */
-export const IMAGE_BREAKPOINTS = [384, 640, 1080, 1920];
+export const IMAGE_WIDTHS = {
+	mobile: 480,
+	tablet: 960,
+	desktop: 1920
+} as const;

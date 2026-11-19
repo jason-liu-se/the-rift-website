@@ -1,4 +1,4 @@
-import { IMAGE_CONFIG, IMAGE_LOADER } from '@angular/common';
+import { IMAGE_LOADER } from '@angular/common';
 import {
 	provideHttpClient,
 	withFetch,
@@ -20,7 +20,6 @@ import {
 } from '@angular/router';
 
 import { routes } from './app.routes';
-import { IMAGE_BREAKPOINTS } from './config/images';
 import {
 	cloudflareImageLoader,
 	originalImageLoader
@@ -54,13 +53,12 @@ export const appConfig: ApplicationConfig = {
 		// Reuses the server-rendered HTML (and the API responses it fetched)
 		// instead of rendering the page again in the browser.
 		provideClientHydration(withEventReplay()),
-		// Resized images for NgOptimizedImage (`ngSrc`). Development servers
+		// Resized images for OptimizedImageComponent. Development servers
 		// have no Cloudflare image transformations, so they get the originals.
 		{
 			provide: IMAGE_LOADER,
 			useFactory: () =>
 				isDevMode() ? originalImageLoader : cloudflareImageLoader
-		},
-		{ provide: IMAGE_CONFIG, useValue: { breakpoints: IMAGE_BREAKPOINTS } }
+		}
 	]
 };

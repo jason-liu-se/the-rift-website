@@ -1,0 +1,11 @@
+:host {
+	display: block;
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+}
+
+img {
+	object-fit: var(--image-fit, cover);
+	object-position: var(--image-position, center);
+}
