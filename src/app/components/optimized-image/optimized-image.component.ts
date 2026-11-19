@@ -5,9 +5,15 @@ import {
 	afterNextRender,
 	booleanAttribute,
 	input,
+	output,
 	viewChild
 } from '@angular/core';
 import { IMAGE_WIDTHS } from 'src/app/config/images';
+
+export interface ImageSize {
+	width: number;
+	height: number;
+}
 
 /** `480w, 960w, 1920w`: the only widths an image is offered at. */
 const SRCSET = Object.values(IMAGE_WIDTHS)
@@ -38,6 +44,8 @@ export class OptimizedImageComponent {
 	public readonly original = input(false, { transform: booleanAttribute });
 	/** How wide the image shows, as in `<img sizes>`, so a small one loads small. */
 	public readonly sizes = input('100vw');
+	/** The loaded file's natural size, e.g. to fit a frame to the image. */
+	public readonly loaded = output<ImageSize>();
 
 	protected readonly srcset = SRCSET;
 
@@ -45,13 +53,27 @@ export class OptimizedImageComponent {
 		viewChild.required<ElementRef<HTMLImageElement>>('image');
 
 	constructor() {
-		// A server-rendered image can fail before hydration adds the listener.
+		// A server-rendered image can load or fail before hydration adds the
+		// listeners.
 		afterNextRender(() => {
 			const image = this.image().nativeElement;
-			if (image.complete && image.naturalWidth === 0) {
+			if (!image.complete) {
+				return;
+			}
+			if (image.naturalWidth === 0) {
 				this.useOriginal();
+			} else {
+				this.emitLoaded();
 			}
 		});
+	}
+
+	protected emitLoaded(): void {
+		const { naturalWidth, naturalHeight } = this.image().nativeElement;
+		// An SVG without intrinsic dimensions loads with a 0 size.
+		if (naturalWidth > 0 && naturalHeight > 0) {
+			this.loaded.emit({ width: naturalWidth, height: naturalHeight });
+		}
 	}
 
 	/** Without `srcset`, the browser loads `src`: the original file. */

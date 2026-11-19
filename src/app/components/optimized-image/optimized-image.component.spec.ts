@@ -70,4 +70,34 @@ describe('OptimizedImageComponent', () => {
 		expect(render().alt).toBe('');
 		expect(render({ alt: 'A castle' }).alt).toBe('A castle');
 	});
+
+	it('emits the loaded file’s natural size', () => {
+		const fixture = TestBed.createComponent(OptimizedImageComponent);
+		fixture.componentRef.setInput('src', SRC);
+		const sizes: unknown[] = [];
+		fixture.componentInstance.loaded.subscribe((size) => sizes.push(size));
+		fixture.detectChanges();
+		const image: HTMLImageElement =
+			fixture.nativeElement.querySelector('img');
+
+		Object.defineProperty(image, 'naturalWidth', { value: 1920 });
+		Object.defineProperty(image, 'naturalHeight', { value: 1080 });
+		image.dispatchEvent(new Event('load'));
+
+		expect(sizes).toEqual([{ width: 1920, height: 1080 }]);
+	});
+
+	it('emits no size for an image without intrinsic dimensions', () => {
+		const fixture = TestBed.createComponent(OptimizedImageComponent);
+		fixture.componentRef.setInput('src', SRC);
+		const sizes: unknown[] = [];
+		fixture.componentInstance.loaded.subscribe((size) => sizes.push(size));
+		fixture.detectChanges();
+
+		fixture.nativeElement
+			.querySelector('img')
+			.dispatchEvent(new Event('load'));
+
+		expect(sizes).toEqual([]);
+	});
 });
