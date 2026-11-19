@@ -24,7 +24,7 @@ export const NEWS_POSTS: NewsPost[] = Array.from(
 
 const image = (name: string, caption: string): GalleryImage => ({
 	id: name,
-	url: `/assets/general-background-images/${name}`,
+	imageUrl: `/assets/general-background-images/${name}`,
 	caption
 });
 
@@ -49,7 +49,7 @@ export const DOWNLOAD_COLLECTIONS: DownloadCollection[] = [
 				title: 'World download',
 				desc: 'The full season 5 world.',
 				downloadUrl: 'https://example.com/season-5.zip',
-				backgroundUrl:
+				imageUrl:
 					'/assets/general-background-images/mountain-side-1.webp'
 			}
 		]

@@ -17,7 +17,7 @@ describe('GalleryPageComponent', () => {
 		`${galleryUrl}/${collection}?startIndex=0&limit=1`;
 	const photo = (url: string): GalleryImage => ({
 		id: url,
-		url,
+		imageUrl: url,
 		caption: ''
 	});
 	let fixture: ComponentFixture<GalleryPageComponent>;

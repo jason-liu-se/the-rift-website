@@ -58,7 +58,7 @@ export class GalleryPageComponent {
 	private toCard = (name: string): Observable<ICardSelection> =>
 		this.galleryProvider.getCollectionImagesObservable(name, 0, 1).pipe(
 			map(({ items, total }) => ({
-				imageUrl: items[0]?.url ?? GALLERY_FALLBACK_IMAGE,
+				imageUrl: items[0]?.imageUrl ?? GALLERY_FALLBACK_IMAGE,
 				routerLink: `/gallery/${encodeURIComponent(name)}`,
 				title: galleryCollectionTitle(name),
 				desc: `${total} photos`

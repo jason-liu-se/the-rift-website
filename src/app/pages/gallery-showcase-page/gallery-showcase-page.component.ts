@@ -97,7 +97,8 @@ export class GalleryShowcasePageComponent {
 					this.imageCache[`${requestedPageIndex}`] = items;
 					this.paginationLength = total;
 					if (requestedPageIndex === 0) {
-						this.imageUrl = items[0]?.url ?? GALLERY_FALLBACK_IMAGE;
+						this.imageUrl =
+							items[0]?.imageUrl ?? GALLERY_FALLBACK_IMAGE;
 					}
 
 					if (isLatestRequest()) {

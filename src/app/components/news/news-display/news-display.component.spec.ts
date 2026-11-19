@@ -10,7 +10,7 @@ const NEWS_POSTS: NewsPost[] = [
 		title: 'Season 6',
 		date: '2026-01-02T12:00:00',
 		content: 'A new season begins.',
-		bannerImg: 'assets/season-6.png'
+		imageUrl: 'assets/season-6.png'
 	},
 	{
 		id: '2',
@@ -23,7 +23,7 @@ const NEWS_POSTS: NewsPost[] = [
 		title: 'Event',
 		date: '2026-05-06T12:00:00',
 		content: 'Build contest.',
-		bannerImg: ''
+		imageUrl: ''
 	}
 ];
 

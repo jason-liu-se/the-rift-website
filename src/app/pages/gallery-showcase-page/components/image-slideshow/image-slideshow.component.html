@@ -10,11 +10,11 @@
 			</button>
 		</div>
 		<div class="content-container">
-			@if (captionedImages[index].url) {
+			@if (captionedImages[index].imageUrl) {
 				<div class="image-frame">
 					<!-- Full screen: the original, unresized photo. -->
 					<app-optimized-image
-						[src]="captionedImages[index].url"
+						[src]="captionedImages[index].imageUrl"
 						priority
 						original
 						[alt]="captionedImages[index].caption"
