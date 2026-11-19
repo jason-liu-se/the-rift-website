@@ -14,10 +14,12 @@
 	},
 	"observability": { "enabled": true },
 	// Pings the API's /health every 4 minutes so its host doesn't sleep
-	// (`scheduled` in src/server.ts).
+	// (`scheduled` in src/server.ts), sending the HEALTH_CHECK_TOKEN secret
+	// (README "Deployment").
 	"triggers": { "crons": ["*/4 * * * *"] },
 	// Settings for pull request preview deployments (`wrangler preview`). The
-	// Worker has no vars or bindings, so it needs none; the block only has to exist.
+	// Worker has no vars or bindings besides the cron's secret, so it needs none;
+	// the block only has to exist.
 	"previews": {},
 	"routes": [{ "pattern": "riftsmp.ca", "custom_domain": true }]
 }

@@ -129,7 +129,14 @@ Setup:
    WebP at three widths (`src/app/config/images.ts`). On the Free plan, once the
    month's 5,000 unique transformations are used, new ones fail and the
    component shows the original file instead.
-6. Verify the domain in Google Search Console, submit
+6. Keep the health check reachable: generate a random token
+   (`openssl rand -hex 32`), save it as the Worker secret `HEALTH_CHECK_TOKEN`
+   (`npx wrangler secret put HEALTH_CHECK_TOKEN`), and if a WAF rule blocks
+   other Workers from the API, exempt requests that carry it:
+   `... and not any(http.request.headers["x-health-check-token"][*] eq "<token>")`.
+   Cron requests don't come from the site's zone, so `cf.worker.upstream_zone`
+   can't identify them. Failed checks are logged with the full response.
+7. Verify the domain in Google Search Console, submit
    `https://<domain>/sitemap.xml`, and import the site into Bing Webmaster
    Tools.
 

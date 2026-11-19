@@ -37,12 +37,21 @@ export const reqHandler = createRequestHandler(async (request) => {
 const API_HEALTH_URL = `${environment.API_URL}/health`;
 /** Enough to identify an error or challenge page in the Workers logs. */
 const MAX_LOGGED_BODY_LENGTH = 2000;
+/**
+ * Carries the HEALTH_CHECK_TOKEN Worker secret, so the API zone's WAF can let
+ * this Worker's health checks through while blocking other Workers (README
+ * "Deployment").
+ */
+const HEALTH_CHECK_TOKEN_HEADER = 'X-Health-Check-Token';
 
 export default {
 	fetch: reqHandler,
 	// Runs on the Cron Trigger in wrangler.jsonc: keeps the API's free-tier host
 	// from putting it to sleep, which would slow the next page render.
-	async scheduled(controller: { cron: string; scheduledTime: number }) {
+	async scheduled(
+		controller: { cron: string; scheduledTime: number },
+		env: { HEALTH_CHECK_TOKEN?: string }
+	) {
 		const started = Date.now();
 		const context = {
 			url: API_HEALTH_URL,
@@ -51,7 +60,11 @@ export default {
 		};
 		let response: Response;
 		try {
-			response = await fetch(API_HEALTH_URL);
+			response = await fetch(API_HEALTH_URL, {
+				headers: {
+					[HEALTH_CHECK_TOKEN_HEADER]: env.HEALTH_CHECK_TOKEN ?? ''
+				}
+			});
 		} catch (error) {
 			console.error('API health check threw', {
 				...context,
