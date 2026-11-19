@@ -45,6 +45,28 @@ describe('OptimizedImageComponent', () => {
 		expect(image.getAttribute('src')).toBe(SRC);
 	});
 
+	it('starts later images of a failed source on the original file', () => {
+		const failed = '/assets/failed.webp';
+		render({ src: failed }).dispatchEvent(new Event('error'));
+
+		expect(render({ src: failed }).getAttribute('srcset')).not.toContain(
+			'/cdn-cgi/'
+		);
+		expect(render().getAttribute('srcset')).toContain('/cdn-cgi/');
+	});
+
+	it('keeps its loader params when src changes to a failed source', () => {
+		const failed = '/assets/failed.webp';
+		render({ src: failed }).dispatchEvent(new Event('error'));
+		const fixture = TestBed.createComponent(OptimizedImageComponent);
+		fixture.componentRef.setInput('src', SRC);
+		fixture.detectChanges();
+
+		fixture.componentRef.setInput('src', failed);
+
+		expect(() => fixture.detectChanges()).not.toThrow();
+	});
+
 	it('serves only the original file when original is set', () => {
 		const image = render({ original: true });
 
