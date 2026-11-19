@@ -1,6 +1,6 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import {
 	HttpClient,
+	HttpErrorResponse,
 	provideHttpClient,
 	withInterceptors
 } from '@angular/common/http';
@@ -10,6 +10,7 @@ import {
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { CONTENT_VERSION } from '../../testing/api-fixtures';
+import { CONTENT_VERSION_MAX_AGE_MS } from '../../config/api';
 import { environment } from '../../../environments/environment';
 import { contentVersionInterceptor } from './content-version.interceptor';
 import { unversioned } from './content-version.service';
@@ -33,7 +34,10 @@ describe('contentVersionInterceptor', () => {
 		controller = TestBed.inject(HttpTestingController);
 	});
 
-	afterEach(() => controller.verify());
+	afterEach(() => {
+		controller.verify();
+		vi.useRealTimers();
+	});
 
 	it('fetches the version once and sends it as v on every API GET', () => {
 		http.get(newsUrl, { params: { limit: 5 } }).subscribe();
@@ -76,5 +80,24 @@ describe('contentVersionInterceptor', () => {
 		http.get(newsUrl).subscribe();
 		controller.expectOne(versionUrl).flush(CONTENT_VERSION);
 		controller.expectOne(`${newsUrl}?v=${CONTENT_VERSION.version}`);
+	});
+
+	it('fetches the version again once it is too old', () => {
+		vi.useFakeTimers({ toFake: ['Date'] });
+		const newVersion = CONTENT_VERSION.version + 1;
+
+		http.get(newsUrl).subscribe();
+		controller.expectOne(versionUrl).flush(CONTENT_VERSION);
+		controller.expectOne(`${newsUrl}?v=${CONTENT_VERSION.version}`);
+
+		vi.advanceTimersByTime(CONTENT_VERSION_MAX_AGE_MS);
+		http.get(newsUrl).subscribe();
+		controller.expectNone(versionUrl);
+		controller.expectOne(`${newsUrl}?v=${CONTENT_VERSION.version}`);
+
+		vi.advanceTimersByTime(1);
+		http.get(newsUrl).subscribe();
+		controller.expectOne(versionUrl).flush({ version: newVersion });
+		controller.expectOne(`${newsUrl}?v=${newVersion}`);
 	});
 });

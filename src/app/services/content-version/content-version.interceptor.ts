@@ -19,9 +19,11 @@ export const contentVersionInterceptor: HttpInterceptorFn = (req, next) => {
 		return next(req);
 	}
 
-	return inject(ContentVersionService).version$.pipe(
-		switchMap((version) =>
-			next(req.clone({ setParams: { v: String(version) } }))
-		)
-	);
+	return inject(ContentVersionService)
+		.version()
+		.pipe(
+			switchMap((version) =>
+				next(req.clone({ setParams: { v: String(version) } }))
+			)
+		);
 };
