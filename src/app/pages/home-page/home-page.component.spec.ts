@@ -27,8 +27,9 @@ describe('HomePageComponent', () => {
 		fixture.detectChanges();
 		const element: HTMLElement = fixture.nativeElement;
 		const welcomeBackground = () =>
-			element.querySelector<HTMLElement>('app-welcome-card .card')!.style
-				.backgroundImage;
+			element
+				.querySelector('app-welcome-card img.background')
+				?.getAttribute('src') ?? '';
 		const resizeWindow = (width: number) => {
 			setInnerWidth(width);
 			window.dispatchEvent(new Event('resize'));

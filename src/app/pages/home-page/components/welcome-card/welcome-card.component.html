@@ -1,10 +1,14 @@
 <div class="card-wrapper">
-	<div
-		class="card"
-		[style.background-image]="
-			backgroundUrl ? 'url(' + backgroundUrl + ')' : null
-		"
-	>
+	<div class="card">
+		@if (backgroundUrl) {
+			<img
+				class="background"
+				[ngSrc]="backgroundUrl"
+				fill
+				priority
+				alt=""
+			/>
+		}
 		<div class="card-content">
 			<div class="card-container">
 				<!-- The header image is the page heading (e.g. the logo on the home page). -->

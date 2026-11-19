@@ -1,7 +1,8 @@
-<div
-	class="background-image-card"
-	[style.background-image]="'url(' + src + ')'"
->
+<div class="background-image-card">
+	<!-- Every use is a page banner, at the top of the page. -->
+	@if (src) {
+		<img class="background" [ngSrc]="src" fill priority alt="" />
+	}
 	<div class="overlay-content">
 		<div class="text-container">
 			@if (showTitle) {

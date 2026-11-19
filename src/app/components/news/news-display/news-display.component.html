@@ -3,7 +3,14 @@
 		@for (post of newsPosts; track post.id) {
 			<li class="news-post">
 				@if (post.bannerImg) {
-					<img class="banner-img" [src]="post.bannerImg" alt="" />
+					<div class="banner">
+						<img
+							class="banner-img"
+							[ngSrc]="post.bannerImg"
+							fill
+							alt=""
+						/>
+					</div>
 				}
 				<div class="news-post-content">
 					<h2 class="title">{{ post.title }}</h2>

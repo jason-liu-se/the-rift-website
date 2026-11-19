@@ -10,11 +10,17 @@
 			</button>
 		</div>
 		<div class="content-container">
-			<img
-				class="image"
-				[src]="captionedImages[index].url"
-				[alt]="captionedImages[index].caption"
-			/>
+			@if (captionedImages[index].url) {
+				<div class="image-frame">
+					<img
+						class="image"
+						[ngSrc]="captionedImages[index].url"
+						fill
+						loading="eager"
+						[alt]="captionedImages[index].caption"
+					/>
+				</div>
+			}
 			<p class="caption">{{ captionedImages[index].caption }}</p>
 		</div>
 		<div class="next-button-container">

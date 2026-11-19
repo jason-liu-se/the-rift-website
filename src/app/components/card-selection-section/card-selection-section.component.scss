@@ -36,6 +36,7 @@ $hover-animation-text-offset: -0.5rem;
 }
 
 .collection-card {
+	position: relative;
 	width: $collection-card-width;
 	height: $collection-card-height;
 	outline: 1px solid black;
@@ -60,9 +61,7 @@ $hover-animation-text-offset: -0.5rem;
 }
 
 .background-content {
-	grid-area: 1 / 1 / 2 / 2;
-	background-position: center;
-	background-size: cover;
+	object-fit: cover;
 	transition: filter $hover-animation-duration;
 }
 

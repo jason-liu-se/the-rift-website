@@ -1,9 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { OPTIMIZED_IMAGE } from 'src/app/directives/image-fallback.directive';
 
 @Component({
 	selector: 'app-background-image-card',
 	templateUrl: './background-image-card.component.html',
-	styleUrls: ['./background-image-card.component.scss']
+	styleUrls: ['./background-image-card.component.scss'],
+	imports: [OPTIMIZED_IMAGE]
 })
 export class BackgroundImageCardComponent implements OnInit {
 	@Input({ required: true }) src = '';

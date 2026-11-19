@@ -23,12 +23,16 @@ describe('BackgroundImageCardComponent', () => {
 		});
 	});
 
-	it('uses src as the background image', () => {
-		const card = render().querySelector<HTMLElement>(
-			'.background-image-card'
-		);
+	it('shows src as a decorative, eagerly loaded background image', () => {
+		const image = render().querySelector('img');
 
-		expect(card?.style.backgroundImage).toContain(SRC);
+		expect(image?.getAttribute('src')).toBe(SRC);
+		expect(image?.alt).toBe('');
+		expect(image?.getAttribute('fetchpriority')).toBe('high');
+	});
+
+	it('renders no image until src is set', () => {
+		expect(render({ src: '' }).querySelector('img')).toBeNull();
 	});
 
 	describe('title', () => {

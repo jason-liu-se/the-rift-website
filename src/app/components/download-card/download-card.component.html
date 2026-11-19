@@ -1,8 +1,8 @@
 <div class="download-card-wrapper">
-	<div
-		class="download-card"
-		[style.background-image]="imgSrc ? 'url(' + imgSrc + ')' : null"
-	>
+	@if (imgSrc) {
+		<img class="background" [ngSrc]="imgSrc" fill alt="" />
+	}
+	<div class="download-card">
 		<div class="containers">
 			<div class="text-container">
 				@if (showTitle) {

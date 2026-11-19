@@ -1,9 +1,11 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { OPTIMIZED_IMAGE } from 'src/app/directives/image-fallback.directive';
 
 @Component({
 	selector: 'app-caption-card',
 	templateUrl: './caption-card.component.html',
-	styleUrls: ['./caption-card.component.scss']
+	styleUrls: ['./caption-card.component.scss'],
+	imports: [OPTIMIZED_IMAGE]
 })
 export class CaptionCardComponent implements OnInit {
 	@Input({ required: true }) public src!: string;

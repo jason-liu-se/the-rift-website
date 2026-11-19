@@ -81,14 +81,12 @@ describe('GalleryShowcasePageComponent', () => {
 		});
 
 		it("shows the collection's name and first photo as the page header", () => {
-			const header = element.querySelector<HTMLElement>(
-				'.background-image-card'
-			);
+			const header = element.querySelector('.background-image-card img');
 
 			expect(element.querySelector('h1')?.textContent).toBe(
 				'Gallery: Season 5'
 			);
-			expect(header?.style.backgroundImage).toContain(FIRST_PAGE[0].url);
+			expect(header?.getAttribute('src')).toBe(FIRST_PAGE[0].url);
 		});
 
 		it('shows the first page of the collection and its total', () => {
@@ -217,8 +215,9 @@ describe('GalleryShowcasePageComponent', () => {
 		fixture.detectChanges();
 
 		expect(
-			element.querySelector<HTMLElement>('.background-image-card')?.style
-				.backgroundImage
-		).toContain(GALLERY_FALLBACK_IMAGE);
+			element
+				.querySelector('.background-image-card img')
+				?.getAttribute('src')
+		).toBe(GALLERY_FALLBACK_IMAGE);
 	});
 });

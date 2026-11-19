@@ -76,13 +76,11 @@ describe('GalleryPageComponent', () => {
 		loadSeasons5And6();
 
 		expect(descriptions()).toEqual(['12 photos', '7 photos']);
-		const backgrounds = cards().map(
-			(card) =>
-				card.querySelector<HTMLElement>('.background-content')?.style
-					.backgroundImage
+		const images = cards().map((card) =>
+			card.querySelector('.background-content')?.getAttribute('src')
 		);
-		expect(backgrounds[0]).toContain('five.webp');
-		expect(backgrounds[1]).toContain('six.webp');
+		expect(images[0]).toContain('five.webp');
+		expect(images[1]).toContain('six.webp');
 	});
 
 	it('uses the fallback image for a collection with no photos', () => {
@@ -91,8 +89,7 @@ describe('GalleryPageComponent', () => {
 		fixture.detectChanges();
 
 		expect(
-			element.querySelector<HTMLElement>('.background-content')?.style
-				.backgroundImage
+			element.querySelector('.background-content')?.getAttribute('src')
 		).toContain(GALLERY_FALLBACK_IMAGE);
 		expect(descriptions()).toEqual(['0 photos']);
 	});

@@ -11,7 +11,9 @@
 
 .caption-card {
 	display: flex;
-	flex: 1 1 auto;
+	// Optimised images fill their tile, so the tile can't take the image's
+	// width: start at a 16:9 photo's width at this height.
+	flex: 1 1 calc(300px * 16 / 9);
 	height: 300px;
 	overflow: hidden;
 	transition:
