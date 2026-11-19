@@ -1,6 +1,6 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { switchMap } from 'rxjs';
+import { catchError, of, switchMap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ContentVersionService, UNVERSIONED } from './content-version.service';
 
@@ -8,7 +8,7 @@ import { ContentVersionService, UNVERSIONED } from './content-version.service';
  * Sends the content version as `v` on every API GET, so no public read can
  * miss it (the API doesn't cache a read without it). Writes aren't GETs, and
  * uncached GETs opt out with `unversioned()`. If the version can't be fetched,
- * the read fails with that error.
+ * the read goes without `v`: uncached, so slower, but it still works.
  */
 export const contentVersionInterceptor: HttpInterceptorFn = (req, next) => {
 	if (
@@ -22,8 +22,13 @@ export const contentVersionInterceptor: HttpInterceptorFn = (req, next) => {
 	return inject(ContentVersionService)
 		.version()
 		.pipe(
+			catchError(() => of(undefined)),
 			switchMap((version) =>
-				next(req.clone({ setParams: { v: String(version) } }))
+				next(
+					version === undefined
+						? req
+						: req.clone({ setParams: { v: String(version) } })
+				)
 			)
 		);
 };

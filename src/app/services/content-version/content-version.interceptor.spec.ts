@@ -1,6 +1,5 @@
 import {
 	HttpClient,
-	HttpErrorResponse,
 	provideHttpClient,
 	withInterceptors
 } from '@angular/common/http';
@@ -65,17 +64,12 @@ describe('contentVersionInterceptor', () => {
 		controller.expectOne('https://example.com/data');
 	});
 
-	it('fails the read when the version fails, and fetches it again next time', () => {
-		let error: HttpErrorResponse | undefined;
-		http.get(newsUrl).subscribe({
-			error: (e: HttpErrorResponse) => (error = e)
-		});
+	it('reads without v when the version fails, and fetches it again next time', () => {
+		http.get(newsUrl).subscribe();
 		controller
 			.expectOne(versionUrl)
 			.flush(null, { status: 500, statusText: 'Server Error' });
-
-		expect(error?.status).toBe(500);
-		controller.expectNone(newsUrl);
+		controller.expectOne(newsUrl);
 
 		http.get(newsUrl).subscribe();
 		controller.expectOne(versionUrl).flush(CONTENT_VERSION);
