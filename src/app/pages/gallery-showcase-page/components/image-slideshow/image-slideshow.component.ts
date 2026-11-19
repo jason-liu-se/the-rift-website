@@ -1,19 +1,25 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, signal } from '@angular/core';
 import { GalleryImage } from 'src/app/interfaces/api-responses';
 import { MatIcon } from '@angular/material/icon';
 import { OptimizedImageComponent } from 'src/app/components/optimized-image/optimized-image.component';
+import { ImageActionsComponent } from '../image-actions/image-actions.component';
+
+/** Most gallery photos are 16:9 screenshots; used until a photo loads. */
+const DEFAULT_IMAGE_RATIO = 16 / 9;
 
 @Component({
 	selector: 'app-image-slideshow',
 	templateUrl: './image-slideshow.component.html',
 	styleUrls: ['./image-slideshow.component.scss'],
-	imports: [MatIcon, OptimizedImageComponent]
+	imports: [MatIcon, OptimizedImageComponent, ImageActionsComponent]
 })
 export class ImageSlideshowComponent implements OnInit {
 	@Input({ required: true }) public captionedImages!: GalleryImage[];
 	@Input() public startingIndex = 0;
 
 	public index = 0;
+	/** The current photo's width ÷ height. */
+	protected readonly imageRatio = signal(DEFAULT_IMAGE_RATIO);
 
 	public isPrevDisabled = false;
 	public isNextDisabled = false;
@@ -38,6 +44,7 @@ export class ImageSlideshowComponent implements OnInit {
 
 	public handleClickPrev(): void {
 		this.index--;
+		this.imageRatio.set(DEFAULT_IMAGE_RATIO);
 
 		if (this.index <= 0) {
 			this.index = 0;
@@ -51,6 +58,7 @@ export class ImageSlideshowComponent implements OnInit {
 
 	public handleClickNext(): void {
 		this.index++;
+		this.imageRatio.set(DEFAULT_IMAGE_RATIO);
 
 		if (this.index >= this.captionedImages.length - 1) {
 			this.index = this.captionedImages.length - 1;

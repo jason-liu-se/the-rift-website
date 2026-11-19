@@ -128,7 +128,9 @@ Setup:
    through `OptimizedImageComponent` (`src/app/components/optimized-image/`), as
    WebP at three widths (`src/app/config/images.ts`). On the Free plan, once the
    month's 5,000 unique transformations are used, new ones fail and the
-   component shows the original file instead.
+   component shows the original file instead. The gallery's Download PNG reads
+   the original file, so image hosts other than the site must allow its origin
+   in CORS.
 6. Verify the domain in Google Search Console, submit
    `https://<domain>/sitemap.xml`, and import the site into Bing Webmaster
    Tools.

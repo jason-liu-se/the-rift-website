@@ -1,0 +1,45 @@
+<!-- Fixed accessible names: the visible label changes, the announcer speaks. -->
+<div class="image-actions" role="group" aria-label="Image actions">
+	<button
+		type="button"
+		class="action"
+		aria-label="Copy link"
+		(click)="copyLink()"
+	>
+		@switch (copyState()) {
+			@case ("done") {
+				<mat-icon aria-hidden="true">check</mat-icon>
+				<span class="label">Copied</span>
+			}
+			@case ("failed") {
+				<mat-icon aria-hidden="true">error</mat-icon>
+				<span class="label">Couldn't copy</span>
+			}
+			@default {
+				<mat-icon aria-hidden="true">link</mat-icon>
+				<span class="label">Copy link</span>
+			}
+		}
+	</button>
+	<button
+		type="button"
+		class="action"
+		aria-label="Download PNG"
+		(click)="downloadPng()"
+	>
+		@switch (downloadState()) {
+			@case ("busy") {
+				<mat-icon aria-hidden="true">hourglass_empty</mat-icon>
+				<span class="label">Preparing…</span>
+			}
+			@case ("failed") {
+				<mat-icon aria-hidden="true">error</mat-icon>
+				<span class="label">Download failed</span>
+			}
+			@default {
+				<mat-icon aria-hidden="true">download</mat-icon>
+				<span class="label">Download PNG</span>
+			}
+		}
+	</button>
+</div>

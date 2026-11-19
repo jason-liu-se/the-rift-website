@@ -33,6 +33,7 @@ Specs in `e2e/` run every route on desktop and mobile in Chromium.
 | `responsive.spec.ts`    | No horizontal scroll at narrow widths / 200% zoom |
 | `data.spec.ts`          | API data appears on screen                        |
 | `error-states.spec.ts`  | Error state and retry (focus), 404 page           |
+| `image-actions.spec.ts` | Slideshow's Copy link and PNG download            |
 
 **Mocks.** No API or BlueMap is needed:
 
