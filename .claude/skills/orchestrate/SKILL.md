@@ -117,10 +117,11 @@ For each finished agent:
    gets one list.
 2. Send fixes back to the same agent (`SendMessage`), which keeps its context,
    rather than fixing them yourself. A fix round replays the agent's whole
-   context, so send Critical and Important findings and only the cheap Minor
-   ones; list the rest in the PR or a follow-up. Fix only trivial issues
-   directly. If a fix needs files the task doesn't own, update ownership in the
-   plan first. Findings outside every task's files go into a follow-up issue.
+   context, so send Critical and Important findings (the `a11y-auditor`'s
+   Blocker and Serious) and only the cheap Minor ones; list the rest in the PR
+   or a follow-up. Fix only trivial issues directly. If a fix needs files the
+   task doesn't own, update ownership in the plan first. Findings outside every
+   task's files go into a follow-up issue.
 3. Before blaming a PR for an e2e failure, run the same spec on the base.
 
 ## 7. Integrate

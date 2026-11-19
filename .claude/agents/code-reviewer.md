@@ -130,9 +130,9 @@ Start with a one-line summary of what you reviewed. Then list findings grouped
 by severity, most severe first:
 
 - **Critical**: bugs, security issues, or breakage that must be fixed.
-- **Warning**: missed edge cases, accessibility/keyboard/responsive failures, or
-  overlooked changes likely to cause problems.
-- **Suggestion**: readability/maintainability improvements.
+- **Important**: missed edge cases, accessibility/keyboard/responsive failures,
+  or overlooked changes likely to cause problems.
+- **Minor**: readability/maintainability improvements.
 - **Questions for the user**: design decisions the reviewer shouldn't make
   alone, such as whether mobile and desktop layouts should diverge.
 

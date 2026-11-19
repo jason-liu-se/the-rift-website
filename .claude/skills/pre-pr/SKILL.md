@@ -46,6 +46,6 @@ Give one short summary:
 - **Screenshots:** the image links for the PR, or why there are none.
 - **Verdict:** ready for a PR, or the list of things to fix first.
 
-Fix failing checks and Critical or Important findings that are in the branch's
-scope, then re-run the affected checks. List the rest in the report (and the PR)
-for the user to decide.
+Fix failing checks and Critical or Important findings (the `a11y-auditor`'s
+Blocker and Serious) that are in the branch's scope, then re-run the affected
+checks. List the rest in the report (and the PR) for the user to decide.
