@@ -12,21 +12,28 @@
 	align-items: center;
 	gap: 0.3em;
 	min-height: 2.25em;
-	padding: 0.25em 0.75em;
+	padding: 0.25em 0.5em;
 	// Near-opaque, so the text keeps its contrast over a light page.
 	border: 1px solid rgba($colour-light-text, 0.5);
 	border-radius: 10px;
 	background-color: rgba($colour-dark-background, 0.85);
 	color: $colour-light-text;
 	font: inherit;
-	// Smaller on phones, so both buttons fit on one row above the photo.
-	font-size: 0.875rem;
 	cursor: pointer;
+}
+
+// Icon-only on phones, to save room; each button's aria-label names it.
+.label {
+	display: none;
 }
 
 @media only screen and (min-width: 60rem) {
 	.action {
-		font-size: 1rem;
+		padding-inline: 0.75em;
+	}
+
+	.label {
+		display: inline;
 	}
 }
 
