@@ -1,3 +1,5 @@
+import { Clipboard } from '@angular/cdk/clipboard';
+import { provideHttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 
 import { GalleryImage } from 'src/app/interfaces/api-responses';
@@ -29,7 +31,10 @@ function render(inputs: Partial<ImageSlideshowComponent> = {}) {
 
 describe('ImageSlideshowComponent', () => {
 	beforeEach(() => {
-		TestBed.configureTestingModule({ imports: [ImageSlideshowComponent] });
+		TestBed.configureTestingModule({
+			imports: [ImageSlideshowComponent],
+			providers: [provideHttpClient()]
+		});
 	});
 
 	it('shows the first image by default, with only Next enabled', () => {
@@ -96,5 +101,54 @@ describe('ImageSlideshowComponent', () => {
 		expect(caption()).toBe('');
 		expect(prev.disabled).toBe(true);
 		expect(next.disabled).toBe(true);
+	});
+
+	it('copies the link of the image on show', () => {
+		const copy = vi
+			.spyOn(TestBed.inject(Clipboard), 'copy')
+			.mockReturnValue(true);
+		const { element, next, click } = render();
+		const copyLink = () =>
+			element.querySelector<HTMLButtonElement>(
+				'app-image-actions button'
+			)!;
+
+		click(next);
+		copyLink().click();
+
+		expect(copy).toHaveBeenCalledWith(
+			new URL('assets/two.png', document.baseURI).href
+		);
+	});
+
+	it('sizes the viewer to the photo once it loads, 16:9 until then', () => {
+		const { element } = render();
+		const viewer = element.querySelector<HTMLElement>('.viewer')!;
+		const image = viewer.querySelector('img')!;
+		expect(viewer.style.getPropertyValue('--image-ratio')).toBe(
+			`${16 / 9}`
+		);
+
+		Object.defineProperty(image, 'naturalWidth', { value: 1000 });
+		Object.defineProperty(image, 'naturalHeight', { value: 2000 });
+		image.dispatchEvent(new Event('load'));
+		TestBed.tick();
+
+		expect(viewer.style.getPropertyValue('--image-ratio')).toBe('0.5');
+	});
+
+	it('goes back to 16:9 for the next photo until it loads', () => {
+		const { element, next, click } = render();
+		const viewer = () => element.querySelector<HTMLElement>('.viewer')!;
+		const image = viewer().querySelector('img')!;
+		Object.defineProperty(image, 'naturalWidth', { value: 1000 });
+		Object.defineProperty(image, 'naturalHeight', { value: 2000 });
+		image.dispatchEvent(new Event('load'));
+
+		click(next);
+
+		expect(viewer().style.getPropertyValue('--image-ratio')).toBe(
+			`${16 / 9}`
+		);
 	});
 });

@@ -3,22 +3,34 @@
 		<div class="prev-button-container">
 			<button
 				class="prev"
+				aria-label="Previous image"
 				(click)="handleClickPrev()"
 				[disabled]="isPrevDisabled"
 			>
-				<mat-icon class="icon">chevron_left</mat-icon>
+				<mat-icon class="icon" aria-hidden="true"
+					>chevron_left</mat-icon
+				>
 			</button>
 		</div>
 		<div class="content-container">
 			@if (captionedImages[index].imageUrl) {
-				<div class="image-frame">
-					<!-- Full screen: the original, unresized photo. -->
-					<app-optimized-image
-						[src]="captionedImages[index].imageUrl"
-						priority
-						original
-						[alt]="captionedImages[index].caption"
+				<!-- Sized to the photo, so the actions line up with its edge. -->
+				<div class="viewer" [style.--image-ratio]="imageRatio()">
+					<app-image-actions
+						[imageUrl]="captionedImages[index].imageUrl"
 					/>
+					<div class="image-frame">
+						<!-- Full screen: the original, unresized photo. -->
+						<app-optimized-image
+							[src]="captionedImages[index].imageUrl"
+							priority
+							original
+							[alt]="captionedImages[index].caption"
+							(loaded)="
+								imageRatio.set($event.width / $event.height)
+							"
+						/>
+					</div>
 				</div>
 			}
 			<p class="caption">{{ captionedImages[index].caption }}</p>
@@ -26,10 +38,13 @@
 		<div class="next-button-container">
 			<button
 				class="next"
+				aria-label="Next image"
 				(click)="handleClickNext()"
 				[disabled]="isNextDisabled"
 			>
-				<mat-icon class="icon">chevron_right</mat-icon>
+				<mat-icon class="icon" aria-hidden="true"
+					>chevron_right</mat-icon
+				>
 			</button>
 		</div>
 	</div>

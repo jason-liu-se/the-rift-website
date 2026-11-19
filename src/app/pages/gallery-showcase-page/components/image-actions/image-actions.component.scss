@@ -1,0 +1,41 @@
+@use "../../../../../theme-colours" as *;
+
+.image-actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: 0.5em;
+}
+
+.action {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3em;
+	min-height: 2.25em;
+	padding: 0.25em 0.75em;
+	// Near-opaque, so the text keeps its contrast over a light page.
+	border: 1px solid rgba($colour-light-text, 0.5);
+	border-radius: 10px;
+	background-color: rgba($colour-dark-background, 0.85);
+	color: $colour-light-text;
+	font: inherit;
+	// Smaller on phones, so both buttons fit on one row above the photo.
+	font-size: 0.875rem;
+	cursor: pointer;
+}
+
+@media only screen and (min-width: 60rem) {
+	.action {
+		font-size: 1rem;
+	}
+}
+
+.action:hover {
+	border-color: $colour-light-text;
+	background-color: $colour-dark-background;
+}
+
+.action:focus-visible {
+	outline: 2px solid $colour-light-text;
+	outline-offset: 2px;
+}

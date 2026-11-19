@@ -1,12 +1,16 @@
 @use "../../../../../theme-colours" as *;
 
 $edge-padding-vertical: 10vh;
+// Clears the pop-up's Close button on short (landscape phone) screens.
+$edge-padding-top: max($edge-padding-vertical, 4em);
 $edge-padding-horizontal: min(3em, 1vw);
+// Room for the actions above the photo and the caption below it.
+$photo-surroundings: 6em;
 
 .image-slideshow {
-	height: calc(100% - 2 * $edge-padding-vertical);
+	height: calc(100% - $edge-padding-top - $edge-padding-vertical);
 	width: calc(100% - 2 * $edge-padding-horizontal);
-	padding: $edge-padding-vertical $edge-padding-horizontal;
+	padding: $edge-padding-top $edge-padding-horizontal $edge-padding-vertical;
 }
 
 .containers {
@@ -30,11 +34,24 @@ $edge-padding-horizontal: min(3em, 1vw);
 	flex: 1;
 }
 
+$image-max-height: min(
+	65vh,
+	calc(
+		100vh - $edge-padding-top - $edge-padding-vertical - $photo-surroundings
+	)
+);
+
+.viewer {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5em;
+	width: min(100%, calc($image-max-height * var(--image-ratio)));
+}
+
 .image-frame {
 	--image-fit: contain;
 	position: relative;
-	width: 100%;
-	height: 70vh;
+	aspect-ratio: var(--image-ratio);
 }
 
 .caption {
