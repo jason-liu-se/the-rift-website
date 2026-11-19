@@ -35,15 +35,48 @@ export const reqHandler = createRequestHandler(async (request) => {
 });
 
 const API_HEALTH_URL = `${environment.API_URL}/health`;
+/** Enough to identify an error or challenge page in the Workers logs. */
+const MAX_LOGGED_BODY_LENGTH = 2000;
 
 export default {
 	fetch: reqHandler,
 	// Runs on the Cron Trigger in wrangler.jsonc: keeps the API's free-tier host
 	// from putting it to sleep, which would slow the next page render.
-	async scheduled() {
-		const response = await fetch(API_HEALTH_URL);
-		if (!response.ok) {
-			console.error(`API health check failed: HTTP ${response.status}`);
+	async scheduled(controller: { cron: string; scheduledTime: number }) {
+		const started = Date.now();
+		const context = {
+			url: API_HEALTH_URL,
+			cron: controller.cron,
+			scheduledTime: new Date(controller.scheduledTime).toISOString()
+		};
+		let response: Response;
+		try {
+			response = await fetch(API_HEALTH_URL);
+		} catch (error) {
+			console.error('API health check threw', {
+				...context,
+				durationMs: Date.now() - started,
+				error: error instanceof Error ? error.stack : String(error)
+			});
+			return;
 		}
+		if (response.ok) {
+			return;
+		}
+		// Everything the response says about who refused it and why (a 403 is
+		// often a WAF or bot challenge page, identifiable from its headers/body).
+		const body = await response
+			.text()
+			.catch((error) => `<unreadable: ${error}>`);
+		console.error(`API health check failed: HTTP ${response.status}`, {
+			...context,
+			durationMs: Date.now() - started,
+			status: response.status,
+			statusText: response.statusText,
+			redirected: response.redirected,
+			finalUrl: response.url,
+			headers: Object.fromEntries(response.headers),
+			body: body.slice(0, MAX_LOGGED_BODY_LENGTH)
+		});
 	}
 };
