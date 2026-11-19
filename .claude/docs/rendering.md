@@ -56,6 +56,13 @@ other browser APIs only in event handlers, `afterNextRender`, or behind
   renders without the data and the browser fetches it after hydration. Only a
   failure in the browser shows the page's error state and retry button
   (`LoadState` in `src/app/components/fallback-panel/`).
+- Every API `GET` sends the site's content version as `v`
+  (`contentVersionInterceptor`, `src/app/services/content-version/`), so the API
+  and Cloudflare cache public reads until the next edit. The version is fetched
+  on first use, once per server request and once per page load in the browser
+  (hydration reuses the server's). Writes aren't `GET`s, and uncached `GET`s
+  (the version itself, `/auth/me`) opt out with `unversioned()`; a public read
+  without `v` isn't cached.
 - Logged-in API requests send the API's httpOnly session cookies
   (`withCredentials`). When one answers 401 because the short-lived access token
   expired, `authRefreshInterceptor` (`src/app/services/auth/`) calls

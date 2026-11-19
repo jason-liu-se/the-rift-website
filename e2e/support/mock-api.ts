@@ -8,6 +8,7 @@ import { Page } from '@playwright/test';
 import { environment } from '../../src/environments/environment.development';
 import { GalleryImage } from '../../src/app/interfaces/api-responses';
 import {
+	CONTENT_VERSION,
 	DOWNLOAD_COLLECTIONS,
 	GALLERY_COLLECTIONS,
 	MAP_SEASONS,
@@ -79,6 +80,9 @@ function galleryCollection(encodedName: string): GalleryImage[] | undefined {
 export function respondTo(url: URL): IMockResponse {
 	const notFound = { status: 404, json: { error: `ERROR: ${url.pathname}` } };
 
+	if (url.pathname === '/content/version') {
+		return ok(CONTENT_VERSION);
+	}
 	if (url.pathname === '/news') {
 		return paginateByQuery(NEWS_POSTS, url.searchParams);
 	}
