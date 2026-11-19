@@ -1,3 +1,4 @@
+import { IMAGE_LOADER } from '@angular/common';
 import { FeedbackCardComponent } from 'src/app/components/feedback-card/feedback-card.component';
 import {
 	Component,
@@ -22,6 +23,7 @@ import { NewsToolComponent } from './components/news-tool/news-tool.component';
 import { ADMIN_LOGIN_PATH } from 'src/app/config/admin';
 import { SITE_NAME } from 'src/app/config/site';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { originalImageLoader } from 'src/app/utilities/image-loaders';
 
 interface IAdminTool {
 	/** The URL fragment that opens the tool, e.g. /admin#news. */
@@ -53,7 +55,10 @@ export const ADMIN_TOOLS: readonly IAdminTool[] = [
 		NewsToolComponent,
 		DownloadsToolComponent,
 		GalleryToolComponent
-	]
+	],
+	// Previews show whatever URL an editor types: don't spend Cloudflare
+	// transformations on them.
+	providers: [{ provide: IMAGE_LOADER, useValue: originalImageLoader }]
 })
 export class AdminPageComponent {
 	private auth = inject(AuthService);

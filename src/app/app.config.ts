@@ -1,9 +1,14 @@
+import { IMAGE_LOADER } from '@angular/common';
 import {
 	provideHttpClient,
 	withFetch,
 	withInterceptors
 } from '@angular/common/http';
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import {
+	ApplicationConfig,
+	isDevMode,
+	provideZoneChangeDetection
+} from '@angular/core';
 import {
 	provideClientHydration,
 	withEventReplay
@@ -15,6 +20,10 @@ import {
 } from '@angular/router';
 
 import { routes } from './app.routes';
+import {
+	cloudflareImageLoader,
+	originalImageLoader
+} from './utilities/image-loaders';
 import { SeoTitleStrategy } from './seo/seo-title-strategy';
 import { authRefreshInterceptor } from './services/auth/auth-refresh.interceptor';
 import { serverApiTimeoutInterceptor } from './services/server-api-timeout/server-api-timeout.interceptor';
@@ -43,6 +52,13 @@ export const appConfig: ApplicationConfig = {
 		),
 		// Reuses the server-rendered HTML (and the API responses it fetched)
 		// instead of rendering the page again in the browser.
-		provideClientHydration(withEventReplay())
+		provideClientHydration(withEventReplay()),
+		// Resized images for OptimizedImageComponent. Development servers
+		// have no Cloudflare image transformations, so they get the originals.
+		{
+			provide: IMAGE_LOADER,
+			useFactory: () =>
+				isDevMode() ? originalImageLoader : cloudflareImageLoader
+		}
 	]
 };

@@ -4,14 +4,10 @@
 .caption-card {
 	width: 100%;
 	height: 100%;
+	// The size when the parent sets no height: an optimised image's size must
+	// be known before it loads.
+	aspect-ratio: 16 / 9;
 	position: relative;
-}
-
-.background-image {
-	object-fit: cover;
-	width: 100%;
-	height: 100%;
-	vertical-align: middle;
 }
 
 .overlay-elements {

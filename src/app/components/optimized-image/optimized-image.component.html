@@ -1,0 +1,11 @@
+<img
+	#image
+	[ngSrc]="src()"
+	[ngSrcset]="srcset"
+	[sizes]="sizes()"
+	[loaderParams]="{ original: original() }"
+	[priority]="priority()"
+	fill
+	[alt]="alt()"
+	(error)="useOriginal()"
+/>

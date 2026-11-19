@@ -7,11 +7,13 @@
 	color: blue;
 }
 
+.background {
+	--image-position: center left;
+	border-radius: 5px;
+}
+
 .download-card {
 	background-color: white;
-	background-size: cover;
-	background-repeat: no-repeat;
-	background-position: center left;
 	height: fit-content;
 	border-radius: 5px;
 	padding: 40px 25px;

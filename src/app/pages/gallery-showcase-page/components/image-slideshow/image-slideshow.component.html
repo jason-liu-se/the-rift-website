@@ -10,11 +10,17 @@
 			</button>
 		</div>
 		<div class="content-container">
-			<img
-				class="image"
-				[src]="captionedImages[index].url"
-				[alt]="captionedImages[index].caption"
-			/>
+			@if (captionedImages[index].url) {
+				<div class="image-frame">
+					<!-- Full screen: the original, unresized photo. -->
+					<app-optimized-image
+						[src]="captionedImages[index].url"
+						priority
+						original
+						[alt]="captionedImages[index].caption"
+					/>
+				</div>
+			}
 			<p class="caption">{{ captionedImages[index].caption }}</p>
 		</div>
 		<div class="next-button-container">

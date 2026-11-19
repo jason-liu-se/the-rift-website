@@ -1,9 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { OptimizedImageComponent } from 'src/app/components/optimized-image/optimized-image.component';
 
 @Component({
 	selector: 'app-background-image-card',
 	templateUrl: './background-image-card.component.html',
-	styleUrls: ['./background-image-card.component.scss']
+	styleUrls: ['./background-image-card.component.scss'],
+	imports: [OptimizedImageComponent]
 })
 export class BackgroundImageCardComponent implements OnInit {
 	@Input({ required: true }) src = '';

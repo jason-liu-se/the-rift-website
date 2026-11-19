@@ -27,22 +27,22 @@ describe('WelcomeCardComponent', () => {
 		);
 	});
 
-	it('uses backgroundUrl as the background image', () => {
-		const card = render({
+	it('shows backgroundUrl as a decorative, eagerly loaded background image', () => {
+		const image = render({
 			backgroundUrl: 'assets/spawn.png'
-		}).querySelector<HTMLElement>('.card');
+		}).querySelector('.background img');
 
-		expect(card?.style.backgroundImage).toContain('assets/spawn.png');
+		expect(image?.getAttribute('src')).toBe('assets/spawn.png');
+		expect(image?.getAttribute('alt')).toBe('');
+		expect(image?.getAttribute('fetchpriority')).toBe('high');
 	});
 
 	it.each(['', null])(
 		'has no background image when backgroundUrl is %j',
 		(backgroundUrl) => {
-			const card = render({ backgroundUrl }).querySelector<HTMLElement>(
-				'.card'
-			);
-
-			expect(card?.style.backgroundImage).toBe('');
+			expect(
+				render({ backgroundUrl }).querySelector('.background img')
+			).toBeNull();
 		}
 	);
 });

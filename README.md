@@ -123,7 +123,13 @@ Setup:
    login, it must also be on the same site (e.g. `api.<domain>`), since its
    session cookies are `SameSite=Lax`. BlueMap must use HTTPS and allow the site
    to embed it (`X-Frame-Options` / `frame-ancestors`).
-5. Verify the domain in Google Search Console, submit
+5. Turn on image transformations for the zone (Images > Transformations), and
+   allow the hosts the API's images come from under Sources. Images use them
+   through `OptimizedImageComponent` (`src/app/components/optimized-image/`), as
+   WebP at three widths (`src/app/config/images.ts`). On the Free plan, once the
+   month's 5,000 unique transformations are used, new ones fail and the
+   component shows the original file instead.
+6. Verify the domain in Google Search Console, submit
    `https://<domain>/sitemap.xml`, and import the site into Bing Webmaster
    Tools.
 

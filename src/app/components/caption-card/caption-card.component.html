@@ -1,5 +1,9 @@
 <div class="caption-card">
-	<img class="background-image" src="{{ src }}" alt="{{ alt }}" />
+	<app-optimized-image
+		[src]="src"
+		sizes="(min-width: 60rem) 50vw, 100vw"
+		[alt]="alt"
+	/>
 	<div class="overlay-elements {{ visibilityType }}">
 		<p class="caption-text">{{ caption }}</p>
 		<div class="gradient"></div>

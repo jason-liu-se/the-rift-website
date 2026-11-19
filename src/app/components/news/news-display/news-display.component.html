@@ -3,7 +3,9 @@
 		@for (post of newsPosts; track post.id) {
 			<li class="news-post">
 				@if (post.bannerImg) {
-					<img class="banner-img" [src]="post.bannerImg" alt="" />
+					<div class="banner">
+						<app-optimized-image [src]="post.bannerImg" />
+					</div>
 				}
 				<div class="news-post-content">
 					<h2 class="title">{{ post.title }}</h2>

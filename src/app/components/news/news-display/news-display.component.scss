@@ -30,9 +30,11 @@ $news-post-padding: 15px;
 	overflow: hidden;
 }
 
-.banner-img {
-	width: 100%;
-	max-height: 100%;
+.banner {
+	position: relative;
+	// Fixed, as an optimised image's size must be known before it loads; most
+	// banners are 16:9 screenshots.
+	aspect-ratio: 16 / 9;
 }
 
 .news-post-content {

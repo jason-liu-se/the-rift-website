@@ -1,9 +1,11 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { OptimizedImageComponent } from 'src/app/components/optimized-image/optimized-image.component';
 
 @Component({
 	selector: 'app-caption-card',
 	templateUrl: './caption-card.component.html',
-	styleUrls: ['./caption-card.component.scss']
+	styleUrls: ['./caption-card.component.scss'],
+	imports: [OptimizedImageComponent]
 })
 export class CaptionCardComponent implements OnInit {
 	@Input({ required: true }) public src!: string;

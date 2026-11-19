@@ -33,18 +33,17 @@ describe('DownloadCardComponent', () => {
 		expect(element.querySelector('.description')).toBeNull();
 	});
 
-	it('uses imgSrc as the background image', () => {
-		const card = render({
-			imgSrc: 'assets/world.png'
-		}).querySelector<HTMLElement>('.download-card');
+	it('shows imgSrc as a decorative background image', () => {
+		const image = render({ imgSrc: 'assets/world.png' }).querySelector(
+			'img'
+		);
 
-		expect(card?.style.backgroundImage).toContain('assets/world.png');
+		expect(image?.getAttribute('src')).toBe('assets/world.png');
+		expect(image?.alt).toBe('');
 	});
 
 	it('has no background image when imgSrc is empty', () => {
-		const card = render().querySelector<HTMLElement>('.download-card');
-
-		expect(card?.getAttribute('style')).toBeNull();
+		expect(render().querySelector('img')).toBeNull();
 	});
 
 	it('links the Download button to src in a new tab', () => {
