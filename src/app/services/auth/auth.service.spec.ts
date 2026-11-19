@@ -6,6 +6,7 @@ import {
 import { TestBed } from '@angular/core/testing';
 import { environment } from '../../../environments/environment';
 import { SessionUser } from '../../interfaces/api-responses';
+import { UNVERSIONED } from '../content-version/content-version.service';
 import { AuthService } from './auth.service';
 
 describe('AuthService', () => {
@@ -26,7 +27,7 @@ describe('AuthService', () => {
 		expect(service.loginUrl).toBe(`${environment.API_URL}/auth/discord`);
 	});
 
-	it('gets the logged-in user with the session cookies', () => {
+	it('gets the logged-in user with the session cookies, unversioned', () => {
 		const user: SessionUser = { id: '1', username: 'editor' };
 		let result: SessionUser | undefined;
 		service.getMe().subscribe((me) => (result = me));
@@ -34,6 +35,7 @@ describe('AuthService', () => {
 		const request = controller.expectOne(`${environment.API_URL}/auth/me`);
 		expect(request.request.method).toBe('GET');
 		expect(request.request.withCredentials).toBe(true);
+		expect(request.request.context.get(UNVERSIONED)).toBe(true);
 		request.flush(user);
 
 		expect(result).toEqual(user);

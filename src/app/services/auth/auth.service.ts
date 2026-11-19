@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { SessionUser } from '../../interfaces/api-responses';
+import { unversioned } from '../content-version/content-version.service';
 
 /**
  * The editor's login session. The API keeps it in httpOnly cookies, so every
@@ -20,7 +21,8 @@ export class AuthService {
 	/** The logged-in user; errors (401) when nobody is logged in. */
 	public getMe(): Observable<SessionUser> {
 		return this.http.get<SessionUser>(`${environment.API_URL}/auth/me`, {
-			withCredentials: true
+			withCredentials: true,
+			context: unversioned()
 		});
 	}
 

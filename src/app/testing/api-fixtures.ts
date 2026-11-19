@@ -3,12 +3,15 @@
 // response shape in the app breaks the fixtures, and every test using them, at
 // compile time. Relative imports only: Playwright loads this file in Node.
 import {
+	ContentVersion,
 	DownloadCollection,
 	GalleryImage,
 	MapSeason,
 	NewsPost,
 	PaginatedResponse
 } from '../interfaces/api-responses';
+
+export const CONTENT_VERSION: ContentVersion = { version: 1763580000000 };
 
 const NEWS_POST_COUNT = 12; // more than one page of 10
 

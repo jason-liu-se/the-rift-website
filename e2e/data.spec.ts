@@ -1,11 +1,15 @@
-// Smoke tests that API responses reach the screen in the real app. Detailed
-// request/response behaviour is covered by the unit tests.
+// Smoke tests that API responses reach the screen in the real app, and that a
+// page load fetches the content version once. Detailed request/response
+// behaviour is covered by the unit tests.
 import {
+	CONTENT_VERSION,
 	DOWNLOAD_COLLECTIONS,
 	GALLERY_COLLECTIONS,
 	MAP_SEASONS,
 	NEWS_POSTS
 } from '../src/app/testing/api-fixtures';
+import { environment } from '../src/environments/environment.development';
+import { Page } from '@playwright/test';
 import { expect, test } from './support/test';
 
 const NEWS_PAGE_SIZE = 10;
@@ -60,4 +64,51 @@ test("the map page links each season's dimensions", async ({ page }) => {
 			).toBeVisible();
 		}
 	}
+});
+
+/** Records the URLs of the API requests the browser makes. */
+function recordApiRequests(page: Page): string[] {
+	const urls: string[] = [];
+	page.on('request', (request) => {
+		if (request.url().startsWith(environment.API_URL)) {
+			urls.push(request.url());
+		}
+	});
+	return urls;
+}
+
+async function openDownloadsInApp(page: Page): Promise<void> {
+	await page.getByRole('link', { name: 'Downloads' }).first().click();
+	await expect(
+		page.getByText(DOWNLOAD_COLLECTIONS[0].items[0].title)
+	).toBeVisible();
+}
+
+const versionedDownloadsUrl = `${environment.API_URL}/downloads?v=${CONTENT_VERSION.version}`;
+
+test("a page load keeps the server's content version for later reads", async ({
+	page
+}) => {
+	const browserApiRequests = recordApiRequests(page);
+
+	// Hydration reuses the server's responses, including the version.
+	await page.goto('/news', { waitUntil: 'networkidle' });
+	expect(browserApiRequests).toEqual([]);
+
+	await openDownloadsInApp(page);
+	expect(browserApiRequests).toEqual([versionedDownloadsUrl]);
+});
+
+test('a page load without API data fetches the version on the first read', async ({
+	page
+}) => {
+	const browserApiRequests = recordApiRequests(page);
+
+	await page.goto('/about', { waitUntil: 'networkidle' });
+	await openDownloadsInApp(page);
+
+	expect(browserApiRequests).toEqual([
+		`${environment.API_URL}/content/version`,
+		versionedDownloadsUrl
+	]);
 });
