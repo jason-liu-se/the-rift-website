@@ -49,10 +49,10 @@ describe('NewsDisplayComponent', () => {
 	});
 
 	it('shows a banner image only when the item has one', () => {
-		expect(posts[0].querySelector('.banner-img')?.getAttribute('src')).toBe(
+		expect(posts[0].querySelector('.banner img')?.getAttribute('src')).toBe(
 			'assets/season-6.png'
 		);
-		expect(posts[1].querySelector('.banner-img')).toBeNull();
-		expect(posts[2].querySelector('.banner-img')).toBeNull();
+		expect(posts[1].querySelector('.banner img')).toBeNull();
+		expect(posts[2].querySelector('.banner img')).toBeNull();
 	});
 });

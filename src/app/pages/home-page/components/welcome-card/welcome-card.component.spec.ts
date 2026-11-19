@@ -30,7 +30,7 @@ describe('WelcomeCardComponent', () => {
 	it('shows backgroundUrl as a decorative, eagerly loaded background image', () => {
 		const image = render({
 			backgroundUrl: 'assets/spawn.png'
-		}).querySelector('img.background');
+		}).querySelector('.background img');
 
 		expect(image?.getAttribute('src')).toBe('assets/spawn.png');
 		expect(image?.getAttribute('alt')).toBe('');
@@ -41,7 +41,7 @@ describe('WelcomeCardComponent', () => {
 		'has no background image when backgroundUrl is %j',
 		(backgroundUrl) => {
 			expect(
-				render({ backgroundUrl }).querySelector('img.background')
+				render({ backgroundUrl }).querySelector('.background img')
 			).toBeNull();
 		}
 	);

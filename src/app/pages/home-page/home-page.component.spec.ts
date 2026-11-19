@@ -28,7 +28,7 @@ describe('HomePageComponent', () => {
 		const element: HTMLElement = fixture.nativeElement;
 		const welcomeBackground = () =>
 			element
-				.querySelector('app-welcome-card img.background')
+				.querySelector('app-welcome-card .background img')
 				?.getAttribute('src') ?? '';
 		const resizeWindow = (width: number) => {
 			setInnerWidth(width);

@@ -77,7 +77,7 @@ describe('GalleryPageComponent', () => {
 
 		expect(descriptions()).toEqual(['12 photos', '7 photos']);
 		const images = cards().map((card) =>
-			card.querySelector('.background-content')?.getAttribute('src')
+			card.querySelector('.background-content img')?.getAttribute('src')
 		);
 		expect(images[0]).toContain('five.webp');
 		expect(images[1]).toContain('six.webp');
@@ -89,7 +89,9 @@ describe('GalleryPageComponent', () => {
 		fixture.detectChanges();
 
 		expect(
-			element.querySelector('.background-content')?.getAttribute('src')
+			element
+				.querySelector('.background-content img')
+				?.getAttribute('src')
 		).toContain(GALLERY_FALLBACK_IMAGE);
 		expect(descriptions()).toEqual(['0 photos']);
 	});

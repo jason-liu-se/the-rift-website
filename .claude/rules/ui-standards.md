@@ -79,9 +79,10 @@ The whole site works by keyboard alone:
 - One `<h1>` per page and a logical heading order.
 - Descriptive link text and real `<a routerLink>` links for navigation.
 - Compressed WebP images sized for their use; nothing render-blocking.
-- Content and background images use `<img ngSrc>` (import `OPTIMIZED_IMAGE` from
-  `src/app/directives/image-fallback.directive.ts`), not CSS `background-image`,
-  so they're resized; `priority` on above-the-fold images. The admin page serves
+- Content and background images use `<app-optimized-image>`
+  (`src/app/components/optimized-image/`), not `<img>` or CSS
+  `background-image`, so they're resized. Mark the page's LCP image (e.g. its
+  banner) `priority`, and full-screen views `original`. The admin page serves
   originals (its own `IMAGE_LOADER`), and Discord avatars stay plain
   `<img src>`.
 - Route titles and descriptions: see [seo.md](./seo.md).

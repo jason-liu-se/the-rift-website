@@ -12,11 +12,11 @@
 		<div class="content-container">
 			@if (captionedImages[index].url) {
 				<div class="image-frame">
-					<img
-						class="image"
-						[ngSrc]="captionedImages[index].url"
-						fill
-						loading="eager"
+					<!-- Full screen: the original, unresized photo. -->
+					<app-optimized-image
+						[src]="captionedImages[index].url"
+						priority
+						original
 						[alt]="captionedImages[index].caption"
 					/>
 				</div>

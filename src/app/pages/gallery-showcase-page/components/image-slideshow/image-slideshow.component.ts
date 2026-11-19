@@ -1,13 +1,13 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { GalleryImage } from 'src/app/interfaces/api-responses';
 import { MatIcon } from '@angular/material/icon';
-import { OPTIMIZED_IMAGE } from 'src/app/directives/image-fallback.directive';
+import { OptimizedImageComponent } from 'src/app/components/optimized-image/optimized-image.component';
 
 @Component({
 	selector: 'app-image-slideshow',
 	templateUrl: './image-slideshow.component.html',
 	styleUrls: ['./image-slideshow.component.scss'],
-	imports: [MatIcon, OPTIMIZED_IMAGE]
+	imports: [MatIcon, OptimizedImageComponent]
 })
 export class ImageSlideshowComponent implements OnInit {
 	@Input({ required: true }) public captionedImages!: GalleryImage[];

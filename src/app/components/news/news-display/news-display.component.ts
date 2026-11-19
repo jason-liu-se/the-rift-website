@@ -1,12 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { NewsPost } from 'src/app/interfaces/api-responses';
-import { OPTIMIZED_IMAGE } from 'src/app/directives/image-fallback.directive';
+import { OptimizedImageComponent } from 'src/app/components/optimized-image/optimized-image.component';
 
 @Component({
 	selector: 'app-news-display',
 	templateUrl: './news-display.component.html',
 	styleUrls: ['./news-display.component.scss'],
-	imports: [OPTIMIZED_IMAGE]
+	imports: [OptimizedImageComponent]
 })
 export class NewsDisplayComponent {
 	@Input({ required: true }) public newsPosts!: NewsPost[];

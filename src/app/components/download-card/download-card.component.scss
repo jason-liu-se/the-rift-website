@@ -8,8 +8,7 @@
 }
 
 .background {
-	object-fit: cover;
-	object-position: center left;
+	--image-position: center left;
 	border-radius: 5px;
 }
 

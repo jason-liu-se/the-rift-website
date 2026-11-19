@@ -31,13 +31,10 @@ $edge-padding-horizontal: min(3em, 1vw);
 }
 
 .image-frame {
+	--image-fit: contain;
 	position: relative;
 	width: 100%;
 	height: 70vh;
-}
-
-.image {
-	object-fit: contain;
 }
 
 .caption {

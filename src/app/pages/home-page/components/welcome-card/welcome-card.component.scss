@@ -29,7 +29,6 @@ $max-image-height: 150px;
 // Under the ::after shade.
 .card > .background {
 	z-index: 0;
-	object-fit: cover;
 }
 
 .card::after {

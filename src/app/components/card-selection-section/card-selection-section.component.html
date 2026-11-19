@@ -3,12 +3,10 @@
 		@for (item of items; track item) {
 			<div class="collection-card-grid collection-card">
 				<!-- sizes: $collection-card-width -->
-				<img
+				<app-optimized-image
 					class="background-content"
-					[ngSrc]="item.imageUrl"
-					fill
+					[src]="item.imageUrl"
 					sizes="15rem"
-					alt=""
 				/>
 				<a
 					class="overlay-content"

@@ -1,12 +1,10 @@
 <div class="card-wrapper">
 	<div class="card">
 		@if (backgroundUrl) {
-			<img
+			<app-optimized-image
 				class="background"
-				[ngSrc]="backgroundUrl"
-				fill
+				[src]="backgroundUrl"
 				priority
-				alt=""
 			/>
 		}
 		<div class="card-content">

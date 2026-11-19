@@ -49,7 +49,9 @@ describe('CardSelectionSectionComponent', () => {
 				ITEMS[i].routerLink
 			);
 			expect(
-				card.querySelector('.background-content')?.getAttribute('src')
+				card
+					.querySelector('.background-content img')
+					?.getAttribute('src')
 			).toContain(ITEMS[i].imageUrl);
 		});
 	});

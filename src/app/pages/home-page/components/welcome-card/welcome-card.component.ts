@@ -1,12 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
-import { OPTIMIZED_IMAGE } from 'src/app/directives/image-fallback.directive';
+import { OptimizedImageComponent } from 'src/app/components/optimized-image/optimized-image.component';
 
 @Component({
 	selector: 'app-welcome-card',
 	templateUrl: './welcome-card.component.html',
 	styleUrls: ['./welcome-card.component.scss'],
-	imports: [MatIcon, OPTIMIZED_IMAGE]
+	imports: [MatIcon, OptimizedImageComponent]
 })
 export class WelcomeCardComponent {
 	@Input() public desc = '';

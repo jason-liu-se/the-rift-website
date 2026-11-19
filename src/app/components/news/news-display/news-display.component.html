@@ -4,12 +4,7 @@
 			<li class="news-post">
 				@if (post.bannerImg) {
 					<div class="banner">
-						<img
-							class="banner-img"
-							[ngSrc]="post.bannerImg"
-							fill
-							alt=""
-						/>
+						<app-optimized-image [src]="post.bannerImg" />
 					</div>
 				}
 				<div class="news-post-content">

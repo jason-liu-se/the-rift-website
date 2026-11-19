@@ -1,7 +1,7 @@
 <div class="background-image-card">
 	<!-- Every use is a page banner, at the top of the page. -->
 	@if (src) {
-		<img class="background" [ngSrc]="src" fill priority alt="" />
+		<app-optimized-image [src]="src" priority />
 	}
 	<div class="overlay-content">
 		<div class="text-container">
