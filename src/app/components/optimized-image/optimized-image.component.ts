@@ -2,9 +2,13 @@ import { NgOptimizedImage } from '@angular/common';
 import {
 	Component,
 	ElementRef,
+	InjectionToken,
 	afterNextRender,
 	booleanAttribute,
+	computed,
+	inject,
 	input,
+	untracked,
 	viewChild
 } from '@angular/core';
 import { IMAGE_WIDTHS } from 'src/app/config/images';
@@ -13,6 +17,18 @@ import { IMAGE_WIDTHS } from 'src/app/config/images';
 const SRCSET = Object.values(IMAGE_WIDTHS)
 	.map((width) => `${width}w`)
 	.join(', ');
+
+/**
+ * Sources whose resized versions failed on this page load. Later images with
+ * the same source start on the original, because the browser can mark a URL
+ * that already failed as broken again without firing `error`, so
+ * `useOriginal()` would never run (seen in Chrome after navigating back to a
+ * page).
+ */
+const FAILED_SOURCES = new InjectionToken('FAILED_SOURCES', {
+	providedIn: 'root',
+	factory: () => new Set<string>()
+});
 
 /**
  * An image resized to WebP by Cloudflare (see `cloudflareImageLoader`), which
@@ -40,6 +56,14 @@ export class OptimizedImageComponent {
 	public readonly sizes = input('100vw');
 
 	protected readonly srcset = SRCSET;
+	private readonly failedSources = inject(FAILED_SOURCES);
+	/**
+	 * Read once: `NgOptimizedImage` doesn't allow `loaderParams` to change after
+	 * init, so neither a later failure nor a new `src` may flip it.
+	 */
+	protected readonly serveOriginal = computed(
+		() => this.original() || this.failedSources.has(untracked(this.src))
+	);
 
 	private readonly image =
 		viewChild.required<ElementRef<HTMLImageElement>>('image');
@@ -56,6 +80,9 @@ export class OptimizedImageComponent {
 
 	/** Without `srcset`, the browser loads `src`: the original file. */
 	protected useOriginal(): void {
+		if (!this.original()) {
+			this.failedSources.add(this.src());
+		}
 		this.image().nativeElement.removeAttribute('srcset');
 	}
 }
