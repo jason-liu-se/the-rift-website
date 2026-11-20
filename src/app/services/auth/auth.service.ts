@@ -103,7 +103,11 @@ export class AuthService {
 						// A logout there: a check here may have started before it.
 						this.logouts++;
 						if (!wasLoggedOut) {
-							this.ended.next('other-tab');
+							// `logout()` marks its logout pending first; otherwise
+							// the session expired there.
+							this.ended.next(
+								this.isLogoutPending() ? 'other-tab' : 'expired'
+							);
 						}
 					}
 				});
@@ -156,8 +160,9 @@ export class AuthService {
 		// Later checks reuse this page load's check: they read `state()`, and
 		// the counter keeps an answer that's still on its way from changing it.
 		this.logouts++;
-		this.setUser(null);
+		// Pending first: other tabs read it to tell a logout from an expiry.
 		this.setLogoutPending(true);
+		this.setUser(null);
 		this.finishLogout().subscribe();
 	}
 

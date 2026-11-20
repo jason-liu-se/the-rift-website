@@ -1,6 +1,11 @@
 import { BrowserContext, Page } from '@playwright/test';
 import { environment } from '../src/environments/environment.development';
-import { SAVED_USER_KEY, EDITOR, signIn } from './support/auth';
+import {
+	EDITOR,
+	LOGOUT_PENDING_KEY,
+	SAVED_USER_KEY,
+	signIn
+} from './support/auth';
 import { scanForViolations } from './support/axe';
 import { gotoRoute } from './support/navigation';
 import { routeFor } from './support/routes';
@@ -8,14 +13,17 @@ import { expect, test } from './support/test';
 
 const { API_URL } = environment;
 
-/** Logs out in another tab of the same browser: removes the saved user there. */
+/** Logs out in another tab of the same browser, as its `logout()` does. */
 async function logOutInAnotherTab(context: BrowserContext): Promise<void> {
 	const otherTab = await context.newPage();
 	// Any page on this site will do; a static file doesn't start the app.
 	await otherTab.goto('/robots.txt');
 	await otherTab.evaluate(
-		(key) => localStorage.removeItem(key),
-		SAVED_USER_KEY
+		([savedUserKey, pendingKey]) => {
+			localStorage.setItem(pendingKey, 'true');
+			localStorage.removeItem(savedUserKey);
+		},
+		[SAVED_USER_KEY, LOGOUT_PENDING_KEY]
 	);
 	await otherTab.close();
 }
