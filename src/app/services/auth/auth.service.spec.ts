@@ -1,4 +1,8 @@
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import {
+	HttpClient,
+	provideHttpClient,
+	withInterceptors
+} from '@angular/common/http';
 import {
 	HttpTestingController,
 	provideHttpClientTesting
@@ -90,6 +94,36 @@ describe('AuthService', () => {
 		expect(result.user).toBeNull();
 		expect(service.user()).toBeNull();
 		expect(savedUser()).toBeNull();
+	});
+
+	it('stays logged in when an expired access token is refreshed', () => {
+		setUp();
+		const result = check();
+		controller.expectOne(ME_URL).flush(null, UNAUTHORIZED);
+		controller
+			.expectOne(AUTH_REFRESH_URL)
+			.flush(null, { status: 204, statusText: 'No Content' });
+		controller.expectOne(ME_URL).flush(USER);
+
+		expect(result.user).toEqual(USER);
+		expect(service.user()).toEqual(USER);
+		expect(JSON.parse(savedUser()!)).toEqual(USER);
+	});
+
+	it('logs out when any logged-in request finds the session is over', () => {
+		setUp();
+		check();
+		controller.expectOne(ME_URL).flush(USER);
+		const editUrl = `${environment.API_URL}/news`;
+		TestBed.inject(HttpClient)
+			.post(editUrl, null, { withCredentials: true })
+			.subscribe({ error: () => undefined });
+		controller.expectOne(editUrl).flush(null, UNAUTHORIZED);
+		controller.expectOne(AUTH_REFRESH_URL).flush(null, UNAUTHORIZED);
+
+		expect(service.user()).toBeNull();
+		expect(savedUser()).toBeNull();
+		expect(check().user).toBeNull();
 	});
 
 	it('keeps the last-known user while the API is down, and checks again next time', () => {
