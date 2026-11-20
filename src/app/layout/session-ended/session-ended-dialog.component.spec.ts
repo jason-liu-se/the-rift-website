@@ -91,6 +91,15 @@ describe('SessionEndedDialogComponent', () => {
 		expect(dialog()).not.toBeNull();
 	});
 
+	it('stays open on the browser Back button', async () => {
+		await open();
+
+		window.dispatchEvent(new PopStateEvent('popstate'));
+		TestBed.tick();
+
+		expect(dialog()).not.toBeNull();
+	});
+
 	it('blocks scrolling of the page behind', async () => {
 		// Scrolling is only blocked on a page taller than the window.
 		vi.spyOn(

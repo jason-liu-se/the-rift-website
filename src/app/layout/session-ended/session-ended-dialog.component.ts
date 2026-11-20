@@ -20,12 +20,14 @@ const COPY: Record<SessionEndReason, { heading: string; text: string }> = {
 };
 
 /**
- * Opens the dialog. It can't be dismissed (the page behind no longer works),
- * and the CDK's default scroll strategy stops the page behind scrolling.
+ * Opens the dialog. Nothing but its buttons closes it, not even Back (the page
+ * behind no longer works), and the CDK's default scroll strategy stops the
+ * page behind scrolling.
  */
 export const SESSION_ENDED_DIALOG_CONFIG = {
 	role: 'alertdialog',
 	disableClose: true,
+	closeOnNavigation: false,
 	ariaLabelledBy: 'session-ended-heading',
 	ariaDescribedBy: 'session-ended-text',
 	autoFocus: '.log-in-again'
