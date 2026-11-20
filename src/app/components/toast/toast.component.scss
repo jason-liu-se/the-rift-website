@@ -1,0 +1,31 @@
+@use "../../../theme-colours" as *;
+@use "../../../font-sizes" as *;
+
+:host {
+	display: block;
+	max-width: calc(100vw - 2rem);
+	padding: 0.75rem 1.25rem;
+	border-radius: 4px;
+	background-color: $colour-dark-background;
+	color: $colour-light-text;
+	box-shadow: 0 2px 8px rgba($colour-dark-background, 0.4);
+	font-size: $font-size-small;
+	animation: toast-in 0.2s ease-out;
+}
+
+.message {
+	margin: 0;
+}
+
+@keyframes toast-in {
+	from {
+		opacity: 0;
+		transform: translateY(0.5rem);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	:host {
+		animation: none;
+	}
+}
