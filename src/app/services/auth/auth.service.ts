@@ -8,6 +8,7 @@ import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
 	Observable,
+	Subject,
 	catchError,
 	filter,
 	finalize,
@@ -30,6 +31,12 @@ export const SAVED_USER_KEY = 'session-user';
  * would be logged straight back in.
  */
 export const LOGOUT_PENDING_KEY = 'logout-pending';
+
+/**
+ * Why a session ended without a logout in this tab: it expired (or was
+ * revoked), or the user logged out in another tab.
+ */
+export type SessionEndReason = 'expired' | 'other-tab';
 
 /** No answer from the API (status 0: offline, timeout) or a server error. */
 const isUnreachable = (error: unknown): boolean =>
@@ -65,6 +72,7 @@ export class AuthService {
 	 * before one can be ignored.
 	 */
 	private logouts = 0;
+	private readonly ended = new Subject<SessionEndReason>();
 
 	/** Starts a Discord login; navigate to it, don't fetch it. */
 	public readonly loginUrl = `${environment.API_URL}/auth/discord`;
@@ -76,6 +84,9 @@ export class AuthService {
 	 */
 	public readonly user = this.state.asReadonly();
 
+	/** Each session that ends without a logout in this tab, and why. */
+	public readonly sessionEnded = this.ended.asObservable();
+
 	constructor() {
 		if (this.isBrowser) {
 			// Fires for changes made in other tabs only.
@@ -86,11 +97,15 @@ export class AuthService {
 				)
 				.subscribe(() => {
 					const user = this.readSavedUser();
+					const wasLoggedOut = this.state() === null;
+					this.state.set(user);
 					if (!user) {
 						// A logout there: a check here may have started before it.
 						this.logouts++;
+						if (!wasLoggedOut) {
+							this.ended.next('other-tab');
+						}
 					}
-					this.state.set(user);
 				});
 			// An earlier logout may not have reached the API (it was down, or
 			// the browser closed first). After construction, because
@@ -126,7 +141,11 @@ export class AuthService {
 
 	/** Ends the session here, after the API ended it (a refresh failed). */
 	public markLoggedOut(): void {
+		const hadUser = !!this.state() || this.hasSavedUser();
 		this.setUser(null);
+		if (hadUser) {
+			this.ended.next('expired');
+		}
 	}
 
 	/**
