@@ -75,3 +75,14 @@ other browser APIs only in event handlers, `afterNextRender`, or behind
   see the API's cookies, so there it stays unknown). The last-known user is kept
   in `localStorage`: it still shows while the API is down, and a logout in one
   tab logs out the others.
+- The navbar (`src/app/layout/navbar/`) checks the session after hydration only
+  when a user is saved, so anonymous visitors make no `/auth/me` request, and
+  loads the user menu (avatar, Admin, Log out) once the user is known, so server
+  HTML shows no user UI.
+- Logging out always succeeds for the user at once: `AuthService.logout()`
+  clears the user and saved user, sets a `logout-pending` flag in
+  `localStorage`, and then sends `POST /auth/logout`. Only the API can clear the
+  httpOnly cookies, so while the flag is set (the API was down, or the browser
+  closed first) the logout is retried on start-up, on the `online` event, and by
+  every `checkSession()` (instead of `/auth/me`; the answer is "logged out"
+  either way), and the login page's Discord button sends it before navigating.

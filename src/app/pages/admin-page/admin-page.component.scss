@@ -97,23 +97,6 @@ $navbar-height: 3rem;
 	font-weight: 600;
 }
 
-.account {
-	display: flex;
-	min-width: 0;
-	align-items: center;
-	gap: 16px;
-}
-
-.account button {
-	flex: none;
-	white-space: nowrap;
-}
-
-.account button:focus-visible {
-	outline: 2px solid $colour-primary;
-	outline-offset: 2px;
-}
-
 .tool-card {
 	padding: 20px;
 	border: 1px solid $colour-light-grey;

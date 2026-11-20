@@ -1,18 +1,12 @@
-import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Title } from '@angular/platform-browser';
 import { Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { NEVER, of, throwError } from 'rxjs';
-import { AuthService } from 'src/app/services/auth/auth.service';
 import { ANY_URL_ROUTES } from 'src/app/testing/render-component';
 import { AdminPageComponent } from './admin-page.component';
 
 describe('AdminPageComponent', () => {
-	const logout = vi.fn(() => of<void>(undefined));
 	let harness: RouterTestingHarness;
-
-	beforeEach(() => logout.mockClear());
 
 	async function open(url: string): Promise<HTMLElement> {
 		TestBed.configureTestingModule({
@@ -20,25 +14,13 @@ describe('AdminPageComponent', () => {
 				provideRouter([
 					{ path: 'admin', component: AdminPageComponent },
 					...ANY_URL_ROUTES
-				]),
-				{
-					provide: AuthService,
-					useValue: {
-						logout,
-						user: signal({ id: '1', username: 'editor' })
-					}
-				}
+				])
 			]
 		});
 		harness = await RouterTestingHarness.create();
 		await harness.navigateByUrl(url);
 		return harness.routeNativeElement!;
 	}
-
-	const clickLogout = (element: HTMLElement) =>
-		[...element.querySelectorAll('button')]
-			.find((button) => button.textContent?.includes('Log out'))!
-			.click();
 
 	const currentLink = (element: HTMLElement) =>
 		element.querySelector('nav [aria-current="page"]')?.textContent;
@@ -94,51 +76,5 @@ describe('AdminPageComponent', () => {
 		expect(documentTitle()).toBe('Downloads · Admin | The Rift');
 		// Announces the switch by moving focus to the new heading.
 		expect(document.activeElement).toBe(element.querySelector('h1'));
-	});
-
-	it('shows the logged-in editor in the top bar', async () => {
-		const element = await open('/admin');
-		expect(
-			element.querySelector('header app-admin-user')?.textContent
-		).toContain('editor');
-	});
-
-	it('logs out and goes to the login page', async () => {
-		const element = await open('/admin');
-		clickLogout(element);
-		await harness.fixture.whenStable();
-
-		expect(logout).toHaveBeenCalled();
-		expect(TestBed.inject(Router).url).toBe('/admin/login');
-	});
-
-	it('marks Log out busy and ignores presses while logging out', async () => {
-		logout.mockReturnValueOnce(NEVER);
-		const element = await open('/admin');
-		clickLogout(element);
-		clickLogout(element);
-		harness.detectChanges();
-
-		expect(logout).toHaveBeenCalledTimes(1);
-		const button = element.querySelector('.account button');
-		expect(button?.getAttribute('aria-busy')).toBe('true');
-		expect(button?.getAttribute('aria-disabled')).toBe('true');
-	});
-
-	it('stays and says so when logging out fails', async () => {
-		logout.mockReturnValueOnce(throwError(() => new Error('offline')));
-		const element = await open('/admin');
-		clickLogout(element);
-		await harness.fixture.whenStable();
-		harness.detectChanges();
-
-		expect(TestBed.inject(Router).url).toBe('/admin');
-		expect(element.querySelector('[role="alert"]')?.textContent).toContain(
-			"Couldn't log out"
-		);
-		// Ready to try again.
-		expect(
-			element.querySelector('.account button')?.hasAttribute('aria-busy')
-		).toBe(false);
 	});
 });
