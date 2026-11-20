@@ -7,7 +7,7 @@ import {
 	UrlTree,
 	provideRouter
 } from '@angular/router';
-import { Observable, firstValueFrom, of, throwError } from 'rxjs';
+import { Observable, firstValueFrom, of } from 'rxjs';
 import { routes } from '../app.routes';
 import { ADMIN_LOGIN_PATH, ADMIN_PATH } from '../config/admin';
 import { AuthService } from '../services/auth/auth.service';
@@ -24,10 +24,12 @@ describe('admin auth guards', () => {
 				{
 					provide: AuthService,
 					useValue: {
-						getMe: () =>
-							loggedIn
-								? of({ id: '1', username: 'editor' })
-								: throwError(() => new Error('401'))
+						checkSession: () =>
+							of(
+								loggedIn
+									? { id: '1', username: 'editor' }
+									: null
+							)
 					}
 				}
 			]
