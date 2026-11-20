@@ -8,6 +8,7 @@ import {
 } from './support/auth';
 import { scanForViolations } from './support/axe';
 import { gotoRoute } from './support/navigation';
+import { TAG } from './support/projects';
 import { routeFor } from './support/routes';
 import { expect, test } from './support/test';
 
@@ -90,6 +91,33 @@ test.describe('on a protected page', () => {
 		await expect(page).toHaveURL(/\/$/);
 		await expect(dialog(page)).toHaveCount(0);
 	});
+});
+
+test(`${TAG.desktopOnly} a logout in another admin tab shows its dialog, which Back off the admin page closes`, async ({
+	page,
+	context
+}) => {
+	await signIn(page);
+	await gotoRoute(page, routeFor('/news'));
+	await page.getByRole('button', { name: 'Account menu' }).click();
+	await page.getByRole('menuitem', { name: 'Admin' }).click();
+	await expect(page).toHaveURL(/\/admin$/);
+
+	const otherTab = await context.newPage();
+	await signIn(otherTab);
+	await otherTab.goto('/admin');
+	await otherTab.getByRole('button', { name: 'Account menu' }).click();
+	await otherTab.getByRole('menuitem', { name: 'Log out' }).click();
+	await expect(otherTab).toHaveURL(/\/admin\/login$/);
+
+	await expect(
+		dialog(page).getByRole('heading', { name: "You've logged out" })
+	).toBeVisible();
+
+	await page.goBack();
+
+	await expect(page).toHaveURL(/\/news$/);
+	await expect(dialog(page)).toHaveCount(0);
 });
 
 test("another tab's logout on a public page shows a toast", async ({

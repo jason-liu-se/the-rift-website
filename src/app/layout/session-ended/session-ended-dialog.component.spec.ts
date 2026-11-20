@@ -2,13 +2,14 @@ import { Dialog } from '@angular/cdk/dialog';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
+import { of } from 'rxjs';
+import { requireLoggedIn } from 'src/app/guards/admin-auth.guards';
 import { LOGIN_RETURN_URL_KEY } from 'src/app/guards/login-return-url';
 import { SessionUser } from 'src/app/interfaces/api-responses';
 import {
 	AuthService,
 	SessionEndReason
 } from 'src/app/services/auth/auth.service';
-import { ANY_URL_ROUTES } from 'src/app/testing/render-component';
 import {
 	SESSION_ENDED_DIALOG_CONFIG,
 	SessionEndedDialogComponent
@@ -26,8 +27,22 @@ describe('SessionEndedDialogComponent', () => {
 	async function open(reason: SessionEndReason = 'expired', url = '/admin') {
 		TestBed.configureTestingModule({
 			providers: [
-				provideRouter(ANY_URL_ROUTES),
-				{ provide: AuthService, useValue: { user } }
+				provideRouter([
+					{
+						path: 'admin',
+						canActivate: [requireLoggedIn],
+						children: []
+					},
+					{ path: '**', children: [] }
+				]),
+				{
+					provide: AuthService,
+					// The guard lets the editor in; `user` is what the dialog watches.
+					useValue: {
+						user,
+						checkSession: () => of({ id: '1', username: 'editor' })
+					}
+				}
 			]
 		});
 		await TestBed.inject(Router).navigateByUrl(url);
@@ -98,6 +113,22 @@ describe('SessionEndedDialogComponent', () => {
 		TestBed.tick();
 
 		expect(dialog()).not.toBeNull();
+	});
+
+	it('stays open going back to another admin tool', async () => {
+		await open('expired', '/admin#news');
+
+		await TestBed.inject(Router).navigateByUrl('/admin#downloads');
+
+		expect(dialog()).not.toBeNull();
+	});
+
+	it('closes going back to a page that needs no login', async () => {
+		await open();
+
+		await TestBed.inject(Router).navigateByUrl('/news');
+
+		expect(dialog()).toBeNull();
 	});
 
 	it('blocks scrolling of the page behind', async () => {
