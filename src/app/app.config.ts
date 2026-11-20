@@ -25,6 +25,7 @@ import {
 	originalImageLoader
 } from './utilities/image-loaders';
 import { SeoTitleStrategy } from './seo/seo-title-strategy';
+import { apiStatusInterceptor } from './services/api-status/api-status.interceptor';
 import { authRefreshInterceptor } from './services/auth/auth-refresh.interceptor';
 import { contentVersionInterceptor } from './services/content-version/content-version.interceptor';
 import { serverApiTimeoutInterceptor } from './services/server-api-timeout/server-api-timeout.interceptor';
@@ -48,6 +49,7 @@ export const appConfig: ApplicationConfig = {
 			withFetch(),
 			withInterceptors([
 				serverApiTimeoutInterceptor,
+				apiStatusInterceptor,
 				contentVersionInterceptor,
 				authRefreshInterceptor
 			])

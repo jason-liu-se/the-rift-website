@@ -46,6 +46,8 @@ The whole site works by keyboard alone:
 - Logical Tab order; real `<button>`/`<a>` elements (no positive `tabindex`).
 - Always-visible focus.
 - No focus traps outside dialogs/menus, which close on Escape and restore focus.
+  Exception: an alert dialog over a page that no longer works (the session-ended
+  dialog) stays open and offers its own ways out.
 - Sensible focus on route changes.
 - When the focused element is removed (a dismissed notice, a retry that
   succeeds, content swapped for an error), move focus somewhere sensible

@@ -55,7 +55,8 @@ other browser APIs only in event handlers, `afterNextRender`, or behind
   `SERVER_API_TIMEOUT_MS` (`src/app/config/api.ts`, server only), the page
   renders without the data and the browser fetches it after hydration. Only a
   failure in the browser shows the page's error state and retry button
-  (`LoadState` in `src/app/components/fallback-panel/`).
+  (`LoadState` in `src/app/utilities/`), and the page retries by itself once the
+  API is back (see `ApiStatusService`).
 - Every API `GET` sends the site's content version as `v`
   (`contentVersionInterceptor`, `src/app/services/content-version/`), so the API
   and Cloudflare cache public reads until the next edit. The version is fetched
@@ -75,3 +76,30 @@ other browser APIs only in event handlers, `afterNextRender`, or behind
   see the API's cookies, so there it stays unknown). The last-known user is kept
   in `localStorage`: it still shows while the API is down, and a logout in one
   tab logs out the others.
+- A session that ends without a logout in this tab (it expired, or the user
+  logged out in another tab) shows a toast, or on a protected page a dialog that
+  offers to log in again and return to the same page
+  (`src/app/layout/session-ended/`).
+- `ApiStatusService` (`src/app/services/api-status/`) tells the browser whether
+  the API is `up`, `down` or `offline`, fed by `apiStatusInterceptor` (down
+  after a network error, timeout or 5xx) and the `online`/`offline` events. A
+  response can't mark it up again: the browser may answer a GET from its HTTP
+  cache. While down, it checks `/health` (`cache: 'no-store'`) every
+  `API_HEALTH_CHECK_INTERVAL_MS` while the tab is visible, and at once on
+  `online`, when the tab becomes visible, or after another response; only a
+  health answer marks it up. It stays `up` on the server. When it returns to
+  `up`, it retries a pending logout, and every `LoadState` that failed retries
+  its page. `StatusBannerComponent` (`src/app/layout/status-banner/`) shows the
+  status above the navbar and publishes `--status-banner-height`; its state
+  lives in a root service so dismissals outlast navigations.
+- The navbar (`src/app/layout/navbar/`) checks the session after hydration only
+  when a user is saved, so anonymous visitors make no `/auth/me` request, and
+  loads the user menu (avatar, Admin, Log out) once the user is known, so server
+  HTML shows no user UI.
+- Logging out always succeeds for the user at once: `AuthService.logout()`
+  clears the user and saved user, sets a `logout-pending` flag in
+  `localStorage`, and then sends `POST /auth/logout`. Only the API can clear the
+  httpOnly cookies, so while the flag is set (the API was down, or the browser
+  closed first) the logout is retried on start-up, on the `online` event, and by
+  every `checkSession()` (instead of `/auth/me`; the answer is "logged out"
+  either way), and the login page's Discord button sends it before navigating.

@@ -18,6 +18,7 @@ import { PageTemplateDirective } from 'src/app/directives/page-template.directiv
 import { NavbarComponent } from '../navbar/navbar.component';
 import { ContactComponent } from '../../components/contact/contact.component';
 import { FooterComponent } from '../footer/footer.component';
+import { StatusBannerComponent } from '../status-banner/status-banner.component';
 
 /** sessionStorage key set while reloading after a page chunk failed to load. */
 export const CHUNK_RELOAD_KEY = 'reloaded-after-chunk-error';
@@ -27,6 +28,7 @@ export const CHUNK_RELOAD_KEY = 'reloaded-after-chunk-error';
 	templateUrl: './page-template.component.html',
 	styleUrls: ['./page-template.component.scss'],
 	imports: [
+		StatusBannerComponent,
 		NavbarComponent,
 		PageTemplateDirective,
 		ContactComponent,

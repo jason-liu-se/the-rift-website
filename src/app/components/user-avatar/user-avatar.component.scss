@@ -1,10 +1,12 @@
-@use "../../../../../theme-colours" as *;
-@use "../../../../../font-sizes" as *;
+@use "../../../theme-colours" as *;
+@use "../../../font-sizes" as *;
 
 $avatar-size: 36px;
 
 :host {
 	display: flex;
+	// A parent can put the avatar last with `row-reverse`.
+	flex-direction: var(--user-avatar-direction, row);
 	align-items: center;
 	gap: 10px;
 	min-width: 0;

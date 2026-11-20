@@ -14,14 +14,25 @@
 				{{ errorMessage }}
 			</app-feedback-card>
 		}
-		<a
+		<!-- The region is always in the DOM, so the message is announced. -->
+		<div aria-live="polite">
+			@if (apiUnreachable()) {
+				<app-feedback-card title="Couldn't reach The Rift">
+					Check your connection and try again.
+				</app-feedback-card>
+			}
+		</div>
+		<button
 			mat-flat-button
+			type="button"
 			color="primary"
 			class="discord-button"
-			[href]="loginUrl"
+			[attr.aria-disabled]="starting() || null"
+			[attr.aria-busy]="starting() || null"
+			(click)="startLogin()"
 		>
 			Continue with Discord
-		</a>
+		</button>
 	</div>
 	<!-- Portrait screens get a crop around the tree: the photo covers the
 	whole page there, so most of the wide image would be cut off anyway. -->
