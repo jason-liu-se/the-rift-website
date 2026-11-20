@@ -1,9 +1,15 @@
-import { Dialog } from '@angular/cdk/dialog';
 import { isPlatformBrowser } from '@angular/common';
-import { DestroyRef, Injectable, PLATFORM_ID, inject } from '@angular/core';
+import {
+	DestroyRef,
+	Injectable,
+	Injector,
+	PLATFORM_ID,
+	inject
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { ToastService } from 'src/app/components/toast/toast.service';
+import { ADMIN_LOGIN_PATH } from 'src/app/config/admin';
+import { saveLoginReturnUrl } from 'src/app/guards/login-return-url';
 import { isOnProtectedPage } from 'src/app/guards/requires-login';
 import {
 	AuthService,
@@ -11,10 +17,10 @@ import {
 } from 'src/app/services/auth/auth.service';
 
 /**
- * Tells the user when their session ends without a logout in this tab: a
- * dialog on a protected page (it no longer works), a toast anywhere else. On a
- * fresh load of a protected page no page is open yet, so it's the toast, and
- * `requireLoggedIn` then redirects to the login page.
+ * Tells the user when their session ends without a logout in this tab, through
+ * `SessionEndedNotifier` (loaded on first use). On a fresh load of a protected
+ * page no page is open yet, so it's the toast, and `requireLoggedIn` then
+ * redirects to the login page.
  */
 @Injectable({
 	providedIn: 'root'
@@ -22,11 +28,9 @@ import {
 export class SessionEndedService {
 	private auth = inject(AuthService);
 	private router = inject(Router);
-	private toast = inject(ToastService);
-	private dialog = inject(Dialog);
+	private injector = inject(Injector);
 	private destroyRef = inject(DestroyRef);
 	private isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
-	private dialogOpen = false;
 
 	public start(): void {
 		if (!this.isBrowser) {
@@ -34,44 +38,24 @@ export class SessionEndedService {
 		}
 		this.auth.sessionEnded
 			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe((reason) => {
-				if (isOnProtectedPage(this.router)) {
-					this.openDialog(reason);
-				} else {
-					this.showToast();
-				}
-			});
+			.subscribe((reason) => this.notify(reason));
 	}
 
-	/**
-	 * One dialog at a time; its code loads on first use. If it can't be shown
-	 * (a deploy replaced that code), the toast still tells the user.
-	 */
-	private openDialog(reason: SessionEndReason): void {
-		if (this.dialogOpen) {
-			return;
-		}
-		this.dialogOpen = true;
-		import('./session-ended-dialog.component')
-			.then(
-				({
-					SessionEndedDialogComponent,
-					SESSION_ENDED_DIALOG_CONFIG
-				}) =>
-					this.dialog
-						.open(SessionEndedDialogComponent, {
-							...SESSION_ENDED_DIALOG_CONFIG,
-							data: reason
-						})
-						.closed.subscribe(() => (this.dialogOpen = false))
+	private notify(reason: SessionEndReason): void {
+		const onProtectedPage = isOnProtectedPage(this.router);
+		import('./session-ended-notifier')
+			.then(({ SessionEndedNotifier }) =>
+				this.injector
+					.get(SessionEndedNotifier)
+					.notify(reason, onProtectedPage)
 			)
 			.catch(() => {
-				this.dialogOpen = false;
-				this.showToast();
+				// Its code is gone (a deploy replaced it). A protected page no
+				// longer works: log in again as the dialog would, returning here.
+				if (onProtectedPage) {
+					saveLoginReturnUrl(this.router.url);
+					void this.router.navigateByUrl(ADMIN_LOGIN_PATH);
+				}
 			});
-	}
-
-	private showToast(): void {
-		this.toast.show('Your session has ended');
 	}
 }
