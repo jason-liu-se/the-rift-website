@@ -3,12 +3,16 @@ import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { Subject } from 'rxjs';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { renderComponent } from 'src/app/testing/render-component';
-import { AdminLoginPageComponent } from './admin-login-page.component';
+import {
+	AdminLoginPageComponent,
+	NAVIGATE_TO
+} from './admin-login-page.component';
 
 const LOGIN_URL = 'http://api.test/auth/discord';
 
 const logoutPending = vi.fn(() => false);
 const finishLogout = vi.fn(() => new Subject<boolean>());
+const navigateTo = vi.fn();
 
 function renderPage(error?: string): ComponentFixture<AdminLoginPageComponent> {
 	TestBed.configureTestingModule({
@@ -22,6 +26,7 @@ function renderPage(error?: string): ComponentFixture<AdminLoginPageComponent> {
 					finishLogout
 				}
 			},
+			{ provide: NAVIGATE_TO, useValue: navigateTo },
 			{
 				provide: ActivatedRoute,
 				useValue: {
@@ -36,16 +41,25 @@ function renderPage(error?: string): ComponentFixture<AdminLoginPageComponent> {
 }
 
 const render = (error?: string): HTMLElement => renderPage(error).nativeElement;
+const loginButton = (element: HTMLElement) =>
+	element.querySelector<HTMLButtonElement>('button')!;
 
 describe('AdminLoginPageComponent', () => {
-	it('links to the Discord login', () => {
+	beforeEach(() => {
+		logoutPending.mockReturnValue(false);
+		finishLogout.mockClear();
+		navigateTo.mockClear();
+	});
+
+	it('has a Discord button, not a link that could skip the pending logout', () => {
 		const element = render();
-		const link = element.querySelector('a');
 		expect(element.querySelector('h1')?.textContent).toBe(
 			'Log in to The Rift admin'
 		);
-		expect(link?.textContent).toContain('Continue with Discord');
-		expect(link?.getAttribute('href')).toBe(LOGIN_URL);
+		expect(loginButton(element).textContent).toContain(
+			'Continue with Discord'
+		);
+		expect(element.querySelector('a')).toBeNull();
 	});
 
 	it('shows no error without an error code', () => {
@@ -65,57 +79,53 @@ describe('AdminLoginPageComponent', () => {
 		).toContain('Login failed');
 	});
 
+	it('goes to Discord at once when no logout is pending', () => {
+		loginButton(render()).click();
+
+		expect(navigateTo).toHaveBeenCalledWith(LOGIN_URL);
+		expect(finishLogout).not.toHaveBeenCalled();
+	});
+
 	describe('with a logout the API has not heard of', () => {
-		/** Clicks the Discord link; returns whether the browser would follow it. */
-		function click(element: HTMLElement): { followed: boolean[] } {
-			const result: { followed: boolean[] } = { followed: [] };
-			element.addEventListener('click', (event) =>
-				result.followed.push(!event.defaultPrevented)
-			);
-			element.querySelector('a')!.click();
-			return result;
-		}
+		beforeEach(() => logoutPending.mockReturnValue(true));
 
-		beforeEach(() => {
-			logoutPending.mockReturnValue(true);
-			finishLogout.mockClear();
-		});
-		afterEach(() => logoutPending.mockReturnValue(false));
-
-		it('goes to Discord straight away when nothing is pending', () => {
-			logoutPending.mockReturnValue(false);
-
-			expect(click(render()).followed).toEqual([true]);
-			expect(finishLogout).not.toHaveBeenCalled();
-		});
-
-		it('sends the logout first and goes to Discord once it is done', () => {
-			const answer = new Subject<boolean>();
-			finishLogout.mockReturnValueOnce(answer);
-			const element = render();
-
-			const result = click(element);
-			expect(result.followed).toEqual([false]);
-
-			logoutPending.mockReturnValue(false);
-			answer.next(true);
-			expect(result.followed).toEqual([false, true]);
-		});
-
-		it('stays and shows an error when the logout fails', () => {
+		it('sends the logout first, busy meanwhile, and goes to Discord once it is done', () => {
 			const answer = new Subject<boolean>();
 			finishLogout.mockReturnValueOnce(answer);
 			const fixture = renderPage();
-			const result = click(fixture.nativeElement);
+			const button = loginButton(fixture.nativeElement);
+
+			button.click();
+			button.click();
+			fixture.detectChanges();
+
+			expect(finishLogout).toHaveBeenCalledTimes(1);
+			expect(navigateTo).not.toHaveBeenCalled();
+			expect(button.getAttribute('aria-busy')).toBe('true');
+			expect(button.getAttribute('aria-disabled')).toBe('true');
+
+			answer.next(true);
+
+			expect(navigateTo).toHaveBeenCalledOnce();
+			expect(navigateTo).toHaveBeenCalledWith(LOGIN_URL);
+		});
+
+		it('stays and announces an error in a region that was already there', () => {
+			const answer = new Subject<boolean>();
+			finishLogout.mockReturnValueOnce(answer);
+			const fixture = renderPage();
+			const element: HTMLElement = fixture.nativeElement;
+			const region = element.querySelector('[aria-live="polite"]');
+			loginButton(element).click();
 
 			answer.next(false);
 			fixture.detectChanges();
 
-			expect(result.followed).toEqual([false]);
-			expect(
-				fixture.nativeElement.querySelector('[role="alert"]')
-					?.textContent
-			).toContain("Couldn't reach The Rift");
+			expect(navigateTo).not.toHaveBeenCalled();
+			expect(element.querySelector('[aria-live="polite"]')).toBe(region);
+			expect(region?.textContent).toContain("Couldn't reach The Rift");
+			// Ready to try again.
+			expect(loginButton(element).hasAttribute('aria-busy')).toBe(false);
 		});
 	});
 });

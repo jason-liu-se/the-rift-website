@@ -5,6 +5,7 @@ import { of } from 'rxjs';
 import { ToastService } from 'src/app/components/toast/toast.service';
 import { requireLoggedIn } from 'src/app/guards/admin-auth.guards';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { FocusRecoveryService } from 'src/app/services/focus-recovery/focus-recovery.service';
 import { ANY_URL_ROUTES } from 'src/app/testing/render-component';
 import { UserMenuComponent } from './user-menu.component';
 
@@ -103,6 +104,16 @@ describe('UserMenuComponent', () => {
 		);
 	});
 
+	it('closes when the panel header is pressed, and focuses the button', async () => {
+		await key(trigger(), 'Enter');
+
+		element.querySelector<HTMLElement>('.panel-header')!.click();
+		await settle();
+
+		expect(trigger().getAttribute('aria-expanded')).toBe('false');
+		expect(document.activeElement).toBe(trigger());
+	});
+
 	describe('keyboard', () => {
 		it('opens with Enter, ArrowDown or Space, and closes with Escape', async () => {
 			for (const name of ['Enter', 'ArrowDown', ' ']) {
@@ -145,6 +156,28 @@ describe('UserMenuComponent', () => {
 			expect(show).toHaveBeenCalledWith("You've logged out");
 			expect(loggedOut).toHaveBeenCalled();
 			expect(TestBed.inject(Router).url).toBe('/news');
+		});
+
+		it('recovers focus once the menu is gone, so it does not fall to <body>', async () => {
+			const recover = vi.spyOn(
+				TestBed.inject(FocusRecoveryService),
+				'recoverAfterRender'
+			);
+
+			await logOutFrom('/news');
+
+			expect(recover).toHaveBeenCalledOnce();
+		});
+
+		it('leaves focus to the navigation when going to the login page', async () => {
+			const recover = vi.spyOn(
+				TestBed.inject(FocusRecoveryService),
+				'recoverAfterRender'
+			);
+
+			await logOutFrom('/admin');
+
+			expect(recover).not.toHaveBeenCalled();
 		});
 
 		it('goes to the login page from a protected page', async () => {

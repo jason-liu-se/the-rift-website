@@ -114,6 +114,30 @@ test.describe('user menu on mobile', () => {
 	});
 });
 
+test.describe('focus after logging out of a public page', () => {
+	test(`${TAG.desktopOnly} lands on <main>, not <body>`, async ({ page }) => {
+		await signIn(page);
+		await gotoRoute(page, routeFor('/'));
+		await trigger(page).click();
+		await page.getByRole('menuitem', { name: 'Log out' }).click();
+
+		await expect(page.getByText("You've logged out")).toBeVisible();
+		await expect(page.locator('main')).toBeFocused();
+	});
+
+	test(`${TAG.mobileOnly} lands on <main> after Log out in the hamburger menu`, async ({
+		page
+	}) => {
+		await signIn(page);
+		await gotoRoute(page, routeFor('/'));
+		await page.getByRole('button', { name: 'Menu' }).click();
+		await page.getByRole('button', { name: 'Log out' }).click();
+
+		await expect(page.getByText("You've logged out")).toBeVisible();
+		await expect(page.locator('main')).toBeFocused();
+	});
+});
+
 test.describe('logout while the API is down', () => {
 	test(`${TAG.desktopOnly} still logs out, and retries on the next page load`, async ({
 		page

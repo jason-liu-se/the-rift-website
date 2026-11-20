@@ -31,6 +31,12 @@ export const SAVED_USER_KEY = 'session-user';
  */
 export const LOGOUT_PENDING_KEY = 'logout-pending';
 
+/** No answer from the API (status 0: offline, timeout) or a server error. */
+const isUnreachable = (error: unknown): boolean =>
+	!(error instanceof HttpErrorResponse) ||
+	error.status === 0 ||
+	error.status >= HttpStatusCode.InternalServerError;
+
 export const isUnauthorized = (error: unknown): boolean =>
 	error instanceof HttpErrorResponse &&
 	error.status === HttpStatusCode.Unauthorized;
@@ -54,6 +60,8 @@ export class AuthService {
 	private readonly state = signal<SessionUser | null | undefined>(undefined);
 	private check$?: Observable<unknown>;
 	private finishLogout$?: Observable<boolean>;
+	/** Counts logouts, so a session check started before one can be ignored. */
+	private logouts = 0;
 
 	/** Starts a Discord login; navigate to it, don't fetch it. */
 	public readonly loginUrl = `${environment.API_URL}/auth/discord`;
@@ -97,7 +105,10 @@ export class AuthService {
 			return of(null);
 		}
 		if (this.isLogoutPending()) {
-			return this.finishLogout().pipe(map(() => null));
+			// Don't make guards wait on the request: it's retried in the
+			// background and the user is logged out either way.
+			this.retryPendingLogout();
+			return of(null);
 		}
 		this.check$ ??= this.fetchSession();
 		return this.check$.pipe(map(() => this.state() ?? null));
@@ -113,10 +124,16 @@ export class AuthService {
 	 * fails, the logout stays pending and is retried (see `finishLogout`).
 	 */
 	public logout(): void {
+		this.logouts++;
 		this.check$ = undefined;
 		this.setUser(null);
 		this.setLogoutPending(true);
 		this.finishLogout().subscribe();
+	}
+
+	/** Whether a user is saved: the last session check found one. */
+	public hasSavedUser(): boolean {
+		return this.readSavedUser() !== null;
 	}
 
 	/** Whether the API still has to be told about a logout. */
@@ -133,8 +150,9 @@ export class AuthService {
 
 	/**
 	 * Sends the pending logout to the API (one request at a time, shared by
-	 * every caller) and resolves to whether it's done. Done also when the
-	 * session had already ended (401); not done when the API can't be reached.
+	 * every caller) and resolves to whether it's done. Done on any answer from
+	 * the API (a 401 means the session had already ended, and retrying a 4xx
+	 * would never help); not done when it can't be reached (no answer, or 5xx).
 	 */
 	public finishLogout(): Observable<boolean> {
 		this.finishLogout$ ??= this.http
@@ -143,7 +161,7 @@ export class AuthService {
 			})
 			.pipe(
 				map(() => true),
-				catchError((error: unknown) => of(isUnauthorized(error))),
+				catchError((error: unknown) => of(!isUnreachable(error))),
 				tap((done) => {
 					if (done) {
 						this.setLogoutPending(false);
@@ -177,19 +195,25 @@ export class AuthService {
 	}
 
 	private fetchSession(): Observable<unknown> {
+		const startedAt = this.logouts;
+		const loggedOutSince = () => this.logouts !== startedAt;
 		return this.http
 			.get<SessionUser>(`${environment.API_URL}/auth/me`, {
 				withCredentials: true,
 				context: unversioned()
 			})
 			.pipe(
-				// A logout in the meantime wins.
+				// A logout in the meantime wins, whenever the API answers.
 				tap((user) => {
-					if (!this.isLogoutPending()) {
+					if (!loggedOutSince()) {
 						this.setUser(user);
 					}
 				}),
 				catchError((error: unknown) => {
+					if (loggedOutSince()) {
+						// Nothing to restore, and `check$` isn't this check's any more.
+						return of(null);
+					}
 					if (isUnauthorized(error)) {
 						this.setUser(null);
 					} else {

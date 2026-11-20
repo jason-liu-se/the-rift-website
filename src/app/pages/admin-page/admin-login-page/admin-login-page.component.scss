@@ -83,6 +83,10 @@
 	min-height: 48px;
 	margin-top: 8px;
 
+	&[aria-disabled="true"] {
+		opacity: 0.6;
+	}
+
 	&:focus-visible {
 		outline: 2px solid $colour-light-text;
 		outline-offset: 2px;

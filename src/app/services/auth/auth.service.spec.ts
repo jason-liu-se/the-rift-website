@@ -223,6 +223,31 @@ describe('AuthService', () => {
 			expect(isPending()).toBeNull();
 		});
 
+		it.each([
+			[
+				'a network failure',
+				{ status: 0, statusText: 'Unknown Error' },
+				true
+			],
+			['a server error', SERVER_ERROR, true],
+			[
+				'a bad request',
+				{ status: 400, statusText: 'Bad Request' },
+				false
+			],
+			['a rate limit', { status: 429, statusText: 'Too Many' }, false],
+			['a missing route', { status: 404, statusText: 'Not Found' }, false]
+		])(
+			'keeps the logout pending after %s only if retrying could help',
+			(_, response, pending) => {
+				signedIn();
+				service.logout();
+				controller.expectOne(LOGOUT_URL).flush(null, response);
+
+				expect(isPending() !== null).toBe(pending);
+			}
+		);
+
 		it('sends one request however often it is asked', () => {
 			signedIn();
 			service.logout();
@@ -232,15 +257,45 @@ describe('AuthService', () => {
 			controller.expectOne(LOGOUT_URL).flush(null, NO_CONTENT);
 		});
 
-		it('ignores a session check that answers after logging out', () => {
+		it('ignores a session check that answers after logging out, even once the logout is done', () => {
 			setUp();
 			check();
+			const staleCheck = controller.expectOne(ME_URL);
 			service.logout();
-			controller.expectOne(LOGOUT_URL).flush(null, SERVER_ERROR);
-			controller.expectOne(ME_URL).flush(USER);
+			controller.expectOne(LOGOUT_URL).flush(null, NO_CONTENT);
+			expect(isPending()).toBeNull();
+
+			staleCheck.flush(USER);
 
 			expect(service.user()).toBeNull();
 			expect(savedUser()).toBeNull();
+		});
+
+		it('ignores a session check that fails after logging out, and keeps a newer one', () => {
+			setUp();
+			saveUser(USER);
+			check();
+			const staleCheck = controller.expectOne(ME_URL);
+			service.logout();
+			controller.expectOne(LOGOUT_URL).flush(null, NO_CONTENT);
+			const newer = check();
+			const newerCheck = controller.expectOne(ME_URL);
+
+			staleCheck.flush(null, SERVER_ERROR);
+			check();
+			newerCheck.flush(USER);
+
+			expect(newer.user).toEqual(USER);
+			// The newer check stayed shared: nothing else asked the API.
+		});
+
+		it('knows whether a user is saved', () => {
+			setUp();
+			expect(service.hasSavedUser()).toBe(false);
+
+			saveUser(USER);
+
+			expect(service.hasSavedUser()).toBe(true);
 		});
 
 		describe('while pending', () => {
@@ -262,14 +317,16 @@ describe('AuthService', () => {
 				controller.expectNone(LOGOUT_URL);
 			});
 
-			it('checks the session by retrying the logout, and is logged out either way', async () => {
+			it('answers a session check at once, retrying the logout in the background', async () => {
 				setUp();
 				await Promise.resolve();
 				controller.expectOne(LOGOUT_URL).flush(null, SERVER_ERROR);
 
+				// Logged out before the request answers, so guards don't wait.
 				const failed = check();
-				controller.expectOne(LOGOUT_URL).flush(null, SERVER_ERROR);
+				const request = controller.expectOne(LOGOUT_URL);
 				expect(failed.user).toBeNull();
+				request.flush(null, SERVER_ERROR);
 				expect(isPending()).not.toBeNull();
 
 				const succeeded = check();

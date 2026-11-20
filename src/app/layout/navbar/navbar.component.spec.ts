@@ -61,7 +61,13 @@ describe('NavbarComponent', () => {
 				provideRouter(ANY_URL_ROUTES),
 				{
 					provide: AuthService,
-					useValue: { user, checkSession, logout }
+					useValue: {
+						user,
+						checkSession,
+						logout,
+						hasSavedUser: () =>
+							localStorage.getItem(SAVED_USER_KEY) !== null
+					}
 				},
 				{ provide: ToastService, useValue: { show } }
 			]

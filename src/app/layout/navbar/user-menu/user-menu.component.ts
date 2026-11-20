@@ -6,6 +6,7 @@ import { UserAvatarComponent } from 'src/app/components/user-avatar/user-avatar.
 import { ADMIN_LOGIN_PATH, ADMIN_PATH } from 'src/app/config/admin';
 import { requiresLogin } from 'src/app/guards/requires-login';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { FocusRecoveryService } from 'src/app/services/focus-recovery/focus-recovery.service';
 
 /**
  * The signed-in user's account actions in the navbar: a menu opened from their
@@ -22,6 +23,7 @@ export class UserMenuComponent {
 	private auth = inject(AuthService);
 	private router = inject(Router);
 	private toast = inject(ToastService);
+	private focusRecovery = inject(FocusRecoveryService);
 
 	public readonly adminPath = ADMIN_PATH;
 	/** Emits once the session has ended, so the navbar can close the hamburger menu. */
@@ -38,6 +40,8 @@ export class UserMenuComponent {
 		if (leaveProtectedPage) {
 			void this.router.navigateByUrl(ADMIN_LOGIN_PATH);
 		} else {
+			// The menu goes with the user, taking focus with it.
+			this.focusRecovery.recoverAfterRender();
 			this.toast.show("You've logged out");
 		}
 	}

@@ -10,10 +10,7 @@ import { MatIcon } from '@angular/material/icon';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatButton } from '@angular/material/button';
 import { LOGO_PATH } from 'src/app/config/site';
-import {
-	AuthService,
-	SAVED_USER_KEY
-} from 'src/app/services/auth/auth.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { isDesktopWidth } from 'src/app/utilities/viewport.util';
 import { publishHeight } from '../publish-height';
 import { UserMenuComponent } from './user-menu/user-menu.component';
@@ -44,7 +41,8 @@ export class NavbarComponent {
 	public isHamburgerMenuVisible = false;
 
 	/** The signed-in user; unknown (so no user menu) on the server and until checked. */
-	public readonly user = inject(AuthService).user;
+	private auth = inject(AuthService);
+	public readonly user = this.auth.user;
 
 	private readonly menuButton =
 		viewChild.required<ElementRef<HTMLButtonElement>>('menuButton');
@@ -52,12 +50,11 @@ export class NavbarComponent {
 		viewChild.required<ElementRef<HTMLElement>>('wrapper');
 
 	constructor() {
-		const auth = inject(AuthService);
-		// Visitors who never signed in make no request. The saved user is what
-		// shows (and lets the menu open) until the API confirms the session.
+		// Visitors who never signed in make no request. `user()` stays unknown
+		// (so no user menu) until the API answers, or fails and the saved user shows.
 		afterNextRender(() => {
-			if (hasSavedUser()) {
-				auth.checkSession().subscribe();
+			if (this.auth.hasSavedUser()) {
+				this.auth.checkSession().subscribe();
 			}
 		});
 		publishHeight(
@@ -84,13 +81,5 @@ export class NavbarComponent {
 		if (isDesktopWidth()) {
 			this.isHamburgerMenuVisible = false;
 		}
-	}
-}
-
-function hasSavedUser(): boolean {
-	try {
-		return localStorage.getItem(SAVED_USER_KEY) !== null;
-	} catch {
-		return false;
 	}
 }
