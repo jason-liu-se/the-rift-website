@@ -1,0 +1,58 @@
+@use "../../../theme-colours" as *;
+@use "../../../font-sizes" as *;
+
+:host {
+	display: block;
+	box-sizing: border-box;
+	width: min(28rem, calc(100vw - 2rem));
+	padding: 1.5rem;
+	border-radius: 8px;
+	background-color: $colour-light-background;
+	color: $colour-dark-text;
+	box-shadow: 0 4px 16px rgba($colour-dark-background, 0.4);
+}
+
+.heading {
+	margin: 0 0 0.5rem;
+	font-size: $font-size-medium-plus;
+}
+
+.text {
+	margin: 0 0 1.5rem;
+	font-size: $font-size-small;
+}
+
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: 0.75rem;
+}
+
+.action {
+	min-height: 44px;
+	padding: 0 1rem;
+	border: 2px solid $colour-primary;
+	border-radius: 4px;
+	font: inherit;
+	cursor: pointer;
+
+	&:focus-visible {
+		outline: 2px solid $colour-dark-text;
+		outline-offset: 2px;
+	}
+}
+
+.primary {
+	background-color: $colour-primary;
+	color: $colour-light-text;
+}
+
+.secondary {
+	background-color: $colour-light-background;
+	color: $colour-primary;
+
+	&:hover {
+		background-color: rgba($colour-primary, 0.08);
+	}
+}
