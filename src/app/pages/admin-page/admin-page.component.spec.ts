@@ -1,3 +1,4 @@
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Title } from '@angular/platform-browser';
 import { Router, provideRouter } from '@angular/router';
@@ -24,7 +25,7 @@ describe('AdminPageComponent', () => {
 					provide: AuthService,
 					useValue: {
 						logout,
-						getMe: () => of({ id: '1', username: 'editor' })
+						user: signal({ id: '1', username: 'editor' })
 					}
 				}
 			]

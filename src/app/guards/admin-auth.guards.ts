@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { catchError, map, of } from 'rxjs';
+import { map } from 'rxjs';
 import { ADMIN_LOGIN_PATH, ADMIN_PATH } from '../config/admin';
 import { AuthService } from '../services/auth/auth.service';
 
@@ -8,20 +8,14 @@ import { AuthService } from '../services/auth/auth.service';
 export const requireLoggedIn: CanActivateFn = () => {
 	const router = inject(Router);
 	return inject(AuthService)
-		.getMe()
-		.pipe(
-			map(() => true),
-			catchError(() => of(router.parseUrl(ADMIN_LOGIN_PATH)))
-		);
+		.checkSession()
+		.pipe(map((user) => (user ? true : router.parseUrl(ADMIN_LOGIN_PATH))));
 };
 
 /** Sends a logged-in editor straight to the admin page. */
 export const requireLoggedOut: CanActivateFn = () => {
 	const router = inject(Router);
 	return inject(AuthService)
-		.getMe()
-		.pipe(
-			map(() => router.parseUrl(ADMIN_PATH)),
-			catchError(() => of(true))
-		);
+		.checkSession()
+		.pipe(map((user) => (user ? router.parseUrl(ADMIN_PATH) : true)));
 };

@@ -14,9 +14,11 @@ import {
 	AUTH_REFRESH_URL,
 	authRefreshInterceptor
 } from './auth-refresh.interceptor';
+import { AuthService } from './auth.service';
 
 const ME_URL = `${environment.API_URL}/auth/me`;
 const UNAUTHORIZED = { status: 401, statusText: 'Unauthorized' };
+const SERVER_ERROR = { status: 500, statusText: 'Server Error' };
 
 describe('authRefreshInterceptor', () => {
 	let http: HttpClient;
@@ -78,11 +80,30 @@ describe('authRefreshInterceptor', () => {
 		expect(result.error?.url).toBe(ME_URL);
 	});
 
+	it('logs out when the refresh fails because the session is over', () => {
+		const auth = TestBed.inject(AuthService);
+		const markLoggedOut = vi.spyOn(auth, 'markLoggedOut');
+		getMe();
+		controller.expectOne(ME_URL).flush(null, UNAUTHORIZED);
+		expectRefresh().flush(null, UNAUTHORIZED);
+
+		expect(markLoggedOut).toHaveBeenCalled();
+	});
+
+	it("passes on the refresh's error when it fails for another reason", () => {
+		const auth = TestBed.inject(AuthService);
+		const markLoggedOut = vi.spyOn(auth, 'markLoggedOut');
+		const result = getMe();
+		controller.expectOne(ME_URL).flush(null, UNAUTHORIZED);
+		expectRefresh().flush(null, SERVER_ERROR);
+
+		expect(result.error?.status).toBe(500);
+		expect(markLoggedOut).not.toHaveBeenCalled();
+	});
+
 	it('passes on other errors without refreshing', () => {
 		const result = getMe();
-		controller
-			.expectOne(ME_URL)
-			.flush(null, { status: 500, statusText: 'Server Error' });
+		controller.expectOne(ME_URL).flush(null, SERVER_ERROR);
 
 		expect(result.error?.status).toBe(500);
 	});

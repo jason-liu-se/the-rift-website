@@ -1,47 +1,139 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import {
 	HttpTestingController,
 	provideHttpClientTesting
 } from '@angular/common/http/testing';
+import { PLATFORM_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { environment } from '../../../environments/environment';
 import { SessionUser } from '../../interfaces/api-responses';
 import { UNVERSIONED } from '../content-version/content-version.service';
-import { AuthService } from './auth.service';
+import {
+	AUTH_REFRESH_URL,
+	authRefreshInterceptor
+} from './auth-refresh.interceptor';
+import { AuthService, SAVED_USER_KEY } from './auth.service';
+
+const ME_URL = `${environment.API_URL}/auth/me`;
+const USER: SessionUser = { id: '1', username: 'editor' };
+const UNAUTHORIZED = { status: 401, statusText: 'Unauthorized' };
+const SERVER_ERROR = { status: 500, statusText: 'Server Error' };
 
 describe('AuthService', () => {
 	let service: AuthService;
 	let controller: HttpTestingController;
 
-	beforeEach(() => {
+	function setUp(platform = 'browser') {
 		TestBed.configureTestingModule({
-			providers: [provideHttpClient(), provideHttpClientTesting()]
+			providers: [
+				provideHttpClient(withInterceptors([authRefreshInterceptor])),
+				provideHttpClientTesting(),
+				{ provide: PLATFORM_ID, useValue: platform }
+			]
 		});
 		service = TestBed.inject(AuthService);
 		controller = TestBed.inject(HttpTestingController);
+	}
+
+	function check() {
+		const result: { user?: SessionUser | null } = {};
+		service.checkSession().subscribe((user) => (result.user = user));
+		return result;
+	}
+
+	const savedUser = () => localStorage.getItem(SAVED_USER_KEY);
+	const saveUser = (user: SessionUser) =>
+		localStorage.setItem(SAVED_USER_KEY, JSON.stringify(user));
+
+	afterEach(() => {
+		controller.verify();
+		localStorage.clear();
 	});
 
-	afterEach(() => controller.verify());
-
 	it('links to the Discord login', () => {
+		setUp();
 		expect(service.loginUrl).toBe(`${environment.API_URL}/auth/discord`);
 	});
 
-	it('gets the logged-in user with the session cookies, unversioned', () => {
-		const user: SessionUser = { id: '1', username: 'editor' };
-		let result: SessionUser | undefined;
-		service.getMe().subscribe((me) => (result = me));
+	it('is unknown until the session is checked', () => {
+		setUp();
+		expect(service.user()).toBeUndefined();
+	});
 
-		const request = controller.expectOne(`${environment.API_URL}/auth/me`);
-		expect(request.request.method).toBe('GET');
+	it('checks the session once with the session cookies, unversioned', () => {
+		setUp();
+		const first = check();
+		const second = check();
+
+		const request = controller.expectOne(ME_URL);
 		expect(request.request.withCredentials).toBe(true);
 		expect(request.request.context.get(UNVERSIONED)).toBe(true);
-		request.flush(user);
+		request.flush(USER);
+		const later = check();
 
-		expect(result).toEqual(user);
+		expect([first.user, second.user, later.user]).toEqual([
+			USER,
+			USER,
+			USER
+		]);
+		expect(service.user()).toEqual(USER);
+		expect(JSON.parse(savedUser()!)).toEqual(USER);
+	});
+
+	it('is logged out when the session is over', () => {
+		setUp();
+		saveUser(USER);
+		const result = check();
+		controller.expectOne(ME_URL).flush(null, UNAUTHORIZED);
+		controller.expectOne(AUTH_REFRESH_URL).flush(null, UNAUTHORIZED);
+
+		expect(result.user).toBeNull();
+		expect(service.user()).toBeNull();
+		expect(savedUser()).toBeNull();
+	});
+
+	it('keeps the last-known user while the API is down, and checks again next time', () => {
+		setUp();
+		saveUser(USER);
+		const result = check();
+		controller.expectOne(ME_URL).flush(null, SERVER_ERROR);
+
+		expect(result.user).toEqual(USER);
+		expect(service.user()).toEqual(USER);
+
+		check();
+		controller.expectOne(ME_URL).flush(USER);
+	});
+
+	it('keeps the last-known user when the refresh fails because the API is down', () => {
+		setUp();
+		saveUser(USER);
+		const result = check();
+		controller.expectOne(ME_URL).flush(null, UNAUTHORIZED);
+		controller.expectOne(AUTH_REFRESH_URL).flush(null, SERVER_ERROR);
+
+		expect(result.user).toEqual(USER);
+		expect(savedUser()).not.toBeNull();
+	});
+
+	it('is logged out while the API is down if nobody logged in before', () => {
+		setUp();
+		const result = check();
+		controller.expectOne(ME_URL).flush(null, SERVER_ERROR);
+
+		expect(result.user).toBeNull();
+	});
+
+	it('never checks on the server, which leaves the user unknown', () => {
+		setUp('server');
+		expect(check().user).toBeNull();
+		expect(service.user()).toBeUndefined();
 	});
 
 	it('logs out with the session cookies', () => {
+		setUp();
+		check();
+		controller.expectOne(ME_URL).flush(USER);
 		let done = false;
 		service.logout().subscribe({ complete: () => (done = true) });
 
@@ -53,5 +145,40 @@ describe('AuthService', () => {
 		request.flush(null, { status: 204, statusText: 'No Content' });
 
 		expect(done).toBe(true);
+		expect(service.user()).toBeNull();
+		expect(savedUser()).toBeNull();
+		expect(check().user).toBeNull();
+	});
+
+	it('stays logged in when logging out fails', () => {
+		setUp();
+		check();
+		controller.expectOne(ME_URL).flush(USER);
+		service.logout().subscribe({ error: () => undefined });
+		controller
+			.expectOne(`${environment.API_URL}/auth/logout`)
+			.flush(null, SERVER_ERROR);
+
+		expect(service.user()).toEqual(USER);
+	});
+
+	it('follows logins and logouts in other tabs', () => {
+		setUp();
+		const otherTab = (newValue: string | null) => {
+			if (newValue) {
+				localStorage.setItem(SAVED_USER_KEY, newValue);
+			} else {
+				localStorage.removeItem(SAVED_USER_KEY);
+			}
+			window.dispatchEvent(
+				new StorageEvent('storage', { key: SAVED_USER_KEY, newValue })
+			);
+		};
+
+		otherTab(JSON.stringify(USER));
+		expect(service.user()).toEqual(USER);
+
+		otherTab(null);
+		expect(service.user()).toBeNull();
 	});
 });
