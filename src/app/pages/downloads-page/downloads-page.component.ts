@@ -22,7 +22,9 @@ export class DownloadsPageComponent {
 	private downloadsProvider = inject(DownloadsProviderService);
 
 	public downloadCollections: DownloadCollection[] = [];
-	protected readonly loadState = new LoadState();
+	protected readonly loadState = new LoadState(() =>
+		this.loadDownloadCollections()
+	);
 
 	constructor() {
 		this.loadDownloadCollections();

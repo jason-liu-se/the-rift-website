@@ -2,6 +2,7 @@
 // browser is offline, accessible, and dismissible by keyboard.
 import { Page } from '@playwright/test';
 import { environment } from '../src/environments/environment.development';
+import { NEWS_POSTS } from '../src/app/testing/api-fixtures';
 import { scanForViolations } from './support/axe';
 import { failApiRequests } from './support/mock-api';
 import { gotoRoute } from './support/navigation';
@@ -10,9 +11,11 @@ import { routeFor } from './support/routes';
 import { expect, test } from './support/test';
 
 /** Opens the news page by in-app navigation while the API fails in the browser. */
-async function openNewsWhileApiIsDown(page: Page): Promise<void> {
+async function openNewsWhileApiIsDown(
+	page: Page
+): Promise<() => Promise<void>> {
 	await gotoRoute(page, routeFor('/'));
-	await failApiRequests(page, '/news');
+	const restoreApi = await failApiRequests(page, '/news');
 	const menuButton = page.locator('.hamburger-menu-button');
 	if (await menuButton.isVisible()) {
 		await menuButton.click();
@@ -21,6 +24,7 @@ async function openNewsWhileApiIsDown(page: Page): Promise<void> {
 		.locator('nav')
 		.getByRole('link', { name: 'News', exact: true })
 		.click();
+	return restoreApi;
 }
 
 test('the banner says the services are down, and sits above the navbar', async ({
@@ -116,4 +120,47 @@ test(`${TAG.desktopOnly} the account menu sits below the banner and is not cover
 	expect(
 		(await page.locator('.user-item').boundingBox())!.y
 	).toBeGreaterThanOrEqual(bannerBottom - 1);
+});
+
+test('"Back online" is hidden by the first navigation after it', async ({
+	page,
+	context
+}) => {
+	await gotoRoute(page, routeFor('/'));
+	await context.setOffline(true);
+	await context.setOffline(false);
+	await expect(page.locator('app-status-banner .message')).toHaveText(
+		'Back online'
+	);
+
+	const menuButton = page.locator('.hamburger-menu-button');
+	if (await menuButton.isVisible()) {
+		await menuButton.click();
+	}
+	await page
+		.locator('nav')
+		.getByRole('link', { name: 'News', exact: true })
+		.click();
+
+	await expect(page.locator('app-status-banner .message')).toBeEmpty();
+});
+
+test('a page that failed because the API was down reloads when it is back', async ({
+	page
+}) => {
+	const restoreApi = await openNewsWhileApiIsDown(page);
+	await expect(
+		page
+			.getByRole('alert')
+			.getByRole('heading', { name: "Couldn't load the news" })
+	).toBeVisible();
+
+	// The API is back; the health check (brought forward) finds out.
+	await restoreApi();
+	await page.evaluate(() => window.dispatchEvent(new Event('online')));
+
+	await expect(
+		page.getByText(NEWS_POSTS[0].title, { exact: true })
+	).toBeVisible();
+	await expect(page.locator('app-fallback-panel')).toHaveCount(0);
 });

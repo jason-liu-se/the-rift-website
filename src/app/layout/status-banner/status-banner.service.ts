@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationStart, Router } from '@angular/router';
-import { filter, skip } from 'rxjs';
+import { filter } from 'rxjs';
 import { ApiStatusService } from '../../services/api-status/api-status.service';
 
 export type StatusBannerKind = 'down' | 'offline' | 'recovered';
@@ -60,8 +60,13 @@ export class StatusBannerService {
 		// page load isn't a navigation away from anything.
 		this.router.events
 			.pipe(
-				filter((event) => event instanceof NavigationStart),
-				skip(this.router.navigated ? 0 : 1),
+				// `navigated` is false only during the first page load, however
+				// late this service is created within it.
+				filter(
+					(event) =>
+						event instanceof NavigationStart &&
+						this.router.navigated
+				),
 				takeUntilDestroyed()
 			)
 			.subscribe(() => {

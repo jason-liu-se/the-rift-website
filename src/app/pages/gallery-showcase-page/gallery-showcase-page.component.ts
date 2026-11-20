@@ -44,7 +44,9 @@ export class GalleryShowcasePageComponent {
 	public pageIndex = 0;
 	public pageEvent!: PageEvent;
 
-	protected readonly loadState = new LoadState();
+	protected readonly loadState = new LoadState(() =>
+		this.populateCaptionedImages()
+	);
 
 	/** Counts requests, so only the latest one updates the page. */
 	private latestRequest = 0;

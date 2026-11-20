@@ -33,7 +33,9 @@ export class NewsPageComponent {
 	public pageIndex = 0;
 	public pageEvent!: PageEvent;
 	public newsPosts: NewsPost[] = [];
-	protected readonly loadState = new LoadState();
+	protected readonly loadState = new LoadState(() =>
+		this.populateNewsPosts()
+	);
 
 	/** Counts requests, so only the latest one updates the page. */
 	private latestRequest = 0;

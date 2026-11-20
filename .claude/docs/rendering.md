@@ -55,7 +55,8 @@ other browser APIs only in event handlers, `afterNextRender`, or behind
   `SERVER_API_TIMEOUT_MS` (`src/app/config/api.ts`, server only), the page
   renders without the data and the browser fetches it after hydration. Only a
   failure in the browser shows the page's error state and retry button
-  (`LoadState` in `src/app/components/fallback-panel/`).
+  (`LoadState` in `src/app/components/fallback-panel/`), and the page retries by
+  itself once the API is back (see `ApiStatusService`).
 - Every API `GET` sends the site's content version as `v`
   (`contentVersionInterceptor`, `src/app/services/content-version/`), so the API
   and Cloudflare cache public reads until the next edit. The version is fetched
@@ -77,13 +78,16 @@ other browser APIs only in event handlers, `afterNextRender`, or behind
   tab logs out the others.
 - `ApiStatusService` (`src/app/services/api-status/`) tells the browser whether
   the API is `up`, `down` or `offline`, fed by `apiStatusInterceptor` (down
-  after a network error, timeout or 5xx; up after any other response) and the
-  `online`/`offline` events. While down, it polls `/health` every
-  `API_HEALTH_CHECK_INTERVAL_MS` while the tab is visible. It stays `up` on the
-  server. `StatusBannerComponent` (`src/app/layout/status-banner/`) shows it
-  above the navbar and publishes `--status-banner-height`; its state lives in a
-  root service so dismissals outlast navigations. When the status returns to
-  `up`, it also retries a pending logout.
+  after a network error, timeout or 5xx) and the `online`/`offline` events. A
+  response can't mark it up again: the browser may answer a GET from its HTTP
+  cache. While down, it checks `/health` (`cache: 'no-store'`) every
+  `API_HEALTH_CHECK_INTERVAL_MS` while the tab is visible, and at once on
+  `online`, when the tab becomes visible, or after another response; only a
+  health answer marks it up. It stays `up` on the server. When it returns to
+  `up`, it retries a pending logout, and every `LoadState` that failed retries
+  its page. `StatusBannerComponent` (`src/app/layout/status-banner/`) shows the
+  status above the navbar and publishes `--status-banner-height`; its state
+  lives in a root service so dismissals outlast navigations.
 - The navbar (`src/app/layout/navbar/`) checks the session after hydration only
   when a user is saved, so anonymous visitors make no `/auth/me` request, and
   loads the user menu (avatar, Admin, Log out) once the user is known, so server

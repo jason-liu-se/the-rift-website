@@ -14,6 +14,7 @@ import {
 import {
 	EMPTY,
 	Observable,
+	Subject,
 	Subscription,
 	catchError,
 	exhaustMap,
@@ -28,6 +29,9 @@ import { environment } from '../../../environments/environment';
 import { API_HEALTH_CHECK_INTERVAL_MS } from '../../config/api';
 import { AuthService } from '../auth/auth.service';
 import { unversioned } from '../content-version/content-version.service';
+
+/** The API's health endpoint, which only the status checks request. */
+export const API_HEALTH_URL = `${environment.API_URL}/health`;
 
 export type ApiStatus = 'up' | 'down' | 'offline';
 
@@ -50,6 +54,7 @@ export class ApiStatusService {
 	private readonly apiDown = signal(false);
 	private readonly browserOnline = signal(true);
 	private healthChecks?: Subscription;
+	private readonly checkNow = new Subject<void>();
 
 	/** Offline wins: while the network is gone, the API's state is unknown. */
 	public readonly status: Signal<ApiStatus> = computed(() => {
@@ -90,7 +95,10 @@ export class ApiStatusService {
 		});
 	}
 
-	/** An API request got a response (any status below 500). */
+	/**
+	 * A health check got a response, so the API is up. Other responses can't
+	 * say so: the browser may answer a GET from its HTTP cache, without the API.
+	 */
 	public reportUp(): void {
 		if (!this.isBrowser) {
 			return;
@@ -98,6 +106,16 @@ export class ApiStatusService {
 		this.apiDown.set(false);
 		this.healthChecks?.unsubscribe();
 		this.healthChecks = undefined;
+	}
+
+	/**
+	 * Another API request got a response. While the API is down that could be
+	 * a cached one, so it only brings the next health check forward.
+	 */
+	public reportResponse(): void {
+		if (this.apiDown()) {
+			this.checkNow.next();
+		}
 	}
 
 	/** An API request failed: network error, timeout, or a 5xx response. */
@@ -128,7 +146,8 @@ export class ApiStatusService {
 		return merge(
 			fromEvent(window, 'online'),
 			fromEvent(window, 'offline'),
-			fromEvent(this.document, 'visibilitychange')
+			fromEvent(this.document, 'visibilitychange'),
+			this.checkNow
 		).pipe(
 			map(() => firstCheckIn(true)),
 			// The request that failed was just now, so the first check can wait.
@@ -141,8 +160,10 @@ export class ApiStatusService {
 			// A check still running (up to the interval) isn't doubled up.
 			exhaustMap(() =>
 				this.http
-					.get(`${environment.API_URL}/health`, {
+					.get(API_HEALTH_URL, {
 						context: unversioned(),
+						// Always asks the API, never the browser's cache.
+						cache: 'no-store',
 						timeout: API_HEALTH_CHECK_INTERVAL_MS
 					})
 					.pipe(catchError(() => EMPTY))

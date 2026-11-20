@@ -26,7 +26,9 @@ export class GalleryPageComponent {
 	protected readonly collectionCards = signal<ICardSelection[] | undefined>(
 		undefined
 	);
-	protected readonly loadState = new LoadState();
+	protected readonly loadState = new LoadState(() =>
+		this.setGalleryCollections()
+	);
 
 	constructor() {
 		this.setGalleryCollections();

@@ -81,11 +81,12 @@ describe('ApiStatusService', () => {
 			expect(service.status()).toBe('up');
 		});
 
-		it('is up again after any response', () => {
+		it('is up again once a health check gets any answer', async () => {
 			send();
 			answer(500);
-			send();
-			answer(401);
+
+			await advance(API_HEALTH_CHECK_INTERVAL_MS);
+			answer(401, HEALTH_URL);
 
 			expect(service.status()).toBe('up');
 		});
@@ -124,12 +125,28 @@ describe('ApiStatusService', () => {
 			controller.expectNone(HEALTH_URL);
 		});
 
-		it('stops checking when another request succeeds', async () => {
+		it('asks the API, not the browser cache, and stays down on another response until it answers', async () => {
 			send();
 			answer(200);
+			await advance(0);
 
-			await advance(API_HEALTH_CHECK_INTERVAL_MS * 2);
-			controller.expectNone(HEALTH_URL);
+			// A response may come from the browser's cache: check at once.
+			const check = controller.expectOne(HEALTH_URL);
+			expect(check.request.cache).toBe('no-store');
+			expect(service.status()).toBe('down');
+
+			check.flush({});
+			expect(service.status()).toBe('up');
+		});
+
+		it('does not pile up checks when several responses arrive together', async () => {
+			send();
+			answer(200);
+			send();
+			answer(404);
+			await advance(0);
+
+			expect(controller.match(HEALTH_URL)).toHaveLength(1);
 		});
 
 		it('pauses while the tab is hidden and checks at once when it is visible again', async () => {
@@ -195,14 +212,14 @@ describe('ApiStatusService', () => {
 		beforeEach(() => setup());
 		afterEach(() => localStorage.clear());
 
-		it('sends it once when the API comes back after being down', () => {
+		it('sends it once when the API comes back after being down', async () => {
 			send();
 			answer(500);
 			TestBed.tick();
 			localStorage.setItem(LOGOUT_PENDING_KEY, 'true');
 
-			send();
-			answer(200);
+			await advance(API_HEALTH_CHECK_INTERVAL_MS);
+			answer(200, HEALTH_URL);
 			TestBed.tick();
 
 			controller.expectOne(LOGOUT_URL).flush(null);
@@ -220,12 +237,12 @@ describe('ApiStatusService', () => {
 			controller.expectOne(LOGOUT_URL).flush(null);
 		});
 
-		it('sends nothing when no logout is pending', () => {
+		it('sends nothing when no logout is pending', async () => {
 			send();
 			answer(500);
 			TestBed.tick();
-			send();
-			answer(200);
+			await advance(API_HEALTH_CHECK_INTERVAL_MS);
+			answer(200, HEALTH_URL);
 			TestBed.tick();
 
 			controller.expectNone(LOGOUT_URL);

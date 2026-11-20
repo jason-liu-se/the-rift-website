@@ -48,7 +48,7 @@ export class MapPageComponent {
 	private mapProvider = inject(MapProviderService);
 
 	public readonly seasons = signal<ISeasonCards[]>([]);
-	protected readonly loadState = new LoadState();
+	protected readonly loadState = new LoadState(() => this.loadSeasons());
 
 	constructor() {
 		this.loadSeasons();
