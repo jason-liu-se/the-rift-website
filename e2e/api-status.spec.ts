@@ -1,9 +1,11 @@
 // The status banner above the navbar: shown when the API is down or the
 // browser is offline, accessible, and dismissible by keyboard.
 import { Page } from '@playwright/test';
+import { environment } from '../src/environments/environment.development';
 import { scanForViolations } from './support/axe';
 import { failApiRequests } from './support/mock-api';
 import { gotoRoute } from './support/navigation';
+import { TAG } from './support/projects';
 import { routeFor } from './support/routes';
 import { expect, test } from './support/test';
 
@@ -84,4 +86,34 @@ test('the open mobile menu fits the screen below the banner @mobile-only', async
 		.locator('.rift-navbar-wrapper')
 		.evaluate((element) => element.getBoundingClientRect().bottom);
 	expect(bottom).toBeLessThanOrEqual(640);
+});
+
+test(`${TAG.desktopOnly} the account menu sits below the banner and is not covered by it`, async ({
+	page,
+	context
+}) => {
+	// Must match SAVED_USER_KEY (auth.service.ts, which pulls in Angular).
+	const editor = JSON.stringify({ id: '1', username: 'editor' });
+	await page.addInitScript(
+		(user) => localStorage.setItem('session-user', user),
+		editor
+	);
+	await page.route(`${environment.API_URL}/auth/me**`, (route) =>
+		route.fulfill({ status: 200, json: JSON.parse(editor) })
+	);
+	await gotoRoute(page, routeFor('/news'));
+	await context.setOffline(true);
+	const banner = page.locator('app-status-banner .banner');
+	await expect(banner).toBeVisible();
+
+	await page.getByRole('button', { name: 'Account menu' }).click();
+	const menu = page.getByRole('menu', { name: 'Account' });
+	await expect(menu).toBeVisible();
+
+	const bannerBox = (await banner.boundingBox())!;
+	const bannerBottom = bannerBox.y + bannerBox.height;
+	expect((await menu.boundingBox())!.y).toBeGreaterThanOrEqual(bannerBottom);
+	expect(
+		(await page.locator('.user-item').boundingBox())!.y
+	).toBeGreaterThanOrEqual(bannerBottom - 1);
 });

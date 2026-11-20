@@ -1,0 +1,60 @@
+<div class="desktop">
+	<button
+		#trigger="ngMenuTrigger"
+		ngMenuTrigger
+		#userButton
+		type="button"
+		class="user-button"
+		aria-label="Account menu"
+		[menu]="accountMenu"
+		[class.open]="trigger.expanded()"
+	>
+		<app-user-avatar [showUsername]="false" />
+	</button>
+	<!-- Opens over the button, so its avatar takes the button's place. -->
+	<div class="panel" [class.open]="trigger.expanded()">
+		<!-- Where the button's avatar was: pressing it closes the menu, like the button. -->
+		<app-user-avatar
+			class="panel-header"
+			(click)="trigger.close(); userButton.focus()"
+		/>
+		<div ngMenu #accountMenu="ngMenu" class="menu" aria-label="Account">
+			<a
+				ngMenuItem
+				value="admin"
+				class="menu-item"
+				[routerLink]="adminPath"
+			>
+				<span class="material-icons icon" aria-hidden="true"
+					>admin_panel_settings</span
+				>
+				Admin
+			</a>
+			<button
+				ngMenuItem
+				value="logout"
+				type="button"
+				class="menu-item"
+				(click)="logout()"
+			>
+				<span class="material-icons icon" aria-hidden="true"
+					>logout</span
+				>
+				Log out
+			</button>
+		</div>
+	</div>
+</div>
+<div class="mobile">
+	<app-user-avatar />
+	<a class="mobile-item" [routerLink]="adminPath">
+		<span class="material-icons icon" aria-hidden="true"
+			>admin_panel_settings</span
+		>
+		Admin
+	</a>
+	<button type="button" class="mobile-item" (click)="logout()">
+		<span class="material-icons icon" aria-hidden="true">logout</span>
+		Log out
+	</button>
+</div>

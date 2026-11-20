@@ -122,6 +122,15 @@
 					</button>
 				</div>
 			</li>
+			@if (user()) {
+				<li class="user-item">
+					@defer (on immediate) {
+						<app-user-menu
+							(loggedOut)="isHamburgerMenuVisible = false"
+						/>
+					}
+				</li>
+			}
 		</ul>
 		<br class="{{ isHamburgerMenuVisible ? '' : 'hidden' }}" />
 	</nav>

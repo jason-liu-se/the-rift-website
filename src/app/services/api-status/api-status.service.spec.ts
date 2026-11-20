@@ -8,6 +8,7 @@ import { PLATFORM_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { environment } from '../../../environments/environment';
 import { API_HEALTH_CHECK_INTERVAL_MS } from '../../config/api';
+import { LOGOUT_PENDING_KEY } from '../auth/auth.service';
 import { UNVERSIONED } from '../content-version/content-version.service';
 import { apiStatusInterceptor } from './api-status.interceptor';
 import { ApiStatusService } from './api-status.service';
@@ -185,6 +186,49 @@ describe('ApiStatusService', () => {
 
 			window.dispatchEvent(new Event('online'));
 			expect(service.status()).toBe('down');
+		});
+	});
+
+	describe('retrying a pending logout', () => {
+		const LOGOUT_URL = `${environment.API_URL}/auth/logout`;
+
+		beforeEach(() => setup());
+		afterEach(() => localStorage.clear());
+
+		it('sends it once when the API comes back after being down', () => {
+			send();
+			answer(500);
+			TestBed.tick();
+			localStorage.setItem(LOGOUT_PENDING_KEY, 'true');
+
+			send();
+			answer(200);
+			TestBed.tick();
+
+			controller.expectOne(LOGOUT_URL).flush(null);
+			expect(localStorage.getItem(LOGOUT_PENDING_KEY)).toBeNull();
+		});
+
+		it('sends it once when the browser comes back online', () => {
+			window.dispatchEvent(new Event('offline'));
+			TestBed.tick();
+			localStorage.setItem(LOGOUT_PENDING_KEY, 'true');
+
+			window.dispatchEvent(new Event('online'));
+			TestBed.tick();
+
+			controller.expectOne(LOGOUT_URL).flush(null);
+		});
+
+		it('sends nothing when no logout is pending', () => {
+			send();
+			answer(500);
+			TestBed.tick();
+			send();
+			answer(200);
+			TestBed.tick();
+
+			controller.expectNone(LOGOUT_URL);
 		});
 	});
 

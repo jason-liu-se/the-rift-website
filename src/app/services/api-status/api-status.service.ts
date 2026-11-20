@@ -6,8 +6,10 @@ import {
 	PLATFORM_ID,
 	Signal,
 	computed,
+	effect,
 	inject,
-	signal
+	signal,
+	untracked
 } from '@angular/core';
 import {
 	EMPTY,
@@ -24,6 +26,7 @@ import {
 } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { API_HEALTH_CHECK_INTERVAL_MS } from '../../config/api';
+import { AuthService } from '../auth/auth.service';
 import { unversioned } from '../content-version/content-version.service';
 
 export type ApiStatus = 'up' | 'down' | 'offline';
@@ -42,6 +45,7 @@ export class ApiStatusService {
 	private readonly document = inject(DOCUMENT);
 	private readonly http = inject(HttpClient);
 	private readonly destroyRef = inject(DestroyRef);
+	private readonly auth = inject(AuthService);
 
 	private readonly apiDown = signal(false);
 	private readonly browserOnline = signal(true);
@@ -65,6 +69,21 @@ export class ApiStatusService {
 			fromEvent(window, 'online').pipe(map(() => true)),
 			fromEvent(window, 'offline').pipe(map(() => false))
 		).subscribe((online) => this.browserOnline.set(online));
+		// The API can be reached again: tell it about a logout it missed.
+		let previous = this.status();
+		effect(() => {
+			const current = this.status();
+			untracked(() => {
+				if (
+					previous !== 'up' &&
+					current === 'up' &&
+					this.auth.isLogoutPending()
+				) {
+					this.auth.finishLogout().subscribe();
+				}
+				previous = current;
+			});
+		});
 		this.destroyRef.onDestroy(() => {
 			connection.unsubscribe();
 			this.healthChecks?.unsubscribe();

@@ -30,25 +30,7 @@
 				{{ activeTool().label
 				}}<span class="cdk-visually-hidden"> – Admin</span>
 			</h1>
-			<div class="account">
-				<app-admin-user />
-				<button
-					mat-stroked-button
-					type="button"
-					[attr.aria-disabled]="loggingOut() || null"
-					[attr.aria-busy]="loggingOut() || null"
-					(click)="logout()"
-				>
-					<mat-icon>logout</mat-icon>
-					Log out
-				</button>
-			</div>
 		</header>
-		@if (logoutFailed()) {
-			<app-feedback-card title="Couldn't log out">
-				Check your connection and try again.
-			</app-feedback-card>
-		}
 		<div class="tool-card">
 			@switch (activeTool().id) {
 				@case ("downloads") {

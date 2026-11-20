@@ -1,7 +1,11 @@
 @use "../../../theme-colours" as *;
 
 $h-logo-edge-padding: 1rem;
+// Distance from the screen edge for the pinned user avatar, as the hamburger button has.
+$edge-gutter: $h-logo-edge-padding;
 $navbar-height: 3rem;
+// Room the pinned user avatar needs from the right edge (gutter, avatar, gap).
+$user-reserve: 4.5rem;
 
 .edge-padding {
 	padding: $h-logo-edge-padding 0;
@@ -146,6 +150,12 @@ $navbar-height: 3rem;
 	border: 2px solid $colour-primary;
 }
 
+.user-item {
+	display: flex;
+	width: 100%;
+	justify-content: center;
+}
+
 .hidden {
 	display: none;
 }
@@ -252,6 +262,24 @@ $navbar-height: 3rem;
 	.join-button.mat-button-active {
 		background-color: transparent;
 		border: 2px solid $colour-primary;
+	}
+
+	// Pinned to the right edge of the screen, outside the centred links. Where
+	// the centred links would reach it (just above 60rem), they move left.
+	.rift-navbar-wrapper:has(.user-item) {
+		padding-right: max(0px, calc($user-reserve - (100vw - 55rem) / 2));
+	}
+
+	.user-item {
+		position: fixed;
+		// Below the status banner, like the navbar.
+		top: var(--status-banner-height, 0px);
+		right: $edge-gutter;
+		// Above the Join button when the open menu covers it.
+		z-index: 1;
+		width: auto;
+		height: $navbar-height;
+		align-items: center;
 	}
 
 	.left-align {
