@@ -1,0 +1,42 @@
+<div class="desktop">
+	<button
+		#trigger="ngMenuTrigger"
+		ngMenuTrigger
+		type="button"
+		class="user-button"
+		aria-label="Account menu"
+		[menu]="accountMenu"
+		[class.open]="trigger.expanded()"
+	>
+		<app-user-avatar [showUsername]="false" />
+	</button>
+	<!-- Opens over the button, so its avatar takes the button's place. -->
+	<div class="panel" [class.open]="trigger.expanded()">
+		<app-user-avatar class="panel-header" />
+		<div ngMenu #accountMenu="ngMenu" class="menu" aria-label="Account">
+			<a
+				ngMenuItem
+				value="admin"
+				class="menu-item"
+				[routerLink]="adminPath"
+				>Admin</a
+			>
+			<button
+				ngMenuItem
+				value="logout"
+				type="button"
+				class="menu-item"
+				(click)="logout()"
+			>
+				Log out
+			</button>
+		</div>
+	</div>
+</div>
+<div class="mobile">
+	<app-user-avatar />
+	<a class="mobile-item" [routerLink]="adminPath">Admin</a>
+	<button type="button" class="mobile-item" (click)="logout()">
+		Log out
+	</button>
+</div>

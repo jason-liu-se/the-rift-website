@@ -143,6 +143,12 @@ $navbar-height: 3rem;
 	border: 2px solid $colour-primary;
 }
 
+.user-item {
+	display: flex;
+	width: 100%;
+	justify-content: center;
+}
+
 .hidden {
 	display: none;
 }
@@ -249,6 +255,12 @@ $navbar-height: 3rem;
 	.join-button.mat-button-active {
 		background-color: transparent;
 		border: 2px solid $colour-primary;
+	}
+
+	.user-item {
+		width: auto;
+		margin-left: 10px;
+		align-items: center;
 	}
 
 	.left-align {

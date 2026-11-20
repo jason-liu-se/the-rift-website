@@ -3,19 +3,19 @@ import { TestBed } from '@angular/core/testing';
 import { SessionUser } from 'src/app/interfaces/api-responses';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { renderComponent } from 'src/app/testing/render-component';
-import { AdminUserComponent } from './admin-user.component';
+import { UserAvatarComponent } from './user-avatar.component';
 
 const AVATAR_URL = 'https://cdn.discordapp.test/avatars/1/a.png';
 
 function render(user: SessionUser | null) {
 	TestBed.configureTestingModule({
-		imports: [AdminUserComponent],
+		imports: [UserAvatarComponent],
 		providers: [{ provide: AuthService, useValue: { user: signal(user) } }]
 	});
-	return renderComponent(AdminUserComponent);
+	return renderComponent(UserAvatarComponent);
 }
 
-describe('AdminUserComponent', () => {
+describe('UserAvatarComponent', () => {
 	it('shows the editor’s avatar and username', () => {
 		const element: HTMLElement = render({
 			id: '1',
@@ -54,6 +54,25 @@ describe('AdminUserComponent', () => {
 
 		expect(element.querySelector('img')).toBeNull();
 		expect(element.querySelector('.avatar')?.textContent?.trim()).toBe('A');
+	});
+
+	it('shows the avatar alone when told to hide the username', () => {
+		TestBed.configureTestingModule({
+			imports: [UserAvatarComponent],
+			providers: [
+				{
+					provide: AuthService,
+					useValue: { user: signal({ id: '1', username: 'steve' }) }
+				}
+			]
+		});
+		const fixture = TestBed.createComponent(UserAvatarComponent);
+		fixture.componentRef.setInput('showUsername', false);
+		fixture.detectChanges();
+		const element: HTMLElement = fixture.nativeElement;
+
+		expect(element.querySelector('.avatar')?.textContent?.trim()).toBe('S');
+		expect(element.querySelector('.username')).toBeNull();
 	});
 
 	it('shows a generic icon and no name when nobody is logged in', () => {

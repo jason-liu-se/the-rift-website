@@ -14,11 +14,17 @@
 				{{ errorMessage }}
 			</app-feedback-card>
 		}
+		@if (apiUnreachable()) {
+			<app-feedback-card title="Couldn't reach The Rift">
+				Check your connection and try again.
+			</app-feedback-card>
+		}
 		<a
 			mat-flat-button
 			color="primary"
 			class="discord-button"
 			[href]="loginUrl"
+			(click)="startLogin($event)"
 		>
 			Continue with Discord
 		</a>

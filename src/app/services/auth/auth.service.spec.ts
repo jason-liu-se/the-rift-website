@@ -16,7 +16,11 @@ import {
 	AUTH_REFRESH_URL,
 	authRefreshInterceptor
 } from './auth-refresh.interceptor';
-import { AuthService, SAVED_USER_KEY } from './auth.service';
+import {
+	AuthService,
+	LOGOUT_PENDING_KEY,
+	SAVED_USER_KEY
+} from './auth.service';
 
 const ME_URL = `${environment.API_URL}/auth/me`;
 const USER: SessionUser = { id: '1', username: 'editor' };
@@ -168,37 +172,153 @@ describe('AuthService', () => {
 		expect(service.user()).toBeUndefined();
 	});
 
-	it('logs out with the session cookies', () => {
-		setUp();
-		check();
-		controller.expectOne(ME_URL).flush(USER);
-		let done = false;
-		service.logout().subscribe({ complete: () => (done = true) });
+	describe('logging out', () => {
+		const LOGOUT_URL = `${environment.API_URL}/auth/logout`;
+		const NO_CONTENT = { status: 204, statusText: 'No Content' };
+		const isPending = () => localStorage.getItem(LOGOUT_PENDING_KEY);
 
-		const request = controller.expectOne(
-			`${environment.API_URL}/auth/logout`
-		);
-		expect(request.request.method).toBe('POST');
-		expect(request.request.withCredentials).toBe(true);
-		request.flush(null, { status: 204, statusText: 'No Content' });
+		function signedIn() {
+			setUp();
+			check();
+			controller.expectOne(ME_URL).flush(USER);
+		}
 
-		expect(done).toBe(true);
-		expect(service.user()).toBeNull();
-		expect(savedUser()).toBeNull();
-		expect(check().user).toBeNull();
-		controller.expectNone(ME_URL);
-	});
+		it('clears the user at once, then tells the API with the session cookies', () => {
+			signedIn();
+			service.logout();
 
-	it('stays logged in when logging out fails', () => {
-		setUp();
-		check();
-		controller.expectOne(ME_URL).flush(USER);
-		service.logout().subscribe({ error: () => undefined });
-		controller
-			.expectOne(`${environment.API_URL}/auth/logout`)
-			.flush(null, SERVER_ERROR);
+			expect(service.user()).toBeNull();
+			expect(savedUser()).toBeNull();
+			expect(isPending()).not.toBeNull();
+			const request = controller.expectOne(LOGOUT_URL);
+			expect(request.request.method).toBe('POST');
+			expect(request.request.withCredentials).toBe(true);
 
-		expect(service.user()).toEqual(USER);
+			request.flush(null, NO_CONTENT);
+
+			expect(isPending()).toBeNull();
+			expect(service.isLogoutPending()).toBe(false);
+			// Later checks ask the API again.
+			check();
+			controller.expectOne(ME_URL).flush(null, UNAUTHORIZED);
+			controller.expectOne(AUTH_REFRESH_URL).flush(null, UNAUTHORIZED);
+		});
+
+		it('logs out locally and keeps the logout pending when the API is down', () => {
+			signedIn();
+			service.logout();
+			controller.expectOne(LOGOUT_URL).flush(null, SERVER_ERROR);
+
+			expect(service.user()).toBeNull();
+			expect(savedUser()).toBeNull();
+			expect(isPending()).not.toBeNull();
+		});
+
+		it('counts a logout the session had already ended (401) as done', () => {
+			signedIn();
+			service.logout();
+			controller.expectOne(LOGOUT_URL).flush(null, UNAUTHORIZED);
+			controller.expectOne(AUTH_REFRESH_URL).flush(null, UNAUTHORIZED);
+
+			expect(isPending()).toBeNull();
+		});
+
+		it('sends one request however often it is asked', () => {
+			signedIn();
+			service.logout();
+			service.logout();
+			service.finishLogout().subscribe();
+
+			controller.expectOne(LOGOUT_URL).flush(null, NO_CONTENT);
+		});
+
+		it('ignores a session check that answers after logging out', () => {
+			setUp();
+			check();
+			service.logout();
+			controller.expectOne(LOGOUT_URL).flush(null, SERVER_ERROR);
+			controller.expectOne(ME_URL).flush(USER);
+
+			expect(service.user()).toBeNull();
+			expect(savedUser()).toBeNull();
+		});
+
+		describe('while pending', () => {
+			beforeEach(() => localStorage.setItem(LOGOUT_PENDING_KEY, 'true'));
+
+			it('retries once when the app starts, with the session cookies', async () => {
+				setUp();
+				await Promise.resolve();
+
+				const request = controller.expectOne(LOGOUT_URL);
+				expect(request.request.withCredentials).toBe(true);
+				request.flush(null, NO_CONTENT);
+				expect(isPending()).toBeNull();
+			});
+
+			it('does not retry on the server', async () => {
+				setUp('server');
+				await Promise.resolve();
+				controller.expectNone(LOGOUT_URL);
+			});
+
+			it('checks the session by retrying the logout, and is logged out either way', async () => {
+				setUp();
+				await Promise.resolve();
+				controller.expectOne(LOGOUT_URL).flush(null, SERVER_ERROR);
+
+				const failed = check();
+				controller.expectOne(LOGOUT_URL).flush(null, SERVER_ERROR);
+				expect(failed.user).toBeNull();
+				expect(isPending()).not.toBeNull();
+
+				const succeeded = check();
+				controller.expectOne(LOGOUT_URL).flush(null, NO_CONTENT);
+				expect(succeeded.user).toBeNull();
+				expect(isPending()).toBeNull();
+				controller.expectNone(ME_URL);
+			});
+
+			it('shares one retry between the start-up retry and a session check', () => {
+				setUp();
+				const result = check();
+
+				controller.expectOne(LOGOUT_URL).flush(null, NO_CONTENT);
+
+				expect(result.user).toBeNull();
+			});
+
+			it('uses /auth/me again once the logout went through', async () => {
+				setUp();
+				await Promise.resolve();
+				controller.expectOne(LOGOUT_URL).flush(null, NO_CONTENT);
+
+				check();
+				controller.expectOne(ME_URL).flush(USER);
+				expect(service.user()).toEqual(USER);
+			});
+
+			it('retries when the browser comes back online', async () => {
+				setUp();
+				await Promise.resolve();
+				controller.expectOne(LOGOUT_URL).flush(null, SERVER_ERROR);
+
+				window.dispatchEvent(new Event('online'));
+
+				controller.expectOne(LOGOUT_URL).flush(null, NO_CONTENT);
+				expect(isPending()).toBeNull();
+			});
+
+			it('sends nothing on coming online once it is done', async () => {
+				setUp();
+				await Promise.resolve();
+				controller.expectOne(LOGOUT_URL).flush(null, NO_CONTENT);
+
+				window.dispatchEvent(new Event('online'));
+
+				controller.expectNone(LOGOUT_URL);
+			});
+		});
 	});
 
 	it('follows logins and logouts in other tabs', () => {

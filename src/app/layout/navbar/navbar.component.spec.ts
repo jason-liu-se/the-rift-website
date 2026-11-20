@@ -1,5 +1,13 @@
+import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
+import { of } from 'rxjs';
+import { ToastService } from 'src/app/components/toast/toast.service';
+import { SessionUser } from 'src/app/interfaces/api-responses';
+import {
+	AuthService,
+	SAVED_USER_KEY
+} from 'src/app/services/auth/auth.service';
 
 import {
 	ANY_URL_ROUTES,
@@ -34,13 +42,32 @@ describe('NavbarComponent', () => {
 	};
 
 	let resize: () => void;
+	const EDITOR: SessionUser = { id: '1', username: 'editor' };
+	const user = signal<SessionUser | null | undefined>(undefined);
+	const checkSession = vi.fn(() => of(user() ?? null));
+	const logout = vi.fn();
+	const show = vi.fn();
 
-	beforeEach(() => {
+	beforeEach(async () => {
+		user.set(undefined);
+		localStorage.removeItem(SAVED_USER_KEY);
+		checkSession.mockClear();
+		logout.mockClear();
+		show.mockClear();
 		resize = stubResizeObserver();
 		TestBed.configureTestingModule({
 			imports: [NavbarComponent],
-			providers: [provideRouter(ANY_URL_ROUTES)]
+			providers: [
+				provideRouter(ANY_URL_ROUTES),
+				{
+					provide: AuthService,
+					useValue: { user, checkSession, logout }
+				},
+				{ provide: ToastService, useValue: { show } }
+			]
 		});
+		// Resolves the lazily loaded user menu.
+		await TestBed.compileComponents();
 		fixture = renderComponent(NavbarComponent);
 		element = fixture.nativeElement;
 	});
@@ -49,6 +76,7 @@ describe('NavbarComponent', () => {
 		resetViewport();
 		vi.unstubAllGlobals();
 		document.documentElement.style.removeProperty(NAVBAR_HEIGHT_VARIABLE);
+		localStorage.removeItem(SAVED_USER_KEY);
 	});
 
 	it('publishes its height for scroll padding', () => {
@@ -167,6 +195,58 @@ describe('NavbarComponent', () => {
 
 				expect(menuLinks()?.classList).not.toContain('hidden');
 			});
+		});
+	});
+
+	describe('user menu', () => {
+		const userMenu = () => element.querySelector('app-user-menu');
+		const signIn = async () => {
+			user.set(EDITOR);
+			fixture.detectChanges();
+			// The menu loads lazily.
+			await fixture.whenStable();
+			fixture.detectChanges();
+		};
+
+		it('is absent while the user is unknown or signed out', () => {
+			expect(userMenu()).toBeNull();
+
+			user.set(null);
+			fixture.detectChanges();
+
+			expect(userMenu()).toBeNull();
+		});
+
+		it('makes no session request for an anonymous visitor', () => {
+			expect(checkSession).not.toHaveBeenCalled();
+		});
+
+		it('checks the session after rendering when a user is saved', () => {
+			localStorage.setItem(SAVED_USER_KEY, JSON.stringify(EDITOR));
+
+			renderComponent(NavbarComponent);
+
+			expect(checkSession).toHaveBeenCalledTimes(1);
+		});
+
+		it('appears once the user is known, and goes when they log out', async () => {
+			await signIn();
+			expect(userMenu()?.textContent).toContain('editor');
+
+			user.set(null);
+			fixture.detectChanges();
+
+			expect(userMenu()).toBeNull();
+		});
+
+		it('closes the hamburger menu after logging out', async () => {
+			await signIn();
+			click('.hamburger-menu-button');
+
+			element.querySelector<HTMLElement>('.mobile button')!.click();
+			fixture.detectChanges();
+
+			expect(menuLinks()?.classList).toContain('hidden');
 		});
 	});
 

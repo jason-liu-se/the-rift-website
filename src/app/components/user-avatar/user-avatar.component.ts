@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { AuthService } from 'src/app/services/auth/auth.service';
 
@@ -8,13 +8,15 @@ import { AuthService } from 'src/app/services/auth/auth.service';
  * is logged in.
  */
 @Component({
-	selector: 'app-admin-user',
-	templateUrl: './admin-user.component.html',
-	styleUrls: ['./admin-user.component.scss'],
+	selector: 'app-user-avatar',
+	templateUrl: './user-avatar.component.html',
+	styleUrls: ['./user-avatar.component.scss'],
 	imports: [MatIcon]
 })
-export class AdminUserComponent {
+export class UserAvatarComponent {
 	public readonly user = inject(AuthService).user;
+	/** Turn off to show the avatar alone. */
+	public readonly showUsername = input(true);
 
 	public readonly avatarFailed = signal(false);
 	public readonly avatarUrl = computed(() =>
