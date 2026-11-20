@@ -68,4 +68,10 @@ other browser APIs only in event handlers, `afterNextRender`, or behind
 - Logged-in API requests send the API's httpOnly session cookies
   (`withCredentials`). When one answers 401 because the short-lived access token
   expired, `authRefreshInterceptor` (`src/app/services/auth/`) calls
-  `POST /auth/refresh` once and retries it.
+  `POST /auth/refresh` once and retries it. If the refresh answers 401 too, the
+  session is over and the app logs out.
+- `AuthService.user()` is the logged-in user for the whole app. It's checked
+  with `GET /auth/me` once per page load, in the browser only (the server can't
+  see the API's cookies, so there it stays unknown). The last-known user is kept
+  in `localStorage`: it still shows while the API is down, and a logout in one
+  tab logs out the others.
