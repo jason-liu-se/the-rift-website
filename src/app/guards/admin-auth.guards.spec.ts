@@ -12,11 +12,13 @@ import { routes } from '../app.routes';
 import { ADMIN_LOGIN_PATH, ADMIN_PATH } from '../config/admin';
 import { AuthService } from '../services/auth/auth.service';
 import { requireLoggedIn, requireLoggedOut } from './admin-auth.guards';
+import { LOGIN_RETURN_URL_KEY, saveLoginReturnUrl } from './login-return-url';
 
 describe('admin auth guards', () => {
 	function runGuard(
 		guard: CanActivateFn,
-		loggedIn: boolean
+		loggedIn: boolean,
+		url = ADMIN_PATH
 	): Promise<boolean | UrlTree> {
 		TestBed.configureTestingModule({
 			providers: [
@@ -35,7 +37,7 @@ describe('admin auth guards', () => {
 			]
 		});
 		const result = TestBed.runInInjectionContext(() =>
-			guard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot)
+			guard({} as ActivatedRouteSnapshot, { url } as RouterStateSnapshot)
 		) as Observable<boolean | UrlTree>;
 		return firstValueFrom(result);
 	}
@@ -53,6 +55,37 @@ describe('admin auth guards', () => {
 	);
 
 	describe('requireLoggedIn', () => {
+		beforeEach(() => sessionStorage.clear());
+
+		it('returns a logged-in editor to the saved page, once', async () => {
+			saveLoginReturnUrl('/admin#news');
+
+			expect(urlOf(await runGuard(requireLoggedIn, true))).toBe(
+				'/admin#news'
+			);
+			TestBed.resetTestingModule();
+			expect(await runGuard(requireLoggedIn, true, '/admin#news')).toBe(
+				true
+			);
+		});
+
+		it("lets them in when the saved page is where they're going", async () => {
+			saveLoginReturnUrl('/admin');
+
+			expect(await runGuard(requireLoggedIn, true)).toBe(true);
+		});
+
+		it('keeps the saved page while nobody is logged in', async () => {
+			saveLoginReturnUrl('/admin#news');
+
+			expect(urlOf(await runGuard(requireLoggedIn, false))).toBe(
+				ADMIN_LOGIN_PATH
+			);
+			expect(sessionStorage.getItem(LOGIN_RETURN_URL_KEY)).toBe(
+				'/admin#news'
+			);
+		});
+
 		it('lets a logged-in editor in', async () => {
 			expect(await runGuard(requireLoggedIn, true)).toBe(true);
 		});

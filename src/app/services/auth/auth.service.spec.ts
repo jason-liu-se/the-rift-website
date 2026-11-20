@@ -19,7 +19,8 @@ import {
 import {
 	AuthService,
 	LOGOUT_PENDING_KEY,
-	SAVED_USER_KEY
+	SAVED_USER_KEY,
+	SessionEndReason
 } from './auth.service';
 
 const ME_URL = `${environment.API_URL}/auth/me`;
@@ -101,6 +102,73 @@ describe('AuthService', () => {
 		// A definite answer: later checks don't ask again.
 		expect(check().user).toBeNull();
 		controller.expectNone(ME_URL);
+	});
+
+	describe('reporting an ended session', () => {
+		let reasons: SessionEndReason[];
+
+		function setUpReporting() {
+			setUp();
+			reasons = [];
+			service.sessionEnded.subscribe((reason) => reasons.push(reason));
+		}
+
+		it('reports an expired session once when the page-load check finds it over', () => {
+			saveUser(USER);
+			setUpReporting();
+			check();
+			controller.expectOne(ME_URL).flush(null, UNAUTHORIZED);
+			controller.expectOne(AUTH_REFRESH_URL).flush(null, UNAUTHORIZED);
+
+			expect(reasons).toEqual(['expired']);
+		});
+
+		it('reports nothing when nobody was logged in', () => {
+			setUpReporting();
+			check();
+			controller.expectOne(ME_URL).flush(null, UNAUTHORIZED);
+			controller.expectOne(AUTH_REFRESH_URL).flush(null, UNAUTHORIZED);
+
+			expect(reasons).toEqual([]);
+		});
+
+		it('marks a logout pending before removing the user, so other tabs can tell it from an expiry', () => {
+			setUpReporting();
+			check();
+			controller.expectOne(ME_URL).flush(USER);
+			const pendingWhenRemoved: (string | null)[] = [];
+			const removeItem = Storage.prototype.removeItem;
+			vi.spyOn(Storage.prototype, 'removeItem').mockImplementation(
+				function (this: Storage, key: string) {
+					if (key === SAVED_USER_KEY) {
+						pendingWhenRemoved.push(
+							this.getItem(LOGOUT_PENDING_KEY)
+						);
+					}
+					removeItem.call(this, key);
+				}
+			);
+
+			service.logout();
+			vi.restoreAllMocks();
+			controller
+				.expectOne(`${environment.API_URL}/auth/logout`)
+				.flush(null, { status: 204, statusText: 'No Content' });
+
+			expect(pendingWhenRemoved).toEqual(['true']);
+		});
+
+		it('reports nothing for a logout in this tab', () => {
+			setUpReporting();
+			check();
+			controller.expectOne(ME_URL).flush(USER);
+			service.logout();
+			controller
+				.expectOne(`${environment.API_URL}/auth/logout`)
+				.flush(null, { status: 204, statusText: 'No Content' });
+
+			expect(reasons).toEqual([]);
+		});
 	});
 
 	it('stays logged in when an expired access token is refreshed', () => {
@@ -409,6 +477,40 @@ describe('AuthService', () => {
 
 			expect(service.user()).toBeNull();
 			expect(savedUser()).toBeNull();
+		});
+
+		it('reports a logout there', () => {
+			setUp();
+			const reasons: SessionEndReason[] = [];
+			service.sessionEnded.subscribe((reason) => reasons.push(reason));
+
+			otherTab(JSON.stringify(USER));
+			// logout() there marks the logout pending before removing the user.
+			localStorage.setItem(LOGOUT_PENDING_KEY, 'true');
+			otherTab(null);
+
+			expect(reasons).toEqual(['other-tab']);
+		});
+
+		it('reports the session expiring there as expired', () => {
+			setUp();
+			const reasons: SessionEndReason[] = [];
+			service.sessionEnded.subscribe((reason) => reasons.push(reason));
+
+			otherTab(JSON.stringify(USER));
+			otherTab(null);
+
+			expect(reasons).toEqual(['expired']);
+		});
+
+		it('reports nothing for a login there', () => {
+			setUp();
+			const reasons: SessionEndReason[] = [];
+			service.sessionEnded.subscribe((reason) => reasons.push(reason));
+
+			otherTab(JSON.stringify(USER));
+
+			expect(reasons).toEqual([]);
 		});
 	});
 });

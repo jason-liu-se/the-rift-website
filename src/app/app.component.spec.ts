@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { AppComponent } from './app.component';
+import { SessionEndedService } from './layout/session-ended/session-ended.service';
 
 describe('AppComponent', () => {
 	beforeEach(() =>
@@ -9,6 +10,16 @@ describe('AppComponent', () => {
 			providers: [provideRouter([])]
 		})
 	);
+
+	it('starts telling the user when their session ends', () => {
+		const start = vi
+			.spyOn(TestBed.inject(SessionEndedService), 'start')
+			.mockImplementation(() => undefined);
+
+		TestBed.createComponent(AppComponent);
+
+		expect(start).toHaveBeenCalled();
+	});
 
 	it('should create the app', () => {
 		const fixture = TestBed.createComponent(AppComponent);

@@ -1,0 +1,14 @@
+<h2 id="session-ended-heading" class="heading">{{ copy.heading }}</h2>
+<p id="session-ended-text" class="text">{{ copy.text }}</p>
+<div class="actions">
+	<button type="button" class="action secondary" (click)="goHome()">
+		Go to the home page
+	</button>
+	<button
+		type="button"
+		class="action primary log-in-again"
+		(click)="logInAgain()"
+	>
+		Log in again
+	</button>
+</div>
