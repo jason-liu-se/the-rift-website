@@ -38,25 +38,40 @@ export class SessionEndedService {
 				if (isOnProtectedPage(this.router)) {
 					this.openDialog(reason);
 				} else {
-					this.toast.show('Your session has ended');
+					this.showToast();
 				}
 			});
 	}
 
-	/** One dialog at a time; its code loads on first use. */
+	/**
+	 * One dialog at a time; its code loads on first use. If it can't be shown
+	 * (a deploy replaced that code), the toast still tells the user.
+	 */
 	private openDialog(reason: SessionEndReason): void {
 		if (this.dialogOpen) {
 			return;
 		}
 		this.dialogOpen = true;
-		void import('./session-ended-dialog.component').then(
-			({ SessionEndedDialogComponent, SESSION_ENDED_DIALOG_CONFIG }) =>
-				this.dialog
-					.open(SessionEndedDialogComponent, {
-						...SESSION_ENDED_DIALOG_CONFIG,
-						data: reason
-					})
-					.closed.subscribe(() => (this.dialogOpen = false))
-		);
+		import('./session-ended-dialog.component')
+			.then(
+				({
+					SessionEndedDialogComponent,
+					SESSION_ENDED_DIALOG_CONFIG
+				}) =>
+					this.dialog
+						.open(SessionEndedDialogComponent, {
+							...SESSION_ENDED_DIALOG_CONFIG,
+							data: reason
+						})
+						.closed.subscribe(() => (this.dialogOpen = false))
+			)
+			.catch(() => {
+				this.dialogOpen = false;
+				this.showToast();
+			});
+	}
+
+	private showToast(): void {
+		this.toast.show('Your session has ended');
 	}
 }

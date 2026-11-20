@@ -1,3 +1,4 @@
+import { Dialog } from '@angular/cdk/dialog';
 import { PLATFORM_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
@@ -84,6 +85,26 @@ describe('SessionEndedService', () => {
 		await new Promise((resolve) => setTimeout(resolve));
 
 		expect(dialogs()).toHaveLength(1);
+	});
+
+	it("falls back to the toast when the dialog can't be shown, and tries again next time", async () => {
+		const router = start();
+		await router.navigateByUrl('/admin');
+		const open = vi
+			.spyOn(TestBed.inject(Dialog), 'open')
+			.mockImplementationOnce(() => {
+				// As when its code fails to load (a deploy replaced it).
+				throw new Error('Failed to fetch dynamically imported module');
+			});
+
+		sessionEnded.next('expired');
+		await vi.waitFor(() =>
+			expect(show).toHaveBeenCalledWith('Your session has ended')
+		);
+		sessionEnded.next('expired');
+		await dialogOpened();
+
+		expect(open).toHaveBeenCalledTimes(2);
 	});
 
 	it('does nothing on the server', async () => {
