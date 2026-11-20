@@ -198,10 +198,9 @@ describe('AuthService', () => {
 
 			expect(isPending()).toBeNull();
 			expect(service.isLogoutPending()).toBe(false);
-			// Later checks ask the API again.
-			check();
-			controller.expectOne(ME_URL).flush(null, UNAUTHORIZED);
-			controller.expectOne(AUTH_REFRESH_URL).flush(null, UNAUTHORIZED);
+			// Later checks reuse this page load's check, without asking again.
+			expect(check().user).toBeNull();
+			controller.expectNone(ME_URL);
 		});
 
 		it('logs out locally and keeps the logout pending when the API is down', () => {
@@ -271,22 +270,21 @@ describe('AuthService', () => {
 			expect(savedUser()).toBeNull();
 		});
 
-		it('ignores a session check that fails after logging out, and keeps a newer one', () => {
+		it('ignores a session check that fails after logging out, and asks nothing more', () => {
 			setUp();
 			saveUser(USER);
 			check();
 			const staleCheck = controller.expectOne(ME_URL);
 			service.logout();
 			controller.expectOne(LOGOUT_URL).flush(null, NO_CONTENT);
-			const newer = check();
-			const newerCheck = controller.expectOne(ME_URL);
 
+			// The API is down: it would otherwise restore the saved user and ask again.
 			staleCheck.flush(null, SERVER_ERROR);
-			check();
-			newerCheck.flush(USER);
 
-			expect(newer.user).toEqual(USER);
-			// The newer check stayed shared: nothing else asked the API.
+			expect(service.user()).toBeNull();
+			expect(savedUser()).toBeNull();
+			expect(check().user).toBeNull();
+			controller.expectNone(ME_URL);
 		});
 
 		it('knows whether a user is saved', () => {

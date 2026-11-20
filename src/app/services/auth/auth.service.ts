@@ -124,8 +124,9 @@ export class AuthService {
 	 * fails, the logout stays pending and is retried (see `finishLogout`).
 	 */
 	public logout(): void {
+		// Later checks reuse this page load's check: they read `state()`, and
+		// the counter keeps an answer that's still on its way from changing it.
 		this.logouts++;
-		this.check$ = undefined;
 		this.setUser(null);
 		this.setLogoutPending(true);
 		this.finishLogout().subscribe();
@@ -211,7 +212,7 @@ export class AuthService {
 				}),
 				catchError((error: unknown) => {
 					if (loggedOutSince()) {
-						// Nothing to restore, and `check$` isn't this check's any more.
+						// Logged out since: nothing to restore, and nothing to ask again.
 						return of(null);
 					}
 					if (isUnauthorized(error)) {
