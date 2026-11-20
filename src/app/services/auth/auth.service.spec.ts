@@ -49,10 +49,9 @@ describe('AuthService', () => {
 	const saveUser = (user: SessionUser) =>
 		localStorage.setItem(SAVED_USER_KEY, JSON.stringify(user));
 
-	afterEach(() => {
-		controller.verify();
-		localStorage.clear();
-	});
+	// Before each test, so a failed test's saved user can't leak into the next.
+	beforeEach(() => localStorage.clear());
+	afterEach(() => controller.verify());
 
 	it('links to the Discord login', () => {
 		setUp();
@@ -74,6 +73,7 @@ describe('AuthService', () => {
 		expect(request.request.context.get(UNVERSIONED)).toBe(true);
 		request.flush(USER);
 		const later = check();
+		controller.expectNone(ME_URL);
 
 		expect([first.user, second.user, later.user]).toEqual([
 			USER,
@@ -94,6 +94,9 @@ describe('AuthService', () => {
 		expect(result.user).toBeNull();
 		expect(service.user()).toBeNull();
 		expect(savedUser()).toBeNull();
+		// A definite answer: later checks don't ask again.
+		expect(check().user).toBeNull();
+		controller.expectNone(ME_URL);
 	});
 
 	it('stays logged in when an expired access token is refreshed', () => {
@@ -124,6 +127,7 @@ describe('AuthService', () => {
 		expect(service.user()).toBeNull();
 		expect(savedUser()).toBeNull();
 		expect(check().user).toBeNull();
+		controller.expectNone(ME_URL);
 	});
 
 	it('keeps the last-known user while the API is down, and checks again next time', () => {
@@ -182,6 +186,7 @@ describe('AuthService', () => {
 		expect(service.user()).toBeNull();
 		expect(savedUser()).toBeNull();
 		expect(check().user).toBeNull();
+		controller.expectNone(ME_URL);
 	});
 
 	it('stays logged in when logging out fails', () => {
