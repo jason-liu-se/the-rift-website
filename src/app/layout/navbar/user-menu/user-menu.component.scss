@@ -47,6 +47,7 @@ $panel-padding: 8px;
 	:host {
 		position: relative;
 		width: auto;
+		height: 100%;
 	}
 
 	.mobile {
@@ -56,6 +57,7 @@ $panel-padding: 8px;
 	.desktop {
 		display: flex;
 		align-items: center;
+		height: 100%;
 	}
 
 	.user-button {

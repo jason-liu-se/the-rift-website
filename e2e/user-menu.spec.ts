@@ -114,6 +114,40 @@ test.describe('user menu on mobile', () => {
 	});
 });
 
+test.describe('user menu position on desktop', () => {
+	// The narrowest desktop width, and a wide one.
+	for (const width of [960, 1920]) {
+		test(`${TAG.desktopOnly} is pinned to the right edge at ${width}px and the open menu covers the button`, async ({
+			page
+		}) => {
+			await page.setViewportSize({ width, height: 800 });
+			await signIn(page);
+			await gotoRoute(page, routeFor('/'));
+			const avatar = trigger(page).locator('.avatar');
+			const box = await avatar.boundingBox();
+
+			// 1rem from the edge, clear of the Join button.
+			expect(box!.x + box!.width).toBeCloseTo(width - 16, 0);
+			const join = await page
+				.getByRole('navigation', { name: 'Main' })
+				.getByRole('button', { name: 'Join' })
+				.boundingBox();
+			expect(join!.x + join!.width).toBeLessThan(box!.x);
+
+			await trigger(page).click();
+			const headerAvatar = page.locator('.panel-header .avatar');
+			await expect(headerAvatar).toBeVisible();
+			const open = await headerAvatar.boundingBox();
+			// Within a pixel: the same place.
+			expect(Math.abs(open!.x - box!.x)).toBeLessThan(1);
+			expect(Math.abs(open!.y - box!.y)).toBeLessThan(1);
+			const panel = await page.locator('.panel').boundingBox();
+			expect(panel!.x).toBeGreaterThanOrEqual(0);
+			expect(panel!.x + panel!.width).toBeLessThanOrEqual(width);
+		});
+	}
+});
+
 test.describe('focus after logging out of a public page', () => {
 	test(`${TAG.desktopOnly} lands on <main>, not <body>`, async ({ page }) => {
 		await signIn(page);
