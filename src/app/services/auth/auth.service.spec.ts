@@ -376,8 +376,7 @@ describe('AuthService', () => {
 		});
 	});
 
-	it('follows logins and logouts in other tabs', () => {
-		setUp();
+	describe('in other tabs', () => {
 		const otherTab = (newValue: string | null) => {
 			if (newValue) {
 				localStorage.setItem(SAVED_USER_KEY, newValue);
@@ -389,10 +388,27 @@ describe('AuthService', () => {
 			);
 		};
 
-		otherTab(JSON.stringify(USER));
-		expect(service.user()).toEqual(USER);
+		it('follows logins and logouts', () => {
+			setUp();
 
-		otherTab(null);
-		expect(service.user()).toBeNull();
+			otherTab(JSON.stringify(USER));
+			expect(service.user()).toEqual(USER);
+
+			otherTab(null);
+			expect(service.user()).toBeNull();
+		});
+
+		it('ignores a session check that answers after a logout there', () => {
+			setUp();
+			saveUser(USER);
+			check();
+			const staleCheck = controller.expectOne(ME_URL);
+
+			otherTab(null);
+			staleCheck.flush(USER);
+
+			expect(service.user()).toBeNull();
+			expect(savedUser()).toBeNull();
+		});
 	});
 });

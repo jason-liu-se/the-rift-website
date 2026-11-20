@@ -60,7 +60,10 @@ export class AuthService {
 	private readonly state = signal<SessionUser | null | undefined>(undefined);
 	private check$?: Observable<unknown>;
 	private finishLogout$?: Observable<boolean>;
-	/** Counts logouts, so a session check started before one can be ignored. */
+	/**
+	 * Counts logouts, in this tab or another, so a session check started
+	 * before one can be ignored.
+	 */
 	private logouts = 0;
 
 	/** Starts a Discord login; navigate to it, don't fetch it. */
@@ -81,7 +84,14 @@ export class AuthService {
 					filter(({ key }) => key === SAVED_USER_KEY || key === null),
 					takeUntilDestroyed()
 				)
-				.subscribe(() => this.state.set(this.readSavedUser()));
+				.subscribe(() => {
+					const user = this.readSavedUser();
+					if (!user) {
+						// A logout there: a check here may have started before it.
+						this.logouts++;
+					}
+					this.state.set(user);
+				});
 			// An earlier logout may not have reached the API (it was down, or
 			// the browser closed first). After construction, because
 			// authRefreshInterceptor injects this service.
