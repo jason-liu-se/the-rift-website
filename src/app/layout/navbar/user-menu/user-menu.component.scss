@@ -27,6 +27,10 @@ $panel-padding: 8px;
 	font-size: 1.25rem;
 }
 
+.menu-item {
+	justify-content: space-between;
+}
+
 .mobile-item {
 	display: flex;
 	align-items: center;
