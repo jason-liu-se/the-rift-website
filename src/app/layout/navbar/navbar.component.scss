@@ -33,7 +33,9 @@ $navbar-height: 3rem;
 }
 
 .expand {
-	height: 100vh;
+	// The banner above the navbar takes some of the screen.
+	// (less the wrapper's 1px border)
+	height: calc(100dvh - var(--status-banner-height, 0px) - 1px);
 }
 
 .always-visible {

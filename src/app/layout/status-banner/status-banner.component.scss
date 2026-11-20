@@ -20,6 +20,12 @@
 	border-width: 0 0 1px;
 }
 
+// Nothing to say: no height, but the live region stays in the DOM.
+.banner.empty {
+	padding: 0;
+	border-width: 0;
+}
+
 .message {
 	margin: 0;
 	font-weight: 600;

@@ -50,7 +50,8 @@ describe('StatusBannerComponent', () => {
 		TestBed.tick();
 		fixture.detectChanges();
 	};
-	const text = () => element.querySelector('.banner')?.textContent?.trim();
+	const text = () =>
+		element.querySelector('.message')?.textContent?.trim() || undefined;
 	const dismissButton = () =>
 		element.querySelector<HTMLButtonElement>('.dismiss');
 	const goDown = async () => {
@@ -140,6 +141,24 @@ describe('StatusBannerComponent', () => {
 		expect(text()).toBeUndefined();
 	});
 
+	it('just disappears when the API recovers during a navigation that began in the outage', async () => {
+		await goDown();
+
+		const navigation = router.navigateByUrl('/other');
+		// Up again before the navigation ends and before the banner reacts.
+		apiStatus.reportUp();
+		await navigation;
+		await settle();
+
+		expect(text()).toBeUndefined();
+	});
+
+	it('keeps the dismiss button out of the live region', async () => {
+		await goDown();
+
+		expect(element.querySelector('[role="status"] button')).toBeNull();
+	});
+
 	it('dismisses the "Back online" message', async () => {
 		await goDown();
 		await recover();
@@ -201,7 +220,9 @@ describe('StatusBannerComponent', () => {
 	it('names the dismiss button for screen readers', async () => {
 		await goDown();
 
-		expect(dismissButton()?.getAttribute('aria-label')).toBe('Dismiss');
+		expect(dismissButton()?.getAttribute('aria-label')).toBe(
+			'Dismiss status message'
+		);
 	});
 
 	it('publishes its height as --status-banner-height', () => {

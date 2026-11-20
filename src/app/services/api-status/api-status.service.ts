@@ -97,9 +97,10 @@ export class ApiStatusService {
 	 */
 	private checkHealthUntilUp(): Observable<unknown> {
 		const window = this.document.defaultView!;
-		// null pauses the checks while the tab is hidden.
+		// null pauses the checks while the tab is hidden or the browser is
+		// offline (the `online` event checks at once).
 		const firstCheckIn = (immediately: boolean) =>
-			this.document.visibilityState !== 'visible'
+			this.document.visibilityState !== 'visible' || !this.browserOnline()
 				? null
 				: immediately
 					? 0
@@ -107,6 +108,7 @@ export class ApiStatusService {
 
 		return merge(
 			fromEvent(window, 'online'),
+			fromEvent(window, 'offline'),
 			fromEvent(this.document, 'visibilitychange')
 		).pipe(
 			map(() => firstCheckIn(true)),

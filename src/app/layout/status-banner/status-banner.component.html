@@ -1,31 +1,31 @@
-<!-- The live region stays in the DOM, so its changes are announced politely. -->
-<div role="status">
-	@if (message(); as text) {
-		<div
-			class="banner"
-			[class.success]="kind() === 'recovered'"
-			[class.warning]="kind() !== 'recovered'"
+<!-- The message's live region stays in the DOM, so its changes are announced
+     politely; the button sits outside it so only the message is read. -->
+<div
+	class="banner"
+	[class.empty]="!message()"
+	[class.success]="kind() === 'recovered'"
+	[class.warning]="kind() !== 'recovered'"
+>
+	<p class="message" role="status">{{ message() }}</p>
+	@if (message()) {
+		<button
+			type="button"
+			class="dismiss"
+			aria-label="Dismiss status message"
+			(click)="dismiss()"
 		>
-			<p class="message">{{ text }}</p>
-			<button
-				type="button"
-				class="dismiss"
-				aria-label="Dismiss"
-				(click)="dismiss()"
+			<svg
+				viewBox="0 0 24 24"
+				width="24"
+				height="24"
+				fill="currentColor"
+				aria-hidden="true"
+				focusable="false"
 			>
-				<svg
-					viewBox="0 0 24 24"
-					width="24"
-					height="24"
-					fill="currentColor"
-					aria-hidden="true"
-					focusable="false"
-				>
-					<path
-						d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-					/>
-				</svg>
-			</button>
-		</div>
+				<path
+					d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+				/>
+			</svg>
+		</button>
 	}
 </div>

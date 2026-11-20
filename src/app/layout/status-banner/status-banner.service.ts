@@ -7,7 +7,7 @@ import {
 	untracked
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { NavigationEnd, Router } from '@angular/router';
+import { NavigationStart, Router } from '@angular/router';
 import { filter, skip } from 'rxjs';
 import { ApiStatusService } from '../../services/api-status/api-status.service';
 
@@ -56,10 +56,11 @@ export class StatusBannerService {
 			});
 		});
 
-		// The first page load isn't a navigation away from anything.
+		// Counted when it starts: the API may recover before it ends. The first
+		// page load isn't a navigation away from anything.
 		this.router.events
 			.pipe(
-				filter((event) => event instanceof NavigationEnd),
+				filter((event) => event instanceof NavigationStart),
 				skip(this.router.navigated ? 0 : 1),
 				takeUntilDestroyed()
 			)

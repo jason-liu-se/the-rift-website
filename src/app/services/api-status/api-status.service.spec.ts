@@ -148,6 +148,16 @@ describe('ApiStatusService', () => {
 			controller.expectOne(HEALTH_URL);
 		});
 
+		it('does not check while the browser is offline, and checks at once when it is back', async () => {
+			window.dispatchEvent(new Event('offline'));
+			await advance(API_HEALTH_CHECK_INTERVAL_MS * 3);
+			controller.expectNone(HEALTH_URL);
+
+			window.dispatchEvent(new Event('online'));
+			await advance(0);
+			controller.expectOne(HEALTH_URL);
+		});
+
 		it('does not start a check while one is still running', async () => {
 			await advance(API_HEALTH_CHECK_INTERVAL_MS);
 			await advance(API_HEALTH_CHECK_INTERVAL_MS);
