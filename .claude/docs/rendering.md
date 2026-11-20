@@ -55,8 +55,8 @@ other browser APIs only in event handlers, `afterNextRender`, or behind
   `SERVER_API_TIMEOUT_MS` (`src/app/config/api.ts`, server only), the page
   renders without the data and the browser fetches it after hydration. Only a
   failure in the browser shows the page's error state and retry button
-  (`LoadState` in `src/app/components/fallback-panel/`), and the page retries by
-  itself once the API is back (see `ApiStatusService`).
+  (`LoadState` in `src/app/utilities/`), and the page retries by itself once the
+  API is back (see `ApiStatusService`).
 - Every API `GET` sends the site's content version as `v`
   (`contentVersionInterceptor`, `src/app/services/content-version/`), so the API
   and Cloudflare cache public reads until the next edit. The version is fetched

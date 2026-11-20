@@ -1,6 +1,6 @@
 import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID, effect, inject, signal, untracked } from '@angular/core';
-import { ApiStatusService } from '../../services/api-status/api-status.service';
+import { ApiStatusService } from '../services/api-status/api-status.service';
 
 /**
  * Whether a page's API request failed, for showing `app-fallback-panel` in place

@@ -11,7 +11,7 @@ import { PaginatorIntlService } from 'src/app/services/paginator-intl/paginator-
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
 import { NewsDisplayComponent } from '../../components/news/news-display/news-display.component';
 import { FallbackPanelComponent } from '../../components/fallback-panel/fallback-panel.component';
-import { LoadState } from '../../components/fallback-panel/load-state';
+import { LoadState } from '../../utilities/load-state';
 
 @Component({
 	selector: 'app-page-news',

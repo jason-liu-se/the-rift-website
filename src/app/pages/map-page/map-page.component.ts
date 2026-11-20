@@ -6,7 +6,7 @@ import { BackgroundImageCardComponent } from '../../components/background-image-
 import { CardSelectionSectionComponent } from '../../components/card-selection-section/card-selection-section.component';
 import { SectionCardComponent } from '../../components/section-card/section-card.component';
 import { FallbackPanelComponent } from '../../components/fallback-panel/fallback-panel.component';
-import { LoadState } from '../../components/fallback-panel/load-state';
+import { LoadState } from '../../utilities/load-state';
 
 interface ISeasonCards {
 	title: string;

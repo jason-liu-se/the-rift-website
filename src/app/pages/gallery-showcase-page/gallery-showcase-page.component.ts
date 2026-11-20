@@ -15,7 +15,7 @@ import { BackgroundImageCardComponent } from '../../components/background-image-
 import { BackButtonComponent } from '../../components/back-button/back-button.component';
 import { ImageShowcaseSectionComponent } from './components/image-showcase-section/image-showcase-section.component';
 import { FallbackPanelComponent } from '../../components/fallback-panel/fallback-panel.component';
-import { LoadState } from '../../components/fallback-panel/load-state';
+import { LoadState } from '../../utilities/load-state';
 
 @Component({
 	selector: 'app-gallery-showcase-page',

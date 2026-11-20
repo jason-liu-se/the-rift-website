@@ -5,7 +5,7 @@ import { DownloadCollection } from 'src/app/interfaces/api-responses';
 import { SectionCardComponent } from '../../components/section-card/section-card.component';
 import { DownloadCardComponent } from '../../components/download-card/download-card.component';
 import { FallbackPanelComponent } from '../../components/fallback-panel/fallback-panel.component';
-import { LoadState } from '../../components/fallback-panel/load-state';
+import { LoadState } from '../../utilities/load-state';
 
 @Component({
 	selector: 'app-downloads-page',
