@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test';
+import { signIn } from './support/auth';
 import { environment } from '../src/environments/environment.development';
 import { scanForViolations } from './support/axe';
 import { gotoRoute } from './support/navigation';
@@ -6,24 +7,7 @@ import { TAG } from './support/projects';
 import { routeFor } from './support/routes';
 import { expect, test } from './support/test';
 
-// Must match SAVED_USER_KEY (auth.service.ts, which pulls in Angular).
-const SAVED_USER_KEY = 'session-user';
-const EDITOR = { id: '1', username: 'editor' };
 const { API_URL } = environment;
-
-/** Logs in with the mock API: the saved user makes the navbar check the session. */
-async function signIn(page: Page, logoutStatus = 204): Promise<void> {
-	await page.addInitScript(
-		([key, user]) => localStorage.setItem(key, user),
-		[SAVED_USER_KEY, JSON.stringify(EDITOR)]
-	);
-	await page.route(`${API_URL}/auth/me**`, (route) =>
-		route.fulfill({ status: 200, json: EDITOR })
-	);
-	await page.route(`${API_URL}/auth/logout`, (route) =>
-		route.fulfill({ status: logoutStatus, body: '' })
-	);
-}
 
 const trigger = (page: Page) =>
 	page.getByRole('button', { name: 'Account menu' });

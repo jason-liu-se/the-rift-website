@@ -76,6 +76,10 @@ other browser APIs only in event handlers, `afterNextRender`, or behind
   see the API's cookies, so there it stays unknown). The last-known user is kept
   in `localStorage`: it still shows while the API is down, and a logout in one
   tab logs out the others.
+- A session that ends without a logout in this tab (it expired, or the user
+  logged out in another tab) shows a toast, or on a protected page a dialog that
+  offers to log in again and return to the same page
+  (`src/app/layout/session-ended/`).
 - `ApiStatusService` (`src/app/services/api-status/`) tells the browser whether
   the API is `up`, `down` or `offline`, fed by `apiStatusInterceptor` (down
   after a network error, timeout or 5xx) and the `online`/`offline` events. A
