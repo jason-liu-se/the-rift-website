@@ -89,9 +89,9 @@ describe('UserMenuComponent', () => {
 			'editor'
 		);
 		expect(
-			panel()?.querySelector('a[href="/admin"]')?.textContent?.trim()
-		).toBe('Admin');
-		expect(logoutButton().textContent?.trim()).toBe('Log out');
+			panel()?.querySelector('a[href="/admin"]')?.textContent
+		).toContain('Admin');
+		expect(logoutButton().textContent).toContain('Log out');
 	});
 
 	it('also lists the user, Admin and Log out for the hamburger menu', () => {

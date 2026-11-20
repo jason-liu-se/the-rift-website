@@ -24,8 +24,12 @@
 				value="admin"
 				class="menu-item"
 				[routerLink]="adminPath"
-				>Admin</a
 			>
+				<span class="material-icons icon" aria-hidden="true"
+					>admin_panel_settings</span
+				>
+				Admin
+			</a>
 			<button
 				ngMenuItem
 				value="logout"
@@ -33,6 +37,9 @@
 				class="menu-item"
 				(click)="logout()"
 			>
+				<span class="material-icons icon" aria-hidden="true"
+					>logout</span
+				>
 				Log out
 			</button>
 		</div>
@@ -40,8 +47,14 @@
 </div>
 <div class="mobile">
 	<app-user-avatar />
-	<a class="mobile-item" [routerLink]="adminPath">Admin</a>
+	<a class="mobile-item" [routerLink]="adminPath">
+		<span class="material-icons icon" aria-hidden="true"
+			>admin_panel_settings</span
+		>
+		Admin
+	</a>
 	<button type="button" class="mobile-item" (click)="logout()">
+		<span class="material-icons icon" aria-hidden="true">logout</span>
 		Log out
 	</button>
 </div>
