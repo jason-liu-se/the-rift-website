@@ -38,7 +38,8 @@ $navbar-height: 3rem;
 
 .always-visible {
 	position: fixed;
-	top: 0px;
+	// Below the status banner, when one is showing.
+	top: var(--status-banner-height, 0px);
 	z-index: 10;
 }
 

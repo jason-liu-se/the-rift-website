@@ -75,3 +75,11 @@ other browser APIs only in event handlers, `afterNextRender`, or behind
   see the API's cookies, so there it stays unknown). The last-known user is kept
   in `localStorage`: it still shows while the API is down, and a logout in one
   tab logs out the others.
+- `ApiStatusService` (`src/app/services/api-status/`) tells the browser whether
+  the API is `up`, `down` or `offline`, fed by `apiStatusInterceptor` (down
+  after a network error, timeout or 5xx; up after any other response) and the
+  `online`/`offline` events. While down, it polls `/health` every
+  `API_HEALTH_CHECK_INTERVAL_MS` while the tab is visible. It stays `up` on the
+  server. `StatusBannerComponent` (`src/app/layout/status-banner/`) shows it
+  above the navbar and publishes `--status-banner-height`; its state lives in a
+  root service so dismissals outlast navigations.

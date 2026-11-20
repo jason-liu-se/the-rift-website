@@ -1,0 +1,49 @@
+@use "../../components/feedback-card/feedback-variants" as *;
+@use "../../../theme-colours" as *;
+
+// In the page's flow, so content makes room for it, but stuck to the top so
+// it stays above the fixed navbar (which sits below it).
+:host {
+	display: block;
+	position: sticky;
+	top: 0;
+	z-index: 11;
+}
+
+.banner {
+	@include feedback-surface;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	padding: 0.25rem 0.5rem 0.25rem 1rem;
+	border-width: 0 0 1px;
+}
+
+.message {
+	margin: 0;
+	font-weight: 600;
+}
+
+.dismiss {
+	display: flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	width: 2.75rem;
+	height: 2.75rem;
+	border: none;
+	border-radius: 50%;
+	background: none;
+	color: var(--feedback-colour);
+	cursor: pointer;
+
+	&:hover {
+		background-color: rgba($colour-dark-text, 0.08);
+	}
+
+	&:focus-visible {
+		outline: 2px solid $colour-dark-text;
+		outline-offset: -2px;
+	}
+}
