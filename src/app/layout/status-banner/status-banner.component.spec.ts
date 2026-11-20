@@ -5,13 +5,16 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { apiStatusInterceptor } from '../../services/api-status/api-status.interceptor';
 import { ApiStatusService } from '../../services/api-status/api-status.service';
+import { SAVED_USER_KEY } from '../../services/auth/auth.service';
 import { stubResizeObserver } from '../testing/resize-observer';
 import { StatusBannerComponent } from './status-banner.component';
 
 @Component({ template: '' })
 class EmptyPageComponent {}
 
-const DOWN = "The Rift's services are down. Changes can't be saved right now.";
+const DOWN = "The Rift's services are down.";
+const EDITOR_DOWN =
+	"The Rift's services are down. Changes can't be saved right now.";
 
 describe('StatusBannerComponent', () => {
 	let fixture: ComponentFixture<StatusBannerComponent>;
@@ -41,6 +44,7 @@ describe('StatusBannerComponent', () => {
 	});
 
 	afterEach(() => {
+		localStorage.clear();
 		vi.unstubAllGlobals();
 		vi.restoreAllMocks();
 	});
@@ -87,10 +91,24 @@ describe('StatusBannerComponent', () => {
 	it('says the services are down', async () => {
 		await goDown();
 
-		expect(text()).toContain(DOWN);
+		expect(text()).toBe(DOWN);
 		expect(element.querySelector('.banner')?.classList).toContain(
 			'warning'
 		);
+	});
+
+	it("also tells a logged-in editor their changes can't be saved", async () => {
+		// A login in another tab sets the user, like a session check would.
+		localStorage.setItem(
+			SAVED_USER_KEY,
+			JSON.stringify({ id: '1', username: 'editor' })
+		);
+		window.dispatchEvent(
+			new StorageEvent('storage', { key: SAVED_USER_KEY })
+		);
+		await goDown();
+
+		expect(text()).toBe(EDITOR_DOWN);
 	});
 
 	it("says you're offline", async () => {
