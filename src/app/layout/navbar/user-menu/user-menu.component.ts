@@ -1,10 +1,10 @@
 import { Menu, MenuItem, MenuTrigger } from '@angular/aria/menu';
 import { Component, inject, output } from '@angular/core';
-import { ActivatedRouteSnapshot, Router, RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ToastService } from 'src/app/components/toast/toast.service';
 import { UserAvatarComponent } from 'src/app/components/user-avatar/user-avatar.component';
 import { ADMIN_LOGIN_PATH, ADMIN_PATH } from 'src/app/config/admin';
-import { requiresLogin } from 'src/app/guards/requires-login';
+import { isOnProtectedPage } from 'src/app/guards/requires-login';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { FocusRecoveryService } from 'src/app/services/focus-recovery/focus-recovery.service';
 
@@ -34,7 +34,7 @@ export class UserMenuComponent {
 	 * protected page goes to the login page; a public one stays put and says so.
 	 */
 	public logout(): void {
-		const leaveProtectedPage = requiresLogin(this.currentRoute());
+		const leaveProtectedPage = isOnProtectedPage(this.router);
 		this.auth.logout();
 		this.loggedOut.emit();
 		if (leaveProtectedPage) {
@@ -44,13 +44,5 @@ export class UserMenuComponent {
 			this.focusRecovery.recoverAfterRender();
 			this.toast.show("You've logged out");
 		}
-	}
-
-	private currentRoute(): ActivatedRouteSnapshot {
-		let route = this.router.routerState.snapshot.root;
-		while (route.firstChild) {
-			route = route.firstChild;
-		}
-		return route;
 	}
 }
