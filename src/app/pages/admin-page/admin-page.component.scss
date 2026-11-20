@@ -123,7 +123,7 @@ $navbar-height: 3rem;
 	// Keeps the links in view below the fixed navbar on long tools.
 	.tool-nav-content {
 		position: sticky;
-		top: $navbar-height;
+		top: calc($navbar-height + var(--status-banner-height, 0px));
 		padding: 24px 0;
 	}
 

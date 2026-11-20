@@ -37,12 +37,15 @@ $user-reserve: 4.5rem;
 }
 
 .expand {
-	height: 100vh;
+	// The banner above the navbar takes some of the screen.
+	// (less the wrapper's 1px border)
+	height: calc(100dvh - var(--status-banner-height, 0px) - 1px);
 }
 
 .always-visible {
 	position: fixed;
-	top: 0px;
+	// Below the status banner, when one is showing.
+	top: var(--status-banner-height, 0px);
 	z-index: 10;
 }
 
@@ -269,7 +272,8 @@ $user-reserve: 4.5rem;
 
 	.user-item {
 		position: fixed;
-		top: 0;
+		// Below the status banner, like the navbar.
+		top: var(--status-banner-height, 0px);
 		right: $edge-gutter;
 		// Above the Join button when the open menu covers it.
 		z-index: 1;

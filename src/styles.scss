@@ -29,10 +29,13 @@ body {
 	height: 100%;
 }
 
-// Keeps focused or linked-to content clear of the fixed navbar (its height is
-// published by NavbarComponent).
+// Keeps focused or linked-to content clear of the fixed navbar and the status
+// banner above it (heights published by NavbarComponent and
+// StatusBannerComponent).
 html {
-	scroll-padding-top: var(--navbar-height, 0px);
+	scroll-padding-top: calc(
+		var(--status-banner-height, 0px) + var(--navbar-height, 0px)
+	);
 }
 
 body {

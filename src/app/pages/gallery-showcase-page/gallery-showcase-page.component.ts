@@ -15,7 +15,7 @@ import { BackgroundImageCardComponent } from '../../components/background-image-
 import { BackButtonComponent } from '../../components/back-button/back-button.component';
 import { ImageShowcaseSectionComponent } from './components/image-showcase-section/image-showcase-section.component';
 import { FallbackPanelComponent } from '../../components/fallback-panel/fallback-panel.component';
-import { LoadState } from '../../components/fallback-panel/load-state';
+import { LoadState } from '../../utilities/load-state';
 
 @Component({
 	selector: 'app-gallery-showcase-page',
@@ -44,7 +44,9 @@ export class GalleryShowcasePageComponent {
 	public pageIndex = 0;
 	public pageEvent!: PageEvent;
 
-	protected readonly loadState = new LoadState();
+	protected readonly loadState = new LoadState(() =>
+		this.populateCaptionedImages()
+	);
 
 	/** Counts requests, so only the latest one updates the page. */
 	private latestRequest = 0;

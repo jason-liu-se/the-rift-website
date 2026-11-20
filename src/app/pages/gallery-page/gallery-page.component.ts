@@ -7,7 +7,7 @@ import { GalleryProviderService } from 'src/app/services/gallery-provider/galler
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
 import { CardSelectionSectionComponent } from '../../components/card-selection-section/card-selection-section.component';
 import { FallbackPanelComponent } from '../../components/fallback-panel/fallback-panel.component';
-import { LoadState } from '../../components/fallback-panel/load-state';
+import { LoadState } from '../../utilities/load-state';
 
 @Component({
 	selector: 'app-page-gallery',
@@ -26,7 +26,9 @@ export class GalleryPageComponent {
 	protected readonly collectionCards = signal<ICardSelection[] | undefined>(
 		undefined
 	);
-	protected readonly loadState = new LoadState();
+	protected readonly loadState = new LoadState(() =>
+		this.setGalleryCollections()
+	);
 
 	constructor() {
 		this.setGalleryCollections();

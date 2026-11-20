@@ -7,6 +7,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NewsPost } from 'src/app/interfaces/api-responses';
 import { environment } from 'src/environments/environment';
+import { ApiStatusService } from 'src/app/services/api-status/api-status.service';
 import { NewsPageComponent } from './news-page.component';
 
 const PAGE_SIZE = 10;
@@ -138,6 +139,22 @@ describe('NewsPageComponent', () => {
 			failPage(0);
 
 			retryButton().click();
+			fixture.detectChanges();
+			expect(retryButton().getAttribute('aria-disabled')).toBe('true');
+
+			flushPage(0, FIRST_PAGE);
+			expect(fallbackPanel()).toBeNull();
+			expect(titles()).toEqual(['Launch', 'Patch']);
+		});
+
+		it('reloads the news by itself when the API comes back', () => {
+			failPage(0);
+
+			const apiStatus = TestBed.inject(ApiStatusService);
+			apiStatus.reportDown();
+			TestBed.tick();
+			apiStatus.reportUp();
+			TestBed.tick();
 			fixture.detectChanges();
 			expect(retryButton().getAttribute('aria-disabled')).toBe('true');
 
