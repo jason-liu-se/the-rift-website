@@ -1,0 +1,66 @@
+<div class="filters">
+	<mat-form-field class="search" subscriptSizing="dynamic">
+		<mat-label>Search</mat-label>
+		<input
+			matInput
+			type="search"
+			maxlength="100"
+			[ngModel]="filters().search"
+			(ngModelChange)="setFilter('search', $event)"
+		/>
+	</mat-form-field>
+	<mat-form-field subscriptSizing="dynamic">
+		<mat-label>Search in</mat-label>
+		<mat-select
+			multiple
+			placeholder="Everything"
+			[ngModel]="filters().searchFields"
+			(ngModelChange)="setFilter('searchFields', $event)"
+		>
+			@for (field of searchFields(); track field.value) {
+				<mat-option [value]="field.value">{{ field.label }}</mat-option>
+			}
+		</mat-select>
+	</mat-form-field>
+	<mat-form-field subscriptSizing="dynamic">
+		<mat-label>Status</mat-label>
+		<mat-select
+			[ngModel]="filters().status"
+			(ngModelChange)="setFilter('status', $event)"
+		>
+			<mat-option value="">Any</mat-option>
+			@for (status of statuses(); track status.value) {
+				<mat-option [value]="status.value">{{
+					status.label
+				}}</mat-option>
+			}
+			<mat-option value="draft">My drafts</mat-option>
+		</mat-select>
+	</mat-form-field>
+	@if (collections(); as collections) {
+		<mat-form-field subscriptSizing="dynamic">
+			<mat-label>Collection</mat-label>
+			<mat-select
+				[ngModel]="filters().collection"
+				(ngModelChange)="setFilter('collection', $event)"
+			>
+				<mat-option value="">Any</mat-option>
+				@for (collection of collections; track collection.slug) {
+					<mat-option [value]="collection.slug">{{
+						collection.title
+					}}</mat-option>
+				}
+			</mat-select>
+		</mat-form-field>
+	}
+	<mat-form-field subscriptSizing="dynamic">
+		<mat-label>Created by</mat-label>
+		<mat-select
+			[ngModel]="filters().scope"
+			(ngModelChange)="setFilter('scope', $event)"
+		>
+			<mat-option value="all">Anyone</mat-option>
+			<mat-option value="mine">Me</mat-option>
+		</mat-select>
+	</mat-form-field>
+</div>

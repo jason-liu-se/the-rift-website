@@ -10,6 +10,12 @@ import {
 	CONTENT_VERSION,
 	GalleryCollectionFixture,
 	DOWNLOAD_COLLECTIONS,
+	EDITOR_DOWNLOAD_COLLECTIONS,
+	EDITOR_DOWNLOAD_ITEMS,
+	EDITOR_GALLERY_COLLECTIONS,
+	EDITOR_GALLERY_IMAGES,
+	EDITOR_MAP_SEASONS,
+	EDITOR_NEWS_POSTS,
 	GALLERY_COLLECTIONS,
 	MAP_SEASONS,
 	NEWS_DETAIL_VERSION,
@@ -29,6 +35,18 @@ const BLUEMAP_PLACEHOLDER =
 	'<!doctype html><html lang="en"><title>BlueMap</title></html>';
 
 const GALLERY_PAGE_PATH = /^\/gallery\/([^/]+)$/;
+/** The editor tools' lists (unfiltered) and collections. */
+const EDITOR_LISTS: Record<string, unknown[]> = {
+	'/editor/news': EDITOR_NEWS_POSTS,
+	'/editor/gallery/images': EDITOR_GALLERY_IMAGES,
+	'/editor/downloads/items': EDITOR_DOWNLOAD_ITEMS,
+	'/editor/maps/seasons': EDITOR_MAP_SEASONS
+};
+const EDITOR_COLLECTIONS: Record<string, unknown[]> = {
+	'/editor/gallery/collections': EDITOR_GALLERY_COLLECTIONS,
+	'/editor/downloads/collections': EDITOR_DOWNLOAD_COLLECTIONS
+};
+
 const GALLERY_TAGS_PATH = /^\/gallery\/([^/]+)\/tags$/;
 
 export interface IMockResponse {
@@ -115,6 +133,15 @@ export function respondTo(url: URL): IMockResponse {
 	}
 	if (url.pathname === '/maps/seasons') {
 		return ok(MAP_SEASONS);
+	}
+	if (url.pathname in EDITOR_LISTS) {
+		return paginateByQuery(EDITOR_LISTS[url.pathname], url.searchParams);
+	}
+	if (url.pathname in EDITOR_COLLECTIONS) {
+		return ok(EDITOR_COLLECTIONS[url.pathname]);
+	}
+	if (url.pathname === '/editor/drafts') {
+		return ok([]);
 	}
 
 	const pageMatch = GALLERY_PAGE_PATH.exec(url.pathname);

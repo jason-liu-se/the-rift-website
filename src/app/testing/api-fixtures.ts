@@ -6,6 +6,11 @@ import {
 	ContentVersion,
 	DetailVersion,
 	DownloadCollection,
+	EditorCollection,
+	EditorDownloadItemSummary,
+	EditorGalleryImage,
+	EditorMapSeasonSummary,
+	EditorNewsPostSummary,
 	GalleryCollection,
 	GalleryImage,
 	MapSeason,
@@ -116,3 +121,73 @@ export function paginate<T>(
 		total: items.length
 	};
 }
+
+// The editor tools' reads (`/editor/*`): the public content above, with the
+// audit fields the editor sees, plus a hidden item each.
+
+const EDITOR = { id: '1', username: 'editor' };
+
+/** `item` without `key`, as a list summary leaves out a long field. */
+function omit<T extends object, K extends keyof T>(
+	item: T,
+	key: K
+): Omit<T, K> {
+	const copy = { ...item };
+	delete copy[key];
+	return copy;
+}
+
+function withAudit<T extends object>(item: T, index: number) {
+	return {
+		...item,
+		visible: true,
+		status: 'live' as const,
+		revision: index + 1,
+		createdBy: EDITOR,
+		lastUpdatedBy: EDITOR,
+		createdAt: '2026-01-01T12:00:00.000Z',
+		updatedAt: '2026-01-01T12:00:00.000Z'
+	};
+}
+
+export const EDITOR_NEWS_POSTS: EditorNewsPostSummary[] = [
+	...NEWS_POSTS.map((post, index) => withAudit(omit(post, 'content'), index)),
+	{
+		...withAudit(
+			{
+				id: 'news-scheduled',
+				title: 'Coming soon',
+				date: '2027-01-01T12:00:00.000Z'
+			},
+			NEWS_POSTS.length
+		),
+		status: 'scheduled'
+	}
+];
+
+export const EDITOR_GALLERY_IMAGES: EditorGalleryImage[] =
+	GALLERY_COLLECTIONS.flatMap(({ slug, images }) =>
+		images.map((image) => ({ ...image, collection: slug }))
+	).map(withAudit);
+
+export const EDITOR_GALLERY_COLLECTIONS: EditorCollection[] =
+	GALLERY_COLLECTIONS.map(({ slug, title, images }, index) => ({
+		...withAudit({ slug, title, itemCount: images.length }, index)
+	}));
+
+export const EDITOR_DOWNLOAD_ITEMS: EditorDownloadItemSummary[] =
+	DOWNLOAD_COLLECTIONS.flatMap(({ name, items }) =>
+		items.map((item) => ({ ...omit(item, 'desc'), collection: name }))
+	).map(withAudit);
+
+export const EDITOR_DOWNLOAD_COLLECTIONS: EditorCollection[] =
+	DOWNLOAD_COLLECTIONS.map(({ name, title, items }, index) => ({
+		...withAudit({ slug: name, title, itemCount: items.length }, index)
+	}));
+
+export const EDITOR_MAP_SEASONS: EditorMapSeasonSummary[] = MAP_SEASONS.map(
+	({ dimensions, ...season }, index) => ({
+		...withAudit(season, index),
+		dimensionCount: dimensions.length
+	})
+);

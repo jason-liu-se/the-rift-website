@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { EditorListComponent } from '../editor-list/editor-list.component';
+import { FilterOption } from '../editor-list/list-filters/list-filters.component';
 import { DownloadItem } from 'src/app/interfaces/api-responses';
 import { DownloadCardComponent } from '../../../../components/download-card/download-card.component';
 
@@ -7,9 +9,15 @@ import { DownloadCardComponent } from '../../../../components/download-card/down
 	selector: 'app-downloads-tool',
 	templateUrl: './downloads-tool.component.html',
 	styleUrls: ['../admin-tool.scss'],
-	imports: [DownloadCardComponent]
+	imports: [EditorListComponent, DownloadCardComponent]
 })
 export class DownloadsToolComponent {
+	protected readonly noun = { one: 'download', many: 'downloads' };
+	protected readonly searchFields: FilterOption[] = [
+		{ value: 'title', label: 'Title' },
+		{ value: 'desc', label: 'Description' }
+	];
+
 	public readonly preview: DownloadItem = {
 		id: 'preview',
 		title: 'Sample download',

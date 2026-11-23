@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { EditorListComponent } from '../editor-list/editor-list.component';
+import { FilterOption } from '../editor-list/list-filters/list-filters.component';
 import { NewsPost } from 'src/app/interfaces/api-responses';
 import { NewsDisplayComponent } from '../../../../components/news/news-display/news-display.component';
 
@@ -7,9 +9,15 @@ import { NewsDisplayComponent } from '../../../../components/news/news-display/n
 	selector: 'app-news-tool',
 	templateUrl: './news-tool.component.html',
 	styleUrls: ['../admin-tool.scss'],
-	imports: [NewsDisplayComponent]
+	imports: [EditorListComponent, NewsDisplayComponent]
 })
 export class NewsToolComponent {
+	protected readonly noun = { one: 'post', many: 'posts' };
+	protected readonly searchFields: FilterOption[] = [
+		{ value: 'title', label: 'Title' },
+		{ value: 'content', label: 'Content' }
+	];
+
 	public readonly preview: NewsPost = {
 		id: 'preview',
 		title: 'Sample news post',

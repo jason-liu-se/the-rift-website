@@ -1,10 +1,15 @@
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { renderComponent } from 'src/app/testing/render-component';
 import { NewsToolComponent } from './news-tool.component';
 
 describe('NewsToolComponent', () => {
 	it('previews a sample post with the news page component', () => {
-		TestBed.configureTestingModule({ imports: [NewsToolComponent] });
+		TestBed.configureTestingModule({
+			imports: [NewsToolComponent],
+			providers: [provideHttpClient(), provideHttpClientTesting()]
+		});
 		const fixture = renderComponent(NewsToolComponent);
 		const post = fixture.nativeElement.querySelector(
 			'app-news-display .title'

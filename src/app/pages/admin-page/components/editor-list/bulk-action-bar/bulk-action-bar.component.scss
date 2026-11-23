@@ -1,0 +1,24 @@
+@use "../../../../../../theme-colours" as *;
+
+.bar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 12px;
+	padding: 8px 12px;
+	border-radius: 8px;
+	background-color: rgba($colour-primary, 0.08);
+}
+
+.count {
+	margin: 0 8px 0 0;
+	font-weight: 600;
+}
+
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-left: auto;
+}

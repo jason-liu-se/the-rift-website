@@ -1,0 +1,39 @@
+<div class="bar">
+	<p class="count">{{ selectedCount() }} of {{ total() }} selected</p>
+	@if (canSelectAllMatching() && !isAllMatching()) {
+		<button mat-button type="button" (click)="selectAllMatching.emit()">
+			{{ allMatchingLabel() }}
+		</button>
+	}
+	<button mat-button type="button" (click)="clearSelection.emit()">
+		Clear selection
+	</button>
+	<div class="actions" role="group" aria-label="Bulk actions">
+		<button
+			mat-stroked-button
+			type="button"
+			[disabled]="isBusy()"
+			(click)="runAction.emit('show')"
+		>
+			Show
+		</button>
+		<button
+			mat-stroked-button
+			type="button"
+			[disabled]="isBusy()"
+			(click)="runAction.emit('hide')"
+		>
+			Hide
+		</button>
+		<ng-content select="[bulkActions]" />
+		<button
+			mat-flat-button
+			color="warn"
+			type="button"
+			[disabled]="isBusy()"
+			(click)="runAction.emit('delete')"
+		>
+			Delete
+		</button>
+	</div>
+</div>

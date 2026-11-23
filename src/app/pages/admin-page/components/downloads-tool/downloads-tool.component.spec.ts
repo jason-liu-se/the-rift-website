@@ -1,10 +1,15 @@
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { renderComponent } from 'src/app/testing/render-component';
 import { DownloadsToolComponent } from './downloads-tool.component';
 
 describe('DownloadsToolComponent', () => {
 	it('previews a sample download with the downloads page card', () => {
-		TestBed.configureTestingModule({ imports: [DownloadsToolComponent] });
+		TestBed.configureTestingModule({
+			imports: [DownloadsToolComponent],
+			providers: [provideHttpClient(), provideHttpClientTesting()]
+		});
 		const fixture = renderComponent(DownloadsToolComponent);
 		const { preview } = fixture.componentInstance;
 		const card: HTMLElement =
