@@ -45,8 +45,9 @@ matching files are read or edited.
 - **External services.** The Rift API and BlueMap run separately. Import
   `environment` from `src/environments/` (generated from `.env`); never
   hard-code URLs.
-- **API types** come from `src/app/interfaces/api-responses.ts`, a verbatim copy
-  of the web-server's contract: never edit it here (README "API contract").
+- **API types** come from `src/app/interfaces/api-*.ts` (`api-requests.ts` what
+  each endpoint takes, `api-responses.ts` what it sends), verbatim copies of the
+  web-server's contract: never edit them here (README "API contract").
 - **Services** live in `src/app/services/<name>/`, one folder per service (with
   its spec and any closely tied interceptor). API services are thin `HttpClient`
   wrappers returning Observables; caching happens in the consuming component.
