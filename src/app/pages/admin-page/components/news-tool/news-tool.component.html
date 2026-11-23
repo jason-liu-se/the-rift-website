@@ -7,7 +7,7 @@
 	[fieldsTemplate]="fields"
 />
 <ng-template #item let-post>
-	<span class="title">{{ toPlainText(post.title) }}</span>
+	<app-markdown class="title" [markdown]="post.title" [inline]="true" />
 	<span class="dates">
 		{{ post.status === "scheduled" ? "Goes live" : "Posted" }}
 		{{ formatDateTime(post.date) }}
