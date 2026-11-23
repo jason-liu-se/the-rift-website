@@ -367,6 +367,17 @@ export class EditorListComponent<T extends EditorContentType> {
 			);
 	}
 
+	/**
+	 * Opens a row's item or draft from a click anywhere on it but its own
+	 * controls (checkbox, buttons, menu, links), which do their own thing.
+	 */
+	protected openFromRow(event: MouseEvent, open: () => void): void {
+		const target = event.target as HTMLElement;
+		if (!target.closest('a, button, input, label, mat-checkbox')) {
+			open();
+		}
+	}
+
 	/** Ctrl+A previews selecting the page; Enter/Space confirm, Escape cancels. */
 	protected handleSelectionKeys(event: KeyboardEvent): void {
 		const target = event.target as HTMLElement;

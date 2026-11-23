@@ -56,19 +56,9 @@ tr.selected,
 	background-color: rgba($colour-primary, 0.06);
 }
 
-// The item's name opens it, like its Edit button.
-.item-name {
-	padding: 0;
-	border: none;
-	background: none;
-	color: inherit;
-	font: inherit;
-	text-align: left;
+// Clicking a row opens it, like its Edit button.
+tr.openable {
 	cursor: pointer;
-
-	&:hover {
-		text-decoration: underline;
-	}
 }
 
 .item {

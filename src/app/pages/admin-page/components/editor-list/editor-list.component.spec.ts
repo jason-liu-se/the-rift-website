@@ -320,24 +320,39 @@ describe('EditorListComponent', () => {
 		]);
 	});
 
-	it('opens an item or draft from its name, as from its Edit button', () => {
+	it('opens an item or draft from a click anywhere on its row', () => {
 		flushList();
 		const edited = vi.fn();
 		const opened = vi.fn();
 		fixture.componentInstance.editItem.subscribe(edited);
 		fixture.componentInstance.openDraft.subscribe(opened);
 
-		rows()[1].querySelector<HTMLButtonElement>('.item-name')!.click();
-		rows()[0].querySelector<HTMLButtonElement>('.item-name')!.click();
+		rows()[1]
+			.querySelector<HTMLElement>('td[data-label="Status"]')!
+			.click();
+		rows()[0].querySelector<HTMLElement>('td.item')!.click();
 
 		expect(edited).toHaveBeenCalledWith(
 			expect.objectContaining({ id: 'post-1' })
 		);
 		expect(opened).toHaveBeenCalledWith(DRAFTS[0]);
-		// The Edit buttons are the keyboard's way in; the names add no tab stops.
-		expect(
-			rows()[1].querySelector('.item-name')?.getAttribute('tabindex')
-		).toBe('-1');
+	});
+
+	it("doesn't open a row from its own controls", () => {
+		flushList();
+		const edited = vi.fn();
+		fixture.componentInstance.editItem.subscribe(edited);
+
+		checkbox('Select Post 1').click();
+		rows()[1]
+			.querySelector<HTMLButtonElement>(
+				'button[aria-label^="More actions"]'
+			)!
+			.click();
+
+		expect(edited).not.toHaveBeenCalled();
+		// Close the menu the click opened.
+		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
 	});
 
 	it('emits edit and draft actions for the tool to open', () => {

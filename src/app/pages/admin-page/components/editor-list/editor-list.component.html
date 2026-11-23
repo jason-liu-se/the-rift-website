@@ -78,7 +78,12 @@
 		</thead>
 		<tbody>
 			@for (draft of newDrafts(); track draft.id) {
-				<tr [class.selected]="selection.isDraftSelected(draft.id)">
+				<!-- A shortcut for the mouse; the Edit button is the keyboard's. -->
+				<tr
+					class="openable"
+					[class.selected]="selection.isDraftSelected(draft.id)"
+					(click)="openFromRow($event, () => openDraft.emit(draft))"
+				>
 					<td class="select">
 						<mat-checkbox
 							color="primary"
@@ -90,13 +95,7 @@
 						/>
 					</td>
 					<td class="item">
-						<!-- A shortcut for the mouse; the Edit button is the keyboard's. -->
-						<button
-							type="button"
-							class="item-name draft-item"
-							tabindex="-1"
-							(click)="openDraft.emit(draft)"
-						>
+						<span class="draft-item">
 							@if (draft.fields.imageUrl) {
 								<img
 									class="draft-thumbnail"
@@ -106,7 +105,7 @@
 								/>
 							}
 							{{ itemName(draft.fields) }}
-						</button>
+						</span>
 					</td>
 					<td data-label="Status">
 						<app-status-badge status="draft" />
@@ -141,7 +140,11 @@
 				</tr>
 			}
 			@for (item of items(); track item.id) {
-				<tr [class.selected]="selection.isSelected(item.id)">
+				<tr
+					class="openable"
+					[class.selected]="selection.isSelected(item.id)"
+					(click)="openFromRow($event, () => editItem.emit(item))"
+				>
 					<td class="select">
 						<mat-checkbox
 							color="primary"
@@ -151,24 +154,16 @@
 						/>
 					</td>
 					<td class="item">
-						<!-- A shortcut for the mouse; the Edit button is the keyboard's. -->
-						<button
-							type="button"
-							class="item-name"
-							tabindex="-1"
-							(click)="editItem.emit(item)"
-						>
-							@if (itemTemplate(); as template) {
-								<ng-container
-									*ngTemplateOutlet="
-										template;
-										context: { $implicit: item }
-									"
-								/>
-							} @else {
-								{{ itemName(item) }}
-							}
-						</button>
+						@if (itemTemplate(); as template) {
+							<ng-container
+								*ngTemplateOutlet="
+									template;
+									context: { $implicit: item }
+								"
+							/>
+						} @else {
+							{{ itemName(item) }}
+						}
 					</td>
 					<td data-label="Status">
 						<app-status-badge
