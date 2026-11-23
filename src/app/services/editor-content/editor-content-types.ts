@@ -1,17 +1,21 @@
 import {
 	BulkDeleteRequest,
 	DownloadItemBulkUpdateRequest,
+	DownloadItemFields,
 	DownloadItemCreateRequest,
 	DownloadItemUpdateRequest,
 	EditorContentType,
 	EditorListQuery,
 	GalleryImageBulkUpdateRequest,
+	GalleryImageFields,
 	GalleryImageCreateRequest,
 	GalleryImageUpdateRequest,
 	MapSeasonBulkUpdateRequest,
+	MapSeasonFields,
 	MapSeasonCreateRequest,
 	MapSeasonUpdateRequest,
 	NewsPostBulkUpdateRequest,
+	NewsPostFields,
 	NewsPostCreateRequest,
 	NewsPostUpdateRequest
 } from '../../interfaces/api-requests';
@@ -30,6 +34,7 @@ import {
 /** What each content type's editor endpoints take and answer. */
 export interface EditorContentTypes {
 	news: {
+		fields: NewsPostFields;
 		summary: EditorNewsPostSummary;
 		item: EditorNewsPost;
 		status: NewsStatus;
@@ -38,6 +43,7 @@ export interface EditorContentTypes {
 		bulkUpdate: NewsPostBulkUpdateRequest;
 	};
 	gallery: {
+		fields: GalleryImageFields;
 		summary: EditorGalleryImage;
 		item: EditorGalleryImage;
 		status: ContentStatus;
@@ -46,6 +52,7 @@ export interface EditorContentTypes {
 		bulkUpdate: GalleryImageBulkUpdateRequest;
 	};
 	downloads: {
+		fields: DownloadItemFields;
 		summary: EditorDownloadItemSummary;
 		item: EditorDownloadItem;
 		status: ContentStatus;
@@ -54,6 +61,7 @@ export interface EditorContentTypes {
 		bulkUpdate: DownloadItemBulkUpdateRequest;
 	};
 	maps: {
+		fields: MapSeasonFields;
 		summary: EditorMapSeasonSummary;
 		item: EditorMapSeason;
 		status: ContentStatus;
@@ -63,6 +71,8 @@ export interface EditorContentTypes {
 	};
 }
 
+export type FieldsOf<T extends EditorContentType> =
+	EditorContentTypes[T]['fields'];
 export type SummaryOf<T extends EditorContentType> =
 	EditorContentTypes[T]['summary'];
 export type ItemOf<T extends EditorContentType> = EditorContentTypes[T]['item'];
@@ -104,4 +114,19 @@ export const EDITOR_ITEMS_PATHS: Record<EditorContentType, string> = {
 	gallery: 'gallery/images',
 	downloads: 'downloads/items',
 	maps: 'maps/seasons'
+};
+
+/** Each content type's own fields: what a draft holds and publishes. */
+export const FIELD_KEYS: { [T in EditorContentType]: (keyof FieldsOf<T>)[] } = {
+	news: ['title', 'content', 'imageUrl'],
+	gallery: ['collection', 'caption', 'imageUrl', 'tags'],
+	downloads: [
+		'collection',
+		'title',
+		'desc',
+		'downloadUrl',
+		'imageUrl',
+		'sortOrder'
+	],
+	maps: ['season', 'imageUrl', 'dimensions']
 };

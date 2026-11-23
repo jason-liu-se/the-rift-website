@@ -301,6 +301,26 @@ describe('EditorListComponent', () => {
 		flushList();
 	});
 
+	it('lists drafts saved only in this browser (made offline)', () => {
+		flushList();
+		localStorage.setItem(
+			'draft:offline',
+			JSON.stringify({
+				id: 'offline',
+				type: 'news',
+				owner: '1',
+				fields: { title: 'Written offline' },
+				isPending: true,
+				updatedAt: '2026-01-01T00:00:00.000Z'
+			})
+		);
+		fixture.componentInstance.reloadItems();
+		flushList();
+
+		expect(rows()[0].textContent).toContain('Written offline');
+		localStorage.clear();
+	});
+
 	it('shows only the drafts for the "My drafts" filter', () => {
 		flushList();
 

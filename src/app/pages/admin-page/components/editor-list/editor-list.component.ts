@@ -54,6 +54,7 @@ import {
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { DraftsService } from 'src/app/services/drafts/drafts.service';
+import { LocalDraftsService } from 'src/app/services/drafts/local-drafts.service';
 import {
 	BulkActionOf,
 	ListQueryOf,
@@ -97,7 +98,7 @@ const STATUS_FILTERS: Record<'news' | 'other', FilterOption[]> = {
 };
 
 /** An item's row; each content type's own cell is `itemTemplate`. */
-interface ItemTemplateContext<T extends EditorContentType> {
+export interface ItemTemplateContext<T extends EditorContentType> {
 	$implicit: SummaryOf<T>;
 }
 
@@ -133,6 +134,7 @@ interface ItemTemplateContext<T extends EditorContentType> {
 export class EditorListComponent<T extends EditorContentType> {
 	private editorContent = inject(EditorContentService);
 	private draftsService = inject(DraftsService);
+	private localDrafts = inject(LocalDraftsService);
 	private auth = inject(AuthService);
 	private bulkRunner = inject(BulkActionRunnerService);
 	private notifier = inject(AdminNotifierService);
@@ -502,9 +504,10 @@ export class EditorListComponent<T extends EditorContentType> {
 	): Observable<unknown> {
 		this.loadState.start();
 		this.selection.clear();
-		const drafts = this.draftsService
-			.fetchDrafts(this.type())
-			.pipe(catchError(() => of(this.drafts())));
+		const drafts = this.draftsService.fetchDrafts(this.type()).pipe(
+			catchError(() => of(this.drafts())),
+			map((serverDrafts) => [...this.localOnlyDrafts(), ...serverDrafts])
+		);
 		const items = query
 			? this.editorContent.fetchItems(this.type(), {
 					...query,
@@ -523,6 +526,29 @@ export class EditorListComponent<T extends EditorContentType> {
 				return EMPTY;
 			})
 		);
+	}
+
+	/** Drafts saved only in this browser (made offline), not yet on the server. */
+	private localOnlyDrafts(): DraftSummary[] {
+		const owner = this.auth.user()?.id;
+		if (!owner) {
+			return [];
+		}
+		return this.localDrafts
+			.list(owner, this.type())
+			.filter(({ revision }) => revision === undefined)
+			.map(
+				({ id, type, fields, target, updatedAt }) =>
+					({
+						id,
+						type,
+						fields,
+						target,
+						revision: 0,
+						createdAt: updatedAt,
+						updatedAt
+					}) as DraftSummary
+			);
 	}
 
 	/** The API query for the filters; undefined when only drafts are wanted. */

@@ -16,3 +16,13 @@ export const EDITOR_SEARCH_DEBOUNCE_MS = 300;
 
 /** How long a success snackbar stays; failures stay until dismissed. */
 export const SNACKBAR_SUCCESS_DURATION_MS = 4000;
+
+/**
+ * How long after typing stops a draft autosaves to the server. At most one
+ * save per pause keeps an editor well under the API's write limit (15 per 15
+ * seconds), leaving room for uploads and other writes.
+ */
+export const AUTOSAVE_DELAY_MS = 3000;
+
+/** Changes this close together are one step for undo (typing a word). */
+export const UNDO_GROUP_MS = 1000;

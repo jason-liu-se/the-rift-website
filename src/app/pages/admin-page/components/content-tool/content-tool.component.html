@@ -1,0 +1,52 @@
+@if (session(); as session) {
+	<app-draft-editor
+		[session]="session"
+		[noun]="noun()"
+		[published]="published()"
+		[hasDate]="hasDate()"
+		(publishedItem)="closeEditor()"
+		(closed)="closeEditor()"
+	>
+		<ng-container
+			*ngTemplateOutlet="
+				fieldsTemplate();
+				context: { $implicit: session }
+			"
+		/>
+	</app-draft-editor>
+} @else if (isOpening()) {
+	<p role="status">Opening…</p>
+} @else {
+	<div class="tool-actions">
+		<button
+			mat-flat-button
+			color="primary"
+			type="button"
+			(click)="openNew()"
+		>
+			New {{ noun().one }}
+		</button>
+		<ng-content select="[toolActions]" />
+	</div>
+	<app-editor-list
+		#list
+		[type]="type()"
+		[noun]="noun()"
+		[searchFields]="searchFields()"
+		[itemTemplate]="itemTemplate()"
+		(editItem)="openEditor('edit', $event.id)"
+		(duplicateItem)="openEditor('duplicate', $event.id)"
+		(openDraft)="openEditor('draft', $event.id)"
+	>
+		@if (bulkActionsTemplate(); as bulkActions) {
+			<ng-container ngProjectAs="[bulkActions]">
+				<ng-container
+					*ngTemplateOutlet="
+						bulkActions;
+						context: { $implicit: list }
+					"
+				/>
+			</ng-container>
+		}
+	</app-editor-list>
+}
