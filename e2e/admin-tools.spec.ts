@@ -347,8 +347,12 @@ test.describe('list quality of life', () => {
 		await page.getByRole('option', { name: 'Live' }).click();
 		await expect(page).toHaveURL(/[?&]status=live/);
 
-		// The name opens the post, like its Edit button.
-		await page.getByRole('button', { name: /^News post 2 Posted/ }).click();
+		// A click anywhere on the row opens the post, like its Edit button.
+		await page
+			.getByRole('row')
+			.filter({ hasText: 'News post 2 ' })
+			.getByRole('cell', { name: 'Live' })
+			.click();
 		await expect(page).toHaveURL(/edit=news-2/);
 		await page.getByRole('button', { name: 'Close' }).click();
 
