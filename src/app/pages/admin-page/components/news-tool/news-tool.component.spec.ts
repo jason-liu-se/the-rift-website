@@ -48,7 +48,7 @@ describe('NewsToolComponent', () => {
 		httpTesting = TestBed.inject(HttpTestingController);
 	});
 
-	it('lists posts with their markdown title and when they go or went live', async () => {
+	it('lists posts with their plain title and when they go or went live', async () => {
 		await open('/admin#news');
 		httpTesting
 			.expectOne(`${EDITOR_URL}/news?startIndex=0&limit=25`)
@@ -65,7 +65,6 @@ describe('NewsToolComponent', () => {
 		const cells = [...element().querySelectorAll('td.item')].map((cell) =>
 			cell.textContent?.replace(/\s+/g, ' ').trim()
 		);
-		expect(element().querySelector('td.item em')?.textContent).toBe('6');
 		expect(cells[0]).toMatch(/^Season 6 Posted .+ · Edited /);
 		expect(cells[1]).toMatch(/^Coming soon Goes live /);
 	});
