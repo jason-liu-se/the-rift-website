@@ -4,10 +4,12 @@ import {
 	Component,
 	TemplateRef,
 	computed,
+	effect,
 	inject,
 	input,
 	output,
-	signal
+	signal,
+	untracked
 } from '@angular/core';
 import {
 	takeUntilDestroyed,
@@ -20,12 +22,14 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import {
 	EMPTY,
 	Observable,
 	Subject,
 	catchError,
 	combineLatest,
+	concat,
 	debounceTime,
 	filter,
 	finalize,
@@ -69,14 +73,16 @@ import {
 } from './bulk-action-bar/bulk-action-bar.component';
 import { BulkActionRunnerService } from './bulk-action-runner.service';
 import { ItemNoun, countItems } from './bulk-results';
-import { ListSelection } from './list-selection';
+import { ListSelection, PageRows } from './list-selection';
+import { fromListParams, toListParams } from './list-params';
 import { itemName } from './item-name';
 import {
 	FilterOption,
 	ListFilters,
-	ListFiltersComponent,
-	NO_FILTERS
+	ListFiltersComponent
 } from './list-filters/list-filters.component';
+
+const DRAFTS: ItemNoun = { one: 'draft', many: 'drafts' };
 
 const STATUS_FILTERS: Record<'news' | 'other', FilterOption[]> = {
 	news: [
@@ -132,6 +138,8 @@ export class EditorListComponent<T extends EditorContentType> {
 	private notifier = inject(AdminNotifierService);
 	private dialog = inject(MatDialog);
 	private announcer = inject(LiveAnnouncer);
+	private router = inject(Router);
+	private route = inject(ActivatedRoute);
 
 	public readonly type = input.required<T>();
 	public readonly noun = input.required<ItemNoun>();
@@ -149,8 +157,11 @@ export class EditorListComponent<T extends EditorContentType> {
 	);
 
 	protected readonly pageSize = EDITOR_PAGE_SIZE;
-	protected readonly filters = signal<ListFilters>(NO_FILTERS);
-	protected readonly pageIndex = signal(0);
+	private readonly fromUrl = fromListParams(
+		this.route.snapshot.queryParamMap
+	);
+	protected readonly filters = signal<ListFilters>(this.fromUrl.filters);
+	protected readonly pageIndex = signal(this.fromUrl.pageIndex);
 	protected readonly page = signal<
 		PaginatedResponse<SummaryOf<T>> | undefined
 	>(undefined);
@@ -184,9 +195,26 @@ export class EditorListComponent<T extends EditorContentType> {
 				)
 			)
 	);
+	/** Every row this page shows: the new drafts, then the items. */
+	protected readonly pageRows = computed<PageRows>(() => ({
+		items: this.pageRefs(),
+		draftIds: this.newDrafts().map(({ id }) => id)
+	}));
 	/** "13 posts": the rows on this page, for Ctrl+A's preview. */
-	protected readonly pageRowCount = computed(() =>
-		countItems(this.pageRefs().length, this.noun())
+	protected readonly pageRowCount = computed(() => {
+		const { items, draftIds } = this.pageRows();
+		const drafts = draftIds.length
+			? ` and ${countItems(draftIds.length, DRAFTS)}`
+			: '';
+		return `${countItems(items.length, this.noun())}${drafts}`;
+	});
+	protected readonly hasRows = computed(() => {
+		const { items, draftIds } = this.pageRows();
+		return items.length + draftIds.length > 0;
+	});
+	/** Every item matching the filters, and the drafts listed with them. */
+	protected readonly selectableCount = computed(
+		() => this.total() + this.newDrafts().length
 	);
 	protected readonly selectedCount = computed(() =>
 		this.selection.count(this.total())
@@ -196,7 +224,7 @@ export class EditorListComponent<T extends EditorContentType> {
 		toObservable(computed(() => this.filters().search)).pipe(
 			debounceTime(EDITOR_SEARCH_DEBOUNCE_MS)
 		),
-		{ initialValue: '' }
+		{ initialValue: this.fromUrl.filters.search }
 	);
 	/** Equal queries are one: typing waits for the debounced search. */
 	private readonly query = computed(
@@ -206,6 +234,11 @@ export class EditorListComponent<T extends EditorContentType> {
 	private readonly reloads = new Subject<void>();
 
 	constructor() {
+		// The filters and page go into the URL as they change.
+		effect(() => {
+			const params = toListParams(this.filters(), this.pageIndex());
+			untracked(() => this.saveToUrl(params));
+		});
 		const requests = combineLatest([
 			toObservable(this.query),
 			toObservable(this.pageIndex)
@@ -242,13 +275,19 @@ export class EditorListComponent<T extends EditorContentType> {
 
 	/** Runs a bulk action on the selection (deletes need confirming). */
 	public runBulkAction(action: BulkActionOf<T>): void {
-		const count = this.selectedCount();
+		const draftCount = this.selection.selectedDraftIds().length;
+		const what = [
+			countItems(this.selectedCount() - draftCount, this.noun()),
+			countItems(draftCount, DRAFTS)
+		]
+			.filter((part) => !part.startsWith('0 '))
+			.join(' and ');
 		const confirmed$ =
 			action.action === 'delete'
 				? confirmAction(this.dialog, {
-						title: `Delete ${countItems(count, this.noun())}?`,
+						title: `Delete ${what}?`,
 						message: "This can't be undone.",
-						confirmLabel: `Delete ${countItems(count, this.noun())}`
+						confirmLabel: `Delete ${what}`
 					})
 				: of(true);
 		confirmed$
@@ -271,14 +310,14 @@ export class EditorListComponent<T extends EditorContentType> {
 
 	protected togglePage(isChecked: boolean): void {
 		if (isChecked) {
-			this.selection.selectPage(this.pageRefs());
+			this.selection.selectPage(this.pageRows());
 		} else {
-			this.selection.unselectPage(this.pageRefs());
+			this.selection.unselectPage(this.pageRows());
 		}
 	}
 
 	protected toggleRow(item: SummaryOf<T>): void {
-		this.selection.toggle(toRef(item), this.pageRefs());
+		this.selection.toggle(toRef(item), this.pageRows());
 	}
 
 	protected selectAllMatching(): void {
@@ -339,7 +378,7 @@ export class EditorListComponent<T extends EditorContentType> {
 			const isConfirmed = event.key === 'Enter' || event.key === ' ';
 			if (isConfirmed || event.key === 'Escape') {
 				event.preventDefault();
-				this.selection.endPreview(this.pageRefs(), isConfirmed);
+				this.selection.endPreview(this.pageRows(), isConfirmed);
 				this.announcer.announce(
 					isConfirmed
 						? `Selected ${rowCount}.`
@@ -353,7 +392,7 @@ export class EditorListComponent<T extends EditorContentType> {
 		}
 		const isSelectAll =
 			(event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'a';
-		if (isSelectAll && this.pageRefs().length > 0) {
+		if (isSelectAll && this.hasRows()) {
 			event.preventDefault();
 			this.selection.previewPage();
 			this.announcer.announce(
@@ -365,13 +404,37 @@ export class EditorListComponent<T extends EditorContentType> {
 		}
 	}
 
+	/**
+	 * Runs the action on the selected items, then (deletes only: drafts have
+	 * no other bulk action) on the selected drafts, one summary each.
+	 */
 	private runConfirmedBulkAction(action: BulkActionOf<T>): void {
+		const draftIds = this.selection.selectedDraftIds();
+		const hasItems = this.selectedCount() > draftIds.length;
+		const onItems = hasItems
+			? this.selectedRefs().pipe(
+					switchMap((refs) =>
+						this.bulkRunner.run(
+							this.type(),
+							action,
+							refs,
+							this.noun()
+						)
+					)
+				)
+			: EMPTY;
+		const onDrafts =
+			draftIds.length === 0
+				? EMPTY
+				: action.action === 'delete'
+					? this.bulkRunner.deleteDrafts(draftIds)
+					: of({
+							message: `Skipped ${countItems(draftIds.length, DRAFTS)}: drafts can only be deleted. Publish them first.`,
+							hasFailures: true
+						});
 		this.isBusy.set(true);
-		this.selectedRefs()
+		concat(onItems, onDrafts)
 			.pipe(
-				switchMap((refs) =>
-					this.bulkRunner.run(this.type(), action, refs, this.noun())
-				),
 				finalize(() => {
 					this.isBusy.set(false);
 					this.selection.clear();
@@ -391,6 +454,23 @@ export class EditorListComponent<T extends EditorContentType> {
 		return this.selection.isAllMatching() && query
 			? this.bulkRunner.fetchAllMatching(this.type(), query)
 			: of(this.selection.selectedRefs());
+	}
+
+	/** Merges `params` into the URL, unless it has them already. */
+	private saveToUrl(params: Params): void {
+		const current = this.route.snapshot.queryParamMap;
+		const isSaved = Object.entries(params).every(
+			([name, value]) => current.get(name) === value
+		);
+		if (!isSaved) {
+			this.router.navigate([], {
+				relativeTo: this.route,
+				queryParams: params,
+				queryParamsHandling: 'merge',
+				preserveFragment: true,
+				replaceUrl: true
+			});
+		}
 	}
 
 	/** Sends one write, says how it went, and reloads the list. */

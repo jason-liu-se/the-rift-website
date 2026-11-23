@@ -8,14 +8,17 @@ import {
 	map,
 	reduce,
 	catchError,
-	of
+	of,
+	toArray
 } from 'rxjs';
 import { EDITOR_PAGE_SIZE, MAX_BULK_ITEMS } from 'src/app/config/admin';
 import {
 	BulkItemRef,
 	EditorContentType
 } from 'src/app/interfaces/api-requests';
-import { BulkResponse } from 'src/app/interfaces/api-responses';
+import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
+import { BulkItemResult, BulkResponse } from 'src/app/interfaces/api-responses';
+import { DraftsService } from 'src/app/services/drafts/drafts.service';
 import {
 	BulkActionOf,
 	BulkUpdateRequestOf,
@@ -30,6 +33,8 @@ import {
 	toChunks
 } from './bulk-results';
 
+const DRAFTS = { one: 'draft', many: 'drafts' };
+
 /**
  * Runs a bulk action on a selection: in requests of at most MAX_BULK_ITEMS,
  * one after another, with one summary per request as its response arrives.
@@ -37,6 +42,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class BulkActionRunnerService {
 	private editorContent = inject(EditorContentService);
+	private drafts = inject(DraftsService);
 
 	public run<T extends EditorContentType>(
 		type: T,
@@ -58,6 +64,35 @@ export class BulkActionRunnerService {
 					)
 				)
 			)
+		);
+	}
+
+	/**
+	 * Deletes the editor's drafts, one request each (there's no bulk delete
+	 * for drafts), with one summary for them all. One already gone counts as
+	 * deleted.
+	 */
+	public deleteDrafts(ids: readonly string[]): Observable<BulkSummary> {
+		return from(ids).pipe(
+			concatMap((id) =>
+				this.drafts.deleteDraft(id).pipe(
+					map((): BulkItemResult<never> => ({ id, outcome: 'ok' })),
+					catchError((error: unknown) =>
+						of<BulkItemResult<never>>(
+							error instanceof HttpErrorResponse &&
+								error.status === HttpStatusCode.NotFound
+								? { id, outcome: 'ok' }
+								: {
+										id,
+										outcome: 'invalid',
+										reason: describeWriteError(error)
+									}
+						)
+					)
+				)
+			),
+			toArray(),
+			map((results) => summarizeBulkResults('delete', results, DRAFTS))
 		);
 	}
 

@@ -8,6 +8,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { of } from 'rxjs';
 import {
+	ActivatedRoute,
+	Router,
+	convertToParamMap,
+	provideRouter
+} from '@angular/router';
+import {
 	DraftSummary,
 	EditorNewsPostSummary
 } from 'src/app/interfaces/api-responses';
@@ -59,6 +65,8 @@ describe('EditorListComponent', () => {
 	let httpTesting: HttpTestingController;
 	let notify: ReturnType<typeof vi.fn>;
 	let isConfirmed: boolean;
+	let urlParams: Record<string, string>;
+	let navigate: ReturnType<typeof vi.spyOn>;
 
 	const rows = () => [...element.querySelectorAll('tbody tr')];
 	const rowText = (row: Element) => row.textContent?.replace(/\s+/g, ' ');
@@ -95,9 +103,19 @@ describe('EditorListComponent', () => {
 	beforeEach(() => {
 		notify = vi.fn();
 		isConfirmed = true;
+		urlParams ??= {};
 		TestBed.configureTestingModule({
 			imports: [EditorListComponent],
 			providers: [
+				provideRouter([]),
+				{
+					provide: ActivatedRoute,
+					useFactory: () => ({
+						snapshot: {
+							queryParamMap: convertToParamMap(urlParams)
+						}
+					})
+				},
 				provideHttpClient(),
 				provideHttpClientTesting(),
 				{
@@ -121,6 +139,9 @@ describe('EditorListComponent', () => {
 			]
 		});
 		httpTesting = TestBed.inject(HttpTestingController);
+		navigate = vi
+			.spyOn(TestBed.inject(Router), 'navigate')
+			.mockResolvedValue(true);
 		fixture = TestBed.createComponent(EditorListComponent<'news'>);
 		fixture.componentRef.setInput('type', 'news');
 		fixture.componentRef.setInput('noun', { one: 'post', many: 'posts' });
@@ -133,6 +154,7 @@ describe('EditorListComponent', () => {
 
 	afterEach(() => {
 		httpTesting.verify();
+		urlParams = undefined!;
 	});
 
 	it('lists every item with its status and editors, after the new drafts', () => {
@@ -188,7 +210,7 @@ describe('EditorListComponent', () => {
 		checkbox('Select Post 1').click();
 		fixture.detectChanges();
 
-		expect(statusText()).toBe('1 of 2 selected');
+		expect(statusText()).toBe('1 of 3 selected');
 	});
 
 	it('previews selecting the page on Ctrl+A, and selects it on Enter', () => {
@@ -199,7 +221,7 @@ describe('EditorListComponent', () => {
 		expect(statusText()).toBe('');
 
 		press('Enter');
-		expect(statusText()).toBe('2 of 2 selected');
+		expect(statusText()).toBe('3 of 3 selected');
 		expect(element.querySelector('.preview-hint')).toBeNull();
 	});
 
@@ -245,7 +267,8 @@ describe('EditorListComponent', () => {
 		fixture.detectChanges();
 		button('Select all 30 posts matching').click();
 		fixture.detectChanges();
-		expect(statusText()).toBe('30 of 30 selected');
+		// The listed draft is on the page, so it's selected too.
+		expect(statusText()).toBe('31 of 31 selected');
 
 		button('Show').click();
 		httpTesting
@@ -297,6 +320,26 @@ describe('EditorListComponent', () => {
 		]);
 	});
 
+	it('opens an item or draft from its name, as from its Edit button', () => {
+		flushList();
+		const edited = vi.fn();
+		const opened = vi.fn();
+		fixture.componentInstance.editItem.subscribe(edited);
+		fixture.componentInstance.openDraft.subscribe(opened);
+
+		rows()[1].querySelector<HTMLButtonElement>('.item-name')!.click();
+		rows()[0].querySelector<HTMLButtonElement>('.item-name')!.click();
+
+		expect(edited).toHaveBeenCalledWith(
+			expect.objectContaining({ id: 'post-1' })
+		);
+		expect(opened).toHaveBeenCalledWith(DRAFTS[0]);
+		// The Edit buttons are the keyboard's way in; the names add no tab stops.
+		expect(
+			rows()[1].querySelector('.item-name')?.getAttribute('tabindex')
+		).toBe('-1');
+	});
+
 	it('emits edit and draft actions for the tool to open', () => {
 		flushList();
 		const edited = vi.fn();
@@ -311,5 +354,153 @@ describe('EditorListComponent', () => {
 			expect.objectContaining({ id: 'post-1' })
 		);
 		expect(opened).toHaveBeenCalledWith(DRAFTS[0]);
+	});
+
+	it('selects drafts with their own checkbox and deletes them with the items', () => {
+		flushList();
+		checkbox('Select draft Unfinished').click();
+		checkbox('Select Post 1').click();
+		fixture.detectChanges();
+		expect(statusText()).toBe('2 of 3 selected');
+
+		button('Delete').click();
+		httpTesting
+			.expectOne({ method: 'DELETE', url: `${NEWS_URL}/bulk` })
+			.flush({ results: [{ id: 'post-1', outcome: 'ok' }] });
+		httpTesting
+			.expectOne({
+				method: 'DELETE',
+				url: `${environment.API_URL}/editor/drafts/draft-new`
+			})
+			.flush(null);
+
+		expect(notify).toHaveBeenCalledWith({
+			message: 'Deleted 1 draft.',
+			hasFailures: false
+		});
+		flushList();
+	});
+
+	it('includes drafts in the page that Ctrl+A selects', () => {
+		flushList();
+
+		press('a', { ctrlKey: true });
+		expect(element.querySelector('.preview-hint')?.textContent).toContain(
+			'Select all 2 posts and 1 draft on this page?'
+		);
+		press('Enter');
+
+		expect(statusText()).toBe('3 of 3 selected');
+	});
+
+	it('skips drafts for actions other than delete, saying so', () => {
+		flushList();
+		checkbox('Select draft Unfinished').click();
+		fixture.detectChanges();
+
+		button('Hide').click();
+
+		httpTesting.expectNone(`${NEWS_URL}/bulk`);
+		expect(notify).toHaveBeenCalledWith({
+			message:
+				'Skipped 1 draft: drafts can only be deleted. Publish them first.',
+			hasFailures: true
+		});
+		flushList();
+	});
+
+	it("shows a draft's image beside its name", () => {
+		const withImage = [
+			{
+				...DRAFTS[0],
+				fields: { title: 'Pic', imageUrl: 'https://i.ibb.co/a/x.png' }
+			}
+		];
+		httpTesting
+			.expectOne(`${NEWS_URL}?startIndex=0&limit=25`)
+			.flush({ items: [], total: 0 });
+		httpTesting.expectOne(DRAFTS_URL).flush(withImage);
+		fixture.detectChanges();
+
+		expect(rows()[0].querySelector('img')?.getAttribute('src')).toBe(
+			'https://i.ibb.co/a/x.png'
+		);
+	});
+
+	it('saves the filters and page in the URL as they change', () => {
+		flushList();
+
+		fixture.componentInstance['setFilters']({
+			scope: 'mine',
+			status: 'hidden',
+			collection: '',
+			search: '',
+			searchFields: []
+		});
+		fixture.detectChanges();
+		TestBed.tick();
+
+		expect(navigate).toHaveBeenLastCalledWith(
+			[],
+			expect.objectContaining({
+				queryParams: expect.objectContaining({
+					status: 'hidden',
+					by: 'mine'
+				}),
+				queryParamsHandling: 'merge',
+				replaceUrl: true
+			})
+		);
+		flushList(
+			`${NEWS_URL}?status=hidden&createdBy=1&startIndex=0&limit=25`
+		);
+	});
+});
+
+describe('EditorListComponent from a URL with filters', () => {
+	it('starts with the filters and page the URL saved', async () => {
+		TestBed.configureTestingModule({
+			imports: [EditorListComponent],
+			providers: [
+				provideRouter([]),
+				{
+					provide: ActivatedRoute,
+					useValue: {
+						snapshot: {
+							queryParamMap: convertToParamMap({
+								search: 'spawn',
+								in: 'title',
+								status: 'live',
+								page: '2'
+							})
+						}
+					}
+				},
+				provideHttpClient(),
+				provideHttpClientTesting(),
+				{
+					provide: AuthService,
+					useValue: { user: signal({ id: '1', username: 'editor' }) }
+				}
+			]
+		});
+		const fixture = TestBed.createComponent(EditorListComponent<'news'>);
+		fixture.componentRef.setInput('type', 'news');
+		fixture.componentRef.setInput('noun', { one: 'post', many: 'posts' });
+		fixture.componentRef.setInput('searchFields', [
+			{ value: 'title', label: 'Title' }
+		]);
+		fixture.detectChanges();
+		await fixture.whenStable();
+
+		// One request, already filtered: no unfiltered one first.
+		TestBed.inject(HttpTestingController).expectOne(
+			`${NEWS_URL}?status=live&q=spawn&in=title&startIndex=25&limit=25`
+		);
+		expect(
+			(
+				fixture.nativeElement as HTMLElement
+			).querySelector<HTMLInputElement>('input[type="search"]')!.value
+		).toBe('spawn');
 	});
 });

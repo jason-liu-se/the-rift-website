@@ -1,6 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { renderComponent } from 'src/app/testing/render-component';
 import { GalleryToolComponent } from './gallery-tool.component';
 
@@ -8,7 +9,11 @@ describe('GalleryToolComponent', () => {
 	it('previews a sample image with the gallery caption card', () => {
 		TestBed.configureTestingModule({
 			imports: [GalleryToolComponent],
-			providers: [provideHttpClient(), provideHttpClientTesting()]
+			providers: [
+				provideHttpClient(),
+				provideHttpClientTesting(),
+				provideRouter([])
+			]
 		});
 		const fixture = renderComponent(GalleryToolComponent);
 		const { preview } = fixture.componentInstance;

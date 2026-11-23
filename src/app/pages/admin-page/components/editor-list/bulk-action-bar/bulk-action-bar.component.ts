@@ -17,8 +17,10 @@ export type CommonBulkAction = 'show' | 'hide' | 'delete';
 })
 export class BulkActionBarComponent {
 	public readonly selectedCount = input.required<number>();
-	/** How many items match the filters. */
+	/** How many rows can be selected: the matching items and listed drafts. */
 	public readonly total = input.required<number>();
+	/** How many items match the filters, for "Select all … matching". */
+	public readonly matchingCount = input.required<number>();
 	public readonly noun = input.required<ItemNoun>();
 	/** The whole page is selected, but not every match. */
 	public readonly canSelectAllMatching = input(false);
@@ -31,6 +33,7 @@ export class BulkActionBarComponent {
 	public readonly clearSelection = output<void>();
 
 	protected readonly allMatchingLabel = computed(
-		() => `Select all ${countItems(this.total(), this.noun())} matching`
+		() =>
+			`Select all ${countItems(this.matchingCount(), this.noun())} matching`
 	);
 }

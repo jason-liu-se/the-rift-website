@@ -1,14 +1,21 @@
 import { computed, signal } from '@angular/core';
 import { BulkItemRef } from 'src/app/interfaces/api-requests';
 
+/** The rows a page of the list shows: the editor's drafts, then items. */
+export interface PageRows {
+	items: readonly BulkItemRef[];
+	draftIds: readonly string[];
+}
+
 /**
- * Which rows of an admin list are selected: some rows (with the revision each
- * was read at, for the bulk request), or every item matching the filters,
- * across pages. Ctrl+A first previews selecting the page's rows, which the
- * user confirms or cancels.
+ * Which rows of an admin list are selected: some items (with the revision
+ * each was read at, for the bulk request) or every item matching the filters,
+ * across pages, plus any of the editor's drafts. Ctrl+A first previews
+ * selecting the page's rows, which the user confirms or cancels.
  */
 export class ListSelection {
 	private readonly refs = signal<ReadonlyMap<string, number>>(new Map());
+	private readonly drafts = signal<ReadonlySet<string>>(new Set());
 	private readonly allMatching = signal(false);
 	private readonly previewing = signal(false);
 
@@ -22,21 +29,28 @@ export class ListSelection {
 			startingRevision
 		}))
 	);
+	public readonly selectedDraftIds = computed(() => [...this.drafts()]);
 
 	/** How many are selected, given how many items match the filters. */
 	public count(total: number): number {
-		return this.allMatching() ? total : this.refs().size;
+		return (
+			(this.allMatching() ? total : this.refs().size) + this.drafts().size
+		);
 	}
 
 	public isSelected(id: string): boolean {
 		return this.allMatching() || this.refs().has(id);
 	}
 
+	public isDraftSelected(id: string): boolean {
+		return this.drafts().has(id);
+	}
+
 	/**
-	 * Selects or unselects one row of `page`. Unselecting one while all
+	 * Selects or unselects one item of `page`. Unselecting one while all
 	 * matching are selected leaves the rest of the page selected.
 	 */
-	public toggle(ref: BulkItemRef, page: readonly BulkItemRef[]): void {
+	public toggle(ref: BulkItemRef, page: PageRows): void {
 		if (this.allMatching()) {
 			this.selectPage(page);
 		}
@@ -46,35 +60,48 @@ export class ListSelection {
 		} else {
 			refs.set(ref.id, ref.startingRevision);
 		}
-		this.setRows(refs);
+		this.setRows(refs, this.drafts(), this.allMatching());
+	}
+
+	public toggleDraft(id: string): void {
+		const drafts = new Set(this.drafts());
+		if (!drafts.delete(id)) {
+			drafts.add(id);
+		}
+		this.setRows(this.refs(), drafts, this.allMatching());
 	}
 
 	/** Selects every row on the page, keeping other selected rows. */
-	public selectPage(page: readonly BulkItemRef[]): void {
+	public selectPage({ items, draftIds }: PageRows): void {
 		const refs = new Map(this.allMatching() ? [] : this.refs());
-		for (const { id, startingRevision } of page) {
+		for (const { id, startingRevision } of items) {
 			refs.set(id, startingRevision);
 		}
-		this.setRows(refs);
+		this.setRows(refs, new Set([...this.drafts(), ...draftIds]));
 	}
 
 	/** Unselects every row on the page (and ends "all matching"). */
-	public unselectPage(page: readonly BulkItemRef[]): void {
+	public unselectPage({ items, draftIds }: PageRows): void {
 		const refs = new Map(this.allMatching() ? [] : this.refs());
-		for (const { id } of page) {
+		for (const { id } of items) {
 			refs.delete(id);
 		}
-		this.setRows(refs);
+		const drafts = new Set(this.drafts());
+		draftIds.forEach((id) => drafts.delete(id));
+		this.setRows(refs, drafts);
 	}
 
-	public isPageSelected(page: readonly BulkItemRef[]): boolean {
-		return page.length > 0 && page.every(({ id }) => this.isSelected(id));
+	public isPageSelected({ items, draftIds }: PageRows): boolean {
+		return (
+			items.length + draftIds.length > 0 &&
+			items.every(({ id }) => this.isSelected(id)) &&
+			draftIds.every((id) => this.isDraftSelected(id))
+		);
 	}
 
+	/** Selects every matching item, keeping any selected drafts. */
 	public selectAllMatching(): void {
-		this.refs.set(new Map());
-		this.allMatching.set(true);
-		this.previewing.set(false);
+		this.setRows(new Map(), this.drafts(), true);
 	}
 
 	public previewPage(): void {
@@ -82,10 +109,7 @@ export class ListSelection {
 	}
 
 	/** Ends a Ctrl+A preview: selects the page if confirmed. */
-	public endPreview(
-		page: readonly BulkItemRef[],
-		isConfirmed: boolean
-	): void {
+	public endPreview(page: PageRows, isConfirmed: boolean): void {
 		this.previewing.set(false);
 		if (isConfirmed) {
 			this.selectPage(page);
@@ -93,12 +117,17 @@ export class ListSelection {
 	}
 
 	public clear(): void {
-		this.setRows(new Map());
+		this.setRows(new Map(), new Set());
 	}
 
-	private setRows(refs: ReadonlyMap<string, number>): void {
+	private setRows(
+		refs: ReadonlyMap<string, number>,
+		drafts: ReadonlySet<string>,
+		isAllMatching = false
+	): void {
 		this.refs.set(refs);
-		this.allMatching.set(false);
+		this.drafts.set(drafts);
+		this.allMatching.set(isAllMatching);
 		this.previewing.set(false);
 	}
 }

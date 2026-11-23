@@ -8,6 +8,7 @@ describe('BulkActionBarComponent', () => {
 		const all = {
 			selectedCount: 25,
 			total: 40,
+			matchingCount: 40,
 			noun: { one: 'post', many: 'posts' },
 			...inputs
 		};

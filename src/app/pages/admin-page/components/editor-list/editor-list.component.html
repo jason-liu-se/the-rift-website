@@ -7,16 +7,17 @@
 />
 <p class="cdk-visually-hidden" role="status">
 	@if (selectedCount() > 0) {
-		{{ selectedCount() }} of {{ total() }} selected
+		{{ selectedCount() }} of {{ selectableCount() }} selected
 	}
 </p>
 @if (selectedCount() > 0) {
 	<app-bulk-action-bar
 		[selectedCount]="selectedCount()"
-		[total]="total()"
+		[total]="selectableCount()"
+		[matchingCount]="total()"
 		[noun]="noun()"
 		[canSelectAllMatching]="
-			selection.isPageSelected(pageRefs()) && total() > items().length
+			selection.isPageSelected(pageRows()) && total() > items().length
 		"
 		[isAllMatching]="selection.isAllMatching()"
 		[isBusy]="isBusy()"
@@ -57,12 +58,12 @@
 					<mat-checkbox
 						color="primary"
 						aria-label="Select every row on this page"
-						[checked]="selection.isPageSelected(pageRefs())"
+						[checked]="selection.isPageSelected(pageRows())"
 						[indeterminate]="
 							selectedCount() > 0 &&
-							!selection.isPageSelected(pageRefs())
+							!selection.isPageSelected(pageRows())
 						"
-						[disabled]="items().length === 0"
+						[disabled]="!hasRows()"
 						(change)="togglePage($event.checked)"
 					/>
 				</th>
@@ -77,9 +78,36 @@
 		</thead>
 		<tbody>
 			@for (draft of newDrafts(); track draft.id) {
-				<tr>
-					<td class="select"></td>
-					<td class="item">{{ itemName(draft.fields) }}</td>
+				<tr [class.selected]="selection.isDraftSelected(draft.id)">
+					<td class="select">
+						<mat-checkbox
+							color="primary"
+							[aria-label]="
+								'Select draft ' + itemName(draft.fields)
+							"
+							[checked]="selection.isDraftSelected(draft.id)"
+							(change)="selection.toggleDraft(draft.id)"
+						/>
+					</td>
+					<td class="item">
+						<!-- A shortcut for the mouse; the Edit button is the keyboard's. -->
+						<button
+							type="button"
+							class="item-name draft-item"
+							tabindex="-1"
+							(click)="openDraft.emit(draft)"
+						>
+							@if (draft.fields.imageUrl) {
+								<img
+									class="draft-thumbnail"
+									[src]="draft.fields.imageUrl"
+									alt=""
+									loading="lazy"
+								/>
+							}
+							{{ itemName(draft.fields) }}
+						</button>
+					</td>
 					<td data-label="Status">
 						<app-status-badge status="draft" />
 					</td>
@@ -123,16 +151,24 @@
 						/>
 					</td>
 					<td class="item">
-						@if (itemTemplate(); as template) {
-							<ng-container
-								*ngTemplateOutlet="
-									template;
-									context: { $implicit: item }
-								"
-							/>
-						} @else {
-							{{ itemName(item) }}
-						}
+						<!-- A shortcut for the mouse; the Edit button is the keyboard's. -->
+						<button
+							type="button"
+							class="item-name"
+							tabindex="-1"
+							(click)="editItem.emit(item)"
+						>
+							@if (itemTemplate(); as template) {
+								<ng-container
+									*ngTemplateOutlet="
+										template;
+										context: { $implicit: item }
+									"
+								/>
+							} @else {
+								{{ itemName(item) }}
+							}
+						</button>
 					</td>
 					<td data-label="Status">
 						<app-status-badge
