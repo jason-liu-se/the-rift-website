@@ -10,6 +10,7 @@ import {
 	viewChild
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -49,7 +50,15 @@ export const ADMIN_TOOLS: readonly IAdminTool[] = [
 	],
 	// Previews show whatever URL an editor types: don't spend Cloudflare
 	// transformations on them.
-	providers: [{ provide: IMAGE_LOADER, useValue: originalImageLoader }]
+	providers: [
+		{ provide: IMAGE_LOADER, useValue: originalImageLoader },
+		// Outlined, not filled: a focused label on the fill's grey is under
+		// 4.5:1 contrast.
+		{
+			provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
+			useValue: { appearance: 'outline' }
+		}
+	]
 })
 export class AdminPageComponent {
 	private title = inject(Title);

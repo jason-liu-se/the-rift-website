@@ -1,7 +1,21 @@
-<app-editor-list type="news" [noun]="noun" [searchFields]="searchFields" />
-<p class="tool-intro">Creating news posts with this tool is coming soon.</p>
-<p class="preview-label">Preview</p>
-<!-- Sample data: shown, but not usable. -->
-<div inert>
-	<app-news-display [newsPosts]="[preview]"></app-news-display>
-</div>
+<app-content-tool
+	type="news"
+	[noun]="noun"
+	[searchFields]="searchFields"
+	[hasDate]="true"
+	[itemTemplate]="item"
+	[fieldsTemplate]="fields"
+/>
+<ng-template #item let-post>
+	<app-markdown class="title" [markdown]="post.title" [inline]="true" />
+	<span class="dates">
+		{{ post.status === "scheduled" ? "Goes live" : "Posted" }}
+		{{ formatDateTime(post.date) }}
+		@if (post.editedAt) {
+			· Edited {{ formatDateTime(post.editedAt) }}
+		}
+	</span>
+</ng-template>
+<ng-template #fields let-session>
+	<app-news-form [session]="session" />
+</ng-template>

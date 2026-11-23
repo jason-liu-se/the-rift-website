@@ -4,7 +4,7 @@
 		<input
 			matInput
 			type="url"
-			maxlength="2000"
+			[maxlength]="maxUrlLength"
 			[attr.aria-invalid]="!!linkProblem()"
 			[ngModel]="url()"
 			(ngModelChange)="url.set($event)"

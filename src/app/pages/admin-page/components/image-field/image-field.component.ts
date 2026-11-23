@@ -12,6 +12,7 @@ import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatFormField, MatHint, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
+import { MAX_URL_LENGTH } from 'src/app/config/content-limits';
 import { IMAGE_URL_PREFIXES } from 'src/app/config/images';
 import { UPLOAD_IMAGE_TYPES } from 'src/app/config/uploads';
 import { ImageUploadForm } from 'src/app/interfaces/api-requests';
@@ -48,6 +49,7 @@ export class ImageFieldComponent {
 	public readonly label = input('Image');
 	public readonly album = input.required<ImageUploadForm>();
 
+	protected readonly maxUrlLength = MAX_URL_LENGTH;
 	protected readonly acceptedTypes = UPLOAD_IMAGE_TYPES.join(',');
 	protected readonly upload = signal<UploadState>({ kind: 'idle' });
 	protected readonly canUpload = computed(

@@ -42,6 +42,8 @@ const EDITOR_LISTS: Record<string, unknown[]> = {
 	'/editor/downloads/items': EDITOR_DOWNLOAD_ITEMS,
 	'/editor/maps/seasons': EDITOR_MAP_SEASONS
 };
+/** One item of an editor list, e.g. /editor/news/news-1. */
+const EDITOR_ITEM_PATH = /^(\/editor\/.+)\/([^/]+)$/;
 const EDITOR_COLLECTIONS: Record<string, unknown[]> = {
 	'/editor/gallery/collections': EDITOR_GALLERY_COLLECTIONS,
 	'/editor/downloads/collections': EDITOR_DOWNLOAD_COLLECTIONS
@@ -136,6 +138,15 @@ export function respondTo(url: URL): IMockResponse {
 	}
 	if (url.pathname in EDITOR_LISTS) {
 		return paginateByQuery(EDITOR_LISTS[url.pathname], url.searchParams);
+	}
+	const editorItem = EDITOR_ITEM_PATH.exec(url.pathname);
+	if (editorItem && editorItem[1] in EDITOR_LISTS) {
+		const item = EDITOR_LISTS[editorItem[1]].find(
+			(candidate) => (candidate as { id: string }).id === editorItem[2]
+		);
+		return item
+			? ok({ content: '', desc: '', dimensions: [], ...item })
+			: notFound;
 	}
 	if (url.pathname in EDITOR_COLLECTIONS) {
 		return ok(EDITOR_COLLECTIONS[url.pathname]);
