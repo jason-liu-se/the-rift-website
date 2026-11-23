@@ -115,8 +115,10 @@ wide desktop widths, not only the size it was evidently built for:
 
 Any violation of the `CLAUDE.md` engineering standards (version-specific best
 practices, reuse, design, clarity, writing less code, file scoping, scope and
-debt), plus constructor injection instead of `inject()` and index-signature
-access not using `data['key']`.
+debt), names that break `.claude/rules/naming.md` (vague or generic names,
+booleans without an `is`/`has`/`should`/`can` prefix, functions that don't say
+what they do), plus constructor injection instead of `inject()` and
+index-signature access not using `data['key']`.
 
 Don't flag pure formatting that Prettier/ESLint would catch, and don't pad the
 report with style nitpicks or speculation. Verify each finding against the code
