@@ -1,8 +1,10 @@
-import { ActivatedRouteSnapshot, Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 import { requireLoggedIn, requireLoggedOut } from './guards/admin-auth.guards';
-import { requireGalleryCollection } from './guards/gallery-collection.guard';
+import {
+	requireGalleryCollection,
+	resolveFromGalleryTitle
+} from './guards/gallery-collection.guard';
 import { PageTemplateComponent } from './layout/page-template/page-template.component';
-import { galleryCollectionTitle } from './services/gallery-provider/gallery-collection-title';
 
 export const routes: Routes = [
 	{
@@ -49,11 +51,13 @@ export const routes: Routes = [
 		path: 'gallery/:collection',
 		canMatch: [requireGalleryCollection],
 		component: PageTemplateComponent,
-		title: (route) =>
-			`${galleryCollectionTitle(route.params['collection'])} Gallery`,
+		title: resolveFromGalleryTitle((title) => `${title} Gallery`),
 		resolve: {
-			description: (route: ActivatedRouteSnapshot) =>
-				`Screenshots of builds from ${galleryCollectionTitle(route.params['collection'])} of The Rift Minecraft SMP.`
+			collectionTitle: resolveFromGalleryTitle((title) => title),
+			description: resolveFromGalleryTitle(
+				(title) =>
+					`Screenshots of builds from ${title} of The Rift Minecraft SMP.`
+			)
 		},
 		data: {
 			loadComponent: () =>

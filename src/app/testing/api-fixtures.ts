@@ -4,7 +4,9 @@
 // compile time. Relative imports only: Playwright loads this file in Node.
 import {
 	ContentVersion,
+	DetailVersion,
 	DownloadCollection,
+	GalleryCollection,
 	GalleryImage,
 	MapSeason,
 	NewsPost,
@@ -12,6 +14,9 @@ import {
 } from '../interfaces/api-responses';
 
 export const CONTENT_VERSION: ContentVersion = { version: 1763580000000 };
+export const NEWS_DETAIL_VERSION: DetailVersion = {
+	version: '1763580000000-1'
+};
 
 const NEWS_POST_COUNT = 12; // more than one page of 10
 
@@ -21,31 +26,52 @@ export const NEWS_POSTS: NewsPost[] = Array.from(
 		id: `news-${index + 1}`,
 		title: `News post ${index + 1}`,
 		date: '2026-01-01T00:00:00.000Z',
-		content: `Content of news post ${index + 1}.`
+		content: `Content of news post ${index + 1}.`,
+		// The newest post was edited after it went live.
+		...(index === 0 && { editedAt: '2026-01-02T12:00:00.000Z' })
 	})
 );
 
-const image = (name: string, caption: string): GalleryImage => ({
+const image = (
+	name: string,
+	caption: string,
+	tags: string[] = []
+): GalleryImage => ({
 	id: name,
 	imageUrl: `/assets/general-background-images/${name}`,
-	caption
+	caption,
+	tags
 });
 
-export const GALLERY_COLLECTIONS: Record<string, GalleryImage[]> = {
-	season5: [
-		image('spawn-walkway-1.webp', 'Spawn walkway'),
-		image('iron-farm-1.webp', 'Iron farm'),
-		image('water-tower-1.webp', 'Water tower')
-	],
-	season6: [
-		image('sunrise-1.webp', 'Sunrise'),
-		image('fancy-tree-1.webp', 'Fancy tree')
-	]
-};
+/** A gallery collection with its images, as the gallery endpoints serve them. */
+export interface GalleryCollectionFixture extends GalleryCollection {
+	images: GalleryImage[];
+}
+
+export const GALLERY_COLLECTIONS: GalleryCollectionFixture[] = [
+	{
+		slug: 'season5',
+		title: 'Season 5',
+		images: [
+			image('spawn-walkway-1.webp', 'Spawn walkway', ['spawn']),
+			image('iron-farm-1.webp', 'Iron farm', ['farm']),
+			image('water-tower-1.webp', 'Water tower', ['night', 'spawn'])
+		]
+	},
+	{
+		slug: 'season6',
+		title: 'Season 6',
+		images: [
+			image('sunrise-1.webp', 'Sunrise'),
+			image('fancy-tree-1.webp', 'Fancy tree')
+		]
+	}
+];
 
 export const DOWNLOAD_COLLECTIONS: DownloadCollection[] = [
 	{
-		name: 'Season 5',
+		name: 'season5',
+		title: 'Season 5',
 		items: [
 			{
 				id: 'season-5-world',

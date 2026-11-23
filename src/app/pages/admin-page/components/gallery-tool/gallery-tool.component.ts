@@ -13,6 +13,7 @@ export class GalleryToolComponent {
 	public readonly preview: GalleryImage = {
 		id: 'preview',
 		imageUrl: '/assets/general-background-images/fancy-tree-1.webp',
-		caption: 'Sample caption'
+		caption: 'Sample caption',
+		tags: []
 	};
 }

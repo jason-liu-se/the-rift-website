@@ -5,8 +5,8 @@ import { renderComponent } from 'src/app/testing/render-component';
 import { ImageShowcaseSectionComponent } from './image-showcase-section.component';
 
 const IMAGES: GalleryImage[] = [
-	{ id: '1', imageUrl: 'assets/one.png', caption: 'One' },
-	{ id: '2', imageUrl: 'assets/two.png', caption: 'Two' }
+	{ id: '1', imageUrl: 'assets/one.png', caption: 'One', tags: [] },
+	{ id: '2', imageUrl: 'assets/two.png', caption: 'Two', tags: [] }
 ];
 
 describe('ImageShowcaseSectionComponent', () => {

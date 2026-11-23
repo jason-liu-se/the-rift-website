@@ -6,12 +6,13 @@
 import { Page } from '@playwright/test';
 // The suite runs against `npm start`, which serves the development environment.
 import { environment } from '../../src/environments/environment.development';
-import { GalleryImage } from '../../src/app/interfaces/api-responses';
 import {
 	CONTENT_VERSION,
+	GalleryCollectionFixture,
 	DOWNLOAD_COLLECTIONS,
 	GALLERY_COLLECTIONS,
 	MAP_SEASONS,
+	NEWS_DETAIL_VERSION,
 	NEWS_POSTS,
 	paginate
 } from '../../src/app/testing/api-fixtures';
@@ -28,6 +29,7 @@ const BLUEMAP_PLACEHOLDER =
 	'<!doctype html><html lang="en"><title>BlueMap</title></html>';
 
 const GALLERY_PAGE_PATH = /^\/gallery\/([^/]+)$/;
+const GALLERY_TAGS_PATH = /^\/gallery\/([^/]+)\/tags$/;
 
 export interface IMockResponse {
 	status: number;
@@ -72,8 +74,22 @@ function paginateByQuery<T>(
 		: ok(paginate(items, startIndex, limit));
 }
 
-function galleryCollection(encodedName: string): GalleryImage[] | undefined {
-	return GALLERY_COLLECTIONS[decodeURIComponent(encodedName)];
+function galleryCollection(
+	encodedSlug: string
+): GalleryCollectionFixture | undefined {
+	const slug = decodeURIComponent(encodedSlug);
+	return GALLERY_COLLECTIONS.find((collection) => collection.slug === slug);
+}
+
+/** The images with every tag in `tags` (comma-separated), as the server filters. */
+function withTags(
+	collection: GalleryCollectionFixture,
+	params: URLSearchParams
+) {
+	const tags = params.get('tags')?.split(',') ?? [];
+	return collection.images.filter((image) =>
+		tags.every((tag) => image.tags.includes(tag))
+	);
 }
 
 /** The fixture response to an API request; shared with mock-api-server.ts. */
@@ -83,6 +99,9 @@ export function respondTo(url: URL): IMockResponse {
 	if (url.pathname === '/content/version') {
 		return ok(CONTENT_VERSION);
 	}
+	if (url.pathname === '/content/version/news') {
+		return ok(NEWS_DETAIL_VERSION);
+	}
 	if (url.pathname === '/news') {
 		return paginateByQuery(NEWS_POSTS, url.searchParams);
 	}
@@ -90,7 +109,9 @@ export function respondTo(url: URL): IMockResponse {
 		return ok(DOWNLOAD_COLLECTIONS);
 	}
 	if (url.pathname === '/gallery') {
-		return ok(Object.keys(GALLERY_COLLECTIONS));
+		return ok(
+			GALLERY_COLLECTIONS.map(({ slug, title }) => ({ slug, title }))
+		);
 	}
 	if (url.pathname === '/maps/seasons') {
 		return ok(MAP_SEASONS);
@@ -98,8 +119,19 @@ export function respondTo(url: URL): IMockResponse {
 
 	const pageMatch = GALLERY_PAGE_PATH.exec(url.pathname);
 	if (pageMatch) {
-		const images = galleryCollection(pageMatch[1]);
-		return images ? paginateByQuery(images, url.searchParams) : notFound;
+		const collection = galleryCollection(pageMatch[1]);
+		return collection
+			? paginateByQuery(
+					withTags(collection, url.searchParams),
+					url.searchParams
+				)
+			: notFound;
+	}
+	const tagsMatch = GALLERY_TAGS_PATH.exec(url.pathname);
+	if (tagsMatch) {
+		const collection = galleryCollection(tagsMatch[1]);
+		const tags = collection?.images.flatMap((image) => image.tags);
+		return tags ? ok([...new Set(tags)].sort()) : notFound;
 	}
 
 	return notFound;
