@@ -337,3 +337,58 @@ test.describe('maps', () => {
 		).toBeFocused();
 	});
 });
+
+test.describe('list quality of life', () => {
+	test('keeps the filters after editing an item and coming back', async ({
+		page
+	}) => {
+		await openTool(page, 'news', EDITOR_NEWS_POSTS[0].title);
+		await page.getByRole('combobox', { name: 'Status' }).click();
+		await page.getByRole('option', { name: 'Live' }).click();
+		await expect(page).toHaveURL(/[?&]status=live/);
+
+		// The name opens the post, like its Edit button.
+		await page.getByRole('button', { name: /^News post 2 Posted/ }).click();
+		await expect(page).toHaveURL(/edit=news-2/);
+		await page.getByRole('button', { name: 'Close' }).click();
+
+		await expect(page).toHaveURL(/\/admin\?status=live#news$/);
+		await expect(
+			page.getByRole('combobox', { name: 'Status' })
+		).toContainText('Live');
+	});
+
+	test("shows a draft's image, and selects the draft", async ({ page }) => {
+		await page.route(`${API_URL}/editor/drafts?type=gallery`, (route) =>
+			route.fulfill({
+				json: [
+					{
+						id: 'draft-1',
+						type: 'gallery',
+						fields: {
+							caption: 'Draft image',
+							imageUrl:
+								'/assets/general-background-images/sunrise-1.webp'
+						},
+						revision: 1,
+						createdAt: '2026-01-01T00:00:00.000Z',
+						updatedAt: '2026-01-01T00:00:00.000Z'
+					}
+				]
+			})
+		);
+		await openTool(page, 'gallery', 'Spawn walkway');
+
+		const draftRow = page
+			.getByRole('row')
+			.filter({ hasText: 'Draft image' });
+		await expect(draftRow.locator('img')).toHaveAttribute(
+			'src',
+			/sunrise-1\.webp$/
+		);
+		await page
+			.getByRole('checkbox', { name: 'Select draft Draft image' })
+			.check();
+		await expect(page.getByText('1 of 6 selected').first()).toBeVisible();
+	});
+});
