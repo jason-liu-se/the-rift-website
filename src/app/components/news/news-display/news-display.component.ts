@@ -14,4 +14,8 @@ export class NewsDisplayComponent {
 	public newsPostToDateString(post: NewsPost): string {
 		return new Date(post.date).toDateString();
 	}
+
+	public editedToDateString(editedAt: string): string {
+		return `Edited ${new Date(editedAt).toDateString()}`;
+	}
 }

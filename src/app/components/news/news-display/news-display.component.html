@@ -9,7 +9,19 @@
 				}
 				<div class="news-post-content">
 					<h2 class="title">{{ post.title }}</h2>
-					<h3 class="date">{{ newsPostToDateString(post) }}</h3>
+					<p class="date">
+						<time [attr.datetime]="post.date">{{
+							newsPostToDateString(post)
+						}}</time>
+						@if (post.editedAt; as editedAt) {
+							<span class="edited">
+								·
+								<time [attr.datetime]="editedAt">{{
+									editedToDateString(editedAt)
+								}}</time>
+							</span>
+						}
+					</p>
 					<hr class="separator" />
 					<p class="content">{{ post.content }}</p>
 				</div>

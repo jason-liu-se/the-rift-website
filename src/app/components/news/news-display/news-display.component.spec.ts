@@ -16,7 +16,8 @@ const NEWS_POSTS: NewsPost[] = [
 		id: '2',
 		title: 'Maintenance',
 		date: '2026-03-04T12:00:00',
-		content: 'Downtime.'
+		content: 'Downtime.',
+		editedAt: '2026-03-05T12:00:00'
 	},
 	{
 		id: '3',
@@ -40,12 +41,19 @@ describe('NewsDisplayComponent', () => {
 	it('renders each post with its title, date and content', () => {
 		expect(posts).toHaveLength(NEWS_POSTS.length);
 		expect(posts[0].querySelector('h2')?.textContent).toBe('Season 6');
-		expect(posts[0].querySelector('.date')?.textContent).toBe(
+		expect(posts[0].querySelector('.date')?.textContent?.trim()).toBe(
 			'Fri Jan 02 2026'
 		);
 		expect(posts[0].querySelector('.content')?.textContent).toBe(
 			'A new season begins.'
 		);
+	});
+
+	it('says when a post was edited, only if it was', () => {
+		const edited = posts[1].querySelector('.edited time');
+		expect(edited?.textContent).toBe('Edited Thu Mar 05 2026');
+		expect(edited?.getAttribute('datetime')).toBe(NEWS_POSTS[1].editedAt);
+		expect(posts[0].querySelector('.edited')).toBeNull();
 	});
 
 	it('shows a banner image only when the item has one', () => {
