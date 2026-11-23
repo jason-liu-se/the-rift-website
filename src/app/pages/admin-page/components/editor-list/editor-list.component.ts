@@ -16,7 +16,7 @@ import {
 	toObservable,
 	toSignal
 } from '@angular/core/rxjs-interop';
-import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatIconButton } from '@angular/material/button';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -118,7 +118,6 @@ export interface ItemTemplateContext<T extends EditorContentType> {
 		EditorAvatarComponent,
 		FallbackPanelComponent,
 		ListFiltersComponent,
-		MatButton,
 		MatCheckbox,
 		MatIcon,
 		MatIconButton,
@@ -381,7 +380,7 @@ export class EditorListComponent<T extends EditorContentType> {
 	 * Opens a row's item or draft from a click anywhere on it but its own
 	 * controls (checkbox, buttons, menu, links), which do their own thing.
 	 */
-	protected openFromRow(event: MouseEvent, open: () => void): void {
+	protected openFromRow(event: Event, open: () => void): void {
 		const target = event.target as HTMLElement;
 		if (!target.closest('a, button, input, label, mat-checkbox')) {
 			open();

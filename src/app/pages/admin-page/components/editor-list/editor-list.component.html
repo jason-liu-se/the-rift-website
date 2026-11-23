@@ -72,7 +72,6 @@
 				</th>
 				<th scope="col">{{ noun().one }}</th>
 				<th scope="col">Status</th>
-				<th scope="col">Created by</th>
 				<th scope="col">Last edited by</th>
 				<th scope="col">
 					<span class="cdk-visually-hidden">Actions</span>
@@ -81,11 +80,14 @@
 		</thead>
 		<tbody>
 			@for (draft of newDrafts(); track draft.id) {
-				<!-- A shortcut for the mouse; the Edit button is the keyboard's. -->
 				<tr
 					class="openable"
+					tabindex="0"
 					[class.selected]="selection.isDraftSelected(draft.id)"
 					(click)="openFromRow($event, () => openDraft.emit(draft))"
+					(keydown.enter)="
+						openFromRow($event, () => openDraft.emit(draft))
+					"
 				>
 					<td class="select">
 						<mat-checkbox
@@ -113,22 +115,10 @@
 					<td data-label="Status">
 						<app-status-badge status="draft" />
 					</td>
-					<td data-label="Created by">
-						<app-editor-avatar [editor]="currentUser()" />
-					</td>
 					<td data-label="Last edited by">
 						<app-editor-avatar [editor]="currentUser()" />
 					</td>
 					<td class="actions">
-						<button
-							mat-button
-							type="button"
-							(click)="openDraft.emit(draft)"
-						>
-							Edit<span class="cdk-visually-hidden">
-								draft {{ itemName(draft.fields) }}</span
-							>
-						</button>
 						<button
 							mat-icon-button
 							type="button"
@@ -145,8 +135,12 @@
 			@for (item of items(); track item.id) {
 				<tr
 					class="openable"
+					tabindex="0"
 					[class.selected]="selection.isSelected(item.id)"
 					(click)="openFromRow($event, () => editItem.emit(item))"
+					(keydown.enter)="
+						openFromRow($event, () => editItem.emit(item))
+					"
 				>
 					<td class="select">
 						<mat-checkbox
@@ -175,22 +169,10 @@
 							[hasDraft]="idsWithDrafts().has(item.id)"
 						/>
 					</td>
-					<td data-label="Created by">
-						<app-editor-avatar [editor]="item.createdBy" />
-					</td>
 					<td data-label="Last edited by">
 						<app-editor-avatar [editor]="item.lastUpdatedBy" />
 					</td>
 					<td class="actions">
-						<button
-							mat-button
-							type="button"
-							(click)="editItem.emit(item)"
-						>
-							Edit<span class="cdk-visually-hidden">
-								{{ itemName(item) }}</span
-							>
-						</button>
 						<button
 							mat-icon-button
 							type="button"

@@ -147,10 +147,8 @@ test.describe('news editor', () => {
 		});
 
 		await page
-			.getByRole('button', {
-				name: `Edit ${EDITOR_NEWS_POSTS[1].title}`,
-				exact: true
-			})
+			.getByRole('row')
+			.filter({ hasText: EDITOR_NEWS_POSTS[1].title })
 			.click();
 
 		await expect(page).toHaveURL(/\?edit=news-2#news$/);
@@ -291,7 +289,8 @@ test.describe('downloads', () => {
 		page
 	}) => {
 		await page
-			.getByRole('button', { name: 'Edit World download', exact: true })
+			.getByRole('row')
+			.filter({ hasText: 'World download' })
 			.click();
 
 		await expect(page.getByRole('textbox', { name: 'Title' })).toHaveValue(

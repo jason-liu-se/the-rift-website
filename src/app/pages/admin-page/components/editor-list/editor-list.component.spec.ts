@@ -168,20 +168,20 @@ describe('EditorListComponent', () => {
 			'Unfinished',
 			'Draft',
 			'editor',
-			'editor'
+			'delete'
 		]);
 		// Markdown is stripped from names; old items have no author.
 		expect(cells(rows()[1]).slice(1, 5)).toEqual([
 			'Post 1',
 			'Live Has your draft',
 			'unknown',
-			'unknown'
+			'more_vert'
 		]);
 		expect(cells(rows()[2]).slice(1, 5)).toEqual([
 			'Post 2',
 			'Live',
-			'editor',
-			'unknown'
+			'unknown',
+			'more_vert'
 		]);
 	});
 
@@ -375,15 +375,19 @@ describe('EditorListComponent', () => {
 		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
 	});
 
-	it('emits edit and draft actions for the tool to open', () => {
+	it('opens an item or draft from the keyboard row action', () => {
 		flushList();
 		const edited = vi.fn();
 		const opened = vi.fn();
 		fixture.componentInstance.editItem.subscribe(edited);
 		fixture.componentInstance.openDraft.subscribe(opened);
 
-		rows()[1].querySelector<HTMLButtonElement>('.actions button')!.click();
-		rows()[0].querySelector<HTMLButtonElement>('.actions button')!.click();
+		rows()[1].dispatchEvent(
+			new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
+		);
+		rows()[0].dispatchEvent(
+			new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
+		);
 
 		expect(edited).toHaveBeenCalledWith(
 			expect.objectContaining({ id: 'post-1' })
