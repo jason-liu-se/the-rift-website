@@ -115,6 +115,22 @@ describe('ContentToolComponent', () => {
 		httpTesting = TestBed.inject(HttpTestingController);
 	});
 
+	it("keeps the list's filters in the URL while an item is open", async () => {
+		await open('/admin?status=hidden#news');
+		flushList();
+
+		button('New post').click();
+		await harness.fixture.whenStable();
+		expect(url()).toBe('/admin?status=hidden&new=#news');
+
+		harness.detectChanges();
+		button('Close').click();
+		await harness.fixture.whenStable();
+		expect(url()).toBe('/admin?status=hidden#news');
+		harness.detectChanges();
+		flushList();
+	});
+
 	it('opens a new item from the list, by URL', async () => {
 		await open('/admin#news');
 		flushList();

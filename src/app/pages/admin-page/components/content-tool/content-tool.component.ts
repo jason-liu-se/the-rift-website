@@ -228,10 +228,18 @@ export class ContentToolComponent<T extends EditorContentType> {
 			: of(session);
 	}
 
-	private navigate(queryParams: Params, replaceUrl = false): void {
+	/**
+	 * Sets the editor's parameters (`{}` closes the editor), keeping the
+	 * list's filters in the URL for when it shows again.
+	 */
+	private navigate(editorParams: Params, replaceUrl = false): void {
+		const noEditor = Object.fromEntries(
+			Object.values(EDITOR_PARAMS).map((name) => [name, null])
+		);
 		this.router.navigate([], {
 			relativeTo: this.route,
-			queryParams,
+			queryParams: { ...noEditor, ...editorParams },
+			queryParamsHandling: 'merge',
 			preserveFragment: true,
 			replaceUrl
 		});

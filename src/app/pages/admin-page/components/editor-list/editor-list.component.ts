@@ -360,13 +360,12 @@ export class EditorListComponent<T extends EditorContentType> {
 			message: "This can't be undone.",
 			confirmLabel: 'Delete draft'
 		})
-			.pipe(filter(Boolean))
-			.subscribe(() =>
-				this.write(
-					this.draftsService.deleteDraft(draft.id),
-					`Deleted your draft ${name}.`
-				)
-			);
+			.pipe(
+				filter(Boolean),
+				switchMap(() => this.bulkRunner.deleteDrafts([draft.id])),
+				finalize(() => this.reloadItems())
+			)
+			.subscribe((summary) => this.notifier.notify(summary));
 	}
 
 	/**
