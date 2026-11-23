@@ -1,4 +1,4 @@
-import { IMAGE_LOADER } from '@angular/common';
+import { DOCUMENT, IMAGE_LOADER } from '@angular/common';
 import {
 	Component,
 	ElementRef,
@@ -67,6 +67,7 @@ export class AdminPageComponent {
 	);
 
 	constructor() {
+		loadAdminTheme(inject(DOCUMENT));
 		let isFirstTool = true;
 		// Switching tools only changes the fragment, so say so: retitle the
 		// document, and move focus to the new heading (not on first load, when
@@ -83,4 +84,22 @@ export class AdminPageComponent {
 			});
 		});
 	}
+}
+
+/** The admin theme's stylesheet (angular.json builds it, not injected). */
+export const ADMIN_THEME_HREF = 'admin-theme.css';
+
+/**
+ * Adds the Material themes only the admin tools use (src/admin-theme.scss),
+ * once, so the public pages never download them.
+ */
+function loadAdminTheme(document: Document): void {
+	if (document.getElementById('admin-theme')) {
+		return;
+	}
+	const link = document.createElement('link');
+	link.id = 'admin-theme';
+	link.rel = 'stylesheet';
+	link.href = ADMIN_THEME_HREF;
+	document.head.append(link);
 }

@@ -1,0 +1,13 @@
+// The Material components only the admin tools use. Built as its own
+// stylesheet (`admin-theme.css`, not injected: see angular.json) and loaded by
+// AdminPageComponent, so the public pages don't download it.
+@use "@angular/material" as mat;
+@use "material-theme" as *;
+
+@include mat.checkbox-theme($app-theme);
+@include mat.form-field-theme($app-theme);
+@include mat.input-theme($app-theme);
+@include mat.select-theme($app-theme);
+@include mat.menu-theme($app-theme);
+@include mat.dialog-theme($app-theme);
+@include mat.snack-bar-theme($app-theme);

@@ -1,9 +1,11 @@
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { Title } from '@angular/platform-browser';
 import { Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { ANY_URL_ROUTES } from 'src/app/testing/render-component';
-import { AdminPageComponent } from './admin-page.component';
+import { ADMIN_THEME_HREF, AdminPageComponent } from './admin-page.component';
 
 describe('AdminPageComponent', () => {
 	let harness: RouterTestingHarness;
@@ -11,6 +13,8 @@ describe('AdminPageComponent', () => {
 	async function open(url: string): Promise<HTMLElement> {
 		TestBed.configureTestingModule({
 			providers: [
+				provideHttpClient(),
+				provideHttpClientTesting(),
 				provideRouter([
 					{ path: 'admin', component: AdminPageComponent },
 					...ANY_URL_ROUTES
@@ -29,6 +33,15 @@ describe('AdminPageComponent', () => {
 		element.querySelector('h1')?.textContent?.replace(/\s+/g, ' ').trim();
 
 	const documentTitle = () => TestBed.inject(Title).getTitle();
+
+	it('loads the admin theme once', async () => {
+		await open('/admin');
+		await harness.navigateByUrl('/admin#gallery');
+
+		const links = document.querySelectorAll('link#admin-theme');
+		expect(links).toHaveLength(1);
+		expect(links[0].getAttribute('href')).toBe(ADMIN_THEME_HREF);
+	});
 
 	it('opens the news tool by default', async () => {
 		const element = await open('/admin');
@@ -69,6 +82,8 @@ describe('AdminPageComponent', () => {
 		downloadsLink.click();
 		await harness.fixture.whenStable();
 		harness.detectChanges();
+		// The tool's list renders (and focus moves) after its first request.
+		await new Promise((resolve) => setTimeout(resolve));
 
 		expect(TestBed.inject(Router).url).toBe('/admin#downloads');
 		expect(element.querySelector('app-downloads-tool')).not.toBeNull();

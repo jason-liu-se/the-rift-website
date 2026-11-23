@@ -28,8 +28,10 @@ Every colour comes from the palette in `src/theme-colours.scss` (which
   handle keyboard, focus, and ARIA, styled with our own SCSS. Use `@angular/cdk`
   for what Aria doesn't cover (overlays, dialogs, focus traps, drag and drop).
 - Angular Material is only for the admin pages. Don't add it elsewhere.
-- `src/theme.scss` themes only the Material components in use. Add a component's
-  theme there when you start using one.
+- `src/theme.scss` themes only the Material components the public pages use;
+  `src/admin-theme.scss`, a separate stylesheet the admin page loads, themes the
+  ones only the admin tools use (keeping them out of every page's CSS). Add a
+  component's theme to one of them when you start using it.
 
 ## Accessibility (WCAG 2.2 AA)
 

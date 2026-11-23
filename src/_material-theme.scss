@@ -1,0 +1,20 @@
+// The site's Material theme, shared by theme.scss (every page) and
+// admin-theme.scss (the admin pages only).
+@use "@angular/material" as mat;
+@use "theme-colours" as *;
+
+$app-primary: mat.m2-define-palette($custom-violet);
+$app-accent: mat.m2-define-palette($custom-blue-grey);
+// Red 800 (#c62828): white text on it has 5.6:1 contrast, for Delete buttons.
+$app-warn: mat.m2-define-palette(mat.$m2-red-palette, 800);
+$app-theme: mat.m2-define-light-theme(
+	(
+		color: (
+			primary: $app-primary,
+			accent: $app-accent,
+			warn: $app-warn
+		),
+		typography: mat.m2-define-typography-config(),
+		density: 0
+	)
+);
