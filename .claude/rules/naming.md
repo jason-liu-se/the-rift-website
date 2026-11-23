@@ -25,9 +25,9 @@ result, `i` in a short loop); generic is not (`data`, `item`, `value`, `info`,
   order?" or "converts what?", it's too vague: `processInOrder` or
   `saveItemsInOrder`, not `inOrder`. If the honest name needs "and", the
   function likely does too much (split it).
-- Abbreviate only what's standard in the domain or the web platform (`url`,
-  `id`, `api`, `html`, `ms`); spell out everything else (`button`, not `btn`;
-  `response`, not `res`, outside one-line callbacks).
+- Abbreviations common in web development are fine (`url`, `id`, `btn`, `res`,
+  `req`, `err`, `ms`); spell out ones a reader would have to decode
+  (`seasonCards`, not `sc`).
 
 ## Casing and form
 
