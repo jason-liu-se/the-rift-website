@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { CollectionsManagerComponent } from '../collections-manager/collections-manager.component';
 import { EditorListComponent } from '../editor-list/editor-list.component';
 import { FilterOption } from '../editor-list/list-filters/list-filters.component';
 import { GalleryImage } from 'src/app/interfaces/api-responses';
@@ -9,7 +10,11 @@ import { CaptionCardComponent } from '../../../../components/caption-card/captio
 	selector: 'app-gallery-tool',
 	templateUrl: './gallery-tool.component.html',
 	styleUrls: ['../admin-tool.scss', './gallery-tool.component.scss'],
-	imports: [EditorListComponent, CaptionCardComponent]
+	imports: [
+		CollectionsManagerComponent,
+		EditorListComponent,
+		CaptionCardComponent
+	]
 })
 export class GalleryToolComponent {
 	protected readonly noun = { one: 'image', many: 'images' };

@@ -234,6 +234,7 @@ export class EditorListComponent<T extends EditorContentType> {
 		{ equal: (a, b) => JSON.stringify(a) === JSON.stringify(b) }
 	);
 	private readonly reloads = new Subject<void>();
+	private readonly collectionReloads = new Subject<void>();
 
 	constructor() {
 		// The filters and page go into the URL as they change.
@@ -257,17 +258,25 @@ export class EditorListComponent<T extends EditorContentType> {
 				takeUntilDestroyed()
 			)
 			.subscribe();
-		toObservable(this.type)
+		merge(toObservable(this.type), this.collectionReloads)
 			.pipe(
-				switchMap((type) =>
-					type === 'gallery' || type === 'downloads'
+				switchMap(() => {
+					const type = this.type();
+					return type === 'gallery' || type === 'downloads'
 						? this.editorContent
 								.fetchCollections(type)
 								.pipe(catchError(() => of(undefined)))
-						: of(undefined)
-				)
+						: of(undefined);
+				}),
+				takeUntilDestroyed()
 			)
 			.subscribe((collections) => this.collections.set(collections));
+	}
+
+	/** Fetches the collections again, after one was created or changed. */
+	public reloadCollections(): void {
+		this.collectionReloads.next();
+		this.reloadItems();
 	}
 
 	/** Fetches the list (and the editor's drafts) again, e.g. after a save. */

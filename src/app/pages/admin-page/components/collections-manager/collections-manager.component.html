@@ -1,0 +1,91 @@
+<section class="collections" aria-labelledby="collections-heading">
+	<h2 id="collections-heading" class="heading">Collections</h2>
+	<ul class="collection-list">
+		@for (collection of collections(); track collection.slug) {
+			<li>
+				<span class="name">
+					<strong>{{ collection.title }}</strong>
+					<span class="details">
+						{{ collection.slug }} ·
+						{{ collection.itemCount }}
+						{{
+							collection.itemCount === 1
+								? itemNoun().one
+								: itemNoun().many
+						}}
+						· {{ collection.visible ? "Visible" : "Hidden" }}
+					</span>
+				</span>
+				<span class="actions">
+					<button
+						mat-stroked-button
+						type="button"
+						(click)="toggleVisibility(collection)"
+					>
+						{{ collection.visible ? "Hide" : "Show"
+						}}<span class="cdk-visually-hidden">
+							{{ collection.title }}</span
+						>
+					</button>
+					<button
+						mat-button
+						color="warn"
+						type="button"
+						(click)="deleteCollection(collection)"
+					>
+						Delete<span class="cdk-visually-hidden">
+							{{ collection.title }}</span
+						>
+					</button>
+				</span>
+			</li>
+		} @empty {
+			<li>No collections yet.</li>
+		}
+	</ul>
+	<form class="create" (submit)="$event.preventDefault(); createCollection()">
+		<h3 class="subheading">New collection</h3>
+		<mat-form-field subscriptSizing="dynamic">
+			<mat-label>Title</mat-label>
+			<input
+				matInput
+				name="title"
+				required
+				[maxlength]="maxTitleLength"
+				[ngModel]="title()"
+				(ngModelChange)="title.set($event)"
+			/>
+		</mat-form-field>
+		<mat-form-field subscriptSizing="dynamic">
+			<mat-label>Slug (in its URL)</mat-label>
+			<input
+				matInput
+				name="slug"
+				required
+				autocapitalize="off"
+				spellcheck="false"
+				[maxlength]="maxSlugLength"
+				[attr.aria-invalid]="!!slugProblem()"
+				[ngModel]="slug()"
+				(ngModelChange)="slug.set($event)"
+			/>
+			<mat-hint>Can't be changed once created.</mat-hint>
+		</mat-form-field>
+		<p class="slug-problem" aria-live="polite">{{ slugProblem() }}</p>
+		<mat-checkbox
+			color="primary"
+			name="visible"
+			[ngModel]="isVisible()"
+			(ngModelChange)="isVisible.set($event)"
+			>Visible to everyone</mat-checkbox
+		>
+		<button
+			mat-flat-button
+			color="primary"
+			type="submit"
+			[disabled]="!canCreate()"
+		>
+			Create collection
+		</button>
+	</form>
+</section>

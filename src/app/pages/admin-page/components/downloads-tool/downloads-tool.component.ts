@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { CollectionsManagerComponent } from '../collections-manager/collections-manager.component';
 import { EditorListComponent } from '../editor-list/editor-list.component';
 import { FilterOption } from '../editor-list/list-filters/list-filters.component';
 import { DownloadItem } from 'src/app/interfaces/api-responses';
@@ -9,7 +10,11 @@ import { DownloadCardComponent } from '../../../../components/download-card/down
 	selector: 'app-downloads-tool',
 	templateUrl: './downloads-tool.component.html',
 	styleUrls: ['../admin-tool.scss'],
-	imports: [EditorListComponent, DownloadCardComponent]
+	imports: [
+		CollectionsManagerComponent,
+		EditorListComponent,
+		DownloadCardComponent
+	]
 })
 export class DownloadsToolComponent {
 	protected readonly noun = { one: 'download', many: 'downloads' };

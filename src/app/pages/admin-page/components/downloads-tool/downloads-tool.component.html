@@ -1,4 +1,14 @@
-<app-editor-list type="downloads" [noun]="noun" [searchFields]="searchFields" />
+<app-collections-manager
+	type="downloads"
+	[itemNoun]="noun"
+	(changed)="list.reloadCollections()"
+/>
+<app-editor-list
+	#list
+	type="downloads"
+	[noun]="noun"
+	[searchFields]="searchFields"
+/>
 <p class="tool-intro">Creating downloads with this tool is coming soon.</p>
 <p class="preview-label">Preview</p>
 <!-- Sample data: shown, but not usable. -->

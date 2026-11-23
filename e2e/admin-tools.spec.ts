@@ -162,3 +162,46 @@ test.describe('news editor', () => {
 		expect(saves).toEqual([]);
 	});
 });
+
+test.describe('gallery collections', () => {
+	test.beforeEach(async ({ page }) => {
+		await signIn(page);
+		await page.goto('/admin#gallery');
+		await expect(
+			page.getByRole('heading', { name: 'Collections' })
+		).toBeVisible();
+		await expect(
+			page.getByText('Season 5', { exact: true }).first()
+		).toBeVisible();
+	});
+
+	test('has no WCAG 2.2 AA violations', async ({ page }) => {
+		expect(await scanForViolations(page)).toEqual([]);
+	});
+
+	test('creates a collection from a title and a valid slug', async ({
+		page
+	}) => {
+		let body: unknown;
+		await page.route(`${API_URL}/editor/gallery/collections`, (route) => {
+			if (route.request().method() !== 'POST') {
+				return route.fallback();
+			}
+			body = route.request().postDataJSON();
+			return route.fulfill({ status: 201, json: {} });
+		});
+		await page.getByRole('textbox', { name: 'Title' }).fill('Season 7');
+		await page.getByRole('textbox', { name: /Slug/ }).fill('Season 7');
+		await expect(page.getByText('Use lowercase letters')).toBeVisible();
+
+		await page.getByRole('textbox', { name: /Slug/ }).fill('season-7');
+		await page.getByRole('button', { name: 'Create collection' }).click();
+
+		await expect(page.getByText('Created Season 7.')).toBeVisible();
+		expect(body).toEqual({
+			slug: 'season-7',
+			title: 'Season 7',
+			visible: true
+		});
+	});
+});

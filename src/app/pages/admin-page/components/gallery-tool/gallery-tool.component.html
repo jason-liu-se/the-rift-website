@@ -1,4 +1,14 @@
-<app-editor-list type="gallery" [noun]="noun" [searchFields]="searchFields" />
+<app-collections-manager
+	type="gallery"
+	[itemNoun]="noun"
+	(changed)="list.reloadCollections()"
+/>
+<app-editor-list
+	#list
+	type="gallery"
+	[noun]="noun"
+	[searchFields]="searchFields"
+/>
 <p class="tool-intro">Adding gallery images with this tool is coming soon.</p>
 <p class="preview-label">Preview</p>
 <!-- Sample data: shown, but not usable. -->
