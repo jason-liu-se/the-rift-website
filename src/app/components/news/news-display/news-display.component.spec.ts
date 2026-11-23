@@ -21,9 +21,9 @@ const NEWS_POSTS: NewsPost[] = [
 	},
 	{
 		id: '3',
-		title: 'Event',
+		title: 'Build *contest*',
 		date: '2026-05-06T12:00:00',
-		content: 'Build contest.',
+		content: 'Enter the **build contest**.\n\n- Theme: spawn',
 		imageUrl: ''
 	}
 ];
@@ -44,8 +44,19 @@ describe('NewsDisplayComponent', () => {
 		expect(posts[0].querySelector('.date')?.textContent?.trim()).toBe(
 			'Fri Jan 02 2026'
 		);
-		expect(posts[0].querySelector('.content')?.textContent).toBe(
+		expect(posts[0].querySelector('.content')?.textContent?.trim()).toBe(
 			'A new season begins.'
+		);
+	});
+
+	it('renders titles and content as markdown', () => {
+		expect(posts[2].querySelector('h2 em')?.textContent).toBe('contest');
+		expect(posts[2].querySelector('h2 p')).toBeNull();
+		expect(posts[2].querySelector('.content strong')?.textContent).toBe(
+			'build contest'
+		);
+		expect(posts[2].querySelector('.content li')?.textContent).toBe(
+			'Theme: spawn'
 		);
 	});
 

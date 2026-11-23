@@ -8,7 +8,9 @@
 					</div>
 				}
 				<div class="news-post-content">
-					<h2 class="title">{{ post.title }}</h2>
+					<h2 class="title">
+						<app-markdown [markdown]="post.title" [inline]="true" />
+					</h2>
 					<p class="date">
 						<time [attr.datetime]="post.date">{{
 							newsPostToDateString(post)
@@ -23,7 +25,7 @@
 						}
 					</p>
 					<hr class="separator" />
-					<p class="content">{{ post.content }}</p>
+					<app-markdown class="content" [markdown]="post.content" />
 				</div>
 			</li>
 		}

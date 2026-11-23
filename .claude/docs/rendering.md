@@ -30,6 +30,12 @@ Code also runs on the server, where there's no real `window`. Touch `window` or
 other browser APIs only in event handlers, `afterNextRender`, or behind
 `isPlatformBrowser`.
 
+News titles and content are markdown, rendered to HTML by `MarkdownComponent`
+(`src/app/components/markdown/`) with `marked` on the server and in the browser
+alike. Raw HTML, unsafe links, and images outside `IMAGE_URL_PREFIXES`
+(`src/app/config/images.ts`, a copy of the API's allowlist) are never rendered,
+and Angular sanitises the result again.
+
 ## How it fits together
 
 - `src/app/app.config.ts` holds the app-wide providers; `app.config.server.ts`
