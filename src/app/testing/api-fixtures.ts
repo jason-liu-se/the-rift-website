@@ -27,8 +27,12 @@ export const NEWS_POSTS: NewsPost[] = Array.from(
 		title: `News post ${index + 1}`,
 		date: '2026-01-01T00:00:00.000Z',
 		content: `Content of news post ${index + 1}.`,
-		// The newest post was edited after it went live.
-		...(index === 0 && { editedAt: '2026-01-02T12:00:00.000Z' })
+		// The newest post was edited after it went live, and uses markdown.
+		...(index === 0 && {
+			editedAt: '2026-01-02T12:00:00.000Z',
+			content:
+				'Content of news post 1, with **bold** text, a [link](/gallery), and a list:\n\n- First\n- Second'
+		})
 	})
 );
 
