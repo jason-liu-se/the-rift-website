@@ -1,5 +1,5 @@
 // Copies The Rift API's contract from the web-server repo, which owns it: every
-// file in its src/contract/ (api-requests.ts, api-responses.ts) to
+// api-*.ts file in its src/contract/ (api-requests.ts, api-responses.ts) to
 // src/app/interfaces/. The copies are committed, so the website builds without
 // the server checked out.
 //
@@ -21,6 +21,9 @@ const ENV_FILE = ".env";
 const PATH_VARIABLE = "LOCAL_WEB_SERVER_PATH";
 const CONTRACT_IN_SERVER = "src/contract";
 const COPIES = "src/app/interfaces";
+// Only the contract's own files (api-requests.ts, api-responses.ts), which
+// the lint and format ignores also match.
+const CONTRACT_PREFIX = "api-";
 
 const { values: options } = parseArgs({
 	options: { check: { type: "boolean", default: false } }
@@ -54,7 +57,9 @@ if (!existsSync(source)) {
 	process.exit(1);
 }
 
-const files = readdirSync(source).filter((file) => file.endsWith(".ts"));
+const files = readdirSync(source).filter(
+	(file) => file.startsWith(CONTRACT_PREFIX) && file.endsWith(".ts")
+);
 const stale = files.filter((file) => {
 	const copy = join(COPIES, file);
 	const contract = readFileSync(join(source, file), "utf8");

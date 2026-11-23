@@ -161,7 +161,7 @@ with.
 
 The API's request and response types are owned by the
 [web-server repo](https://github.com/jason-liu-se/the-rift-web-server). This
-repo keeps a verbatim copy of each file in its `src/contract/` in
+repo keeps a verbatim copy of each `api-*.ts` file in its `src/contract/` in
 `src/app/interfaces/` (`api-requests.ts`, `api-responses.ts`); don't edit them.
 Set `LOCAL_WEB_SERVER_PATH` to your web-server checkout, then:
 
