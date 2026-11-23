@@ -11,12 +11,6 @@
 	/>
 	<mat-hint>Each season has one map.</mat-hint>
 </mat-form-field>
-<app-image-field
-	label="Season image"
-	[album]="{ album: 'maps' }"
-	[url]="fields().imageUrl ?? ''"
-	(urlChange)="setImageUrl($event)"
-/>
 <section aria-labelledby="dimensions-heading">
 	<h3 id="dimensions-heading" class="dimensions-heading">Dimensions</h3>
 	<app-dimensions-editor

@@ -4,10 +4,12 @@ import { MatFormField, MatHint, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MapDimension } from 'src/app/interfaces/api-responses';
 import { DraftSession } from '../../../drafts/draft-session';
-import { ImageFieldComponent } from '../../image-field/image-field.component';
 import { DimensionsEditorComponent } from '../dimensions-editor/dimensions-editor.component';
 
-/** A map season's fields: its number, image, and dimensions. */
+/**
+ * A map season's fields: its number and dimensions. The season's own image is
+ * optional and unused by the site, so only dimensions get images.
+ */
 @Component({
 	selector: 'app-maps-form',
 	templateUrl: './maps-form.component.html',
@@ -15,7 +17,6 @@ import { DimensionsEditorComponent } from '../dimensions-editor/dimensions-edito
 	imports: [
 		DimensionsEditorComponent,
 		FormsModule,
-		ImageFieldComponent,
 		MatFormField,
 		MatHint,
 		MatInput,
@@ -32,10 +33,6 @@ export class MapsFormComponent {
 		const season =
 			value === '' || value === null ? undefined : Number(value);
 		this.session().update({ season });
-	}
-
-	protected setImageUrl(imageUrl: string): void {
-		this.session().update({ imageUrl });
 	}
 
 	protected setDimensions(dimensions: MapDimension[]): void {
