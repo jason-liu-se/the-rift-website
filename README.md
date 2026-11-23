@@ -88,7 +88,7 @@ src/
 │   ├── pages/        One component per routed page; page-only ones in <page>/components/
 │   ├── services/     Injectable services and HTTP interceptors, one folder each
 │   ├── guards/       Route guards (admin login)
-│   ├── interfaces/   Data types; api-responses.ts is synced from web-server
+│   ├── interfaces/   Data types; api-*.ts are synced from web-server
 │   ├── seo/          Page titles, meta tags, and structured data
 │   ├── app.routes.ts          Routes
 │   └── app.routes.server.ts   How each route is rendered
@@ -159,10 +159,11 @@ with.
 
 ## API contract
 
-The API's response types are owned by the
+The API's request and response types are owned by the
 [web-server repo](https://github.com/jason-liu-se/the-rift-web-server). This
-repo keeps a verbatim copy at `src/app/interfaces/api-responses.ts`; don't edit
-it. Set `LOCAL_WEB_SERVER_PATH` to your web-server checkout, then:
+repo keeps a verbatim copy of each file in its `src/contract/` in
+`src/app/interfaces/` (`api-requests.ts`, `api-responses.ts`); don't edit them.
+Set `LOCAL_WEB_SERVER_PATH` to your web-server checkout, then:
 
 ```bash
 npm run api:sync    # copy the server's current contract here
