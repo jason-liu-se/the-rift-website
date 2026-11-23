@@ -145,8 +145,8 @@ describe('EditorListComponent', () => {
 		expect(cells(rows()[0]).slice(1, 5)).toEqual([
 			'Unfinished',
 			'Draft',
-			'You',
-			'You'
+			'editor',
+			'editor'
 		]);
 		// Markdown is stripped from names; old items have no author.
 		expect(cells(rows()[1]).slice(1, 5)).toEqual([

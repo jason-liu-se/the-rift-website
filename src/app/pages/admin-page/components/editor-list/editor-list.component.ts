@@ -45,7 +45,6 @@ import {
 import {
 	DraftSummary,
 	EditorCollection,
-	EditorRef,
 	PaginatedResponse
 } from 'src/app/interfaces/api-responses';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
@@ -62,6 +61,7 @@ import { FallbackPanelComponent } from 'src/app/components/fallback-panel/fallba
 import { LoadState } from 'src/app/utilities/load-state';
 import { describeWriteError } from '../../utilities/write-errors';
 import { confirmAction } from '../confirm-dialog/confirm-dialog.component';
+import { EditorAvatarComponent } from '../editor-avatar/editor-avatar.component';
 import { StatusBadgeComponent } from '../status-badge/status-badge.component';
 import {
 	BulkActionBarComponent,
@@ -108,6 +108,7 @@ interface ItemTemplateContext<T extends EditorContentType> {
 	styleUrl: './editor-list.component.scss',
 	imports: [
 		BulkActionBarComponent,
+		EditorAvatarComponent,
 		FallbackPanelComponent,
 		ListFiltersComponent,
 		MatButton,
@@ -158,6 +159,10 @@ export class EditorListComponent<T extends EditorContentType> {
 	protected readonly isBusy = signal(false);
 	protected readonly loadState = new LoadState(() => this.reloadItems());
 	protected readonly itemName = itemName;
+	/** The editor, who made every draft listed. */
+	protected readonly currentUser = computed(
+		() => this.auth.user() ?? undefined
+	);
 
 	protected readonly statuses = computed(
 		() => STATUS_FILTERS[this.type() === 'news' ? 'news' : 'other']
@@ -278,10 +283,6 @@ export class EditorListComponent<T extends EditorContentType> {
 
 	protected selectAllMatching(): void {
 		this.selection.selectAllMatching();
-	}
-
-	protected editorName(editor: EditorRef | undefined): string {
-		return editor?.username ?? 'unknown';
 	}
 
 	protected toggleVisibility(item: SummaryOf<T>): void {

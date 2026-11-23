@@ -126,6 +126,11 @@ export function paginate<T>(
 // audit fields the editor sees, plus a hidden item each.
 
 const EDITOR = { id: '1', username: 'editor' };
+/** The same editor with an avatar (a local image: e2e blocks other hosts). */
+const EDITOR_WITH_AVATAR = {
+	...EDITOR,
+	avatarUrl: '/assets/home/grass-block.png'
+};
 
 /** `item` without `key`, as a list summary leaves out a long field. */
 function omit<T extends object, K extends keyof T>(
@@ -143,7 +148,7 @@ function withAudit<T extends object>(item: T, index: number) {
 		visible: true,
 		status: 'live' as const,
 		revision: index + 1,
-		createdBy: EDITOR,
+		createdBy: EDITOR_WITH_AVATAR,
 		lastUpdatedBy: EDITOR,
 		createdAt: '2026-01-01T12:00:00.000Z',
 		updatedAt: '2026-01-01T12:00:00.000Z'

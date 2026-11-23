@@ -1,0 +1,15 @@
+@use "../../../../../theme-colours" as *;
+
+.avatar {
+	display: inline-block;
+	vertical-align: middle;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	object-fit: cover;
+
+	&:focus-visible {
+		outline: 2px solid $colour-primary;
+		outline-offset: 2px;
+	}
+}

@@ -83,8 +83,12 @@
 					<td data-label="Status">
 						<app-status-badge status="draft" />
 					</td>
-					<td data-label="Created by">You</td>
-					<td data-label="Last edited by">You</td>
+					<td data-label="Created by">
+						<app-editor-avatar [editor]="currentUser()" />
+					</td>
+					<td data-label="Last edited by">
+						<app-editor-avatar [editor]="currentUser()" />
+					</td>
 					<td class="actions">
 						<button
 							mat-button
@@ -138,10 +142,10 @@
 						/>
 					</td>
 					<td data-label="Created by">
-						{{ editorName(item.createdBy) }}
+						<app-editor-avatar [editor]="item.createdBy" />
 					</td>
 					<td data-label="Last edited by">
-						{{ editorName(item.lastUpdatedBy) }}
+						<app-editor-avatar [editor]="item.lastUpdatedBy" />
 					</td>
 					<td class="actions">
 						<button
