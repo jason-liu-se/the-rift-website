@@ -26,3 +26,15 @@ export const AUTOSAVE_DELAY_MS = 3000;
 
 /** Changes this close together are one step for undo (typing a word). */
 export const UNDO_GROUP_MS = 1000;
+
+/**
+ * What an admin tool's URL opens (query parameters, beside the tool's
+ * fragment), so an item can be opened for editing from anywhere, e.g.
+ * `/admin?edit=<id>#news`.
+ */
+export const EDITOR_PARAMS = {
+	new: 'new',
+	edit: 'edit',
+	draft: 'draft',
+	duplicate: 'duplicate'
+} as const;

@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { MapSeason } from 'src/app/interfaces/api-responses';
 import { ICardSelection } from 'src/app/interfaces/card-selection.interface';
 import { MapProviderService } from 'src/app/services/map-provider/map-provider.service';
+import { EditButtonComponent } from '../../components/edit-button/edit-button.component';
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
 import { CardSelectionSectionComponent } from '../../components/card-selection-section/card-selection-section.component';
 import { SectionCardComponent } from '../../components/section-card/section-card.component';
@@ -9,6 +10,7 @@ import { FallbackPanelComponent } from '../../components/fallback-panel/fallback
 import { LoadState } from '../../utilities/load-state';
 
 interface ISeasonCards {
+	id: string;
 	title: string;
 	cards: ICardSelection[];
 }
@@ -21,8 +23,9 @@ const BLUEMAP_CAMERA_MODE = 'perspective';
  * One card per dimension, opening the map viewer with the same fragment
  * BlueMap uses (`#s6_overworld:0:0:0:1500:0:0:0:0:perspective`).
  */
-function toSeasonCards({ season, dimensions }: MapSeason): ISeasonCards {
+function toSeasonCards({ id, season, dimensions }: MapSeason): ISeasonCards {
 	return {
+		id,
 		title: `Season ${season}`,
 		cards: dimensions.map(({ name, imageUrl, worldId, perspective }) => ({
 			imageUrl,
@@ -40,6 +43,7 @@ function toSeasonCards({ season, dimensions }: MapSeason): ISeasonCards {
 	imports: [
 		BackgroundImageCardComponent,
 		CardSelectionSectionComponent,
+		EditButtonComponent,
 		SectionCardComponent,
 		FallbackPanelComponent
 	]

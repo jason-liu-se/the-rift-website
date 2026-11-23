@@ -15,8 +15,10 @@ The decisions are in issue #101; the API's side is in the web-server's
 - **One tool per content type** (`pages/admin-page/components/<type>-tool/`),
   each an `<app-content-tool>`: the shared list (`editor-list/`) or the shared
   draft editor (`draft-editor/`) around the tool's own form, as the URL's query
-  parameters say (`EDITOR_PARAMS`: `?new`, `?edit=<id>`, `?draft=<id>`,
-  `?duplicate=<id>`, beside the tool's `#fragment`).
+  parameters say (`EDITOR_PARAMS` in `config/admin.ts`: `?new`, `?edit=<id>`,
+  `?draft=<id>`, `?duplicate=<id>`, beside the tool's `#fragment`, which is the
+  content type). Public cards link editors there with `<app-edit-button>`
+  (`components/edit-button/`).
 - **API:** `EditorContentService` (items, bulk actions, collections),
   `DraftsService`, and `ImageUploadService`, typed per content type by
   `EditorContentTypes` (`services/editor-content/editor-content-types.ts`).

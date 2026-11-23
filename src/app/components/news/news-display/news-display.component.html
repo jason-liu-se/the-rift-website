@@ -24,6 +24,13 @@
 							</span>
 						}
 					</p>
+					@if (canEdit) {
+						<app-edit-button
+							type="news"
+							[itemId]="post.id"
+							[itemName]="toPlainText(post.title)"
+						/>
+					}
 					<hr class="separator" />
 					<app-markdown class="content" [markdown]="post.content" />
 				</div>

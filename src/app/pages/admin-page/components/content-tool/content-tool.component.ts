@@ -15,6 +15,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButton } from '@angular/material/button';
 import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
 import { Observable, catchError, map, of, switchMap } from 'rxjs';
+import { EDITOR_PARAMS } from 'src/app/config/admin';
 import { EditorContentType } from 'src/app/interfaces/api-requests';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
 import { ApiStatusService } from 'src/app/services/api-status/api-status.service';
@@ -40,17 +41,6 @@ import {
 	ItemTemplateContext
 } from '../editor-list/editor-list.component';
 import { FilterOption } from '../editor-list/list-filters/list-filters.component';
-
-/**
- * What the URL opens (query parameters, beside the tool's fragment), so an
- * item can be opened for editing from anywhere, e.g. `/admin?edit=<id>#news`.
- */
-export const EDITOR_PARAMS = {
-	new: 'new',
-	edit: 'edit',
-	draft: 'draft',
-	duplicate: 'duplicate'
-} as const;
 
 interface EditorContext<T extends EditorContentType> {
 	$implicit: DraftSession<T>;

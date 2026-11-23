@@ -9,6 +9,12 @@
 						[captionVisibility]="'hover'"
 					/>
 				</button>
+				<app-edit-button
+					class="edit"
+					type="gallery"
+					[itemId]="image.id"
+					[itemName]="image.caption"
+				/>
 			</li>
 		}
 	</ul>

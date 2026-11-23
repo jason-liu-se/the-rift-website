@@ -25,6 +25,13 @@
 				Download
 				<span class="cdk-visually-hidden">(opens in new tab)</span>
 			</a>
+			@if (editId) {
+				<app-edit-button
+					type="downloads"
+					[itemId]="editId"
+					[itemName]="title"
+				/>
+			}
 		</div>
 	</div>
 </div>

@@ -1,3 +1,4 @@
+import { EditButtonComponent } from 'src/app/components/edit-button/edit-button.component';
 import { Component, Input } from '@angular/core';
 import { GalleryImage } from 'src/app/interfaces/api-responses';
 import { CaptionCardComponent } from '../../../../components/caption-card/caption-card.component';
@@ -10,6 +11,7 @@ import { MatIcon } from '@angular/material/icon';
 	templateUrl: './image-showcase-section.component.html',
 	styleUrls: ['./image-showcase-section.component.scss'],
 	imports: [
+		EditButtonComponent,
 		CaptionCardComponent,
 		ImageSlideshowComponent,
 		MatFabButton,
