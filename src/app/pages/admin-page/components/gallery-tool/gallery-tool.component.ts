@@ -1,6 +1,5 @@
 import { Component, signal } from '@angular/core';
 import { MatButton } from '@angular/material/button';
-import { CollectionsManagerComponent } from '../collections-manager/collections-manager.component';
 import { ContentToolComponent } from '../content-tool/content-tool.component';
 import { FilterOption } from '../editor-list/list-filters/list-filters.component';
 import { GalleryBulkActionsComponent } from './gallery-bulk-actions/gallery-bulk-actions.component';
@@ -13,7 +12,6 @@ import { GalleryFormComponent } from './gallery-form/gallery-form.component';
 	templateUrl: './gallery-tool.component.html',
 	styleUrl: './gallery-tool.component.scss',
 	imports: [
-		CollectionsManagerComponent,
 		ContentToolComponent,
 		GalleryBulkActionsComponent,
 		GalleryBulkCreateComponent,
@@ -28,5 +26,4 @@ export class GalleryToolComponent {
 		{ value: 'tags', label: 'Tags' }
 	];
 	protected readonly isBulkCreating = signal(false);
-	protected readonly isManagingCollections = signal(false);
 }

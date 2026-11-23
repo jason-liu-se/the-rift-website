@@ -1,22 +1,27 @@
-<app-collections-manager
-	type="downloads"
-	[itemNoun]="noun"
-	(changed)="list.reloadCollections()"
-/>
-<app-editor-list
-	#list
+<app-content-tool
 	type="downloads"
 	[noun]="noun"
 	[searchFields]="searchFields"
-/>
-<p class="tool-intro">Creating downloads with this tool is coming soon.</p>
-<p class="preview-label">Preview</p>
-<!-- Sample data: shown, but not usable. -->
-<div inert>
-	<app-download-card
-		[title]="preview.title"
-		[desc]="preview.desc"
-		[src]="preview.downloadUrl"
-		[imgSrc]="preview.imageUrl"
-	></app-download-card>
-</div>
+	[itemTemplate]="item"
+	[fieldsTemplate]="fields"
+	[bulkActionsTemplate]="bulkActions"
+>
+</app-content-tool>
+<ng-template #item let-download>
+	{{ download.title }}
+	<span class="details"
+		>{{ download.collection
+		}}{{
+			download.sortOrder !== undefined ? " · #" + download.sortOrder : ""
+		}}</span
+	>
+</ng-template>
+<ng-template #fields let-session>
+	<app-downloads-form [session]="session" />
+</ng-template>
+<ng-template #bulkActions let-list>
+	<app-move-bulk-action
+		[collections]="list.collections() ?? []"
+		(runAction)="list.runBulkAction($event)"
+	/>
+</ng-template>

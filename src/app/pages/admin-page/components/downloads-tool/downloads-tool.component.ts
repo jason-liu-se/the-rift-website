@@ -1,19 +1,21 @@
 import { Component } from '@angular/core';
-import { CollectionsManagerComponent } from '../collections-manager/collections-manager.component';
-import { EditorListComponent } from '../editor-list/editor-list.component';
+import { ContentToolComponent } from '../content-tool/content-tool.component';
 import { FilterOption } from '../editor-list/list-filters/list-filters.component';
-import { DownloadItem } from 'src/app/interfaces/api-responses';
-import { DownloadCardComponent } from '../../../../components/download-card/download-card.component';
+import { MoveBulkActionComponent } from '../move-bulk-action/move-bulk-action.component';
+import { DownloadsFormComponent } from './downloads-form/downloads-form.component';
 
-/** Placeholder: will create downloads. The preview shows sample data. */
+/**
+ * Creates, edits, moves, and deletes downloads. The list is in the downloads
+ * page's order: sort order, then title.
+ */
 @Component({
 	selector: 'app-downloads-tool',
 	templateUrl: './downloads-tool.component.html',
-	styleUrls: ['../admin-tool.scss'],
+	styleUrl: './downloads-tool.component.scss',
 	imports: [
-		CollectionsManagerComponent,
-		EditorListComponent,
-		DownloadCardComponent
+		ContentToolComponent,
+		DownloadsFormComponent,
+		MoveBulkActionComponent
 	]
 })
 export class DownloadsToolComponent {
@@ -22,12 +24,4 @@ export class DownloadsToolComponent {
 		{ value: 'title', label: 'Title' },
 		{ value: 'desc', label: 'Description' }
 	];
-
-	public readonly preview: DownloadItem = {
-		id: 'preview',
-		title: 'Sample download',
-		desc: 'A description of the download will appear here.',
-		downloadUrl: 'https://example.com/world.zip',
-		imageUrl: '/assets/general-background-images/iron-farm-1.webp'
-	};
 }

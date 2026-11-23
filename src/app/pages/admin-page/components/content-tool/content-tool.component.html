@@ -27,6 +27,24 @@
 			New {{ noun().one }}
 		</button>
 		<ng-content select="[toolActions]" />
+		@if (collectionType(); as collectionType) {
+			<button
+				mat-stroked-button
+				type="button"
+				[attr.aria-expanded]="isManagingCollections()"
+				(click)="isManagingCollections.set(!isManagingCollections())"
+			>
+				Collections
+			</button>
+			@if (isManagingCollections()) {
+				<app-collections-manager
+					class="collections"
+					[type]="collectionType"
+					[itemNoun]="noun()"
+					(changed)="reloadList()"
+				/>
+			}
+		}
 	</div>
 	<app-editor-list
 		#list

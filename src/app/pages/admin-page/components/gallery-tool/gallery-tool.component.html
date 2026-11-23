@@ -2,7 +2,6 @@
 	<app-gallery-bulk-create (closed)="isBulkCreating.set(false)" />
 } @else {
 	<app-content-tool
-		#tool
 		type="gallery"
 		[noun]="noun"
 		[searchFields]="searchFields"
@@ -18,25 +17,6 @@
 		>
 			Add many images
 		</button>
-		<button
-			toolActions
-			mat-stroked-button
-			type="button"
-			[attr.aria-expanded]="isManagingCollections()"
-			(click)="isManagingCollections.set(!isManagingCollections())"
-		>
-			Collections
-		</button>
-		<ng-container ngProjectAs="[toolActions]">
-			@if (isManagingCollections()) {
-				<app-collections-manager
-					class="collections"
-					type="gallery"
-					[itemNoun]="noun"
-					(changed)="tool.reloadList()"
-				/>
-			}
-		</ng-container>
 	</app-content-tool>
 }
 <ng-template #item let-image>

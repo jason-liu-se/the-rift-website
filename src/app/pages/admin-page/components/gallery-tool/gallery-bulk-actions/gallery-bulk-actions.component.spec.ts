@@ -28,12 +28,13 @@ describe('GalleryBulkActionsComponent', () => {
 		fixture.detectChanges();
 	});
 
-	it('moves to the chosen collection', () => {
-		expect(button('Move').disabled).toBe(true);
-		fixture.componentInstance['targetCollection'].set('season6');
-		fixture.detectChanges();
-
-		button('Move').click();
+	it('moves through the shared move action', () => {
+		fixture.debugElement
+			.query((node) => node.name === 'app-move-bulk-action')
+			.triggerEventHandler('runAction', {
+				action: 'move',
+				collection: 'season6'
+			});
 
 		expect(actions).toEqual([{ action: 'move', collection: 'season6' }]);
 	});

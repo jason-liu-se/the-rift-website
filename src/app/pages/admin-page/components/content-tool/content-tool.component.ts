@@ -3,6 +3,7 @@ import {
 	Component,
 	DestroyRef,
 	TemplateRef,
+	computed,
 	effect,
 	inject,
 	input,
@@ -17,10 +18,14 @@ import { Observable, catchError, map, of, switchMap } from 'rxjs';
 import { EditorContentType } from 'src/app/interfaces/api-requests';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
 import { ApiStatusService } from 'src/app/services/api-status/api-status.service';
-import { ItemOf } from 'src/app/services/editor-content/editor-content-types';
+import {
+	CollectionContentType,
+	ItemOf
+} from 'src/app/services/editor-content/editor-content-types';
 import { EditorContentService } from 'src/app/services/editor-content/editor-content.service';
 import { FocusRecoveryService } from 'src/app/services/focus-recovery/focus-recovery.service';
 import { DraftSession } from '../../drafts/draft-session';
+import { CollectionsManagerComponent } from '../collections-manager/collections-manager.component';
 import { DraftSessionsService } from '../../drafts/draft-sessions.service';
 import { DraftSyncService } from '../../drafts/draft-sync.service';
 import { describeWriteError } from '../../utilities/write-errors';
@@ -63,6 +68,7 @@ interface BulkActionsContext<T extends EditorContentType> {
 	templateUrl: './content-tool.component.html',
 	styleUrl: './content-tool.component.scss',
 	imports: [
+		CollectionsManagerComponent,
 		DraftEditorComponent,
 		EditorListComponent,
 		MatButton,
@@ -98,6 +104,14 @@ export class ContentToolComponent<T extends EditorContentType> {
 		undefined
 	);
 	protected readonly isOpening = signal(false);
+	protected readonly isManagingCollections = signal(false);
+	/** The type, if it has collections to manage. */
+	protected readonly collectionType = computed<
+		CollectionContentType | undefined
+	>(() => {
+		const type: EditorContentType = this.type();
+		return type === 'gallery' || type === 'downloads' ? type : undefined;
+	});
 
 	constructor() {
 		this.sync.syncPending();

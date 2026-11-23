@@ -281,3 +281,30 @@ test.describe('gallery images', () => {
 		).toBeVisible();
 	});
 });
+
+test.describe('downloads', () => {
+	test.beforeEach(({ page }) =>
+		openTool(page, 'downloads', 'World download')
+	);
+
+	test('edits a download with a preview, and has no WCAG 2.2 AA violations', async ({
+		page
+	}) => {
+		await page
+			.getByRole('button', { name: 'Edit World download', exact: true })
+			.click();
+
+		await expect(page.getByRole('textbox', { name: 'Title' })).toHaveValue(
+			'World download'
+		);
+		await page
+			.getByRole('textbox', { name: 'Title' })
+			.fill('Season 5 world');
+		await expect(
+			page
+				.locator('.preview')
+				.getByRole('heading', { name: 'Season 5 world' })
+		).toBeVisible();
+		expect(await scanForViolations(page)).toEqual([]);
+	});
+});
