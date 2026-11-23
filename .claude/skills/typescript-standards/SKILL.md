@@ -1,15 +1,15 @@
 ---
 name: typescript-standards
 description:
-    TypeScript conventions for The Rift website (Angular) covering naming,
-    typing, immutability, and error handling. Use as reference when writing or
-    reviewing TypeScript code.
+    TypeScript conventions for The Rift website (Angular) covering typing,
+    immutability, and error handling. Use as reference when writing or reviewing
+    TypeScript code.
 user-invocable: false
 ---
 
 # TypeScript Coding Standards
 
-Naming, type safety, immutability, and error handling for this Angular project.
+Type safety, immutability, and error handling for this Angular project.
 `CLAUDE.md` and the lint/format configs take precedence over anything here.
 
 Formatting is owned by Prettier (`.prettierrc`, `.editorconfig`) and linting by
@@ -18,28 +18,9 @@ formatting by hand, and don't restate their values elsewhere.
 
 ## Naming
 
-- `camelCase` for variables, functions, properties, and methods.
-- `PascalCase` for classes, interfaces, types, and enums. No `I` prefix on
-  interfaces (`DownloadCollection`, not `IDownloadCollection`).
-- `SCREAMING_SNAKE_CASE` for fixed, module-level constant values (`MAX_RETRIES`,
-  `SLIDE_INTERVAL_MS`). Include the unit in the name when there is one.
-- Booleans read as a question: `is`, `has`, `should`, `can` prefix (`isLoading`,
-  `hasError`).
-- Functions and methods are verb phrases (`fetchNews`, `formatDate`). Name
-  template event handlers for what they do, not the event (`saveDraft()`, not
-  `onClick()`).
+Names and file names follow `.claude/rules/naming.md`.
 
-### Files
-
-- Use the file names the Angular CLI generates (`npm run ng -- generate ...`):
-  kebab-case with the type suffix, e.g. `news-card.component.ts`,
-  `gallery.service.ts`. A component's `.ts`, `.html`, `.scss`, and `.spec.ts`
-  share one base name.
-- One concept per file. Put files where the README's project structure and
-  `CLAUDE.md`'s file scoping say; types used by only one feature live with that
-  feature.
-
-### Imports and exports
+## Imports and exports
 
 - Named exports only; no default exports.
 - No circular imports. If two files need each other, extract the shared part.

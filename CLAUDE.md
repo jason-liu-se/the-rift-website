@@ -24,9 +24,9 @@ pre-commit hook lints and formats staged files.
 ## Docs and rules
 
 `.claude/docs/` holds context every session needs, imported below.
-`.claude/rules/` holds standards for one area (templates and styles, tests, SEO,
-environment variables); each sets `paths` frontmatter so it loads only when
-matching files are read or edited.
+`.claude/rules/` holds standards for one area (naming, templates and styles,
+tests, SEO, environment variables); each sets `paths` frontmatter so it loads
+only when matching files are read or edited.
 
 @.claude/docs/rendering.md
 
@@ -101,11 +101,11 @@ matching files are read or edited.
   responsibility (one section or concern each), even with a single caller, so a
   page mainly composes components. Single responsibility, low coupling, pure
   functions, side effects isolated.
-- **Clarity.** Descriptive names, small functions, guard clauses, named
-  constants (in `src/app/config/` if shared or likely to be tweaked, like page
-  sizes, links, or seasons, so editors can find them; otherwise with the owning
-  feature). Simple over clever; comment a non-obvious version that's worth
-  keeping.
+- **Clarity.** Descriptive names (`.claude/rules/naming.md`), small functions,
+  guard clauses, named constants (in `src/app/config/` if shared or likely to be
+  tweaked, like page sizes, links, or seasons, so editors can find them;
+  otherwise with the owning feature). Simple over clever; comment a non-obvious
+  version that's worth keeping.
 - **Write less code.** Humans review every line. Use what Angular, Aria, the
   CDK, and RxJS provide, and skip speculative code (unused options, "just in
   case" branches, wrappers or helpers that add indirection without owning a
