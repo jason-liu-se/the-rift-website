@@ -48,10 +48,11 @@ $navbar-height: 3rem;
 	flex-direction: column;
 	align-items: center;
 	gap: 2px;
-	padding: 8px;
+	// Four tabs fit at 320px without breaking a word.
+	padding: 8px 2px;
 	border-radius: 8px;
 	color: $colour-soft-silver;
-	font-size: $font-size-small;
+	font-size: $font-size-x-small;
 	overflow-wrap: anywhere;
 	text-decoration: none;
 	transition:
@@ -145,6 +146,7 @@ $navbar-height: 3rem;
 		flex-direction: row;
 		gap: 12px;
 		padding: 10px 12px;
+		font-size: $font-size-small;
 	}
 
 	.workspace {

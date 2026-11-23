@@ -308,3 +308,32 @@ test.describe('downloads', () => {
 		expect(await scanForViolations(page)).toEqual([]);
 	});
 });
+
+test.describe('maps', () => {
+	test.beforeEach(({ page }) => openTool(page, 'maps', 'Season 5'));
+
+	test('starts a season with three dimensions, reorderable by keyboard', async ({
+		page
+	}) => {
+		await page.getByRole('button', { name: 'New season' }).click();
+		const legends = page.locator('.dimension legend');
+		await expect(legends).toHaveText([
+			'1. Overworld',
+			'2. Nether',
+			'3. End'
+		]);
+		expect(await scanForViolations(page)).toEqual([]);
+
+		await page.getByRole('button', { name: 'Move down Overworld' }).focus();
+		await page.keyboard.press('Enter');
+
+		await expect(legends).toHaveText([
+			'1. Nether',
+			'2. Overworld',
+			'3. End'
+		]);
+		await expect(
+			page.getByRole('button', { name: 'Move down Overworld' })
+		).toBeFocused();
+	});
+});

@@ -18,6 +18,16 @@ describe('describeWriteError', () => {
 		expect(describeWriteError(httpError(status))).toBe(message);
 	});
 
+	it('says what is taken for a 409 without the item', () => {
+		expect(
+			describeWriteError(
+				httpError(409, {
+					error: 'a map season with that season already exists'
+				})
+			)
+		).toBe('A map season with that season already exists.');
+	});
+
 	it("gives the API's reason for a 400", () => {
 		expect(
 			describeWriteError(httpError(400, { error: 'title: too long' }))

@@ -24,6 +24,7 @@ import {
 } from 'src/app/services/editor-content/editor-content-types';
 import { EditorContentService } from 'src/app/services/editor-content/editor-content.service';
 import { FocusRecoveryService } from 'src/app/services/focus-recovery/focus-recovery.service';
+import { DraftFields } from '../../drafts/draft-fields';
 import { DraftSession } from '../../drafts/draft-session';
 import { CollectionsManagerComponent } from '../collections-manager/collections-manager.component';
 import { DraftSessionsService } from '../../drafts/draft-sessions.service';
@@ -96,6 +97,8 @@ export class ContentToolComponent<T extends EditorContentType> {
 	/** The type's own bulk actions, given the list to run them on. */
 	public readonly bulkActionsTemplate =
 		input<TemplateRef<BulkActionsContext<T>>>();
+	/** What a new item starts with (not counted as changes). */
+	public readonly newItemFields = input<DraftFields<T>>({});
 	/** News: publishing chooses when it goes live. */
 	public readonly hasDate = input(false);
 
@@ -192,7 +195,7 @@ export class ContentToolComponent<T extends EditorContentType> {
 		const id = (name: string) => params.get(name);
 		let opening: Observable<DraftSession<T>> | undefined;
 		if (params.has(EDITOR_PARAMS.new)) {
-			opening = of(this.sessions.startNew(type));
+			opening = of(this.sessions.startNew(type, this.newItemFields()));
 		} else if (id(EDITOR_PARAMS.edit)) {
 			opening = this.fetchPublished(id(EDITOR_PARAMS.edit)!).pipe(
 				switchMap((item) => this.sessions.startEdit(type, item))

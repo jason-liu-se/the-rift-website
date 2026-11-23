@@ -25,11 +25,12 @@ export class DraftSessionsService {
 	private apiStatus = inject(ApiStatusService);
 	private auth = inject(AuthService);
 
+	/** A new item, starting from `fields` (defaults, which aren't changes). */
 	public startNew<T extends EditorContentType>(
 		type: T,
 		fields: DraftFields<T> = {}
 	): DraftSession<T> {
-		return this.create({ type, fields, baseline: {} });
+		return this.create({ type, fields, baseline: fields });
 	}
 
 	/** A new draft with the item's fields (Duplicate). */
@@ -37,7 +38,11 @@ export class DraftSessionsService {
 		type: T,
 		item: ItemOf<T>
 	): DraftSession<T> {
-		return this.startNew(type, pickFields(type, item));
+		return this.create({
+			type,
+			fields: pickFields(type, item),
+			baseline: {}
+		});
 	}
 
 	/** Edits a published item, carrying on with the editor's draft of it. */

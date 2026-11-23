@@ -16,6 +16,7 @@ import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DownloadsToolComponent } from './components/downloads-tool/downloads-tool.component';
 import { GalleryToolComponent } from './components/gallery-tool/gallery-tool.component';
+import { MapsToolComponent } from './components/maps-tool/maps-tool.component';
 import { NewsToolComponent } from './components/news-tool/news-tool.component';
 import { SITE_NAME } from 'src/app/config/site';
 import { originalImageLoader } from 'src/app/utilities/image-loaders';
@@ -30,7 +31,8 @@ interface IAdminTool {
 export const ADMIN_TOOLS: readonly IAdminTool[] = [
 	{ id: 'news', label: 'News', icon: 'newspaper' },
 	{ id: 'downloads', label: 'Downloads', icon: 'download' },
-	{ id: 'gallery', label: 'Gallery', icon: 'photo_library' }
+	{ id: 'gallery', label: 'Gallery', icon: 'photo_library' },
+	{ id: 'maps', label: 'Maps', icon: 'map' }
 ];
 
 /**
@@ -46,7 +48,8 @@ export const ADMIN_TOOLS: readonly IAdminTool[] = [
 		RouterLink,
 		NewsToolComponent,
 		DownloadsToolComponent,
-		GalleryToolComponent
+		GalleryToolComponent,
+		MapsToolComponent
 	],
 	// Previews show whatever URL an editor types: don't spend Cloudflare
 	// transformations on them.

@@ -10,7 +10,11 @@ export function describeWriteError(error: unknown): string {
 		case 0:
 			return "The server didn't answer. Check your connection and try again.";
 		case HttpStatusCode.Conflict:
-			return 'It changed since you loaded it. The list has been reloaded; try again.';
+			// Without `current`, something is already taken (a slug, a season).
+			return (error.error as { current?: unknown } | null)?.current ||
+				!apiReason(error)
+				? 'It changed since you loaded it. The list has been reloaded; try again.'
+				: `${capitalize(apiReason(error)!)}.`;
 		case HttpStatusCode.NotFound:
 			return 'It no longer exists.';
 		case HttpStatusCode.TooManyRequests:
@@ -22,6 +26,10 @@ export function describeWriteError(error: unknown): string {
 				? 'The server failed. Try again.'
 				: (apiReason(error) ?? 'Something went wrong. Try again.');
 	}
+}
+
+function capitalize(text: string): string {
+	return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 function apiReason(error: HttpErrorResponse): string | undefined {
