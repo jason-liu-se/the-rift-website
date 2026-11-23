@@ -1,21 +1,64 @@
-<app-collections-manager
-	type="gallery"
-	[itemNoun]="noun"
-	(changed)="list.reloadCollections()"
-/>
-<app-editor-list
-	#list
-	type="gallery"
-	[noun]="noun"
-	[searchFields]="searchFields"
-/>
-<p class="tool-intro">Adding gallery images with this tool is coming soon.</p>
-<p class="preview-label">Preview</p>
-<!-- Sample data: shown, but not usable. -->
-<div inert>
-	<app-caption-card
-		class="preview"
-		[src]="preview.imageUrl"
-		[caption]="preview.caption"
-	></app-caption-card>
-</div>
+@if (isBulkCreating()) {
+	<app-gallery-bulk-create (closed)="isBulkCreating.set(false)" />
+} @else {
+	<app-content-tool
+		#tool
+		type="gallery"
+		[noun]="noun"
+		[searchFields]="searchFields"
+		[itemTemplate]="item"
+		[fieldsTemplate]="fields"
+		[bulkActionsTemplate]="bulkActions"
+	>
+		<button
+			toolActions
+			mat-stroked-button
+			type="button"
+			(click)="isBulkCreating.set(true)"
+		>
+			Add many images
+		</button>
+		<button
+			toolActions
+			mat-stroked-button
+			type="button"
+			[attr.aria-expanded]="isManagingCollections()"
+			(click)="isManagingCollections.set(!isManagingCollections())"
+		>
+			Collections
+		</button>
+		<ng-container ngProjectAs="[toolActions]">
+			@if (isManagingCollections()) {
+				<app-collections-manager
+					class="collections"
+					type="gallery"
+					[itemNoun]="noun"
+					(changed)="tool.reloadList()"
+				/>
+			}
+		</ng-container>
+	</app-content-tool>
+}
+<ng-template #item let-image>
+	<span class="image-item">
+		<img class="thumbnail" [src]="image.imageUrl" alt="" loading="lazy" />
+		<span>
+			{{ image.caption }}
+			<span class="details"
+				>{{ image.collection
+				}}{{
+					image.tags.length ? " · " + image.tags.join(", ") : ""
+				}}</span
+			>
+		</span>
+	</span>
+</ng-template>
+<ng-template #fields let-session>
+	<app-gallery-form [session]="session" />
+</ng-template>
+<ng-template #bulkActions let-list>
+	<app-gallery-bulk-actions
+		[collections]="list.collections() ?? []"
+		(runAction)="list.runBulkAction($event)"
+	/>
+</ng-template>

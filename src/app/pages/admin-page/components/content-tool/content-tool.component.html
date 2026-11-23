@@ -38,15 +38,15 @@
 		(duplicateItem)="openEditor('duplicate', $event.id)"
 		(openDraft)="openEditor('draft', $event.id)"
 	>
-		@if (bulkActionsTemplate(); as bulkActions) {
-			<ng-container ngProjectAs="[bulkActions]">
+		<ng-container ngProjectAs="[bulkActions]">
+			@if (bulkActionsTemplate(); as bulkActions) {
 				<ng-container
 					*ngTemplateOutlet="
 						bulkActions;
 						context: { $implicit: list }
 					"
 				/>
-			</ng-container>
-		}
+			}
+		</ng-container>
 	</app-editor-list>
 }

@@ -1,19 +1,24 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
+import { MatButton } from '@angular/material/button';
 import { CollectionsManagerComponent } from '../collections-manager/collections-manager.component';
-import { EditorListComponent } from '../editor-list/editor-list.component';
+import { ContentToolComponent } from '../content-tool/content-tool.component';
 import { FilterOption } from '../editor-list/list-filters/list-filters.component';
-import { GalleryImage } from 'src/app/interfaces/api-responses';
-import { CaptionCardComponent } from '../../../../components/caption-card/caption-card.component';
+import { GalleryBulkActionsComponent } from './gallery-bulk-actions/gallery-bulk-actions.component';
+import { GalleryBulkCreateComponent } from './gallery-bulk-create/gallery-bulk-create.component';
+import { GalleryFormComponent } from './gallery-form/gallery-form.component';
 
-/** Placeholder: will add gallery images. The preview shows sample data. */
+/** Adds (one or many), edits, tags, moves, and deletes gallery images. */
 @Component({
 	selector: 'app-gallery-tool',
 	templateUrl: './gallery-tool.component.html',
-	styleUrls: ['../admin-tool.scss', './gallery-tool.component.scss'],
+	styleUrl: './gallery-tool.component.scss',
 	imports: [
 		CollectionsManagerComponent,
-		EditorListComponent,
-		CaptionCardComponent
+		ContentToolComponent,
+		GalleryBulkActionsComponent,
+		GalleryBulkCreateComponent,
+		GalleryFormComponent,
+		MatButton
 	]
 })
 export class GalleryToolComponent {
@@ -22,11 +27,6 @@ export class GalleryToolComponent {
 		{ value: 'caption', label: 'Caption' },
 		{ value: 'tags', label: 'Tags' }
 	];
-
-	public readonly preview: GalleryImage = {
-		id: 'preview',
-		imageUrl: '/assets/general-background-images/fancy-tree-1.webp',
-		caption: 'Sample caption',
-		tags: []
-	};
+	protected readonly isBulkCreating = signal(false);
+	protected readonly isManagingCollections = signal(false);
 }

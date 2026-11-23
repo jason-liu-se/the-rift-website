@@ -1,4 +1,25 @@
-.preview {
+@use "../../../../../font-sizes" as *;
+
+.collections {
+	flex: 1 1 100%;
+}
+
+.image-item {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.thumbnail {
+	flex: none;
+	width: 4rem;
+	aspect-ratio: 16 / 9;
+	border-radius: 4px;
+	object-fit: cover;
+}
+
+.details {
 	display: block;
-	max-width: 480px;
+	font-size: $font-size-x-small;
+	font-weight: 400;
 }

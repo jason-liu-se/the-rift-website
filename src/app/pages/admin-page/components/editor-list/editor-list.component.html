@@ -25,7 +25,10 @@
 		(selectAllMatching)="selectAllMatching()"
 		(clearSelection)="selection.clear()"
 	>
-		<ng-content select="[bulkActions]" />
+		<!-- Passed on from the tool, so the bar can place it. -->
+		<ng-container ngProjectAs="[bulkActions]">
+			<ng-content select="[bulkActions]" />
+		</ng-container>
 	</app-bulk-action-bar>
 }
 @if (selection.isPreviewingPage()) {

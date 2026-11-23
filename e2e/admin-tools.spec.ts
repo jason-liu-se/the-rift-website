@@ -165,8 +165,8 @@ test.describe('news editor', () => {
 
 test.describe('gallery collections', () => {
 	test.beforeEach(async ({ page }) => {
-		await signIn(page);
-		await page.goto('/admin#gallery');
+		await openTool(page, 'gallery', 'Spawn walkway');
+		await page.getByRole('button', { name: 'Collections' }).click();
 		await expect(
 			page.getByRole('heading', { name: 'Collections' })
 		).toBeVisible();
@@ -203,5 +203,81 @@ test.describe('gallery collections', () => {
 			title: 'Season 7',
 			visible: true
 		});
+	});
+});
+
+test.describe('gallery images', () => {
+	test.beforeEach(({ page }) => openTool(page, 'gallery', 'Spawn walkway'));
+
+	test('moves the selection to another collection in one request', async ({
+		page
+	}) => {
+		let body: unknown;
+		await page.route(`${API_URL}/editor/gallery/images/bulk`, (route) => {
+			body = route.request().postDataJSON();
+			route.fulfill({
+				json: { results: [{ id: 'iron-farm-1.webp', outcome: 'ok' }] }
+			});
+		});
+		await page
+			.getByRole('checkbox', { name: 'Select Iron farm', exact: true })
+			.check();
+		await page.getByRole('combobox', { name: 'Move to' }).click();
+		await page.getByRole('option', { name: 'Season 6' }).click();
+		await page.getByRole('button', { name: 'Move', exact: true }).click();
+
+		await expect(page.getByText('Moved 1 image.')).toBeVisible();
+		expect(body).toEqual({
+			action: 'move',
+			collection: 'season6',
+			items: [{ id: 'iron-farm-1.webp', startingRevision: 2 }]
+		});
+	});
+
+	test('adds many images from pasted links, and publishes them together', async ({
+		page
+	}) => {
+		let body:
+			{ items: { createId: string; caption: string }[] } | undefined;
+		await page.route(`${API_URL}/editor/gallery/images/bulk`, (route) => {
+			body = route.request().postDataJSON();
+			route.fulfill({
+				json: {
+					results: body!.items.map(({ createId }) => ({
+						id: createId,
+						outcome: 'ok'
+					}))
+				}
+			});
+		});
+		await page.getByRole('button', { name: 'Add many images' }).click();
+		await page
+			.getByRole('textbox', { name: 'Or paste links, one per line' })
+			.fill('https://i.ibb.co/a/one.png\nhttps://i.ibb.co/a/two.png');
+		await page.getByRole('button', { name: 'Add links' }).click();
+		await page
+			.getByRole('combobox', { name: 'Collection', exact: true })
+			.click();
+		await page.getByRole('option', { name: 'Season 5' }).click();
+		await page
+			.getByRole('textbox', { name: 'Caption for image 1' })
+			.fill('One');
+		await page
+			.getByRole('textbox', { name: 'Caption for image 2' })
+			.fill('Two');
+		expect(await scanForViolations(page)).toEqual([]);
+
+		await page
+			.getByRole('button', { name: 'Upload and publish 2 images' })
+			.click();
+
+		await expect(page.getByText('Published 2 images.')).toBeVisible();
+		expect(body?.items.map(({ caption }) => caption)).toEqual([
+			'One',
+			'Two'
+		]);
+		await expect(
+			page.getByText('Pick files or paste links to start.')
+		).toBeVisible();
 	});
 });

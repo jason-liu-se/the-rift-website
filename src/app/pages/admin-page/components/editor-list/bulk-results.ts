@@ -8,9 +8,10 @@ export interface ItemNoun {
 
 /** What a bulk action did, for messages: "Deleted", "Moved". */
 export type BulkActionName =
-	'delete' | 'show' | 'hide' | 'move' | 'add-tags' | 'remove-tags';
+	'create' | 'delete' | 'show' | 'hide' | 'move' | 'add-tags' | 'remove-tags';
 
 const DONE_VERBS: Record<BulkActionName, string> = {
+	create: 'Published',
 	delete: 'Deleted',
 	show: 'Made visible',
 	hide: 'Hid',

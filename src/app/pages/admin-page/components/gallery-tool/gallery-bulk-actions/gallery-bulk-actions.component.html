@@ -1,0 +1,46 @@
+<div class="bulk-move">
+	<mat-form-field subscriptSizing="dynamic">
+		<mat-label>Move to</mat-label>
+		<mat-select
+			[ngModel]="targetCollection()"
+			(ngModelChange)="targetCollection.set($event)"
+		>
+			@for (collection of collections(); track collection.slug) {
+				<mat-option [value]="collection.slug">{{
+					collection.title
+				}}</mat-option>
+			}
+		</mat-select>
+	</mat-form-field>
+	<button
+		mat-stroked-button
+		type="button"
+		[disabled]="!targetCollection()"
+		(click)="move()"
+	>
+		Move
+	</button>
+</div>
+<div class="bulk-tags">
+	<app-tag-input
+		label="Tags to add or remove"
+		[tags]="tags()"
+		(tagsChange)="tags.set($event)"
+	/>
+	<button
+		mat-stroked-button
+		type="button"
+		[disabled]="tags().length === 0"
+		(click)="changeTags('add-tags')"
+	>
+		Add tags
+	</button>
+	<button
+		mat-stroked-button
+		type="button"
+		[disabled]="tags().length === 0"
+		(click)="changeTags('remove-tags')"
+	>
+		Remove tags
+	</button>
+</div>

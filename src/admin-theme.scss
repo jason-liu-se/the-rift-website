@@ -12,3 +12,5 @@
 @include mat.dialog-theme($app-theme);
 @include mat.snack-bar-theme($app-theme);
 @include mat.radio-theme($app-theme);
+@include mat.chips-theme($app-theme);
+@include mat.autocomplete-theme($app-theme);

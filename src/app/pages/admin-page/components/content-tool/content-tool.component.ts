@@ -7,7 +7,8 @@ import {
 	inject,
 	input,
 	signal,
-	untracked
+	untracked,
+	viewChild
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButton } from '@angular/material/button';
@@ -78,6 +79,7 @@ export class ContentToolComponent<T extends EditorContentType> {
 	private focusRecovery = inject(FocusRecoveryService);
 	private apiStatus = inject(ApiStatusService).status;
 	private queryParams = toSignal(this.route.queryParamMap);
+	private list = viewChild(EditorListComponent);
 
 	public readonly type = input.required<T>();
 	public readonly noun = input.required<ItemNoun>();
@@ -148,6 +150,11 @@ export class ContentToolComponent<T extends EditorContentType> {
 			});
 		});
 		inject(DestroyRef).onDestroy(() => this.session()?.close());
+	}
+
+	/** Fetches the list and its collections again (e.g. a collection changed). */
+	public reloadList(): void {
+		this.list()?.reloadCollections();
 	}
 
 	protected openNew(): void {
