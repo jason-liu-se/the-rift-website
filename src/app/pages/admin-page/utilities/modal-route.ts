@@ -7,13 +7,15 @@ import {
 } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
+import { filter, merge } from 'rxjs';
 
 /**
  * Shows a routed component's template in a dialog over the list for as long
- * as its route is active: closing the dialog (Escape, the backdrop, or
- * `close()`) goes back to the list, keeping its filters, and leaving the
- * route (Back) closes the dialog. Call from a routed component's constructor;
- * it returns a function that closes the dialog.
+ * as its route is active. Closing it (Escape, the backdrop, or the returned
+ * function) leaves the route for the list, keeping its filters and scroll;
+ * leaving the route any way (Back, too) closes the dialog. So a route's
+ * `canDeactivate` guards every way out. Call from a routed component's
+ * constructor.
  */
 export function openModalRoute(
 	content: () => TemplateRef<unknown>
@@ -22,8 +24,14 @@ export function openModalRoute(
 	const router = inject(Router);
 	const route = inject(ActivatedRoute);
 	const injector = inject(Injector);
-	const destroyRef = inject(DestroyRef);
 	let dialogRef: MatDialogRef<unknown> | undefined;
+	const leave = () =>
+		void router.navigate(['.'], {
+			relativeTo: route.parent,
+			queryParamsHandling: 'preserve',
+			// The list stays where it was scrolled.
+			scroll: 'manual'
+		});
 
 	afterNextRender(() => {
 		dialogRef = dialog.open(content(), {
@@ -32,19 +40,19 @@ export function openModalRoute(
 			panelClass: 'admin-modal',
 			maxWidth: '100vw',
 			// The content focuses its own heading.
-			autoFocus: false
+			autoFocus: false,
+			// Closing goes through the route (and its guard), even on Back,
+			// which would otherwise close it before the guard runs.
+			disableClose: true,
+			closeOnNavigation: false
 		});
-		dialogRef.afterClosed().subscribe(() => {
-			if (!destroyRef.destroyed) {
-				router.navigate(['.'], {
-					relativeTo: route.parent,
-					queryParamsHandling: 'preserve',
-					// The list stays where it was scrolled.
-					scroll: 'manual'
-				});
-			}
-		});
+		merge(
+			dialogRef.backdropClick(),
+			dialogRef
+				.keydownEvents()
+				.pipe(filter(({ key }) => key === 'Escape'))
+		).subscribe(leave);
 	});
-	destroyRef.onDestroy(() => dialogRef?.close());
-	return () => dialogRef?.close();
+	inject(DestroyRef).onDestroy(() => dialogRef?.close());
+	return leave;
 }

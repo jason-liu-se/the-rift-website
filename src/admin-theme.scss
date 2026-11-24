@@ -3,6 +3,8 @@
 // AdminPageComponent, so the public pages don't download it.
 @use "@angular/material" as mat;
 @use "material-theme" as *;
+@use "theme-colours" as colours;
+@use "font-sizes" as *;
 
 @include mat.checkbox-theme($app-theme);
 @include mat.form-field-theme($app-theme);
@@ -43,4 +45,11 @@
 .mat-mdc-form-field.compact {
 	@include mat.form-field-density(-3);
 	@include mat.select-density(-3);
+}
+
+// Hints under admin fields: quieter than the fields they explain.
+.mat-mdc-form-field-hint-wrapper,
+.mat-mdc-form-field-bottom-align::before {
+	color: rgba(colours.$colour-dark-text, 0.75);
+	font-size: $font-size-x-small;
 }

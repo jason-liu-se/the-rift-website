@@ -10,7 +10,8 @@ import {
 	viewChild
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatButton } from '@angular/material/button';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatRadioButton, MatRadioGroup } from '@angular/material/radio';
@@ -24,9 +25,10 @@ import { ItemOf } from 'src/app/services/editor-content/editor-content-types';
 import { DraftSession, SaveStage } from '../../drafts/draft-session';
 import { describeWriteError } from '../../utilities/write-errors';
 import { itemName } from '../editor-list/item-name';
+import { findMissingFields } from '../../drafts/draft-fields';
 import { EDITOR_TYPES } from '../../editor-types';
 import { EditorWriteService } from '../../services/editor-write.service';
-import { toFieldRows } from './field-values';
+import { DraftConflictComponent } from './draft-conflict/draft-conflict.component';
 
 const STATUS_TEXT: Record<SaveStage, string> = {
 	unchanged: '',
@@ -58,7 +60,10 @@ export interface PublishedState {
 	templateUrl: './draft-editor.component.html',
 	styleUrl: './draft-editor.component.scss',
 	imports: [
+		DraftConflictComponent,
 		FormsModule,
+		MatIcon,
+		MatIconButton,
 		MatButton,
 		MatFormField,
 		MatInput,
@@ -80,7 +85,6 @@ export class DraftEditorComponent<T extends EditorContentType> {
 	public readonly closed = output<void>();
 
 	private readonly config = computed(() => EDITOR_TYPES[this.session().type]);
-	private readonly fieldLabels = computed(() => this.config().fieldLabels);
 	protected readonly noun = computed(() => this.config().noun);
 	/** News: choose when it goes live. */
 	protected readonly hasDate = computed(() => this.config().hasDate);
@@ -92,24 +96,24 @@ export class DraftEditorComponent<T extends EditorContentType> {
 		const name = itemName(this.session().fields() as object);
 		return published ? `Editing ${name}` : `New ${this.config().noun.one}`;
 	});
-	protected readonly conflictRows = computed(() => {
-		const conflict = this.session().conflict();
-		const labels = this.fieldLabels();
-		if (conflict?.kind === 'draft') {
-			return toFieldRows(conflict.theirs.fields, labels);
-		}
-		return conflict?.kind === 'item'
-			? toFieldRows(conflict.theirs, labels)
-			: [];
-	});
-	protected readonly mergeRows = computed(() => {
-		const reference = this.session().mergeReference();
-		return reference ? toFieldRows(reference, this.fieldLabels()) : [];
-	});
 	protected readonly isVisible = signal(true);
 	protected readonly dateChoice = signal<DateChoice>('now');
 	protected readonly scheduledAt = signal('');
 	protected readonly isPublishing = signal(false);
+	/** "Title, Content": what publishing still needs filled in. */
+	protected readonly missingFields = computed(() => {
+		const { requiredFields, fieldLabels } = this.config();
+		return findMissingFields(
+			this.session().fields() as Record<string, unknown>,
+			requiredFields as readonly string[]
+		)
+			.map((key) => (fieldLabels as Record<string, string>)[key])
+			.join(', ');
+	});
+	/** There's a draft to discard (anything saved here or on the server). */
+	protected readonly hasDraft = computed(
+		() => this.session().status() !== 'unchanged'
+	);
 
 	constructor() {
 		afterNextRender(() => {
@@ -132,18 +136,6 @@ export class DraftEditorComponent<T extends EditorContentType> {
 		this.session()
 			.resolveItemConflict('overwrite')
 			.subscribe({ complete: () => this.publish() });
-	}
-
-	protected merge(): void {
-		this.session().resolveItemConflict('merge').subscribe();
-	}
-
-	protected keepDraft(keep: 'mine' | 'theirs'): void {
-		this.session().resolveDraftConflict(keep).subscribe();
-	}
-
-	protected stopMerging(): void {
-		this.session().mergeReference.set(undefined);
 	}
 
 	protected retrySave(): void {

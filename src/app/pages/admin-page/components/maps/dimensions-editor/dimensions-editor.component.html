@@ -59,36 +59,32 @@
 				/>
 				<div class="dimension-actions">
 					<button
-						mat-stroked-button
+						mat-icon-button
 						type="button"
 						class="move-up"
+						[attr.aria-label]="'Move up ' + nameOf(index)"
 						[disabled]="isFirst"
 						(click)="moveDimension(index, -1)"
 					>
-						Move up<span class="cdk-visually-hidden">
-							{{ nameOf(index) }}</span
-						>
+						<mat-icon>arrow_upward</mat-icon>
 					</button>
 					<button
-						mat-stroked-button
+						mat-icon-button
 						type="button"
 						class="move-down"
+						[attr.aria-label]="'Move down ' + nameOf(index)"
 						[disabled]="isLast"
 						(click)="moveDimension(index, 1)"
 					>
-						Move down<span class="cdk-visually-hidden">
-							{{ nameOf(index) }}</span
-						>
+						<mat-icon>arrow_downward</mat-icon>
 					</button>
 					<button
-						mat-button
-						color="warn"
+						mat-icon-button
 						type="button"
+						[attr.aria-label]="'Remove ' + nameOf(index)"
 						(click)="removeDimension(index)"
 					>
-						Remove<span class="cdk-visually-hidden">
-							{{ nameOf(index) }}</span
-						>
+						<mat-icon>delete</mat-icon>
 					</button>
 				</div>
 			</fieldset>

@@ -95,6 +95,8 @@ export class GalleryBulkCreateComponent {
 		() => this.allCollections() ?? []
 	);
 	protected readonly rows = signal<BulkImageRow[]>([]);
+	/** Rows not yet published (published ones leave the list). */
+	public readonly rowCount = computed(() => this.rows().length);
 	protected readonly pastedLinks = signal('');
 	/** "Set all": also the defaults for rows added later. */
 	protected readonly allCollection = signal('');

@@ -1,0 +1,52 @@
+@use "../../../../../../theme-colours" as *;
+@use "../../../../../../font-sizes" as *;
+
+:host {
+	display: contents;
+}
+
+.conflict,
+.merge {
+	display: grid;
+	gap: 12px;
+	padding: 16px;
+	border: 1px solid $colour-warning;
+	border-radius: 8px;
+	background-color: rgba($colour-warning, 0.06);
+
+	p {
+		margin: 0;
+	}
+}
+
+.conflict-message {
+	font-weight: 600;
+}
+
+.version {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: 4px 12px;
+	margin: 0;
+	font-size: $font-size-small;
+
+	dt {
+		font-weight: 600;
+	}
+
+	dd {
+		margin: 0;
+		overflow-wrap: anywhere;
+		white-space: pre-wrap;
+	}
+}
+
+.version-label {
+	font-weight: 600;
+}
+
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}

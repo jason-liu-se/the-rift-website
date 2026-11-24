@@ -9,7 +9,8 @@ import {
 	output
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatButton } from '@angular/material/button';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
 import { MatFormField, MatHint, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import {
@@ -34,6 +35,8 @@ import { ImageFieldComponent } from '../../image-field/image-field.component';
 		FormsModule,
 		ImageFieldComponent,
 		MatButton,
+		MatIcon,
+		MatIconButton,
 		MatFormField,
 		MatHint,
 		MatInput,

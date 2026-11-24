@@ -47,3 +47,11 @@ function toComparable(fields: object): string {
 		.sort(([a], [b]) => a.localeCompare(b));
 	return JSON.stringify(filled);
 }
+
+/** The required fields `fields` leaves blank, in the order given. */
+export function findMissingFields<K extends string>(
+	fields: Partial<Record<K, unknown>>,
+	required: readonly K[]
+): K[] {
+	return required.filter((key) => isBlank(fields[key]));
+}

@@ -14,201 +14,125 @@
 				</button>
 			}
 		</div>
-		<div class="history" role="group" aria-label="Undo history">
+		<div class="tools">
 			<button
-				mat-stroked-button
+				mat-icon-button
 				type="button"
+				aria-label="Undo"
 				[disabled]="!session().canUndo()"
 				(click)="session().undo()"
 			>
-				Undo
+				<mat-icon>undo</mat-icon>
 			</button>
 			<button
-				mat-stroked-button
+				mat-icon-button
 				type="button"
+				aria-label="Redo"
 				[disabled]="!session().canRedo()"
 				(click)="session().redo()"
 			>
-				Redo
+				<mat-icon>redo</mat-icon>
+			</button>
+			<button
+				mat-icon-button
+				type="button"
+				aria-label="Close"
+				(click)="close()"
+			>
+				<mat-icon>close</mat-icon>
 			</button>
 		</div>
 	</header>
 
-	<!-- Always in the DOM, so a new conflict is announced. -->
-	<p class="cdk-visually-hidden" aria-live="assertive">
-		@if (session().conflict()) {
-			{{ noun().one }} conflict: choose how to resolve it below.
-		}
-	</p>
-	@if (session().conflict(); as conflict) {
-		<div class="conflict">
-			<p class="conflict-message">
-				@switch (conflict.kind) {
-					@case ("draft") {
-						This draft was saved somewhere else since (another tab
-						or device). Keep your version, or theirs?
-					}
-					@case ("item") {
-						This {{ noun().one }} changed since you started.
-						Overwrite it with your version, or merge the two by
-						hand?
-					}
-					@case ("deleted") {
-						This {{ noun().one }} was deleted since you started.
-						Publish your version as a new {{ noun().one }}, or
-						discard it?
-					}
-				}
-			</p>
-			@if (conflictRows().length > 0) {
-				<p class="version-label">Their version</p>
-				<dl class="version">
-					@for (row of conflictRows(); track row.name) {
-						<dt>{{ row.name }}</dt>
-						<dd>{{ row.value }}</dd>
-					}
-				</dl>
-			}
-			<div class="actions">
-				@switch (conflict.kind) {
-					@case ("draft") {
-						<button
-							mat-flat-button
-							type="button"
-							(click)="keepDraft('mine')"
-						>
-							Keep mine
-						</button>
-						<button
-							mat-stroked-button
-							type="button"
-							(click)="keepDraft('theirs')"
-						>
-							Keep theirs
-						</button>
-					}
-					@case ("item") {
-						<button
-							mat-flat-button
-							type="button"
-							(click)="overwrite()"
-						>
-							Overwrite with mine
-						</button>
-						<button
-							mat-stroked-button
-							type="button"
-							(click)="merge()"
-						>
-							Merge by hand
-						</button>
-					}
-					@case ("deleted") {
-						<button
-							mat-flat-button
-							type="button"
-							(click)="publishAsNew()"
-						>
-							Publish as new
-						</button>
-						<button
-							mat-stroked-button
-							type="button"
-							(click)="discard()"
-						>
-							Discard
-						</button>
-					}
-				}
-			</div>
-		</div>
-	}
-
-	@if (mergeRows().length > 0) {
-		<div class="merge">
-			<p>
-				Merging: copy what you want to keep from their version into
-				yours, then publish.
-			</p>
-			<p class="version-label">Their version</p>
-			<dl class="version">
-				@for (row of mergeRows(); track row.name) {
-					<dt>{{ row.name }}</dt>
-					<dd>{{ row.value }}</dd>
-				}
-			</dl>
-			<button mat-button type="button" (click)="stopMerging()">
-				Hide their version
-			</button>
-		</div>
-	}
+	<app-draft-conflict
+		[session]="session()"
+		(overwrite)="overwrite()"
+		(publishAsNew)="publishAsNew()"
+		(discard)="discard()"
+	/>
 
 	<div class="fields">
 		<ng-content />
 	</div>
 
-	<fieldset class="options">
-		<legend>Publishing</legend>
-		<mat-radio-group
-			aria-label="Who can see it"
-			[ngModel]="isVisible()"
-			(ngModelChange)="isVisible.set($event)"
-		>
-			<mat-radio-button color="primary" [value]="true"
-				>Visible to everyone</mat-radio-button
-			>
-			<mat-radio-button color="primary" [value]="false"
-				>Hidden (editors only)</mat-radio-button
-			>
-		</mat-radio-group>
-		@if (hasDate()) {
+	<footer class="editor-footer">
+		<fieldset class="options">
+			<legend>Publishing</legend>
 			<mat-radio-group
-				aria-label="When it goes live"
-				[ngModel]="dateChoice()"
-				(ngModelChange)="dateChoice.set($event)"
+				aria-label="Who can see it"
+				[ngModel]="isVisible()"
+				(ngModelChange)="isVisible.set($event)"
 			>
-				@if (published()) {
-					<mat-radio-button color="primary" value="keep"
-						>Keep its date</mat-radio-button
-					>
-				}
-				<mat-radio-button color="primary" value="now"
-					>Now</mat-radio-button
+				<mat-radio-button color="primary" [value]="true"
+					>Visible to everyone</mat-radio-button
 				>
-				<mat-radio-button color="primary" value="schedule"
-					>Schedule</mat-radio-button
+				<mat-radio-button color="primary" [value]="false"
+					>Hidden (editors only)</mat-radio-button
 				>
 			</mat-radio-group>
-			@if (dateChoice() === "schedule") {
-				<mat-form-field subscriptSizing="dynamic">
-					<mat-label>Goes live at</mat-label>
-					<input
-						matInput
-						type="datetime-local"
-						[min]="minScheduleTime()"
-						[ngModel]="scheduledAt()"
-						(ngModelChange)="scheduledAt.set($event)"
-					/>
-				</mat-form-field>
+			@if (hasDate()) {
+				<mat-radio-group
+					aria-label="When it goes live"
+					[ngModel]="dateChoice()"
+					(ngModelChange)="dateChoice.set($event)"
+				>
+					@if (published()) {
+						<mat-radio-button color="primary" value="keep"
+							>Keep its date</mat-radio-button
+						>
+					}
+					<mat-radio-button color="primary" value="now"
+						>Now</mat-radio-button
+					>
+					<mat-radio-button color="primary" value="schedule"
+						>Schedule</mat-radio-button
+					>
+				</mat-radio-group>
+				@if (dateChoice() === "schedule") {
+					<mat-form-field subscriptSizing="dynamic">
+						<mat-label>Goes live at</mat-label>
+						<input
+							matInput
+							type="datetime-local"
+							[min]="minScheduleTime()"
+							[ngModel]="scheduledAt()"
+							(ngModelChange)="scheduledAt.set($event)"
+						/>
+					</mat-form-field>
+				}
 			}
-		}
-	</fieldset>
+		</fieldset>
 
-	<div class="actions">
-		<button
-			mat-flat-button
-			color="primary"
-			type="button"
-			[disabled]="isPublishing() || !!session().conflict()"
-			(click)="publish()"
-		>
-			Publish
-		</button>
-		<button mat-stroked-button type="button" (click)="close()">
-			Close
-		</button>
-		<button mat-button color="warn" type="button" (click)="discard()">
-			Discard draft
-		</button>
-	</div>
+		<div class="actions">
+			<button
+				mat-flat-button
+				color="primary"
+				type="button"
+				aria-describedby="publish-needs"
+				[disabled]="
+					isPublishing() ||
+					!!session().conflict() ||
+					!!missingFields()
+				"
+				(click)="publish()"
+			>
+				Publish
+			</button>
+			@if (missingFields(); as missing) {
+				<p id="publish-needs" class="needs">
+					Fill in {{ missing }} to publish.
+				</p>
+			}
+			@if (hasDraft()) {
+				<button
+					mat-button
+					color="warn"
+					type="button"
+					(click)="discard()"
+				>
+					Discard draft
+				</button>
+			}
+		</div>
+	</footer>
 </section>

@@ -29,6 +29,8 @@ export interface EditorTypeConfig<T extends EditorContentType> {
 	searchFields: readonly FilterOption[];
 	/** Each field's name as the editor sees it (e.g. in a conflict). */
 	fieldLabels: Record<keyof FieldsOf<T>, string>;
+	/** What publishing needs filled in (the API's required fields). */
+	requiredFields: readonly (keyof FieldsOf<T>)[];
 	/** News: publishing chooses when it goes live. */
 	hasDate: boolean;
 	hasCollections: boolean;
@@ -68,6 +70,7 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 			content: 'Content',
 			imageUrl: 'Banner image'
 		},
+		requiredFields: ['title', 'content'],
 		hasDate: true,
 		hasCollections: false,
 		hasBulkCreate: false,
@@ -92,6 +95,13 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 			imageUrl: 'Image',
 			sortOrder: 'Sort order'
 		},
+		requiredFields: [
+			'collection',
+			'title',
+			'desc',
+			'downloadUrl',
+			'imageUrl'
+		],
 		hasDate: false,
 		hasCollections: true,
 		hasBulkCreate: false,
@@ -115,6 +125,7 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 			imageUrl: 'Image',
 			tags: 'Tags'
 		},
+		requiredFields: ['collection', 'caption', 'imageUrl'],
 		hasDate: false,
 		hasCollections: true,
 		hasBulkCreate: true,
@@ -137,6 +148,7 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 			imageUrl: 'Image',
 			dimensions: 'Dimensions'
 		},
+		requiredFields: ['season', 'dimensions'],
 		hasDate: false,
 		hasCollections: false,
 		hasBulkCreate: false,

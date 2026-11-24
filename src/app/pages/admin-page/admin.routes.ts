@@ -59,6 +59,9 @@ export default [
 			{
 				path: 'bulk',
 				canActivate: [hasBulkCreate],
+				canDeactivate: [
+					(modal: BulkCreateModalComponent) => modal.confirmLeave()
+				],
 				component: BulkCreateModalComponent
 			},
 			{ matcher: matchEditorItem, component: EditorModalComponent }
