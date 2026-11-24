@@ -8,10 +8,13 @@ import { TestBed } from '@angular/core/testing';
 import { AUTOSAVE_DELAY_MS } from 'src/app/config/admin';
 import { Draft, EditorNewsPost } from 'src/app/interfaces/api-responses';
 import { ApiStatus } from 'src/app/services/api-status/api-status.service';
+import { ApiStatusService } from 'src/app/services/api-status/api-status.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { DraftsService } from 'src/app/services/drafts/drafts.service';
 import { LocalDraftsService } from 'src/app/services/drafts/local-drafts.service';
 import { environment } from 'src/environments/environment';
 import { DraftSession, DraftSessionStart } from './draft-session';
+import { DraftStore } from './draft-store.service';
 
 const DRAFTS_URL = `${environment.API_URL}/editor/drafts`;
 
@@ -42,18 +45,28 @@ describe('DraftSession', () => {
 	let localDrafts: LocalDraftsService;
 	let ids: number;
 
-	function start(overrides: Partial<DraftSessionStart<'news'>> = {}) {
+	/** A session; with `revision`, of a draft the server has at it. */
+	function start({
+		revision,
+		...overrides
+	}: Partial<DraftSessionStart<'news'>> & { revision?: number } = {}) {
+		const store = TestBed.inject(DraftStore);
+		if (revision !== undefined) {
+			store.noteRevision(overrides.id!, revision);
+		}
 		return new DraftSession(
 			{
 				type: 'news',
-				owner: 'editor-1',
 				fields: {},
 				baseline: {},
+				...(revision !== undefined && {
+					savedFields: overrides.fields
+				}),
 				...overrides
 			},
 			{
 				drafts: TestBed.inject(DraftsService),
-				localDrafts,
+				store,
 				apiStatus,
 				createId: () => `id-${++ids}`
 			}
@@ -75,7 +88,15 @@ describe('DraftSession', () => {
 		ids = 0;
 		apiStatus = signal<ApiStatus>('up');
 		TestBed.configureTestingModule({
-			providers: [provideHttpClient(), provideHttpClientTesting()]
+			providers: [
+				provideHttpClient(),
+				provideHttpClientTesting(),
+				{ provide: ApiStatusService, useValue: { status: apiStatus } },
+				{
+					provide: AuthService,
+					useValue: { user: signal({ id: 'editor-1' }) }
+				}
+			]
 		});
 		httpTesting = TestBed.inject(HttpTestingController);
 		localDrafts = TestBed.inject(LocalDraftsService);
@@ -100,7 +121,8 @@ describe('DraftSession', () => {
 		expect(url).toBe(`${DRAFTS_URL}/id-1`);
 		expect(body).toEqual({ type: 'news', fields: { title: 'Hi' } });
 		expect(session.status()).toBe('saved');
-		expect(localDrafts.find('id-1')?.isPending).toBe(false);
+		// Once the server has it, this browser's copy goes.
+		expect(localDrafts.find('id-1')).toBeUndefined();
 
 		// Later saves send the revision the server last gave.
 		session.update({ content: 'More' });
@@ -133,8 +155,9 @@ describe('DraftSession', () => {
 		});
 	});
 
-	it('keeps editing offline, and saves once the server is back', () => {
+	it('keeps editing offline, and the store sends it once the server is back', () => {
 		apiStatus.set('offline');
+		TestBed.tick();
 		const session = start();
 		session.update({ title: 'Offline' });
 		vi.advanceTimersByTime(AUTOSAVE_DELAY_MS);
@@ -142,11 +165,13 @@ describe('DraftSession', () => {
 		expect(session.status()).toBe('local');
 
 		apiStatus.set('up');
-		session.saveNow().subscribe();
+		TestBed.tick();
+		httpTesting.expectOne({ method: 'GET', url: DRAFTS_URL }).flush([]);
 		httpTesting
 			.expectOne({ method: 'PUT' })
 			.flush(draft('id-1', 1, { title: 'Offline' }));
 		expect(session.status()).toBe('saved');
+		session.close();
 	});
 
 	it('undoes and redoes, grouping quick changes to one field', () => {
@@ -164,6 +189,7 @@ describe('DraftSession', () => {
 		session.redo();
 		expect(session.fields()).toEqual({ title: 'Hi' });
 		session.close();
+		httpTesting.expectOne({ method: 'PUT' }).flush(draft('id-1', 1, {}));
 	});
 
 	it("lets the editor keep their version or another device's on a 409", () => {
@@ -295,5 +321,35 @@ describe('DraftSession', () => {
 		const publish = httpTesting.expectOne(`${DRAFTS_URL}/d/publish`);
 		expect(publish.request.body).toEqual({ visible: true, asNew: true });
 		publish.flush(ITEM);
+	});
+
+	it('creates the draft before publishing an edit with nothing changed', () => {
+		const session = start({
+			fields: { title: 'Theirs' },
+			baseline: { title: 'Theirs' },
+			target: { id: 'post-1', startingRevision: 5 }
+		});
+		session.publish({ visible: true }).subscribe();
+
+		const created = httpTesting.expectOne(`${DRAFTS_URL}/id-1`);
+		expect(created.request.body.target).toEqual({
+			id: 'post-1',
+			startingRevision: 5
+		});
+		created.flush(draft('id-1', 1, { title: 'Theirs' }));
+		httpTesting.expectOne(`${DRAFTS_URL}/id-1/publish`).flush(ITEM);
+		expect(session.status()).toBe('published');
+	});
+
+	it('sends a waiting change when closed, instead of dropping it', () => {
+		const session = start();
+		session.update({ title: 'Quick' });
+		session.close();
+
+		httpTesting
+			.expectOne(`${DRAFTS_URL}/id-1`)
+			.flush(draft('id-1', 1, { title: 'Quick' }));
+		vi.advanceTimersByTime(AUTOSAVE_DELAY_MS);
+		httpTesting.expectNone({ method: 'PUT' });
 	});
 });

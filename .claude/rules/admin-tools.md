@@ -38,11 +38,15 @@ The decisions are in issue #101; the API's side is in the web-server's
   `DraftsService`, and `ImageUploadService`, typed per content type by
   `EditorContentTypes` (`services/editor-content/editor-content-types.ts`).
   Every `/editor/*` request uses `EDITOR_REQUEST_OPTIONS`.
-- **Drafts** (`pages/admin-page/drafts/`): a `DraftSession` per open item saves
-  to `localStorage` on every change and to the server `AUTOSAVE_DELAY_MS` after
-  typing stops (`config/admin.ts`). It owns undo/redo, the "unpublished changes"
-  tell, conflicts (`409`/`404`), and publishing. `DraftSessionsService` starts
-  sessions; `DraftSyncService` sends drafts saved offline once the API is back.
+- **Drafts** (`pages/admin-page/drafts/`): the server holds them. `DraftStore`
+  owns every draft write (one queue, so autosave, retries, publishing, and
+  syncing never race) and this browser's copies, kept only while a change waits
+  for the server (`AUTOSAVE_DELAY_MS` after typing stops, or offline). Its
+  `sync()` reconciles the copies with the server when the admin page opens and
+  when the API comes back. A `DraftSession` per open item holds editing state:
+  fields, undo/redo, the save stage (`SaveState`, one union), conflicts
+  (`409`/`404`), and publishing, which always makes sure the server has the
+  draft first. `DraftSessionsService` starts sessions.
 - **Bulk actions** go through `BulkActionRunnerService`: at most
   `MAX_BULK_ITEMS` a request, one after another, with one snackbar summary per
   response (`summarizeBulkResults`).

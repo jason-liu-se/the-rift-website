@@ -161,6 +161,42 @@ test.describe('news editor', () => {
 	});
 });
 
+test('keeps editing offline, and saves the draft once the API is back', async ({
+	page,
+	context
+}) => {
+	const saves: unknown[] = [];
+	await page.route(`${API_URL}/editor/drafts/*`, (route) => {
+		saves.push(route.request().postDataJSON());
+		route.fulfill({
+			status: 201,
+			json: {
+				id: route.request().url().split('/').pop(),
+				type: 'news',
+				fields: {},
+				revision: 1,
+				createdAt: '2026-01-01T00:00:00.000Z',
+				updatedAt: '2026-01-01T00:00:00.000Z'
+			}
+		});
+	});
+	await openTool(page, 'news', EDITOR_NEWS_POSTS[0].title);
+	await page.getByRole('link', { name: 'New post' }).click();
+
+	await context.setOffline(true);
+	await page.getByRole('textbox', { name: 'Title' }).fill('Written offline');
+	await expect(page.getByText('Saved in this browser')).toBeVisible();
+	expect(saves).toEqual([]);
+
+	await context.setOffline(false);
+	await expect(
+		page.getByRole('status').filter({ hasText: /^Saved$/ })
+	).toBeVisible();
+	expect(saves).toEqual([
+		{ type: 'news', fields: { title: 'Written offline' } }
+	]);
+});
+
 test('opens an item from its link (an Edit button) over its list, and Back closes it', async ({
 	page
 }) => {
