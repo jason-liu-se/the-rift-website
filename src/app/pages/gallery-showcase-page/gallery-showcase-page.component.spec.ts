@@ -4,7 +4,14 @@ import {
 	provideHttpClientTesting
 } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, provideRouter, Router } from '@angular/router';
+import {
+	ActivatedRoute,
+	Params,
+	convertToParamMap,
+	provideRouter,
+	Router
+} from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
 
 import { GALLERY_FALLBACK_IMAGE } from 'src/app/config/gallery';
 import { GalleryImage } from 'src/app/interfaces/api-responses';
@@ -62,8 +69,12 @@ describe('GalleryShowcasePageComponent', () => {
 		httpTesting.expectOne(tagsUrl(collection)).flush(tags);
 	}
 
+	/** The URL's query; navigating with `queryParams` changes it here. */
+	let queryParams: BehaviorSubject<ReturnType<typeof convertToParamMap>>;
+
 	beforeEach(() => {
 		routeParams = {};
+		queryParams = new BehaviorSubject(convertToParamMap({}));
 		TestBed.configureTestingModule({
 			imports: [GalleryShowcasePageComponent],
 			providers: [
@@ -76,15 +87,40 @@ describe('GalleryShowcasePageComponent', () => {
 						snapshot: {
 							params: routeParams,
 							data: { collectionTitle: 'Season 5' }
-						}
+						},
+						queryParamMap: queryParams
 					})
 				}
 			]
 		});
 		httpTesting = TestBed.inject(HttpTestingController);
+		const router = TestBed.inject(Router);
+		const navigate = router.navigate.bind(router);
+		vi.spyOn(router, 'navigate').mockImplementation((commands, extras) => {
+			if (!extras?.queryParams) {
+				return navigate(commands, extras);
+			}
+			const query = Object.entries(extras.queryParams as Params).filter(
+				([, value]) => value !== null
+			);
+			queryParams.next(convertToParamMap(Object.fromEntries(query)));
+			return Promise.resolve(true);
+		});
 	});
 
 	afterEach(() => httpTesting.verify());
+
+	it('opens filtered by the tags in the URL, so a filtered view can be shared', () => {
+		queryParams.next(convertToParamMap({ tags: 'spawn' }));
+		render('season5');
+		httpTesting
+			.expectOne(pageUrl('season5', 0, 'spawn'))
+			.flush({ items: [FIRST_PAGE[0]], total: 1 });
+		fixture.detectChanges();
+
+		expect(captions()).toEqual(['One']);
+		expect(tagButton('spawn').getAttribute('aria-pressed')).toBe('true');
+	});
 
 	describe('with a collection in the URL', () => {
 		beforeEach(() => {

@@ -1,11 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
 	MatPaginatorIntl,
 	PageEvent,
 	MatPaginator
 } from '@angular/material/paginator';
-import { ActivatedRoute } from '@angular/router';
-import { catchError, of } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { catchError, distinctUntilChanged, map, of } from 'rxjs';
 import { GALLERY_FALLBACK_IMAGE } from 'src/app/config/gallery';
 import { GALLERY_PAGE_SIZE } from 'src/app/config/pagination';
 import { GalleryImage } from 'src/app/interfaces/api-responses';
@@ -17,6 +18,13 @@ import { ImageShowcaseSectionComponent } from './components/image-showcase-secti
 import { TagFilterComponent } from './components/tag-filter/tag-filter.component';
 import { FallbackPanelComponent } from '../../components/fallback-panel/fallback-panel.component';
 import { LoadState } from '../../utilities/load-state';
+
+/** The query parameter holding the selected tags, comma-separated. */
+const TAGS_PARAM = 'tags';
+
+function toTags(param: string | null): string[] {
+	return param ? param.split(',').filter(Boolean) : [];
+}
 
 @Component({
 	selector: 'app-gallery-showcase-page',
@@ -34,6 +42,7 @@ import { LoadState } from '../../utilities/load-state';
 })
 export class GalleryShowcasePageComponent {
 	private route = inject(ActivatedRoute);
+	private router = inject(Router);
 	private galleryProvider = inject(GalleryProviderService);
 
 	public title: string;
@@ -47,7 +56,7 @@ export class GalleryShowcasePageComponent {
 	public pageEvent!: PageEvent;
 	/** The collection's tags, for filtering; empty until loaded, or if that fails. */
 	protected readonly tags = signal<readonly string[]>([]);
-	/** Only photos with every one of these tags are shown. */
+	/** Only photos with every one of these tags are shown (the URL's `tags`). */
 	protected readonly selectedTags = signal<readonly string[]>([]);
 
 	protected readonly loadState = new LoadState(() =>
@@ -62,7 +71,15 @@ export class GalleryShowcasePageComponent {
 		const { params, data } = this.route.snapshot;
 		this.collectionName = params['collection'];
 		this.title = `Gallery: ${data['collectionTitle']}`;
-		this.populateCaptionedImages();
+		// The selected tags are in the URL, so a filtered view can be shared,
+		// and Back restores the previous filter.
+		this.route.queryParamMap
+			.pipe(
+				map((params) => toTags(params.get(TAGS_PARAM))),
+				distinctUntilChanged((a, b) => a.join() === b.join()),
+				takeUntilDestroyed()
+			)
+			.subscribe((tags) => this.showTags(tags));
 		// Without tags, the page still works; it just can't be filtered.
 		this.galleryProvider
 			.fetchCollectionTags(this.collectionName)
@@ -70,8 +87,17 @@ export class GalleryShowcasePageComponent {
 			.subscribe((tags) => this.tags.set(tags));
 	}
 
-	/** Shows the first page of the photos with every one of `tags`. */
+	/** Filters by `tags`, through the URL. */
 	public filterByTags(tags: readonly string[]): void {
+		this.router.navigate([], {
+			relativeTo: this.route,
+			queryParams: { [TAGS_PARAM]: tags.length ? tags.join(',') : null },
+			queryParamsHandling: 'merge'
+		});
+	}
+
+	/** Shows the first page of the photos with every one of `tags`. */
+	private showTags(tags: readonly string[]): void {
 		this.selectedTags.set(tags);
 		this.imageCache = {};
 		this.pageIndex = 0;
@@ -120,9 +146,10 @@ export class GalleryShowcasePageComponent {
 			.subscribe({
 				next: ({ items, total }) => {
 					// The header shows the whole collection's first photo.
+					// (or, opened filtered, its first match).
 					if (
 						requestedPageIndex === 0 &&
-						requestedTags.length === 0
+						(requestedTags.length === 0 || !this.imageUrl)
 					) {
 						this.imageUrl =
 							items[0]?.imageUrl ?? GALLERY_FALLBACK_IMAGE;
