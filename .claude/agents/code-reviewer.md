@@ -59,6 +59,8 @@ Important, with the split or move that fixes it. In particular:
 - The same API data fetched by several components instead of one owner.
 - Request, queueing, retry, or confirm-write-notify logic repeated in components
   instead of going through the shared service, interceptor, or helper.
+- Direct `localStorage`, cookie, or third-party SDK calls outside the service
+  that owns that resource.
 - Per-variant behaviour spread across inputs, partial constants, and
   `type === …` checks instead of one config record.
 - A component or service with several responsibilities, over the size limits, or

@@ -46,6 +46,9 @@ once:
   lives in one interceptor or service every caller uses, not a queue or retry
   per component.
 - Repeated flows (confirm, write, notify, reload) share one helper or service.
+- Each shared resource outside Angular (`localStorage`, cookies, a third-party
+  SDK) has one service that owns every call to it: its keys, serialisation, and
+  errors. Code uses that service, never the resource directly.
 
 Centralise what callers really share; don't force unrelated cases through one
 path.
