@@ -1,9 +1,9 @@
+import { STORAGE_KEYS } from '../../services/browser-storage/browser-storage.service';
 import { PLATFORM_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { Subject, of } from 'rxjs';
 import { requireLoggedIn } from 'src/app/guards/admin-auth.guards';
-import { LOGIN_RETURN_URL_KEY } from 'src/app/guards/login-return-url';
 import {
 	AuthService,
 	SessionEndReason
@@ -78,7 +78,7 @@ describe('SessionEndedService', () => {
 		sessionEnded.next('expired');
 
 		await vi.waitFor(() => expect(router.url).toBe('/admin/login'));
-		expect(sessionStorage.getItem(LOGIN_RETURN_URL_KEY)).toBe(
+		expect(sessionStorage.getItem(STORAGE_KEYS.loginReturnUrl)).toBe(
 			'/admin#news'
 		);
 	});

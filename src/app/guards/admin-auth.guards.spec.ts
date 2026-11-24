@@ -1,3 +1,4 @@
+import { STORAGE_KEYS } from '../services/browser-storage/browser-storage.service';
 import { TestBed } from '@angular/core/testing';
 import {
 	ActivatedRouteSnapshot,
@@ -12,7 +13,6 @@ import { routes } from '../app.routes';
 import { ADMIN_LOGIN_PATH, ADMIN_PATH } from '../config/admin';
 import { AuthService } from '../services/auth/auth.service';
 import { requireLoggedIn, requireLoggedOut } from './admin-auth.guards';
-import { LOGIN_RETURN_URL_KEY, saveLoginReturnUrl } from './login-return-url';
 
 describe('admin auth guards', () => {
 	function runGuard(
@@ -58,7 +58,7 @@ describe('admin auth guards', () => {
 		beforeEach(() => sessionStorage.clear());
 
 		it('returns a logged-in editor to the saved page, once', async () => {
-			saveLoginReturnUrl('/admin#news');
+			sessionStorage.setItem(STORAGE_KEYS.loginReturnUrl, '/admin#news');
 
 			expect(urlOf(await runGuard(requireLoggedIn, true))).toBe(
 				'/admin#news'
@@ -70,18 +70,18 @@ describe('admin auth guards', () => {
 		});
 
 		it("lets them in when the saved page is where they're going", async () => {
-			saveLoginReturnUrl('/admin');
+			sessionStorage.setItem(STORAGE_KEYS.loginReturnUrl, '/admin');
 
 			expect(await runGuard(requireLoggedIn, true)).toBe(true);
 		});
 
 		it('keeps the saved page while nobody is logged in', async () => {
-			saveLoginReturnUrl('/admin#news');
+			sessionStorage.setItem(STORAGE_KEYS.loginReturnUrl, '/admin#news');
 
 			expect(urlOf(await runGuard(requireLoggedIn, false))).toBe(
 				ADMIN_LOGIN_PATH
 			);
-			expect(sessionStorage.getItem(LOGIN_RETURN_URL_KEY)).toBe(
+			expect(sessionStorage.getItem(STORAGE_KEYS.loginReturnUrl)).toBe(
 				'/admin#news'
 			);
 		});

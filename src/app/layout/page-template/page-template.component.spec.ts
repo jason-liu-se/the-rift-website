@@ -1,13 +1,11 @@
+import { STORAGE_KEYS } from '../../services/browser-storage/browser-storage.service';
 import { ApplicationRef, Component, Type } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, provideRouter } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
 import { stubResizeObserver } from '../testing/resize-observer';
-import {
-	CHUNK_RELOAD_KEY,
-	PageTemplateComponent
-} from './page-template.component';
+import { PageTemplateComponent } from './page-template.component';
 
 @Component({ template: '<p class="stub-page">Stub page</p>' })
 class StubPageComponent {}
@@ -149,12 +147,14 @@ describe('PageTemplateComponent', () => {
 			// marker set just before reloading and that nothing was rendered.
 			await render({ loadComponent: failedLoad });
 
-			expect(sessionStorage.getItem(CHUNK_RELOAD_KEY)).toBe('true');
+			expect(sessionStorage.getItem(STORAGE_KEYS.chunkReload)).toBe(
+				'true'
+			);
 			expect(mainContent().children).toHaveLength(0);
 		});
 
 		it('fails without reloading again when the reload did not help', async () => {
-			sessionStorage.setItem(CHUNK_RELOAD_KEY, 'true');
+			sessionStorage.setItem(STORAGE_KEYS.chunkReload, 'true');
 			fixture = TestBed.createComponent(PageTemplateComponent);
 			element = fixture.nativeElement;
 			routeData['loadComponent'] = failedLoad;
@@ -165,11 +165,11 @@ describe('PageTemplateComponent', () => {
 		});
 
 		it('clears the reload marker once a page loads', async () => {
-			sessionStorage.setItem(CHUNK_RELOAD_KEY, 'true');
+			sessionStorage.setItem(STORAGE_KEYS.chunkReload, 'true');
 
 			await render();
 
-			expect(sessionStorage.getItem(CHUNK_RELOAD_KEY)).toBeNull();
+			expect(sessionStorage.getItem(STORAGE_KEYS.chunkReload)).toBeNull();
 		});
 	});
 });

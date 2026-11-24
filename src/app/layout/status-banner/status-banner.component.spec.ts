@@ -1,3 +1,4 @@
+import { STORAGE_KEYS } from '../../services/browser-storage/browser-storage.service';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
@@ -5,7 +6,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { apiStatusInterceptor } from '../../services/api-status/api-status.interceptor';
 import { ApiStatusService } from '../../services/api-status/api-status.service';
-import { SAVED_USER_KEY } from '../../services/auth/auth.service';
 import { stubResizeObserver } from '../testing/resize-observer';
 import { StatusBannerComponent } from './status-banner.component';
 
@@ -100,11 +100,11 @@ describe('StatusBannerComponent', () => {
 	it("also tells a logged-in editor their changes can't be saved", async () => {
 		// A login in another tab sets the user, like a session check would.
 		localStorage.setItem(
-			SAVED_USER_KEY,
+			STORAGE_KEYS.savedUser,
 			JSON.stringify({ id: '1', username: 'editor' })
 		);
 		window.dispatchEvent(
-			new StorageEvent('storage', { key: SAVED_USER_KEY })
+			new StorageEvent('storage', { key: STORAGE_KEYS.savedUser })
 		);
 		await goDown();
 
