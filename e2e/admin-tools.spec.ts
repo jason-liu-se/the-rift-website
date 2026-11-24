@@ -70,7 +70,7 @@ test.describe('news list', () => {
 				exact: true
 			})
 			.check();
-		await page.getByRole('button', { name: 'Hide', exact: true }).click();
+		await page.getByRole('button', { name: /^Hide/ }).click();
 
 		await expect(page.getByText('Hid 1 post.')).toBeVisible();
 		expect(body).toEqual({
@@ -372,6 +372,11 @@ test.describe('list quality of life', () => {
 		page
 	}) => {
 		await openTool(page, 'news', EDITOR_NEWS_POSTS[0].title);
+		// On mobile, the filters other than search are behind a button.
+		const moreFilters = page.getByRole('button', { name: /^Filters/ });
+		if (await moreFilters.isVisible()) {
+			await moreFilters.click();
+		}
 		await page.getByRole('combobox', { name: 'Status' }).click();
 		await page.getByRole('option', { name: 'Live' }).click();
 		await expect(page).toHaveURL(/[?&]status=live/);

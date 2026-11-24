@@ -25,6 +25,12 @@ The decisions are in issue #101; the API's side is in the web-server's
   labels, flags, and the type's form, list cell, and bulk actions
   (`components/<type>/`). Shared code reads it; never check `type === …`. A
   type's bulk actions run through `BULK_ACTION_HOST`.
+- **The list** (`editor-list/`): `EditorListStore` owns its state (type and
+  filters from the URL, the loaded items and drafts, the selection, cleared on
+  every load) and `EditorListActions` every write from it (row actions, bulk
+  actions, also as the `BULK_ACTION_HOST`); both are provided by the list page.
+  Drafts and published items are two collapsible groups of one table, with the
+  same row component (`ListRow`, `list-rows.ts`).
 - **Collections** come from `CollectionsStore` (provided by the admin page):
   fetched once per type, reloaded after a collection write.
 - **Writes** (confirm, send, snackbar) go through `EditorWriteService.run()`.
