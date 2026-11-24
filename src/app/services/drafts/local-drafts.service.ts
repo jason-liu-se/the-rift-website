@@ -25,8 +25,8 @@ export type LocalDraft = DraftContent & {
 
 /**
  * Drafts kept in `localStorage`, so editing works offline and survives a
- * closed tab; DraftSyncService sends pending ones to the server. If storage
- * is blocked or full, only the offline copy is lost.
+ * closed tab, until the server has them (DraftStore decides when). If
+ * storage is blocked or full, only the offline copy is lost.
  */
 @Injectable({
 	providedIn: 'root'

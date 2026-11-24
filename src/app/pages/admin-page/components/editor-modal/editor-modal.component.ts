@@ -26,7 +26,6 @@ import { ItemOf } from 'src/app/services/editor-content/editor-content-types';
 import { EditorContentService } from 'src/app/services/editor-content/editor-content.service';
 import { DraftSession } from '../../drafts/draft-session';
 import { DraftSessionsService } from '../../drafts/draft-sessions.service';
-import { OpenDraftService } from '../../drafts/open-draft.service';
 import { EDITOR_TYPES } from '../../editor-types';
 import { openModalRoute } from '../../utilities/modal-route';
 import { describeWriteError } from '../../utilities/write-errors';
@@ -58,7 +57,6 @@ export class EditorModalComponent {
 	private sessions = inject(DraftSessionsService);
 	private editorContent = inject(EditorContentService);
 	private notifier = inject(AdminNotifierService);
-	private openDraft = inject(OpenDraftService);
 	private listStore = inject(EditorListStore);
 	private content = viewChild.required<TemplateRef<unknown>>('content');
 
@@ -127,7 +125,6 @@ export class EditorModalComponent {
 	): void {
 		this.session()?.close();
 		this.session.set(session);
-		this.openDraft.session.set(session);
 	}
 
 	private open({

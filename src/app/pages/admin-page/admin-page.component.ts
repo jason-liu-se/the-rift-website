@@ -4,7 +4,7 @@ import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { EDITOR_TYPES, EDITOR_TYPE_ORDER } from './editor-types';
-import { OpenDraftService } from './drafts/open-draft.service';
+import { DraftStore } from './drafts/draft-store.service';
 import { CollectionsStore } from './services/collections-store.service';
 import { originalImageLoader } from 'src/app/utilities/image-loaders';
 
@@ -28,7 +28,6 @@ export const ADMIN_TOOLS = EDITOR_TYPE_ORDER.map((id) => ({
 	// transformations on them.
 	providers: [
 		CollectionsStore,
-		OpenDraftService,
 		{ provide: IMAGE_LOADER, useValue: originalImageLoader },
 		// Outlined, not filled: a focused label on the fill's grey is under
 		// 4.5:1 contrast.
@@ -43,8 +42,8 @@ export class AdminPageComponent {
 
 	constructor() {
 		loadAdminTheme(inject(DOCUMENT));
-		// Starts syncing drafts saved only in this browser.
-		inject(OpenDraftService);
+		// Sends changes to drafts kept only in this browser.
+		inject(DraftStore).sync();
 	}
 }
 

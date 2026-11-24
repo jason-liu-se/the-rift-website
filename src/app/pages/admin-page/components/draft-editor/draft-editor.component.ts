@@ -21,14 +21,14 @@ import {
 } from 'src/app/interfaces/api-requests';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
 import { ItemOf } from 'src/app/services/editor-content/editor-content-types';
-import { DraftSession, AutosaveStatus } from '../../drafts/draft-session';
+import { DraftSession, SaveStage } from '../../drafts/draft-session';
 import { describeWriteError } from '../../utilities/write-errors';
 import { itemName } from '../editor-list/item-name';
 import { EDITOR_TYPES } from '../../editor-types';
 import { EditorWriteService } from '../../services/editor-write.service';
 import { toFieldRows } from './field-values';
 
-const STATUS_TEXT: Record<AutosaveStatus, string> = {
+const STATUS_TEXT: Record<SaveStage, string> = {
 	unchanged: '',
 	local: 'Saved in this browser',
 	saving: 'Saving…',

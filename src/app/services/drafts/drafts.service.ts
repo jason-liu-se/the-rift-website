@@ -19,11 +19,11 @@ export class DraftsService {
 	private http = inject(HttpClient);
 	private draftsUrl = `${environment.API_URL}/editor/drafts`;
 
-	/** The editor's drafts of one content type, most recently saved first. */
-	public fetchDrafts(type: EditorContentType): Observable<DraftSummary[]> {
+	/** The editor's drafts (of one type, or all), most recently saved first. */
+	public fetchDrafts(type?: EditorContentType): Observable<DraftSummary[]> {
 		return this.http.get<DraftSummary[]>(this.draftsUrl, {
 			...EDITOR_REQUEST_OPTIONS,
-			params: { type }
+			params: type ? { type } : {}
 		});
 	}
 

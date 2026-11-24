@@ -19,14 +19,12 @@ import { AUTOSAVE_DELAY_MS, UNDO_GROUP_MS } from 'src/app/config/admin';
 import {
 	DraftContent,
 	DraftPublishRequest,
-	DraftSaveRequest,
 	DraftTarget,
 	EditorContentType
 } from 'src/app/interfaces/api-requests';
 import { ConflictResponse, Draft } from 'src/app/interfaces/api-responses';
 import { ApiStatus } from 'src/app/services/api-status/api-status.service';
 import { DraftsService } from 'src/app/services/drafts/drafts.service';
-import { LocalDraftsService } from 'src/app/services/drafts/local-drafts.service';
 import { ItemOf } from 'src/app/services/editor-content/editor-content-types';
 import {
 	DraftFields,
@@ -34,24 +32,7 @@ import {
 	isSameFields,
 	pickFields
 } from './draft-fields';
-
-/**
- * Where the draft is saved:
- * - `unchanged`: nothing to save (nothing changed, or it would be empty)
- * - `local`: saved in this browser, waiting for the server (offline, or
- *   until typing pauses)
- * - `saving`, `saved`, `failed`: the server's copy
- * - `conflict`: the server refused a save or publish; see `conflict`
- * - `published`: done
- */
-export type AutosaveStatus =
-	| 'unchanged'
-	| 'local'
-	| 'saving'
-	| 'saved'
-	| 'failed'
-	| 'conflict'
-	| 'published';
+import { DraftStore } from './draft-store.service';
 
 /**
  * Why the server refused:
@@ -66,106 +47,119 @@ export type DraftConflict<T extends EditorContentType> =
 	| { kind: 'item'; theirs: ItemOf<T> }
 	| { kind: 'deleted' };
 
+/** Where the draft's changes are. */
+export type SaveState<T extends EditorContentType> =
+	/** Nothing to save: nothing changed, or it would be empty. */
+	| { stage: 'unchanged' }
+	/** In this browser, waiting for the server (offline, or for a pause). */
+	| { stage: 'local' }
+	| { stage: 'saving' }
+	| { stage: 'saved' }
+	| { stage: 'failed' }
+	/** The server refused a save or publish. */
+	| { stage: 'conflict'; conflict: DraftConflict<T> }
+	| { stage: 'published' };
+
+export type SaveStage = SaveState<EditorContentType>['stage'];
+
 /** How an editing session starts. */
 export interface DraftSessionStart<T extends EditorContentType> {
 	type: T;
-	/** The editor (Discord user ID), whose drafts these are. */
-	owner: string;
 	/** An existing draft's ID; a new draft gets one. */
 	id?: string;
 	fields: DraftFields<T>;
 	/** What "no changes" means: the published item's fields, or the draft's. */
 	baseline: DraftFields<T>;
+	/** What the server has, if it has the draft. */
+	savedFields?: DraftFields<T>;
 	/** The published item an edit draft started from. */
 	target?: DraftTarget;
-	/** The server's revision of an existing draft. */
-	revision?: number;
-	/** The fields have changes the server hasn't saved (a local copy). */
-	isPending?: boolean;
 }
 
 /** What a session needs from outside, passed in so it can be tested alone. */
 export interface DraftSessionDeps {
 	drafts: DraftsService;
-	localDrafts: LocalDraftsService;
+	store: DraftStore;
 	apiStatus: Signal<ApiStatus>;
 	createId: () => string;
 }
 
 /**
- * One editing session of an item or draft: its fields, autosaved to this
- * browser as they change and to the server once typing pauses (only once
- * something changed, and never an empty draft); undo and redo within the
- * session; conflicts; and publishing. Call `close()` when done.
+ * One editing session of an item or draft: its fields (kept in this browser
+ * as they change, and saved through `DraftStore` once typing pauses; never
+ * an empty draft, or one of an item before something changed), undo and redo
+ * within the session, conflicts, and publishing. Call `close()` when done.
  */
 export class DraftSession<T extends EditorContentType> {
-	public readonly type: T;
-	private readonly owner: string;
 	private readonly baseline = signal<DraftFields<T>>({});
-	private readonly draftId: ReturnType<typeof signal<string>>;
 	private readonly savedFields = signal<DraftFields<T>>({});
-	private target?: DraftTarget;
-	private revision?: number;
-	private isPending: boolean;
-	private undoStack: DraftFields<T>[] = [];
-	private redoStack: DraftFields<T>[] = [];
-	private lastChange = { keys: '', at: 0 };
+	private readonly draftId: ReturnType<typeof signal<string>>;
+	private readonly isEditSignal = signal(false);
+	private readonly state = signal<SaveState<T>>({ stage: 'unchanged' });
 	private readonly historySize = signal({ undo: 0, redo: 0 });
 	private readonly saveRequests = new Subject<void>();
 	private readonly autosave: Subscription;
+	private target?: DraftTarget;
+	private undoStack: DraftFields<T>[] = [];
+	private redoStack: DraftFields<T>[] = [];
+	private lastChange = { keys: '', at: 0 };
 
+	public readonly type: T;
 	public readonly fields: ReturnType<typeof signal<DraftFields<T>>>;
-	public readonly status = signal<AutosaveStatus>('unchanged');
-	public readonly conflict = signal<DraftConflict<T> | undefined>(undefined);
 	/** Their version of the item, beside the editor's, while merging. */
 	public readonly mergeReference = signal<DraftFields<T> | undefined>(
 		undefined
 	);
 	/** The draft's ID, which is also the new item's createId. */
 	public readonly id: Signal<string>;
+	/** Editing a published item (rather than a new one). */
+	public readonly isEdit = this.isEditSignal.asReadonly();
+
+	/** The save stage; `local` turns `saved` once the store has sent it. */
+	public readonly status = computed<SaveStage>(() => {
+		const { stage } = this.state();
+		return stage === 'local' && !this.deps.store.isPending(this.id())
+			? 'saved'
+			: stage;
+	});
+	public readonly conflict = computed(() => {
+		const state = this.state();
+		return state.stage === 'conflict' ? state.conflict : undefined;
+	});
 	/** Something differs from the published item (or the draft as opened). */
 	public readonly hasChanges = computed(
 		() => !isSameFields(this.fields(), this.baseline())
 	);
 	public readonly canUndo = computed(() => this.historySize().undo > 0);
 	public readonly canRedo = computed(() => this.historySize().redo > 0);
-	/** Editing a published item (rather than a new one). */
-	public readonly isEdit: Signal<boolean>;
-	private readonly isEditSignal = signal(false);
 
 	constructor(
 		start: DraftSessionStart<T>,
 		private readonly deps: DraftSessionDeps
 	) {
 		this.type = start.type;
-		this.owner = start.owner;
 		this.fields = signal(start.fields);
 		this.baseline.set(start.baseline);
-		this.savedFields.set(start.isPending ? {} : start.fields);
+		this.savedFields.set(start.savedFields ?? {});
 		this.draftId = signal(start.id ?? deps.createId());
 		this.id = this.draftId.asReadonly();
 		this.target = start.target;
 		this.isEditSignal.set(!!start.target);
-		this.isEdit = this.isEditSignal.asReadonly();
-		this.revision = start.revision;
-		this.isPending = !!start.isPending;
-		if (start.revision !== undefined) {
-			this.status.set(this.isPending ? 'local' : 'saved');
-		}
 		this.autosave = this.saveRequests
 			.pipe(
 				debounceTime(AUTOSAVE_DELAY_MS),
-				concatMap(() =>
-					this.saveToServer().pipe(catchError(() => EMPTY))
-				)
+				concatMap(() => this.save().pipe(catchError(() => EMPTY)))
 			)
 			.subscribe();
-		if (this.isPending) {
+		if (deps.store.isPending(this.id())) {
+			this.state.set({ stage: 'local' });
 			this.saveRequests.next();
+		} else if (start.savedFields) {
+			this.state.set({ stage: 'saved' });
 		}
 	}
 
-	/** Changes some fields: saved here at once, and to the server on a pause. */
+	/** Changes some fields: kept here at once, saved to the server on a pause. */
 	public update(changes: DraftFields<T>): void {
 		const keys = Object.keys(changes).sort().join();
 		const now = Date.now();
@@ -198,9 +192,9 @@ export class DraftSession<T extends EditorContentType> {
 		}
 	}
 
-	/** Saves to the server now: a retry, or the API is back. */
+	/** Saves to the server now (a retry). */
 	public saveNow(): Observable<void> {
-		return this.saveToServer();
+		return this.save();
 	}
 
 	/** Keeps mine (saved over theirs) or theirs (replacing mine). */
@@ -210,21 +204,23 @@ export class DraftSession<T extends EditorContentType> {
 			return EMPTY;
 		}
 		const { theirs } = conflict;
-		this.conflict.set(undefined);
-		this.switchToDraft(theirs.id);
-		this.revision = theirs.revision;
+		this.state.set({ stage: 'local' });
+		if (theirs.id !== this.id()) {
+			this.deps.store.forget(this.id());
+			this.draftId.set(theirs.id);
+		}
+		this.deps.store.noteRevision(theirs.id, theirs.revision);
 		this.target = theirs.target ?? this.target;
+		const theirFields = pickFields(this.type, theirs.fields);
+		this.savedFields.set(theirFields);
 		if (keep === 'theirs') {
-			const fields = pickFields(this.type, theirs.fields);
-			this.fields.set(fields);
-			this.savedFields.set(fields);
-			this.isPending = false;
-			this.status.set('saved');
-			this.saveLocally();
+			this.fields.set(theirFields);
+			this.deps.store.dropCopy(this.id());
+			this.state.set({ stage: 'saved' });
 			return of(undefined);
 		}
-		this.isPending = true;
-		return this.saveToServer();
+		this.keepLocally();
+		return this.save();
 	}
 
 	/**
@@ -239,7 +235,6 @@ export class DraftSession<T extends EditorContentType> {
 			return EMPTY;
 		}
 		const { theirs } = conflict;
-		this.conflict.set(undefined);
 		if (how === 'merge') {
 			this.mergeReference.set(pickFields(this.type, theirs));
 		}
@@ -249,8 +244,9 @@ export class DraftSession<T extends EditorContentType> {
 	}
 
 	/**
-	 * Publishes the draft, saving it first. A refusal sets `conflict` (and
-	 * still errors, so the caller can stop).
+	 * Publishes the draft, making sure the server has it first (even an edit
+	 * with nothing changed). A refusal sets `conflict` (and still errors, so
+	 * the caller can stop).
 	 */
 	public publish(options: DraftPublishRequest): Observable<ItemOf<T>> {
 		return defer(() => {
@@ -262,11 +258,10 @@ export class DraftSession<T extends EditorContentType> {
 						)
 				);
 			}
-			const save =
-				this.isPending || this.revision === undefined
-					? this.saveToServer()
-					: of(undefined);
-			return save.pipe(
+			if (this.deps.store.revisionOf(this.id()) === undefined) {
+				this.keepLocally();
+			}
+			return this.save().pipe(
 				switchMap(() => {
 					if (this.conflict()) {
 						return throwError(
@@ -276,9 +271,9 @@ export class DraftSession<T extends EditorContentType> {
 					return this.deps.drafts.publishDraft<T>(this.id(), options);
 				}),
 				tap(() => {
-					this.deps.localDrafts.remove(this.id());
-					this.status.set('published');
-					this.close();
+					this.deps.store.forget(this.id());
+					this.state.set({ stage: 'published' });
+					this.autosave.unsubscribe();
 				}),
 				catchError((error: unknown) => this.toPublishConflict(error))
 			);
@@ -287,17 +282,19 @@ export class DraftSession<T extends EditorContentType> {
 
 	/** The item was deleted: publishes the edit as a new item instead. */
 	public publishAsNew(options: DraftPublishRequest): Observable<ItemOf<T>> {
-		this.conflict.set(undefined);
+		this.state.set({ stage: 'local' });
 		return this.publish({ ...options, asNew: true });
 	}
 
 	/** Deletes the draft here and on the server. */
 	public discard(): Observable<void> {
-		this.close();
-		this.deps.localDrafts.remove(this.id());
-		return this.revision === undefined
-			? of(undefined)
-			: this.deps.drafts.deleteDraft(this.id());
+		this.autosave.unsubscribe();
+		const id = this.id();
+		if (this.deps.store.revisionOf(id) === undefined) {
+			this.deps.store.forget(id);
+			return of(undefined);
+		}
+		return this.deps.store.delete(id);
 	}
 
 	/** The published item an edit draft is of. */
@@ -305,9 +302,20 @@ export class DraftSession<T extends EditorContentType> {
 		return this.target?.id;
 	}
 
-	/** Stops autosaving; a pending change stays in this browser to sync later. */
+	/**
+	 * Stops autosaving, sending a waiting change now (if the server can be
+	 * reached; otherwise it stays in this browser to sync later).
+	 */
 	public close(): void {
 		this.autosave.unsubscribe();
+		const id = this.id();
+		if (
+			this.deps.store.isPending(id) &&
+			!this.conflict() &&
+			this.deps.apiStatus() === 'up'
+		) {
+			this.deps.store.send(id).subscribe({ error: () => undefined });
+		}
 	}
 
 	private setFields(fields: DraftFields<T>): void {
@@ -317,66 +325,59 @@ export class DraftSession<T extends EditorContentType> {
 			redo: this.redoStack.length
 		});
 		if (!this.isWorthKeeping()) {
-			this.status.set('unchanged');
+			this.deps.store.dropCopy(this.id());
+			this.state.set({ stage: 'unchanged' });
 			return;
 		}
-		this.isPending = !isSameFields(fields, this.savedFields());
-		this.saveLocally();
-		if (this.isPending) {
-			this.status.set('local');
-			this.saveRequests.next();
+		if (isSameFields(fields, this.savedFields())) {
+			// Back to what the server has: nothing to send.
+			this.deps.store.dropCopy(this.id());
+			this.state.set({ stage: 'saved' });
+			return;
 		}
+		this.keepLocally();
+		this.saveRequests.next();
 	}
 
 	/** No empty drafts, and none of an item until something changed. */
 	private isWorthKeeping(): boolean {
 		return (
-			this.revision !== undefined ||
+			this.deps.store.revisionOf(this.id()) !== undefined ||
 			(this.hasChanges() && !isEmptyDraft(this.fields()))
 		);
 	}
 
-	private saveLocally(): void {
-		this.deps.localDrafts.save({
-			...this.content(),
+	private keepLocally(): void {
+		this.deps.store.keep({
+			...({ type: this.type, fields: this.fields() } as DraftContent),
 			id: this.id(),
-			owner: this.owner,
-			target: this.target,
-			revision: this.revision,
-			isPending: this.isPending,
-			updatedAt: new Date().toISOString()
+			target: this.target
 		});
+		if (!this.conflict()) {
+			this.state.set({ stage: 'local' });
+		}
 	}
 
-	private content(): DraftContent {
-		return { type: this.type, fields: this.fields() } as DraftContent;
-	}
-
-	private saveToServer(): Observable<void> {
+	private save(): Observable<void> {
 		return defer(() => {
-			if (!this.isPending || !this.isWorthKeeping() || this.conflict()) {
+			if (!this.deps.store.isPending(this.id()) || this.conflict()) {
 				return of(undefined);
 			}
 			if (this.deps.apiStatus() !== 'up') {
-				this.status.set('local');
+				this.state.set({ stage: 'local' });
 				return of(undefined);
 			}
-			const sent = this.fields();
-			const request: DraftSaveRequest = {
-				...this.content(),
-				...(this.revision === undefined
-					? { target: this.target }
-					: { startingRevision: this.revision })
-			};
-			this.status.set('saving');
-			return this.deps.drafts.saveDraft(this.id(), request).pipe(
-				map((draft) => {
-					this.revision = draft.revision;
-					this.savedFields.set(sent);
-					this.isPending = !isSameFields(this.fields(), sent);
-					this.status.set(this.isPending ? 'local' : 'saved');
-					this.saveLocally();
-					if (this.isPending) {
+			this.state.set({ stage: 'saving' });
+			return this.deps.store.send(this.id()).pipe(
+				map((saved) => {
+					if (saved) {
+						this.savedFields.set(
+							pickFields(this.type, saved.fields)
+						);
+					}
+					const isPending = this.deps.store.isPending(this.id());
+					this.state.set({ stage: isPending ? 'local' : 'saved' });
+					if (isPending) {
 						this.saveRequests.next();
 					}
 				}),
@@ -391,42 +392,40 @@ export class DraftSession<T extends EditorContentType> {
 			const theirs = (error as HttpErrorResponse).error as
 				ConflictResponse<Draft> | undefined;
 			if (theirs?.current) {
-				this.conflict.set({ kind: 'draft', theirs: theirs.current });
-				this.status.set('conflict');
+				this.state.set({
+					stage: 'conflict',
+					conflict: { kind: 'draft', theirs: theirs.current }
+				});
 				return of(undefined);
 			}
 		}
-		if (status === HttpStatusCode.NotFound && this.revision !== undefined) {
+		if (
+			status === HttpStatusCode.NotFound &&
+			this.deps.store.revisionOf(this.id()) !== undefined
+		) {
 			// Deleted elsewhere: keep the work as a new draft.
 			return this.moveToNewDraft();
 		}
-		this.status.set('failed');
+		this.state.set({ stage: 'failed' });
 		return throwError(() => error);
 	}
 
 	/** Carries the fields over to a new draft, deleting the old one. */
 	private moveToNewDraft(): Observable<void> {
 		const oldId = this.id();
-		const hadServerCopy = this.revision !== undefined;
-		this.deps.localDrafts.remove(oldId);
+		const hadServerCopy = this.deps.store.revisionOf(oldId) !== undefined;
+		this.deps.store.forget(oldId);
 		this.draftId.set(this.deps.createId());
-		this.revision = undefined;
-		this.isPending = true;
-		this.saveLocally();
+		this.savedFields.set({});
+		this.state.set({ stage: 'local' });
+		this.keepLocally();
 		if (hadServerCopy) {
-			this.deps.drafts
-				.deleteDraft(oldId)
+			this.deps.store
+				.delete(oldId)
 				.pipe(catchError(() => EMPTY))
 				.subscribe();
 		}
-		return this.saveToServer();
-	}
-
-	private switchToDraft(id: string): void {
-		if (id !== this.id()) {
-			this.deps.localDrafts.remove(this.id());
-			this.draftId.set(id);
-		}
+		return this.save();
 	}
 
 	private toPublishConflict(error: unknown): Observable<never> {
@@ -434,14 +433,18 @@ export class DraftSession<T extends EditorContentType> {
 			const theirs = (error.error as ConflictResponse<ItemOf<T>> | null)
 				?.current;
 			if (error.status === HttpStatusCode.Conflict && theirs) {
-				this.conflict.set({ kind: 'item', theirs });
-				this.status.set('conflict');
+				this.state.set({
+					stage: 'conflict',
+					conflict: { kind: 'item', theirs }
+				});
 			} else if (
 				error.status === HttpStatusCode.NotFound &&
 				this.target
 			) {
-				this.conflict.set({ kind: 'deleted' });
-				this.status.set('conflict');
+				this.state.set({
+					stage: 'conflict',
+					conflict: { kind: 'deleted' }
+				});
 			}
 		}
 		return throwError(() => error);

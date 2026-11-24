@@ -32,6 +32,7 @@ import {
 } from 'src/app/services/editor-content/editor-content-types';
 import { EditorContentService } from 'src/app/services/editor-content/editor-content.service';
 import { LoadState } from 'src/app/utilities/load-state';
+import { DraftStore } from '../../drafts/draft-store.service';
 import { EDITOR_TYPES } from '../../editor-types';
 import {
 	ListRow,
@@ -43,7 +44,6 @@ import {
 import { ListFilters } from './list-filters/list-filters.component';
 import { fromListParams, toListParams } from './list-params';
 import { ListSelection } from './list-selection';
-import { LocalDraftsService } from 'src/app/services/drafts/local-drafts.service';
 
 type Item = SummaryOf<EditorContentType>;
 
@@ -58,7 +58,7 @@ export class EditorListStore {
 	private router = inject(Router);
 	private editorContent = inject(EditorContentService);
 	private draftsService = inject(DraftsService);
-	private localDrafts = inject(LocalDraftsService);
+	private draftStore = inject(DraftStore);
 	private auth = inject(AuthService);
 
 	private readonly params = toSignal(
@@ -206,10 +206,9 @@ export class EditorListStore {
 			: of({ items: [], total: 0 });
 		const drafts = this.draftsService.fetchDrafts(type).pipe(
 			catchError(() => of(this.loaded()?.drafts ?? [])),
-			map((serverDrafts) => [
-				...this.localOnlyDrafts(type),
-				...serverDrafts
-			])
+			map((serverDrafts) =>
+				this.draftStore.withPending(serverDrafts, type)
+			)
 		);
 		return combineLatest([items, drafts]).pipe(
 			tap(([page, drafts]) => {
@@ -222,29 +221,6 @@ export class EditorListStore {
 			}),
 			finalize(() => this.isLoading.set(false))
 		);
-	}
-
-	/** Drafts saved only in this browser (made offline), not yet on the server. */
-	private localOnlyDrafts(type: EditorContentType): DraftSummary[] {
-		const owner = this.auth.user()?.id;
-		if (!owner) {
-			return [];
-		}
-		return this.localDrafts
-			.list(owner, type)
-			.filter(({ revision }) => revision === undefined)
-			.map(
-				({ id, fields, target, updatedAt }) =>
-					({
-						id,
-						type,
-						fields,
-						target,
-						revision: 0,
-						createdAt: updatedAt,
-						updatedAt
-					}) as DraftSummary
-			);
 	}
 
 	private navigate(queryParams: Record<string, string | null>): void {

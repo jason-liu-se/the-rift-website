@@ -1,29 +1,24 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of, switchMap, throwError } from 'rxjs';
 import { EditorContentType } from 'src/app/interfaces/api-requests';
-import { Draft } from 'src/app/interfaces/api-responses';
 import { ApiStatusService } from 'src/app/services/api-status/api-status.service';
-import { AuthService } from 'src/app/services/auth/auth.service';
 import { DraftsService } from 'src/app/services/drafts/drafts.service';
-import {
-	LocalDraft,
-	LocalDraftsService
-} from 'src/app/services/drafts/local-drafts.service';
+import { LocalDraft } from 'src/app/services/drafts/local-drafts.service';
 import { ItemOf } from 'src/app/services/editor-content/editor-content-types';
 import { DraftFields, pickFields } from './draft-fields';
 import { DraftSession, DraftSessionStart } from './draft-session';
+import { DraftStore } from './draft-store.service';
 
 /**
- * Starts editing sessions: a new item, a copy of one, an edit of a published
- * item (resuming the editor's draft of it, if any), or an existing draft
- * (this browser's copy, if it has changes the server hasn't saved).
+ * Starts editing sessions: a new item, an edit of a published item (resuming
+ * the editor's draft of it, if any), or an existing draft (with this
+ * browser's waiting change on top, if it has one).
  */
 @Injectable({ providedIn: 'root' })
 export class DraftSessionsService {
 	private drafts = inject(DraftsService);
-	private localDrafts = inject(LocalDraftsService);
+	private store = inject(DraftStore);
 	private apiStatus = inject(ApiStatusService);
-	private auth = inject(AuthService);
 
 	/** A new item, starting from `fields` (defaults, which aren't changes). */
 	public startNew<T extends EditorContentType>(
@@ -33,34 +28,23 @@ export class DraftSessionsService {
 		return this.create({ type, fields, baseline: fields });
 	}
 
-	/** A new draft with the item's fields (Duplicate). */
-	public startCopy<T extends EditorContentType>(
-		type: T,
-		item: ItemOf<T>
-	): DraftSession<T> {
-		return this.create({
-			type,
-			fields: pickFields(type, item),
-			baseline: {}
-		});
-	}
-
 	/** Edits a published item, carrying on with the editor's draft of it. */
 	public startEdit<T extends EditorContentType>(
 		type: T,
 		item: ItemOf<T>
 	): Observable<DraftSession<T>> {
-		const local = this.localDrafts
-			.list(this.owner(), type)
+		const published = pickFields(type, item);
+		const waiting = this.store
+			.pendingCopies(type)
 			.find(({ target }) => target?.id === item.id);
-		if (local) {
-			return of(this.fromLocal(type, local, pickFields(type, item)));
+		if (waiting) {
+			return of(this.fromCopy(type, waiting, published));
 		}
 		const fresh = () =>
 			this.create({
 				type,
-				fields: pickFields(type, item),
-				baseline: pickFields(type, item),
+				fields: published,
+				baseline: published,
 				target: { id: item.id, startingRevision: item.revision }
 			});
 		return this.drafts.fetchDrafts(type).pipe(
@@ -74,76 +58,62 @@ export class DraftSessionsService {
 		);
 	}
 
-	/** Opens a draft by ID: the server's, or this browser's newer copy. */
+	/**
+	 * Opens a draft by ID: the server's, with this browser's waiting change
+	 * on top (sending it may then find a conflict for the editor to resolve).
+	 */
 	public openDraft<T extends EditorContentType>(
 		type: T,
 		id: string
 	): Observable<DraftSession<T>> {
-		const local = this.localDrafts.find(id);
+		const waiting = this.store.findPending(id);
 		return this.drafts.fetchDraft(id).pipe(
-			map((draft) =>
-				local?.isPending && local.revision === draft.revision
-					? this.fromLocal(
+			map((draft) => {
+				this.store.noteRevision(draft.id, draft.revision);
+				const saved = pickFields(type, draft.fields);
+				return waiting
+					? this.fromCopy(type, waiting, saved, saved)
+					: this.create({
 							type,
-							local,
-							pickFields(type, draft.fields)
-						)
-					: this.fromServer(type, draft)
-			),
+							id: draft.id,
+							fields: saved,
+							baseline: saved,
+							savedFields: saved,
+							target: draft.target
+						});
+			}),
 			catchError((error: unknown) =>
-				local
-					? of(this.fromLocal(type, local, {}))
+				waiting
+					? of(this.fromCopy(type, waiting, {}))
 					: throwError(() => error)
 			)
 		);
 	}
 
-	private fromServer<T extends EditorContentType>(
+	private fromCopy<T extends EditorContentType>(
 		type: T,
-		draft: Draft
-	): DraftSession<T> {
-		const fields = pickFields(type, draft.fields);
-		return this.create({
-			type,
-			id: draft.id,
-			fields,
-			baseline: fields,
-			target: draft.target,
-			revision: draft.revision
-		});
-	}
-
-	private fromLocal<T extends EditorContentType>(
-		type: T,
-		local: LocalDraft,
-		baseline: DraftFields<T>
+		copy: LocalDraft,
+		baseline: DraftFields<T>,
+		savedFields?: DraftFields<T>
 	): DraftSession<T> {
 		return this.create({
 			type,
-			id: local.id,
-			fields: pickFields(type, local.fields),
+			id: copy.id,
+			fields: pickFields(type, copy.fields),
 			baseline,
-			target: local.target,
-			revision: local.revision,
-			isPending: local.isPending
+			savedFields,
+			target: copy.target
 		});
 	}
 
 	private create<T extends EditorContentType>(
-		start: Omit<DraftSessionStart<T>, 'owner'>
+		start: DraftSessionStart<T>
 	): DraftSession<T> {
-		return new DraftSession(
-			{ ...start, owner: this.owner() },
-			{
-				drafts: this.drafts,
-				localDrafts: this.localDrafts,
-				apiStatus: this.apiStatus.status,
-				createId: () => crypto.randomUUID()
-			}
-		);
-	}
-
-	private owner(): string {
-		return this.auth.user()?.id ?? '';
+		return new DraftSession(start, {
+			drafts: this.drafts,
+			store: this.store,
+			apiStatus: this.apiStatus.status,
+			createId: () => crypto.randomUUID()
+		});
 	}
 }

@@ -9,7 +9,6 @@ import {
 	reduce,
 	catchError,
 	of,
-	tap,
 	toArray
 } from 'rxjs';
 import { EDITOR_PAGE_SIZE, MAX_BULK_ITEMS } from 'src/app/config/admin';
@@ -17,16 +16,14 @@ import {
 	BulkItemRef,
 	EditorContentType
 } from 'src/app/interfaces/api-requests';
-import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { BulkItemResult, BulkResponse } from 'src/app/interfaces/api-responses';
-import { DraftsService } from 'src/app/services/drafts/drafts.service';
-import { LocalDraftsService } from 'src/app/services/drafts/local-drafts.service';
 import {
 	BulkActionOf,
 	BulkUpdateRequestOf,
 	ListQueryOf
 } from 'src/app/services/editor-content/editor-content-types';
 import { EditorContentService } from 'src/app/services/editor-content/editor-content.service';
+import { DraftStore } from '../../drafts/draft-store.service';
 import { describeWriteError } from '../../utilities/write-errors';
 import {
 	BulkSummary,
@@ -43,8 +40,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class BulkActionRunnerService {
 	private editorContent = inject(EditorContentService);
-	private drafts = inject(DraftsService);
-	private localDrafts = inject(LocalDraftsService);
+	private draftStore = inject(DraftStore);
 
 	public run<T extends EditorContentType>(
 		type: T,
@@ -77,27 +73,15 @@ export class BulkActionRunnerService {
 	public deleteDrafts(ids: readonly string[]): Observable<BulkSummary> {
 		return from(ids).pipe(
 			concatMap((id) =>
-				this.drafts.deleteDraft(id).pipe(
+				this.draftStore.delete(id).pipe(
 					map((): BulkItemResult<never> => ({ id, outcome: 'ok' })),
-					// Already gone (or only ever in this browser): deleted.
 					catchError((error: unknown) =>
-						of<BulkItemResult<never>>(
-							error instanceof HttpErrorResponse &&
-								error.status === HttpStatusCode.NotFound
-								? { id, outcome: 'ok' }
-								: {
-										id,
-										outcome: 'invalid',
-										reason: describeWriteError(error)
-									}
-						)
-					),
-					// This browser's copy goes too, or it would sync the draft back.
-					tap(({ outcome }) => {
-						if (outcome === 'ok') {
-							this.localDrafts.remove(id);
-						}
-					})
+						of<BulkItemResult<never>>({
+							id,
+							outcome: 'invalid',
+							reason: describeWriteError(error)
+						})
+					)
 				)
 			),
 			toArray(),
