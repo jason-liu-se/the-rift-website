@@ -25,9 +25,8 @@
 		(selectAllMatching)="selectAllMatching()"
 		(clearSelection)="selection.clear()"
 	>
-		<!-- Passed on from the tool, so the bar can place it. -->
 		<ng-container ngProjectAs="[bulkActions]">
-			<ng-content select="[bulkActions]" />
+			<ng-container *ngComponentOutlet="config().bulkActions ?? null" />
 		</ng-container>
 	</app-bulk-action-bar>
 }
@@ -151,16 +150,12 @@
 						/>
 					</td>
 					<td class="item">
-						@if (itemTemplate(); as template) {
-							<ng-container
-								*ngTemplateOutlet="
-									template;
-									context: { $implicit: item }
-								"
-							/>
-						} @else {
-							{{ itemName(item) }}
-						}
+						<ng-container
+							*ngComponentOutlet="
+								config().itemCell;
+								inputs: { item }
+							"
+						/>
 					</td>
 					<td data-label="Status">
 						<app-status-badge

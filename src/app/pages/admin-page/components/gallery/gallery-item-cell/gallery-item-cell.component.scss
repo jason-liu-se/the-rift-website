@@ -1,0 +1,21 @@
+@use "../../../../../../font-sizes" as *;
+
+:host {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.thumbnail {
+	flex: none;
+	width: 4rem;
+	aspect-ratio: 16 / 9;
+	border-radius: 4px;
+	object-fit: cover;
+}
+
+.details {
+	display: block;
+	font-size: $font-size-x-small;
+	font-weight: 400;
+}

@@ -7,24 +7,25 @@ import {
 	output,
 	signal
 } from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatCheckbox } from '@angular/material/checkbox';
-import { MatDialog } from '@angular/material/dialog';
 import { MatFormField, MatHint, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
-import { Observable, filter, switchMap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import {
 	MAX_COLLECTION_SLUG_LENGTH,
 	MAX_COLLECTION_TITLE_LENGTH
 } from 'src/app/config/content-limits';
 import { EditorCollection } from 'src/app/interfaces/api-responses';
-import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
 import { CollectionContentType } from 'src/app/services/editor-content/editor-content-types';
 import { EditorContentService } from 'src/app/services/editor-content/editor-content.service';
 import { describeWriteError } from '../../utilities/write-errors';
-import { confirmAction } from '../confirm-dialog/confirm-dialog.component';
+import { CollectionsStore } from '../../services/collections-store.service';
+import {
+	EditorWrite,
+	EditorWriteService
+} from '../../services/editor-write.service';
 import { ItemNoun, countItems } from '../editor-list/bulk-results';
 
 /** A collection's slug, as the API takes it: kebab-case. */
@@ -61,8 +62,8 @@ export function findSlugProblem(slug: string): string | undefined {
 })
 export class CollectionsManagerComponent {
 	private editorContent = inject(EditorContentService);
-	private notifier = inject(AdminNotifierService);
-	private dialog = inject(MatDialog);
+	private writer = inject(EditorWriteService);
+	private store = inject(CollectionsStore);
 
 	public readonly type = input.required<CollectionContentType>();
 	/** How the collection's items are named: "image", "images". */
@@ -72,11 +73,14 @@ export class CollectionsManagerComponent {
 
 	protected readonly maxSlugLength = MAX_COLLECTION_SLUG_LENGTH;
 	protected readonly maxTitleLength = MAX_COLLECTION_TITLE_LENGTH;
-	protected readonly collections = signal<EditorCollection[]>([]);
 	protected readonly slug = signal('');
 	protected readonly title = signal('');
 	protected readonly isVisible = signal(true);
 	protected readonly isSaving = signal(false);
+
+	protected readonly collections = computed(
+		() => this.store.collections(this.type())() ?? []
+	);
 	protected readonly slugProblem = computed(() =>
 		findSlugProblem(this.slug())
 	);
@@ -88,99 +92,72 @@ export class CollectionsManagerComponent {
 			!this.isSaving()
 	);
 
-	constructor() {
-		toObservable(this.type)
-			.pipe(
-				switchMap((type) => this.editorContent.fetchCollections(type))
-			)
-			.subscribe({
-				next: (collections) => this.collections.set(collections),
-				error: (error: unknown) =>
-					this.notifier.notifyFailure(
-						`Couldn't load the collections. ${describeWriteError(error)}`
-					)
-			});
-	}
-
 	protected createCollection(): void {
 		const title = this.title().trim();
+		const slug = this.slug();
 		this.isSaving.set(true);
-		this.write(
-			this.editorContent.createCollection(this.type(), {
-				slug: this.slug(),
-				title,
-				visible: this.isVisible()
-			}),
-			`Created ${title}.`,
-			() => {
+		this.write({
+			request: () =>
+				this.editorContent.createCollection(this.type(), {
+					slug,
+					title,
+					visible: this.isVisible()
+				}),
+			success: `Created ${title}.`,
+			describeFailure: (error) =>
+				isSlugTaken(error)
+					? `The slug ${slug} is taken. Choose another.`
+					: describeWriteError(error)
+		}).subscribe((isCreated) => {
+			this.isSaving.set(false);
+			if (isCreated) {
 				this.slug.set('');
 				this.title.set('');
 			}
-		);
+		});
 	}
 
 	protected toggleVisibility(collection: EditorCollection): void {
-		this.write(
-			this.editorContent.updateCollection(this.type(), collection.slug, {
-				visible: !collection.visible,
-				startingRevision: collection.revision
-			}),
-			`${collection.visible ? 'Hid' : 'Showed'} ${collection.title}.`
-		);
+		this.write({
+			request: () =>
+				this.editorContent.updateCollection(
+					this.type(),
+					collection.slug,
+					{
+						visible: !collection.visible,
+						startingRevision: collection.revision
+					}
+				),
+			success: `${collection.visible ? 'Hid' : 'Showed'} ${collection.title}.`
+		}).subscribe();
 	}
 
 	protected deleteCollection(collection: EditorCollection): void {
 		const items = countItems(collection.itemCount, this.itemNoun());
-		confirmAction(this.dialog, {
-			title: `Delete ${collection.title}?`,
-			message: `This deletes the collection and the ${items} in it. It can't be undone.`,
-			confirmLabel: `Delete it and ${items}`
-		})
-			.pipe(filter(Boolean))
-			.subscribe(() =>
-				this.write(
-					this.editorContent.deleteCollection(
-						this.type(),
-						collection.slug,
-						collection.revision
-					),
-					`Deleted ${collection.title} and ${items}.`
-				)
-			);
+		this.write({
+			confirm: {
+				title: `Delete ${collection.title}?`,
+				message: `This deletes the collection and the ${items} in it. It can't be undone.`,
+				confirmLabel: `Delete it and ${items}`
+			},
+			request: () =>
+				this.editorContent.deleteCollection(
+					this.type(),
+					collection.slug,
+					collection.revision
+				),
+			success: `Deleted ${collection.title} and ${items}.`
+		}).subscribe();
 	}
 
-	private write(
-		request: Observable<unknown>,
-		successMessage: string,
-		onSuccess?: () => void
-	): void {
-		request.subscribe({
-			next: () => {
-				this.notifier.notifySuccess(successMessage);
-				onSuccess?.();
-			},
-			error: (error: unknown) => {
-				this.isSaving.set(false);
-				this.notifier.notifyFailure(
-					isSlugTaken(error)
-						? `The slug ${this.slug()} is taken. Choose another.`
-						: describeWriteError(error)
-				);
-				this.reload();
-			},
-			complete: () => {
-				this.isSaving.set(false);
-				this.reload();
-			}
-		});
-	}
-
-	private reload(): void {
-		this.editorContent.fetchCollections(this.type()).subscribe({
-			next: (collections) => this.collections.set(collections),
-			error: () => undefined
-		});
-		this.changed.emit();
+	/** Runs the write, then reloads the collections and tells the list. */
+	private write(write: EditorWrite): Observable<boolean> {
+		return this.writer.run(write).pipe(
+			tap(() => {
+				this.store.reload(this.type());
+				this.changed.emit();
+			})
+		);
 	}
 }
 

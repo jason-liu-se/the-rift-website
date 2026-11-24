@@ -15,10 +15,13 @@ export function describeFieldValue(value: unknown): string {
 	return String(value);
 }
 
-/** Each field's name and value, in order. */
-export function toFieldRows(fields: object): { name: string; value: string }[] {
-	return Object.entries(fields).map(([name, value]) => ({
-		name,
-		value: describeFieldValue(value)
+/** Each labelled field's label and value, in the labels' order. */
+export function toFieldRows(
+	fields: object,
+	labels: Record<string, string>
+): { name: string; value: string }[] {
+	return Object.entries(labels).map(([key, label]) => ({
+		name: label,
+		value: describeFieldValue((fields as Record<string, unknown>)[key])
 	}));
 }

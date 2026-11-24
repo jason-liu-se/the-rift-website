@@ -32,19 +32,9 @@
 			</h1>
 		</header>
 		<div class="tool-card">
-			@switch (activeTool().id) {
-				@case ("downloads") {
-					<app-downloads-tool />
-				}
-				@case ("gallery") {
-					<app-gallery-tool />
-				}
-				@case ("maps") {
-					<app-maps-tool />
-				}
-				@default {
-					<app-news-tool />
-				}
+			<!-- One tool at a time: switching tools starts the new one afresh. -->
+			@for (tool of [activeTool()]; track tool.id) {
+				<app-content-tool [type]="tool.id" />
 			}
 		</div>
 	</div>

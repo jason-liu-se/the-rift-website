@@ -14,6 +14,7 @@ import { ApiStatusService } from 'src/app/services/api-status/api-status.service
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { environment } from 'src/environments/environment';
 import { ContentToolComponent } from './content-tool.component';
+import { CollectionsStore } from '../../services/collections-store.service';
 
 const EDITOR_URL = `${environment.API_URL}/editor`;
 const POST: EditorNewsPost = {
@@ -27,22 +28,7 @@ const POST: EditorNewsPost = {
 };
 
 @Component({
-	template: `
-		<app-content-tool
-			type="news"
-			[noun]="{ one: 'post', many: 'posts' }"
-			[searchFields]="[]"
-			[fieldsTemplate]="fields"
-			[hasDate]="true"
-		/>
-		<ng-template #fields let-session>
-			<input
-				aria-label="Title"
-				[value]="session.fields().title ?? ''"
-				(input)="session.update({ title: $any($event.target).value })"
-			/>
-		</ng-template>
-	`,
+	template: `<app-content-tool type="news" />`,
 	imports: [ContentToolComponent]
 })
 class NewsToolHostComponent {}
@@ -59,6 +45,10 @@ describe('ContentToolComponent', () => {
 			(candidate) => candidate.textContent?.trim() === name
 		)!;
 	const url = () => TestBed.inject(Router).url;
+	const titleInput = () =>
+		[...element().querySelectorAll('input')].find((input) =>
+			input.labels?.[0]?.textContent?.includes('Title')
+		)!;
 	/** Answers the list's requests, if it's showing. */
 	const flushList = () => {
 		httpTesting
@@ -89,6 +79,7 @@ describe('ContentToolComponent', () => {
 		notifySuccess = vi.fn();
 		TestBed.configureTestingModule({
 			providers: [
+				CollectionsStore,
 				provideHttpClient(),
 				provideHttpClientTesting(),
 				provideRouter([
@@ -154,9 +145,7 @@ describe('ContentToolComponent', () => {
 			]
 		});
 		await open('/admin?new#news');
-		const input = element().querySelector<HTMLInputElement>(
-			'input[aria-label="Title"]'
-		)!;
+		const input = titleInput();
 		input.value = 'Hello';
 		input.dispatchEvent(new Event('input'));
 		harness.detectChanges();
@@ -195,11 +184,7 @@ describe('ContentToolComponent', () => {
 		harness.detectChanges();
 
 		expect(heading()).toBe('Editing Published title');
-		expect(
-			element().querySelector<HTMLInputElement>(
-				'input[aria-label="Title"]'
-			)!.value
-		).toBe('Published title');
+		expect(titleInput().value).toBe('Published title');
 		expect(element().textContent).toContain('Keep its date');
 		// Nothing changed, so no draft yet.
 		expect(element().textContent).not.toContain('Unpublished changes');

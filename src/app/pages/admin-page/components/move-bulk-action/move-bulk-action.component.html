@@ -4,7 +4,7 @@
 		[ngModel]="targetCollection()"
 		(ngModelChange)="targetCollection.set($event)"
 	>
-		@for (collection of collections(); track collection.slug) {
+		@for (collection of collections() ?? []; track collection.slug) {
 			<mat-option [value]="collection.slug">{{
 				collection.title
 			}}</mat-option>

@@ -10,6 +10,7 @@ import { ApiStatusService } from 'src/app/services/api-status/api-status.service
 import { EDITOR_GALLERY_COLLECTIONS } from 'src/app/testing/api-fixtures';
 import { environment } from 'src/environments/environment';
 import { GalleryBulkCreateComponent } from './gallery-bulk-create.component';
+import { CollectionsStore } from '../../../services/collections-store.service';
 
 const EDITOR_URL = `${environment.API_URL}/editor`;
 
@@ -52,6 +53,7 @@ describe('GalleryBulkCreateComponent', () => {
 		TestBed.configureTestingModule({
 			imports: [GalleryBulkCreateComponent],
 			providers: [
+				CollectionsStore,
 				provideHttpClient(),
 				provideHttpClientTesting(),
 				{

@@ -1,0 +1,7 @@
+{{ item().title }}
+<span class="details"
+	>{{ item().collection
+	}}{{
+		item().sortOrder !== undefined ? " · #" + item().sortOrder : ""
+	}}</span
+>

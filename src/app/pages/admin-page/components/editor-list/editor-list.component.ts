@@ -1,8 +1,7 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { NgTemplateOutlet } from '@angular/common';
+import { NgComponentOutlet } from '@angular/common';
 import {
 	Component,
-	TemplateRef,
 	computed,
 	effect,
 	inject,
@@ -48,7 +47,6 @@ import {
 } from 'src/app/interfaces/api-requests';
 import {
 	DraftSummary,
-	EditorCollection,
 	PaginatedResponse
 } from 'src/app/interfaces/api-responses';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
@@ -64,7 +62,11 @@ import {
 import { EditorContentService } from 'src/app/services/editor-content/editor-content.service';
 import { FallbackPanelComponent } from 'src/app/components/fallback-panel/fallback-panel.component';
 import { LoadState } from 'src/app/utilities/load-state';
+import { EDITOR_TYPES, toCollectionType } from '../../editor-types';
+import { CollectionsStore } from '../../services/collections-store.service';
+import { EditorWriteService } from '../../services/editor-write.service';
 import { describeWriteError } from '../../utilities/write-errors';
+import { BULK_ACTION_HOST, BulkActionHost } from './bulk-action-host';
 import { confirmAction } from '../confirm-dialog/confirm-dialog.component';
 import { EditorAvatarComponent } from '../editor-avatar/editor-avatar.component';
 import { StatusBadgeComponent } from '../status-badge/status-badge.component';
@@ -78,29 +80,11 @@ import { ListSelection, PageRows } from './list-selection';
 import { fromListParams, toListParams } from './list-params';
 import { itemName } from './item-name';
 import {
-	FilterOption,
 	ListFilters,
 	ListFiltersComponent
 } from './list-filters/list-filters.component';
 
 const DRAFTS: ItemNoun = { one: 'draft', many: 'drafts' };
-
-const STATUS_FILTERS: Record<'news' | 'other', FilterOption[]> = {
-	news: [
-		{ value: 'live', label: 'Live' },
-		{ value: 'scheduled', label: 'Scheduled' },
-		{ value: 'hidden', label: 'Hidden' }
-	],
-	other: [
-		{ value: 'live', label: 'Live' },
-		{ value: 'hidden', label: 'Hidden' }
-	]
-};
-
-/** An item's row; each content type's own cell is `itemTemplate`. */
-export interface ItemTemplateContext<T extends EditorContentType> {
-	$implicit: SummaryOf<T>;
-}
 
 /**
  * One admin tool's list: every item of its type, public or not, with the
@@ -125,17 +109,24 @@ export interface ItemTemplateContext<T extends EditorContentType> {
 		MatMenuItem,
 		MatMenuTrigger,
 		MatPaginator,
-		NgTemplateOutlet,
+		NgComponentOutlet,
 		StatusBadgeComponent
+	],
+	providers: [
+		{ provide: BULK_ACTION_HOST, useExisting: EditorListComponent }
 	],
 	host: { '(keydown)': 'handleSelectionKeys($event)' }
 })
-export class EditorListComponent<T extends EditorContentType> {
+export class EditorListComponent<
+	T extends EditorContentType
+> implements BulkActionHost {
 	private editorContent = inject(EditorContentService);
 	private draftsService = inject(DraftsService);
 	private localDrafts = inject(LocalDraftsService);
 	private auth = inject(AuthService);
 	private bulkRunner = inject(BulkActionRunnerService);
+	private writer = inject(EditorWriteService);
+	private collectionsStore = inject(CollectionsStore);
 	private notifier = inject(AdminNotifierService);
 	private dialog = inject(MatDialog);
 	private announcer = inject(LiveAnnouncer);
@@ -143,19 +134,10 @@ export class EditorListComponent<T extends EditorContentType> {
 	private route = inject(ActivatedRoute);
 
 	public readonly type = input.required<T>();
-	public readonly noun = input.required<ItemNoun>();
-	public readonly searchFields = input.required<readonly FilterOption[]>();
-	/** Each item's main cell; its name by default. */
-	public readonly itemTemplate = input<TemplateRef<ItemTemplateContext<T>>>();
 
 	public readonly editItem = output<SummaryOf<T>>();
 	public readonly duplicateItem = output<SummaryOf<T>>();
 	public readonly openDraft = output<DraftSummary>();
-
-	/** The type's collections, for the filter and the type's own actions. */
-	public readonly collections = signal<EditorCollection[] | undefined>(
-		undefined
-	);
 
 	protected readonly pageSize = EDITOR_PAGE_SIZE;
 	private readonly fromUrl = fromListParams(
@@ -176,9 +158,16 @@ export class EditorListComponent<T extends EditorContentType> {
 		() => this.auth.user() ?? undefined
 	);
 
-	protected readonly statuses = computed(
-		() => STATUS_FILTERS[this.type() === 'news' ? 'news' : 'other']
+	protected readonly config = computed(() => EDITOR_TYPES[this.type()]);
+	protected readonly noun = computed(() => this.config().noun);
+	protected readonly statuses = computed(() => this.config().statuses);
+	protected readonly searchFields = computed(
+		() => this.config().searchFields
 	);
+	protected readonly collections = computed(() => {
+		const type = toCollectionType(this.type());
+		return type ? this.collectionsStore.collections(type)() : undefined;
+	});
 	protected readonly items = computed(() => this.page()?.items ?? []);
 	protected readonly total = computed(() => this.page()?.total ?? 0);
 	protected readonly pageRefs = computed(() => this.items().map(toRef));
@@ -233,7 +222,6 @@ export class EditorListComponent<T extends EditorContentType> {
 		{ equal: (a, b) => JSON.stringify(a) === JSON.stringify(b) }
 	);
 	private readonly reloads = new Subject<void>();
-	private readonly collectionReloads = new Subject<void>();
 
 	constructor() {
 		// The filters and page go into the URL as they change.
@@ -257,25 +245,6 @@ export class EditorListComponent<T extends EditorContentType> {
 				takeUntilDestroyed()
 			)
 			.subscribe();
-		merge(toObservable(this.type), this.collectionReloads)
-			.pipe(
-				switchMap(() => {
-					const type = this.type();
-					return type === 'gallery' || type === 'downloads'
-						? this.editorContent
-								.fetchCollections(type)
-								.pipe(catchError(() => of(undefined)))
-						: of(undefined);
-				}),
-				takeUntilDestroyed()
-			)
-			.subscribe((collections) => this.collections.set(collections));
-	}
-
-	/** Fetches the collections again, after one was created or changed. */
-	public reloadCollections(): void {
-		this.collectionReloads.next();
-		this.reloadItems();
 	}
 
 	/** Fetches the list (and the editor's drafts) again, e.g. after a save. */
@@ -339,26 +308,33 @@ export class EditorListComponent<T extends EditorContentType> {
 			visible: !item.visible,
 			startingRevision: item.revision
 		} as UpdateRequestOf<T>;
-		this.write(
-			this.editorContent.updateItem(this.type(), item.id, request),
-			`${item.visible ? 'Hid' : 'Showed'} ${this.itemName(item)}.`
-		);
+		this.writer
+			.run({
+				request: () =>
+					this.editorContent.updateItem(
+						this.type(),
+						item.id,
+						request
+					),
+				success: `${item.visible ? 'Hid' : 'Showed'} ${this.itemName(item)}.`
+			})
+			.subscribe(() => this.reloadItems());
 	}
 
 	protected deleteItem(item: SummaryOf<T>): void {
 		const name = this.itemName(item);
-		confirmAction(this.dialog, {
-			title: `Delete ${name}?`,
-			message: "This can't be undone.",
-			confirmLabel: 'Delete'
-		})
-			.pipe(filter(Boolean))
-			.subscribe(() =>
-				this.write(
+		this.writer
+			.run({
+				confirm: {
+					title: `Delete ${name}?`,
+					message: "This can't be undone.",
+					confirmLabel: 'Delete'
+				},
+				request: () =>
 					this.editorContent.deleteItem(this.type(), toRef(item)),
-					`Deleted ${name}.`
-				)
-			);
+				success: `Deleted ${name}.`
+			})
+			.subscribe(() => this.reloadItems());
 	}
 
 	protected deleteDraft(draft: DraftSummary): void {
@@ -491,18 +467,6 @@ export class EditorListComponent<T extends EditorContentType> {
 				replaceUrl: true
 			});
 		}
-	}
-
-	/** Sends one write, says how it went, and reloads the list. */
-	private write(request: Observable<unknown>, successMessage: string): void {
-		request.subscribe({
-			next: () => this.notifier.notifySuccess(successMessage),
-			error: (error: unknown) => {
-				this.notifier.notifyFailure(describeWriteError(error));
-				this.reloadItems();
-			},
-			complete: () => this.reloadItems()
-		});
 	}
 
 	private fetchPage(

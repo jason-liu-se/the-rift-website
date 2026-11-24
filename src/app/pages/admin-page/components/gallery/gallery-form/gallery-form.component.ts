@@ -7,11 +7,11 @@ import { MatOption, MatSelect } from '@angular/material/select';
 import { catchError, of, switchMap } from 'rxjs';
 import { CaptionCardComponent } from 'src/app/components/caption-card/caption-card.component';
 import { MAX_GALLERY_CAPTION_LENGTH } from 'src/app/config/content-limits';
-import { EditorContentService } from 'src/app/services/editor-content/editor-content.service';
 import { GalleryProviderService } from 'src/app/services/gallery-provider/gallery-provider.service';
 import { DraftSession } from '../../../drafts/draft-session';
 import { ImageFieldComponent } from '../../image-field/image-field.component';
 import { TagInputComponent } from '../../tag-input/tag-input.component';
+import { CollectionsStore } from '../../../services/collections-store.service';
 
 /**
  * A gallery image's fields: its collection, image, caption, and tags (with
@@ -41,11 +41,10 @@ export class GalleryFormComponent {
 
 	protected readonly maxCaptionLength = MAX_GALLERY_CAPTION_LENGTH;
 	protected readonly fields = computed(() => this.session().fields());
-	protected readonly collections = toSignal(
-		inject(EditorContentService)
-			.fetchCollections('gallery')
-			.pipe(catchError(() => of([]))),
-		{ initialValue: [] }
+	private readonly allCollections =
+		inject(CollectionsStore).collections('gallery');
+	protected readonly collections = computed(
+		() => this.allCollections() ?? []
 	);
 	/** The tags already in the chosen collection's public images. */
 	protected readonly tagSuggestions = toSignal(

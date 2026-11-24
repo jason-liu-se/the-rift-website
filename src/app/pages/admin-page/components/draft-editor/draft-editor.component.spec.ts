@@ -22,6 +22,7 @@ const THEIRS = {
 /** A session stand-in: the editor only reads its signals and calls it. */
 function fakeSession() {
 	return {
+		type: 'news' as const,
 		fields: signal({ title: 'Mine' }),
 		status: signal('saved'),
 		conflict: signal<unknown>(undefined),
@@ -74,8 +75,6 @@ describe('DraftEditorComponent', () => {
 			'session',
 			session as unknown as DraftSession<'news'>
 		);
-		fixture.componentRef.setInput('noun', { one: 'post', many: 'posts' });
-		fixture.componentRef.setInput('hasDate', true);
 		fixture.componentRef.setInput('published', {
 			visible: false,
 			date: THEIRS.date

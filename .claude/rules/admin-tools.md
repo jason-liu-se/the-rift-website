@@ -12,13 +12,20 @@ paths:
 The decisions are in issue #101; the API's side is in the web-server's
 `src/contract/` (synced to `src/app/interfaces/api-*.ts`).
 
-- **One tool per content type** (`pages/admin-page/components/<type>-tool/`),
-  each an `<app-content-tool>`: the shared list (`editor-list/`) or the shared
-  draft editor (`draft-editor/`) around the tool's own form, as the URL's query
-  parameters say (`EDITOR_PARAMS` in `config/admin.ts`: `?new`, `?edit=<id>`,
-  `?draft=<id>`, `?duplicate=<id>`, beside the tool's `#fragment`, which is the
-  content type). Public cards link editors there with `<app-edit-button>`
-  (`components/edit-button/`).
+- **One tool per content type**, all the same `<app-content-tool>`: the shared
+  list (`editor-list/`) or the shared draft editor (`draft-editor/`) around the
+  type's form, as the URL's query parameters say (`EDITOR_PARAMS` in
+  `config/admin.ts`: `?new`, `?edit=<id>`, `?draft=<id>`, `?duplicate=<id>`,
+  beside the tool's `#fragment`, which is the content type). Public cards link
+  editors there with `<app-edit-button>` (`components/edit-button/`).
+- **Per-type differences live in `EDITOR_TYPES`**
+  (`pages/admin-page/editor-types.ts`): noun, statuses, search fields, field
+  labels, flags, and the type's form, list cell, and bulk actions
+  (`components/<type>/`). Shared code reads it; never check `type === …`. A
+  type's bulk actions run through `BULK_ACTION_HOST`.
+- **Collections** come from `CollectionsStore` (provided by the admin page):
+  fetched once per type, reloaded after a collection write.
+- **Writes** (confirm, send, snackbar) go through `EditorWriteService.run()`.
 - **API:** `EditorContentService` (items, bulk actions, collections),
   `DraftsService`, and `ImageUploadService`, typed per content type by
   `EditorContentTypes` (`services/editor-content/editor-content-types.ts`).
@@ -32,8 +39,8 @@ The decisions are in issue #101; the API's side is in the web-server's
   `MAX_BULK_ITEMS` a request, one after another, with one snackbar summary per
   response (`summarizeBulkResults`).
 - **Feedback:** `AdminNotifierService` (snackbars; failures stay until
-  dismissed), `confirmAction` before anything destructive, and
-  `describeWriteError` for messages.
+  dismissed), `confirmAction` before anything destructive (through
+  `EditorWriteService`), and `describeWriteError` for messages.
 - **Material** is allowed here; theme components only these pages use in
   `src/admin-theme.scss`, which `AdminPageComponent` loads. Avoid `DatePipe` and
   other `@angular/common` extras: they'd join every page's initial chunk (use

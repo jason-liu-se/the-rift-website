@@ -1,10 +1,11 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatOption, MatSelect } from '@angular/material/select';
-import { BulkMoveUpdate } from 'src/app/interfaces/api-requests';
-import { EditorCollection } from 'src/app/interfaces/api-responses';
+import { CollectionContentType } from 'src/app/services/editor-content/editor-content-types';
+import { CollectionsStore } from '../../services/collections-store.service';
+import { BULK_ACTION_HOST } from '../editor-list/bulk-action-host';
 
 /** A bulk action for types with collections: move to another collection. */
 @Component({
@@ -21,13 +22,15 @@ import { EditorCollection } from 'src/app/interfaces/api-responses';
 	]
 })
 export class MoveBulkActionComponent {
-	public readonly collections = input<readonly EditorCollection[]>([]);
-	public readonly runAction = output<Omit<BulkMoveUpdate, 'items'>>();
+	private host = inject(BULK_ACTION_HOST);
 
+	protected readonly collections = inject(CollectionsStore).collections(
+		this.host.type() as CollectionContentType
+	);
 	protected readonly targetCollection = signal('');
 
 	protected move(): void {
-		this.runAction.emit({
+		this.host.runBulkAction({
 			action: 'move',
 			collection: this.targetCollection()
 		});

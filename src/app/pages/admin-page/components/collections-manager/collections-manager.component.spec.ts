@@ -9,6 +9,7 @@ import { of } from 'rxjs';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
 import { EDITOR_GALLERY_COLLECTIONS } from 'src/app/testing/api-fixtures';
 import { environment } from 'src/environments/environment';
+import { CollectionsStore } from '../../services/collections-store.service';
 import {
 	CollectionsManagerComponent,
 	findSlugProblem
@@ -60,6 +61,7 @@ describe('CollectionsManagerComponent', () => {
 		TestBed.configureTestingModule({
 			imports: [CollectionsManagerComponent],
 			providers: [
+				CollectionsStore,
 				provideHttpClient(),
 				provideHttpClientTesting(),
 				{

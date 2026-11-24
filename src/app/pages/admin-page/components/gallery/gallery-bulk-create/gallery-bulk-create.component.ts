@@ -6,7 +6,6 @@ import {
 	output,
 	signal
 } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatCheckbox } from '@angular/material/checkbox';
@@ -51,6 +50,7 @@ import {
 	parsePastedLinks,
 	toCreateRequest
 } from './bulk-image-rows';
+import { CollectionsStore } from '../../../services/collections-store.service';
 
 const IMAGES = { one: 'image', many: 'images' };
 const NOT_ALLOWED_LINK = "This link isn't from imgbb or imgur.";
@@ -89,11 +89,10 @@ export class GalleryBulkCreateComponent {
 
 	protected readonly acceptedTypes = UPLOAD_IMAGE_TYPES.join(',');
 	protected readonly maxCaptionLength = MAX_GALLERY_CAPTION_LENGTH;
-	protected readonly collections = toSignal(
-		this.editorContent
-			.fetchCollections('gallery')
-			.pipe(catchError(() => of([]))),
-		{ initialValue: [] }
+	private readonly allCollections =
+		inject(CollectionsStore).collections('gallery');
+	protected readonly collections = computed(
+		() => this.allCollections() ?? []
 	);
 	protected readonly rows = signal<BulkImageRow[]>([]);
 	protected readonly pastedLinks = signal('');

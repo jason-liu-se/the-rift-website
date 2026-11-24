@@ -11,7 +11,6 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
-import { MatDialog } from '@angular/material/dialog';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatRadioButton, MatRadioGroup } from '@angular/material/radio';
@@ -24,9 +23,9 @@ import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-noti
 import { ItemOf } from 'src/app/services/editor-content/editor-content-types';
 import { DraftSession, AutosaveStatus } from '../../drafts/draft-session';
 import { describeWriteError } from '../../utilities/write-errors';
-import { confirmAction } from '../confirm-dialog/confirm-dialog.component';
-import { ItemNoun } from '../editor-list/bulk-results';
 import { itemName } from '../editor-list/item-name';
+import { EDITOR_TYPES } from '../../editor-types';
+import { EditorWriteService } from '../../services/editor-write.service';
 import { toFieldRows } from './field-values';
 
 const STATUS_TEXT: Record<AutosaveStatus, string> = {
@@ -70,37 +69,42 @@ export interface PublishedState {
 })
 export class DraftEditorComponent<T extends EditorContentType> {
 	private notifier = inject(AdminNotifierService);
-	private dialog = inject(MatDialog);
+	private writer = inject(EditorWriteService);
 	private heading = viewChild.required<ElementRef<HTMLElement>>('heading');
 
 	public readonly session = input.required<DraftSession<T>>();
-	public readonly noun = input.required<ItemNoun>();
 	/** The item being edited, if it's published. */
 	public readonly published = input<PublishedState>();
-	/** News: choose when it goes live. */
-	public readonly hasDate = input(false);
 
 	public readonly publishedItem = output<ItemOf<T>>();
 	public readonly closed = output<void>();
 
+	private readonly config = computed(() => EDITOR_TYPES[this.session().type]);
+	private readonly fieldLabels = computed(() => this.config().fieldLabels);
+	protected readonly noun = computed(() => this.config().noun);
+	/** News: choose when it goes live. */
+	protected readonly hasDate = computed(() => this.config().hasDate);
 	protected readonly statusText = computed(
 		() => STATUS_TEXT[this.session().status()]
 	);
 	protected readonly title = computed(() => {
 		const published = this.published();
 		const name = itemName(this.session().fields() as object);
-		return published ? `Editing ${name}` : `New ${this.noun().one}`;
+		return published ? `Editing ${name}` : `New ${this.config().noun.one}`;
 	});
 	protected readonly conflictRows = computed(() => {
 		const conflict = this.session().conflict();
+		const labels = this.fieldLabels();
 		if (conflict?.kind === 'draft') {
-			return toFieldRows(conflict.theirs.fields);
+			return toFieldRows(conflict.theirs.fields, labels);
 		}
-		return conflict?.kind === 'item' ? toFieldRows(conflict.theirs) : [];
+		return conflict?.kind === 'item'
+			? toFieldRows(conflict.theirs, labels)
+			: [];
 	});
 	protected readonly mergeRows = computed(() => {
 		const reference = this.session().mergeReference();
-		return reference ? toFieldRows(reference) : [];
+		return reference ? toFieldRows(reference, this.fieldLabels()) : [];
 	});
 	protected readonly isVisible = signal(true);
 	protected readonly dateChoice = signal<DateChoice>('now');
@@ -150,23 +154,18 @@ export class DraftEditorComponent<T extends EditorContentType> {
 	}
 
 	protected discard(): void {
-		confirmAction(this.dialog, {
-			title: 'Discard this draft?',
-			message: 'Your changes will be lost. The published version stays.',
-			confirmLabel: 'Discard'
-		})
+		this.writer
+			.run({
+				confirm: {
+					title: 'Discard this draft?',
+					message:
+						'Your changes will be lost. The published version stays.',
+					confirmLabel: 'Discard'
+				},
+				request: () => this.session().discard()
+			})
 			.pipe(filter(Boolean))
-			.subscribe(() =>
-				this.session()
-					.discard()
-					.subscribe({
-						complete: () => this.closed.emit(),
-						error: (error: unknown) =>
-							this.notifier.notifyFailure(
-								describeWriteError(error)
-							)
-					})
-			);
+			.subscribe(() => this.closed.emit());
 	}
 
 	protected close(): void {

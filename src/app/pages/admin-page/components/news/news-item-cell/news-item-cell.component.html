@@ -1,0 +1,8 @@
+<app-markdown class="title" [markdown]="item().title" [inline]="true" />
+<span class="details">
+	{{ item().status === "scheduled" ? "Goes live" : "Posted" }}
+	{{ formatDateTime(item().date) }}
+	@if (item().editedAt) {
+		· Edited {{ formatDateTime(item().editedAt!) }}
+	}
+</span>

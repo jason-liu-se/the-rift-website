@@ -22,6 +22,7 @@ import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-noti
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { environment } from 'src/environments/environment';
 import { EditorListComponent } from './editor-list.component';
+import { CollectionsStore } from '../../services/collections-store.service';
 
 const NEWS_URL = `${environment.API_URL}/editor/news`;
 const DRAFTS_URL = `${environment.API_URL}/editor/drafts?type=news`;
@@ -107,6 +108,7 @@ describe('EditorListComponent', () => {
 		TestBed.configureTestingModule({
 			imports: [EditorListComponent],
 			providers: [
+				CollectionsStore,
 				provideRouter([]),
 				{
 					provide: ActivatedRoute,
@@ -144,10 +146,6 @@ describe('EditorListComponent', () => {
 			.mockResolvedValue(true);
 		fixture = TestBed.createComponent(EditorListComponent<'news'>);
 		fixture.componentRef.setInput('type', 'news');
-		fixture.componentRef.setInput('noun', { one: 'post', many: 'posts' });
-		fixture.componentRef.setInput('searchFields', [
-			{ value: 'title', label: 'Title' }
-		]);
 		element = fixture.nativeElement;
 		fixture.detectChanges();
 	});
@@ -170,15 +168,15 @@ describe('EditorListComponent', () => {
 			'editor',
 			'delete'
 		]);
-		// Markdown is stripped from names; old items have no author.
+		// The type's own cell; old items have no author.
 		expect(cells(rows()[1]).slice(1, 5)).toEqual([
-			'Post 1',
+			expect.stringMatching(/^Post 1 Posted/),
 			'Live Has your draft',
 			'unknown',
 			'more_vert'
 		]);
 		expect(cells(rows()[2]).slice(1, 5)).toEqual([
-			'Post 2',
+			expect.stringMatching(/^Post 2 Posted/),
 			'Live',
 			'unknown',
 			'more_vert'
@@ -501,6 +499,7 @@ describe('EditorListComponent from a URL with filters', () => {
 		TestBed.configureTestingModule({
 			imports: [EditorListComponent],
 			providers: [
+				CollectionsStore,
 				provideRouter([]),
 				{
 					provide: ActivatedRoute,
@@ -525,10 +524,6 @@ describe('EditorListComponent from a URL with filters', () => {
 		});
 		const fixture = TestBed.createComponent(EditorListComponent<'news'>);
 		fixture.componentRef.setInput('type', 'news');
-		fixture.componentRef.setInput('noun', { one: 'post', many: 'posts' });
-		fixture.componentRef.setInput('searchFields', [
-			{ value: 'title', label: 'Title' }
-		]);
 		fixture.detectChanges();
 		await fixture.whenStable();
 

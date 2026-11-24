@@ -1,19 +1,14 @@
 @if (session(); as session) {
 	<app-draft-editor
 		[session]="session"
-		[noun]="noun()"
 		[published]="published()"
-		[hasDate]="hasDate()"
 		(publishedItem)="closeEditor()"
 		(closed)="closeEditor()"
 	>
-		<ng-container
-			*ngTemplateOutlet="
-				fieldsTemplate();
-				context: { $implicit: session }
-			"
-		/>
+		<ng-container *ngComponentOutlet="config().form; inputs: { session }" />
 	</app-draft-editor>
+} @else if (isBulkCreating()) {
+	<app-gallery-bulk-create (closed)="isBulkCreating.set(false)" />
 } @else if (isOpening()) {
 	<p role="status">Opening…</p>
 } @else {
@@ -24,9 +19,17 @@
 			type="button"
 			(click)="openNew()"
 		>
-			New {{ noun().one }}
+			New {{ config().noun.one }}
 		</button>
-		<ng-content select="[toolActions]" />
+		@if (config().hasBulkCreate) {
+			<button
+				mat-stroked-button
+				type="button"
+				(click)="isBulkCreating.set(true)"
+			>
+				Add many {{ config().noun.many }}
+			</button>
+		}
 		@if (collectionType(); as collectionType) {
 			<button
 				mat-stroked-button
@@ -40,7 +43,7 @@
 				<app-collections-manager
 					class="collections"
 					[type]="collectionType"
-					[itemNoun]="noun()"
+					[itemNoun]="config().noun"
 					(changed)="reloadList()"
 				/>
 			}
@@ -49,22 +52,8 @@
 	<app-editor-list
 		#list
 		[type]="type()"
-		[noun]="noun()"
-		[searchFields]="searchFields()"
-		[itemTemplate]="itemTemplate()"
 		(editItem)="openEditor('edit', $event.id)"
 		(duplicateItem)="openEditor('duplicate', $event.id)"
 		(openDraft)="openEditor('draft', $event.id)"
-	>
-		<ng-container ngProjectAs="[bulkActions]">
-			@if (bulkActionsTemplate(); as bulkActions) {
-				<ng-container
-					*ngTemplateOutlet="
-						bulkActions;
-						context: { $implicit: list }
-					"
-				/>
-			}
-		</ng-container>
-	</app-editor-list>
+	/>
 }

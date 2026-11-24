@@ -1,8 +1,7 @@
-import { NgTemplateOutlet } from '@angular/common';
+import { NgComponentOutlet } from '@angular/common';
 import {
 	Component,
 	DestroyRef,
-	TemplateRef,
 	computed,
 	effect,
 	inject,
@@ -19,13 +18,9 @@ import { EDITOR_PARAMS } from 'src/app/config/admin';
 import { EditorContentType } from 'src/app/interfaces/api-requests';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
 import { ApiStatusService } from 'src/app/services/api-status/api-status.service';
-import {
-	CollectionContentType,
-	ItemOf
-} from 'src/app/services/editor-content/editor-content-types';
+import { ItemOf } from 'src/app/services/editor-content/editor-content-types';
 import { EditorContentService } from 'src/app/services/editor-content/editor-content.service';
 import { FocusRecoveryService } from 'src/app/services/focus-recovery/focus-recovery.service';
-import { DraftFields } from '../../drafts/draft-fields';
 import { DraftSession } from '../../drafts/draft-session';
 import { CollectionsManagerComponent } from '../collections-manager/collections-manager.component';
 import { DraftSessionsService } from '../../drafts/draft-sessions.service';
@@ -35,24 +30,13 @@ import {
 	DraftEditorComponent,
 	PublishedState
 } from '../draft-editor/draft-editor.component';
-import { ItemNoun } from '../editor-list/bulk-results';
-import {
-	EditorListComponent,
-	ItemTemplateContext
-} from '../editor-list/editor-list.component';
-import { FilterOption } from '../editor-list/list-filters/list-filters.component';
-
-interface EditorContext<T extends EditorContentType> {
-	$implicit: DraftSession<T>;
-}
-
-interface BulkActionsContext<T extends EditorContentType> {
-	$implicit: EditorListComponent<T>;
-}
+import { EditorListComponent } from '../editor-list/editor-list.component';
+import { GalleryBulkCreateComponent } from '../gallery/gallery-bulk-create/gallery-bulk-create.component';
+import { EDITOR_TYPES, toCollectionType } from '../../editor-types';
 
 /**
- * One admin tool: its list, or the editor for one item or draft (the tool's
- * form, `fieldsTemplate`, in the shared draft editor), as the URL says.
+ * One admin tool: its list, or the editor for one item or draft (the type's
+ * form in the shared draft editor), as the URL says.
  */
 @Component({
 	selector: 'app-content-tool',
@@ -62,8 +46,9 @@ interface BulkActionsContext<T extends EditorContentType> {
 		CollectionsManagerComponent,
 		DraftEditorComponent,
 		EditorListComponent,
+		GalleryBulkCreateComponent,
 		MatButton,
-		NgTemplateOutlet
+		NgComponentOutlet
 	]
 })
 export class ContentToolComponent<T extends EditorContentType> {
@@ -79,18 +64,6 @@ export class ContentToolComponent<T extends EditorContentType> {
 	private list = viewChild(EditorListComponent);
 
 	public readonly type = input.required<T>();
-	public readonly noun = input.required<ItemNoun>();
-	public readonly searchFields = input.required<readonly FilterOption[]>();
-	public readonly fieldsTemplate =
-		input.required<TemplateRef<EditorContext<T>>>();
-	public readonly itemTemplate = input<TemplateRef<ItemTemplateContext<T>>>();
-	/** The type's own bulk actions, given the list to run them on. */
-	public readonly bulkActionsTemplate =
-		input<TemplateRef<BulkActionsContext<T>>>();
-	/** What a new item starts with (not counted as changes). */
-	public readonly newItemFields = input<DraftFields<T>>({});
-	/** News: publishing chooses when it goes live. */
-	public readonly hasDate = input(false);
 
 	protected readonly session = signal<DraftSession<T> | undefined>(undefined);
 	protected readonly published = signal<PublishedState | undefined>(
@@ -98,13 +71,12 @@ export class ContentToolComponent<T extends EditorContentType> {
 	);
 	protected readonly isOpening = signal(false);
 	protected readonly isManagingCollections = signal(false);
-	/** The type, if it has collections to manage. */
-	protected readonly collectionType = computed<
-		CollectionContentType | undefined
-	>(() => {
-		const type: EditorContentType = this.type();
-		return type === 'gallery' || type === 'downloads' ? type : undefined;
-	});
+	protected readonly isBulkCreating = signal(false);
+
+	protected readonly config = computed(() => EDITOR_TYPES[this.type()]);
+	protected readonly collectionType = computed(() =>
+		toCollectionType(this.type())
+	);
 
 	constructor() {
 		this.sync.syncPending();
@@ -159,9 +131,9 @@ export class ContentToolComponent<T extends EditorContentType> {
 		inject(DestroyRef).onDestroy(() => this.session()?.close());
 	}
 
-	/** Fetches the list and its collections again (e.g. a collection changed). */
+	/** Fetches the list again (e.g. a collection changed). */
 	public reloadList(): void {
-		this.list()?.reloadCollections();
+		this.list()?.reloadItems();
 	}
 
 	protected openNew(): void {
@@ -185,7 +157,9 @@ export class ContentToolComponent<T extends EditorContentType> {
 		const id = (name: string) => params.get(name);
 		let opening: Observable<DraftSession<T>> | undefined;
 		if (params.has(EDITOR_PARAMS.new)) {
-			opening = of(this.sessions.startNew(type, this.newItemFields()));
+			opening = of(
+				this.sessions.startNew(type, EDITOR_TYPES[type].newItemFields())
+			);
 		} else if (id(EDITOR_PARAMS.edit)) {
 			opening = this.fetchPublished(id(EDITOR_PARAMS.edit)!).pipe(
 				switchMap((item) => this.sessions.startEdit(type, item))
