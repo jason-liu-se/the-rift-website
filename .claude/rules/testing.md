@@ -10,19 +10,22 @@ paths:
 
 ## What to test
 
-A test is worth having if it catches a regression a user or caller would notice.
-Every test is also code someone must fix by hand when the UI changes, so write
-fewer, sturdier ones (#128).
+Tests prevent undesired behaviour; they shouldn't limit development. A test is
+worth having if it catches a regression a user or caller would notice. Every
+test is also code someone must fix by hand when the UI changes, so write fewer,
+sturdier ones (#128).
 
 - **Behaviour, not markup.** Assert what the user can do (opening an item
   reaches its editor) or what a function returns or sends, not which element
   does it, CSS classes, DOM structure, element counts, or exact wording (unless
   the wording is the behaviour, like an error message).
-- **Unit tests for business logic, integration tests for UI.** Unit tests cover
-  edge cases in business logic: functions and services (validation, conflicts,
-  merging, bulk summaries). Edge cases in UI behaviour (what an action leads to,
-  what shows after a failure) belong in integration (e2e) tests. Don't cover the
-  same behaviour at both levels.
+- **Where each kind of test fits.** Unit tests cover edge cases in business
+  logic: functions and services (validation, conflicts, merging, bulk
+  summaries). Component unit tests cover a component's important behaviour (the
+  output it emits, the request it sends, what it refuses to do), not that every
+  element is on screen. Edge cases in UI flows across components (what an action
+  leads to, what shows after a failure) belong in integration (e2e) tests. Don't
+  cover the same behaviour at both levels.
 - **Find elements the way a user would**: by role and the action's accessible
   name, loosely enough that moving the action to another element (a button
   replaced by a clickable row) doesn't break the test.
