@@ -48,9 +48,29 @@ findings. You are **strictly read-only**.
   they're set, template expressions with side effects.
 - Security: `SafePipe`/`bypassSecurityTrust*` or `innerHTML` on untrusted input.
 
+**Design and structure**
+
+Check every changed component and service against
+`.claude/rules/component-design.md`, and report each rule it breaks as
+Important, with the split or move that fixes it. In particular:
+
+- URL or navigation state synced by hand with effects instead of routes.
+- A template or parent reaching into a child component's state or methods.
+- The same API data fetched by several components instead of one owner.
+- Request, queueing, retry, or confirm-write-notify logic repeated in components
+  instead of going through the shared service, interceptor, or helper.
+- Per-variant behaviour spread across inputs, partial constants, and
+  `type === …` checks instead of one config record.
+- A component or service with several responsibilities, over the size limits, or
+  with near-duplicate template blocks.
+- Several code paths writing the same resource outside one queue; stages implied
+  by combinations of flags.
+
 **Missed edge cases**
 
 - Empty, loading, and error states for HTTP-backed views.
+- No-op and repeated actions: saving or publishing with nothing changed, the
+  same action twice quickly, an action while a previous one is in flight.
 - Empty arrays, single items, very long text, missing images.
 - Unknown route data keys, invalid or missing ids (e.g. BlueMap map ids).
 
@@ -102,6 +122,10 @@ wide desktop widths, not only the size it was evidently built for:
 - Specs not updated or added for changed behaviour, missing the test setup in
   `.claude/rules/testing.md`, or written to pass rather than to catch
   regressions.
+- Brittle or redundant specs (`.claude/rules/testing.md` "What to test"):
+  asserting markup, classes, element counts, or one specific element instead of
+  the behaviour; covering the same behaviour in unit and e2e tests; one test per
+  state where one table-driven test would do.
 - Renamed or removed symbols still referenced elsewhere (grep for them).
 - Dead code, unused imports, `console.log`, commented-out blocks, stray TODOs.
 - Stylesheet growth that risks the style budgets in `angular.json`.
@@ -114,10 +138,10 @@ wide desktop widths, not only the size it was evidently built for:
 **Readability and maintainability**
 
 Any violation of the `CLAUDE.md` engineering standards (version-specific best
-practices, reuse, design, clarity, writing less code, file scoping, scope and
-debt), names that break `.claude/rules/naming.md` (vague or generic names,
-booleans without an `is`/`has`/`should`/`can` prefix, functions that don't say
-what they do), plus constructor injection instead of `inject()` and
+practices, reuse, design, clarity, comments, writing less code, file scoping,
+scope and debt), names that break `.claude/rules/naming.md` (vague or generic
+names, booleans without an `is`/`has`/`should`/`can` prefix, functions that
+don't say what they do), plus constructor injection instead of `inject()` and
 index-signature access not using `data['key']`.
 
 Don't flag pure formatting that Prettier/ESLint would catch, and don't pad the

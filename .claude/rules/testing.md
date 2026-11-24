@@ -8,6 +8,33 @@ paths:
 
 # Testing
 
+## What to test
+
+A test is worth having if it catches a regression a user or caller would notice.
+Every test is also code someone must fix by hand when the UI changes, so write
+fewer, sturdier ones (#128).
+
+- **Behaviour, not markup.** Assert what the user can do (opening an item
+  reaches its editor) or what a function returns or sends, not which element
+  does it, CSS classes, DOM structure, element counts, or exact wording (unless
+  the wording is the behaviour, like an error message).
+- **Unit tests for business logic, integration tests for UI.** Unit tests cover
+  edge cases in business logic: functions and services (validation, conflicts,
+  merging, bulk summaries). Edge cases in UI behaviour (what an action leads to,
+  what shows after a failure) belong in integration (e2e) tests. Don't cover the
+  same behaviour at both levels.
+- **Find elements the way a user would**: by role and the action's accessible
+  name, loosely enough that moving the action to another element (a button
+  replaced by a clickable row) doesn't break the test.
+- **One test per behaviour**, not per control or combination of states. Put the
+  branches of one piece of logic (nothing changed, conflict, partial failure) in
+  one table-driven unit test of that logic.
+- **Before adding a test**, ask whether a regression there would otherwise ship
+  unnoticed. If not, skip it. When a change makes a test pin implementation
+  rather than behaviour, rewrite or delete it.
+- **Keep the total proportionate.** Weigh each test against the time someone
+  without AI would spend keeping it passing as the code changes.
+
 ## Unit tests (Vitest)
 
 `*.spec.ts` files sit next to the code they test and run in jsdom without
@@ -81,8 +108,18 @@ Each entry is a route, optionally `|<CSS selector>` to crop to the feature. For
 a state that needs interaction (an open menu, an error state), take it in a
 temporary spec and don't commit it. The upload prints Markdown image links for a
 `## Screenshots` section in the PR description (the images live on the
-`pr-screenshots` branch, never in the PR's commits). Open one image to check it
-shows the feature; you don't need to look at the rest.
+`pr-screenshots` branch, never in the PR's commits).
+
+**Looking at the UI.** Screenshots are for reviewing the UI, not only for the
+PR. For a new or changed view, look at every capture yourself, desktop and
+mobile, in each state the view has: loading, empty, error, populated, and
+mid-action (something selected, a dialog or menu open, a conflict shown).
+Critique each against `.claude/rules/ui-standards.md` and fix what looks wrong
+before opening the PR: wasted space, awkward wrapping, layout shift, duplicated
+information, controls that look like something else, stacked mobile layouts that
+bury the content. Capture states that need interaction in a temporary spec (with
+the mocks and `signIn` from `e2e/support/auth.ts`), or explore them with the
+Playwright MCP browser tools when a real local API is running.
 
 **Writing a spec**
 
@@ -90,6 +127,9 @@ shows the feature; you don't need to look at the rest.
 - Open pages with `gotoRoute` (`e2e/support/navigation.ts`), and add new routes
   to `e2e/support/routes.ts`.
 - Limit a test to one device with the tags in `e2e/support/projects.ts`.
+- Cover a user flow once, through to its outcome (the item is published, the
+  list shows it). Test a variant end to end only when it takes a different path
+  through several units, like publishing an edit with nothing changed.
 
 **Known issues**
 

@@ -24,9 +24,9 @@ pre-commit hook lints and formats staged files.
 ## Docs and rules
 
 `.claude/docs/` holds context every session needs, imported below.
-`.claude/rules/` holds standards for one area (naming, templates and styles,
-tests, SEO, environment variables); each sets `paths` frontmatter so it loads
-only when matching files are read or edited.
+`.claude/rules/` holds standards for one area (naming, component design,
+templates and styles, tests, SEO, environment variables); each sets `paths`
+frontmatter so it loads only when matching files are read or edited.
 
 @.claude/docs/rendering.md
 
@@ -78,6 +78,9 @@ only when matching files are read or edited.
   screenshots of the affected feature for any UI-facing change; see
   `.claude/rules/testing.md`). Open it as a draft when unsure. Don't wait to be
   asked; the PR is the review.
+- Keep each PR reviewable: one concern, and ideally under about 500 lines of
+  non-test code. Split a bigger feature into stacked PRs that each work on their
+  own.
 - Merge your own PR only when it's low risk and you're confident (the
   `orchestrate` skill's tiers), CI passed, and review left nothing Critical or
   Important. Everything else waits for the user. **Auto-merge into `main` (which
@@ -92,6 +95,11 @@ only when matching files are read or edited.
   current patterns for the exact versions in `package.json`. Where existing code
   is outdated, use the modern pattern in new code and raise a wider migration
   with the user.
+- **Design before building.** For a feature that adds more than a few components
+  or services, or a new pattern, first write a short design and get the user's
+  OK: the component tree and what each part owns, where each piece of state
+  lives (route, service, or component), how data flows, and how writes are
+  sequenced. Update it when the code needs to diverge.
 - **Reuse and design.** Before writing UI or logic, check for existing
   components, services, utilities, and styles. Prefer, in order: reuse it;
   extend it (a new input or variant) when the change fits its purpose; otherwise
@@ -100,19 +108,24 @@ only when matching files are read or edited.
   in the same change. Split pages and large components into child components by
   responsibility (one section or concern each), even with a single caller, so a
   page mainly composes components. Single responsibility, low coupling, pure
-  functions, side effects isolated.
+  functions, side effects isolated. The concrete rules (state, data flow,
+  variants, when to split) are in `.claude/rules/component-design.md`.
 - **Clarity.** Descriptive names (`.claude/rules/naming.md`), small functions,
   guard clauses, named constants (in `src/app/config/` if shared or likely to be
   tweaked, like page sizes, links, or seasons, so editors can find them;
   otherwise with the owning feature). Simple over clever; comment a non-obvious
   version that's worth keeping.
+- **Comments.** Comment only what the code can't say (why, a non-obvious
+  constraint), in as few words as it takes. The more comments there are, the
+  more reviewers skim them and miss the ones that matter.
 - **Write less code.** Humans review every line. Use what Angular, Aria, the
   CDK, and RxJS provide, and skip speculative code (unused options, "just in
   case" branches, wrappers or helpers that add indirection without owning a
   responsibility).
 - **UI.** WCAG 2.2 AA, full keyboard support, mobile-first, and colours only
   from the palette in `src/theme-colours.scss`. Details are in
-  `.claude/rules/ui-standards.md`.
+  `.claude/rules/ui-standards.md`. UI isn't done until you've looked at it on
+  desktop and mobile in each state it has, and fixed what looks wrong.
 - **Dependencies.** Add a package only for substantial, likely-reused, or
   error-prone functionality (e.g. security, date/time, parsing), and justify it
   to the user.
@@ -123,8 +136,10 @@ only when matching files are read or edited.
   moves to `components/`, in the same change, once another page needs it.
   `layout/` holds the shell every route renders (`PageTemplateComponent`,
   navbar, footer).
-- **Tests.** Test real behaviour (inputs, outputs, rendered state, requests) so
-  tests fail when it breaks.
+- **Tests.** Few and sturdy: test behaviour a user or caller relies on (function
+  results, requests sent, where an action leads), not markup, so tests fail when
+  behaviour breaks and survive UI changes (`.claude/rules/testing.md` "What to
+  test").
 - **Scope and debt.** Keep changes scoped. Fix minor debt and remove dead code
   in code you touch; raise major debt or unrelated refactors with the user.
 - **Docs.** Update `README.md`, `.claude/docs/`, `.claude/rules/`, skills, and
