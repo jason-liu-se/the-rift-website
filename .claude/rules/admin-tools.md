@@ -16,9 +16,10 @@ The decisions are in issue #101; the API's side is in the web-server's
   list at `/admin/<type>` (`editor-list-page/`), with creating and editing in
   routed modals over it: `new`, `drafts/<draftId>`, `<id>` (`editor-modal/`, the
   shared `draft-editor/` around the type's form), and `bulk`
-  (`bulk-create-modal/`). `openModalRoute()` ties a dialog to its route: closing
-  it returns to the list with its filters, and Back closes it. Public cards link
-  editors to `/admin/<type>/<id>` with `<app-edit-button>`
+  (`bulk-create-modal/`). `openModalRoute()` ties a dialog to its route: every
+  way of closing it (Escape, backdrop, Close, Back) leaves the route, so a
+  route's `canDeactivate` can ask first (bulk creation with rows does). Public
+  cards link editors to `/admin/<type>/<id>` with `<app-edit-button>`
   (`components/edit-button/`).
 - **Per-type differences live in `EDITOR_TYPES`**
   (`pages/admin-page/editor-types.ts`): noun, statuses, search fields, field

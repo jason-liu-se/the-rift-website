@@ -1,4 +1,9 @@
-import { isEmptyDraft, isSameFields, pickFields } from './draft-fields';
+import {
+	findMissingFields,
+	isEmptyDraft,
+	isSameFields,
+	pickFields
+} from './draft-fields';
 
 describe('draft fields', () => {
 	it("picks a type's own fields, leaving out blank ones", () => {
@@ -28,5 +33,17 @@ describe('draft fields', () => {
 			)
 		).toBe(true);
 		expect(isSameFields({ title: 'a' }, { title: 'b' })).toBe(false);
+	});
+});
+
+describe('findMissingFields', () => {
+	it.each([
+		{ fields: {}, missing: ['title', 'content'] },
+		{ fields: { title: '  ', content: 'Body' }, missing: ['title'] },
+		{ fields: { title: 'Hi', content: 'Body' }, missing: [] }
+	])('finds $missing missing in $fields', ({ fields, missing }) => {
+		expect(findMissingFields(fields, ['title', 'content'])).toEqual(
+			missing
+		);
 	});
 });

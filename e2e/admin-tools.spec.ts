@@ -295,6 +295,30 @@ test.describe('gallery images', () => {
 		});
 	});
 
+	test('asks before closing with images not yet published', async ({
+		page
+	}) => {
+		await page
+			.getByRole('button', { name: 'More ways to add images' })
+			.click();
+		await page.getByRole('menuitem', { name: 'Add many images' }).click();
+		await page
+			.getByRole('textbox', { name: 'Or paste links, one per line' })
+			.fill('https://i.ibb.co/a/one.png\nhttps://i.ibb.co/a/two.png');
+		await page.getByRole('button', { name: 'Add links' }).click();
+
+		await page.keyboard.press('Escape');
+		const confirm = page.getByRole('alertdialog');
+		await expect(confirm).toContainText('Close and drop 2 images?');
+		await confirm.getByRole('button', { name: 'Cancel' }).click();
+		await expect(page).toHaveURL(/\/admin\/gallery\/bulk$/);
+
+		await page.goBack();
+		await confirm.getByRole('button', { name: 'Drop 2 images' }).click();
+		await expect(page).toHaveURL(/\/admin\/gallery$/);
+		await expect(page.getByRole('dialog')).toHaveCount(0);
+	});
+
 	test('adds many images from pasted links, and publishes them together', async ({
 		page
 	}) => {

@@ -23,7 +23,7 @@ const THEIRS = {
 function fakeSession() {
 	return {
 		type: 'news' as const,
-		fields: signal({ title: 'Mine' }),
+		fields: signal({ title: 'Mine', content: 'Body' }),
 		status: signal('saved'),
 		conflict: signal<unknown>(undefined),
 		mergeReference: signal<unknown>(undefined),
@@ -49,7 +49,9 @@ describe('DraftEditorComponent', () => {
 
 	const button = (name: string) =>
 		[...element.querySelectorAll<HTMLButtonElement>('button')].find(
-			(candidate) => candidate.textContent?.trim() === name
+			(candidate) =>
+				(candidate.getAttribute('aria-label') ??
+					candidate.textContent?.trim()) === name
 		)!;
 	const text = () => element.textContent?.replace(/\s+/g, ' ') ?? '';
 
@@ -98,6 +100,14 @@ describe('DraftEditorComponent', () => {
 		button('Publish').click();
 
 		expect(session.publish).toHaveBeenCalledWith({ visible: false });
+	});
+
+	it("won't publish until the required fields are filled in, and says which", () => {
+		session.fields.set({ title: 'Mine', content: '' });
+		fixture.detectChanges();
+
+		expect(button('Publish').disabled).toBe(true);
+		expect(text()).toContain('Fill in Content to publish.');
 	});
 
 	it('shows their version when the item changed, to overwrite or merge', () => {
