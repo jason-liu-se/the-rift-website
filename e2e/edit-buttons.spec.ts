@@ -14,22 +14,22 @@ const PAGES = [
 	{
 		path: '/news',
 		name: NEWS_POSTS[0].title,
-		href: `/admin?edit=${NEWS_POSTS[0].id}#news`
+		href: `/admin/news/${NEWS_POSTS[0].id}`
 	},
 	{
 		path: '/gallery/season5',
 		name: GALLERY_COLLECTIONS[0].images[0].caption,
-		href: `/admin?edit=${GALLERY_COLLECTIONS[0].images[0].id}#gallery`
+		href: `/admin/gallery/${GALLERY_COLLECTIONS[0].images[0].id}`
 	},
 	{
 		path: '/downloads',
 		name: DOWNLOAD_COLLECTIONS[0].items[0].title,
-		href: `/admin?edit=${DOWNLOAD_COLLECTIONS[0].items[0].id}#downloads`
+		href: `/admin/downloads/${DOWNLOAD_COLLECTIONS[0].items[0].id}`
 	},
 	{
 		path: '/map',
 		name: `Season ${MAP_SEASONS[0].season}`,
-		href: `/admin?edit=${MAP_SEASONS[0].id}#maps`
+		href: `/admin/maps/${MAP_SEASONS[0].id}`
 	}
 ];
 

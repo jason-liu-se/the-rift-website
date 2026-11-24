@@ -11,7 +11,7 @@ const { API_URL } = environment;
 /** Opens a tool once its list has loaded. */
 async function openTool(page: Page, tool: string, firstItem: string) {
 	await signIn(page);
-	await page.goto(`/admin#${tool}`);
+	await page.goto(`/admin/${tool}`);
 	await expect(
 		page.getByRole('checkbox', { name: `Select ${firstItem}`, exact: true })
 	).toBeVisible();
@@ -111,7 +111,7 @@ test.describe('news editor', () => {
 			});
 		});
 
-		await page.getByRole('button', { name: 'New post' }).click();
+		await page.getByRole('link', { name: 'New post' }).click();
 		await expect(
 			page.getByRole('heading', { name: 'New post' })
 		).toBeFocused();
@@ -123,7 +123,7 @@ test.describe('news editor', () => {
 		await expect(
 			page.getByRole('status').filter({ hasText: /^Saved$/ })
 		).toBeVisible();
-		await expect(page).toHaveURL(/\?draft=[\w-]+#news$/);
+		await expect(page).toHaveURL(/\/admin\/news\/drafts\/[\w-]+$/);
 		expect(saves.at(-1)).toEqual({
 			type: 'news',
 			fields: { title: 'Fresh', content: 'Hello **all**' }
@@ -133,7 +133,7 @@ test.describe('news editor', () => {
 		await page.getByRole('button', { name: 'Publish' }).click();
 		await expect(page.getByText('Published Fresh.')).toBeVisible();
 		expect(publishRequest).toEqual({ visible: true, date: 'now' });
-		await expect(page).toHaveURL(/\/admin#news$/);
+		await expect(page).toHaveURL(/\/admin\/news$/);
 	});
 
 	test('opens a post to edit with its fields, and makes no draft until it changes', async ({
@@ -151,7 +151,7 @@ test.describe('news editor', () => {
 			.filter({ hasText: EDITOR_NEWS_POSTS[1].title })
 			.click();
 
-		await expect(page).toHaveURL(/\?edit=news-2#news$/);
+		await expect(page).toHaveURL(/\/admin\/news\/news-2$/);
 		await expect(page.getByRole('textbox', { name: 'Title' })).toHaveValue(
 			EDITOR_NEWS_POSTS[1].title
 		);
@@ -159,6 +159,33 @@ test.describe('news editor', () => {
 		await page.waitForTimeout(500);
 		expect(saves).toEqual([]);
 	});
+});
+
+test('opens an item from its link (an Edit button) over its list, and Back closes it', async ({
+	page
+}) => {
+	await signIn(page);
+	await page.goto('/admin/news');
+	await page.goto(`/admin/news/${EDITOR_NEWS_POSTS[1].id}`);
+
+	const editor = page.getByRole('dialog');
+	await expect(editor.getByRole('textbox', { name: 'Title' })).toHaveValue(
+		EDITOR_NEWS_POSTS[1].title
+	);
+	await page.reload();
+	await expect(editor.getByRole('textbox', { name: 'Title' })).toHaveValue(
+		EDITOR_NEWS_POSTS[1].title
+	);
+
+	await page.goBack();
+	await expect(page).toHaveURL(/\/admin\/news$/);
+	await expect(editor).toHaveCount(0);
+	await expect(
+		page.getByRole('checkbox', {
+			name: `Select ${EDITOR_NEWS_POSTS[0].title}`,
+			exact: true
+		})
+	).toBeVisible();
 });
 
 test.describe('gallery collections', () => {
@@ -248,7 +275,10 @@ test.describe('gallery images', () => {
 				}
 			});
 		});
-		await page.getByRole('button', { name: 'Add many images' }).click();
+		await page
+			.getByRole('button', { name: 'More ways to add images' })
+			.click();
+		await page.getByRole('menuitem', { name: 'Add many images' }).click();
 		await page
 			.getByRole('textbox', { name: 'Or paste links, one per line' })
 			.fill('https://i.ibb.co/a/one.png\nhttps://i.ibb.co/a/two.png');
@@ -314,7 +344,7 @@ test.describe('maps', () => {
 	test('starts a season with three dimensions, reorderable by keyboard', async ({
 		page
 	}) => {
-		await page.getByRole('button', { name: 'New season' }).click();
+		await page.getByRole('link', { name: 'New season' }).click();
 		const legends = page.locator('.dimension legend');
 		await expect(legends).toHaveText([
 			'1. Overworld',
@@ -352,10 +382,10 @@ test.describe('list quality of life', () => {
 			.filter({ hasText: 'News post 2 ' })
 			.getByRole('cell', { name: 'Live' })
 			.click();
-		await expect(page).toHaveURL(/edit=news-2/);
+		await expect(page).toHaveURL(/\/admin\/news\/news-2\?status=live$/);
 		await page.getByRole('button', { name: 'Close' }).click();
 
-		await expect(page).toHaveURL(/\/admin\?status=live#news$/);
+		await expect(page).toHaveURL(/\/admin\/news\?status=live$/);
 		await expect(
 			page.getByRole('combobox', { name: 'Status' })
 		).toContainText('Live');

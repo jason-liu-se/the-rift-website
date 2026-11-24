@@ -12,12 +12,14 @@ paths:
 The decisions are in issue #101; the API's side is in the web-server's
 `src/contract/` (synced to `src/app/interfaces/api-*.ts`).
 
-- **One tool per content type**, all the same `<app-content-tool>`: the shared
-  list (`editor-list/`) or the shared draft editor (`draft-editor/`) around the
-  type's form, as the URL's query parameters say (`EDITOR_PARAMS` in
-  `config/admin.ts`: `?new`, `?edit=<id>`, `?draft=<id>`, `?duplicate=<id>`,
-  beside the tool's `#fragment`, which is the content type). Public cards link
-  editors there with `<app-edit-button>` (`components/edit-button/`).
+- **Routes** (`pages/admin-page/admin.routes.ts`, under `/admin`): each tool's
+  list at `/admin/<type>` (`editor-list-page/`), with creating and editing in
+  routed modals over it: `new`, `drafts/<draftId>`, `<id>` (`editor-modal/`, the
+  shared `draft-editor/` around the type's form), and `bulk`
+  (`bulk-create-modal/`). `openModalRoute()` ties a dialog to its route: closing
+  it returns to the list with its filters, and Back closes it. Public cards link
+  editors to `/admin/<type>/<id>` with `<app-edit-button>`
+  (`components/edit-button/`).
 - **Per-type differences live in `EDITOR_TYPES`**
   (`pages/admin-page/editor-types.ts`): noun, statuses, search fields, field
   labels, flags, and the type's form, list cell, and bulk actions

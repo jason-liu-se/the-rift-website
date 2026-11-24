@@ -23,6 +23,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { environment } from 'src/environments/environment';
 import { EditorListComponent } from './editor-list.component';
 import { CollectionsStore } from '../../services/collections-store.service';
+import { EditorListStore } from './editor-list.store';
 
 const NEWS_URL = `${environment.API_URL}/editor/news`;
 const DRAFTS_URL = `${environment.API_URL}/editor/drafts?type=news`;
@@ -109,6 +110,7 @@ describe('EditorListComponent', () => {
 			imports: [EditorListComponent],
 			providers: [
 				CollectionsStore,
+				EditorListStore,
 				provideRouter([]),
 				{
 					provide: ActivatedRoute,
@@ -500,6 +502,7 @@ describe('EditorListComponent from a URL with filters', () => {
 			imports: [EditorListComponent],
 			providers: [
 				CollectionsStore,
+				EditorListStore,
 				provideRouter([]),
 				{
 					provide: ActivatedRoute,

@@ -35,7 +35,7 @@ const toast = (page: Page) => page.locator('app-toast');
 test.describe('on a protected page', () => {
 	test.beforeEach(async ({ page }) => {
 		await signIn(page);
-		await page.goto('/admin#news');
+		await page.goto('/admin/news');
 		await expect(page).toHaveTitle(/Admin/);
 	});
 
@@ -78,7 +78,7 @@ test.describe('on a protected page', () => {
 		// The API's login callback lands on /admin, now logged in again.
 		await page.goto('/admin');
 
-		await expect(page).toHaveURL(/\/admin#news$/);
+		await expect(page).toHaveURL(/\/admin\/news$/);
 	});
 
 	test('Go to the home page leaves the admin page', async ({
@@ -101,7 +101,7 @@ test(`${TAG.desktopOnly} a logout in another admin tab shows its dialog, which B
 	await gotoRoute(page, routeFor('/news'));
 	await page.getByRole('button', { name: 'Account menu' }).click();
 	await page.getByRole('menuitem', { name: 'Admin' }).click();
-	await expect(page).toHaveURL(/\/admin$/);
+	await expect(page).toHaveURL(/\/admin\/news$/);
 
 	const otherTab = await context.newPage();
 	await signIn(otherTab);

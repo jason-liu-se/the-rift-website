@@ -25,7 +25,7 @@ describe('EditButtonComponent', () => {
 	it('opens the item in its tool in a new tab, for an editor', () => {
 		const link = render({ id: '1', username: 'editor' })!;
 
-		expect(link.getAttribute('href')).toBe('/admin?edit=image%201#gallery');
+		expect(link.getAttribute('href')).toBe('/admin/gallery/image%201');
 		expect(link.target).toBe('_blank');
 		expect(link.textContent?.replace(/\s+/g, ' ').trim()).toBe(
 			'edit Edit Spawn walkway (opens in new tab)'
