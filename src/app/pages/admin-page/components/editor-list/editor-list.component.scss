@@ -5,9 +5,44 @@
 	display: block;
 }
 
+// The bulk action bar takes the filters' place without moving the table:
+// both sit in one grid cell, and the hidden filters keep their height.
+.list-head {
+	display: grid;
+	margin-bottom: 8px;
+
+	> * {
+		grid-area: 1 / 1;
+	}
+
+	&.selecting .filters {
+		visibility: hidden;
+	}
+}
+
+.bulk-bar {
+	align-self: start;
+}
+
 .preview-hint {
 	margin: 0 0 12px;
 	font-weight: 600;
+}
+
+// Reserves the bar's height, so it appearing doesn't move the table.
+.progress {
+	height: 4px;
+}
+
+.placeholder {
+	margin: 16px 0 8px;
+}
+
+.skeleton-row {
+	height: 3rem;
+	margin-bottom: 8px;
+	border-radius: 4px;
+	background-color: rgba($colour-light-grey, 0.6);
 }
 
 .editor-table {
@@ -16,78 +51,13 @@
 	font-size: $font-size-small;
 }
 
-// Mobile: each row is a card, its cells labelled.
+// Mobile: rows are cards (see EditorRowComponent), without column headings.
 thead {
 	display: none;
 }
 
-tr {
-	display: grid;
-	grid-template-columns: auto 1fr;
-	gap: 4px 8px;
-	padding: 8px 0;
-	border-bottom: 1px solid $colour-light-grey;
-	flex: 1;
-}
-
-td {
-	padding: 0 8px;
-}
-
-.select {
-	grid-row: span 2;
-}
-
-td[data-label]::before {
-	content: attr(data-label) ": ";
-	font-weight: 600;
-}
-
-td[data-label],
-.actions {
-	grid-column: 2;
-}
-
-tbody tr:hover {
-	background-color: rgba($colour-primary, 0.03);
-}
-
-tr.selected,
-.previewing tbody tr {
-	background-color: rgba($colour-primary, 0.06);
-}
-
-// Clicking a row opens it, like its Edit button.
-tr.openable {
-	cursor: pointer;
-}
-
-.item {
-	overflow-wrap: anywhere;
-	font-weight: 600;
-}
-
-.actions {
-	white-space: nowrap;
-}
-
-// A draft's image, as the tools show their items' (e.g. gallery thumbnails).
-.draft-item {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-}
-
-.draft-thumbnail {
-	flex: none;
-	width: 4rem;
-	aspect-ratio: 16 / 9;
-	border-radius: 4px;
-	object-fit: cover;
-}
-
 .empty {
-	grid-column: 1 / -1;
+	display: block;
 	padding: 24px 8px;
 	text-align: center;
 }
@@ -97,29 +67,16 @@ tr.openable {
 		display: table-header-group;
 	}
 
-	tr {
-		display: table-row;
-	}
-
-	th,
-	td {
+	th {
 		padding: 8px;
 		border-bottom: 1px solid $colour-light-grey;
-		vertical-align: middle;
-	}
-
-	th {
 		text-align: left;
 		font-size: $font-size-x-small;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 	}
 
-	td[data-label]::before {
-		content: none;
-	}
-
-	.actions {
-		text-align: right;
+	.empty {
+		display: table-cell;
 	}
 }

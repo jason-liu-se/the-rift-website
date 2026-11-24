@@ -22,3 +22,13 @@
 	gap: 8px;
 	margin-left: auto;
 }
+
+.type-actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	flex-basis: 100%;
+	padding-top: 8px;
+	border-top: 1px solid rgba($colour-primary, 0.15);
+}

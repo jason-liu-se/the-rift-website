@@ -25,14 +25,6 @@
 			}
 		}
 	</div>
-	<!-- A new list per tool: switching tools starts with its own filters. -->
-	@for (listType of [type()]; track listType) {
-		<app-editor-list
-			[type]="listType"
-			(editItem)="openItem($event)"
-			(duplicateItem)="duplicate($event)"
-			(openDraft)="openDraft($event)"
-		/>
-	}
+	<app-editor-list />
 </div>
 <router-outlet />

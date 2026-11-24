@@ -1,4 +1,5 @@
-import { Component, input, model } from '@angular/core';
+import { Component, computed, input, model, signal } from '@angular/core';
+import { MatButton } from '@angular/material/button';
 import { FormsModule } from '@angular/forms';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
@@ -14,7 +15,7 @@ export interface FilterOption {
 /** An admin list's filters, as the editor set them. */
 export interface ListFilters {
 	scope: 'all' | 'mine';
-	/** A status, `draft` for the editor's drafts only, or '' for any. */
+	/** A status, `draft` for the drafts only, or '' for any. */
 	status: string;
 	/** A collection's slug, or '' for any. */
 	collection: string;
@@ -38,6 +39,7 @@ export const NO_FILTERS: ListFilters = {
 	styleUrl: './list-filters.component.scss',
 	imports: [
 		FormsModule,
+		MatButton,
 		MatFormField,
 		MatInput,
 		MatLabel,
@@ -51,6 +53,20 @@ export class ListFiltersComponent {
 	public readonly searchFields = input.required<readonly FilterOption[]>();
 	/** Shown as a filter when the content type has collections. */
 	public readonly collections = input<readonly EditorCollection[]>();
+
+	/** Mobile: the filters other than search are behind a button. */
+	protected readonly isShowingMore = signal(false);
+
+	/** How many filters other than search are set, for the mobile button. */
+	protected readonly activeCount = computed(() => {
+		const { status, collection, scope, searchFields } = this.filters();
+		return [
+			status,
+			collection,
+			scope === 'mine',
+			searchFields.length > 0
+		].filter(Boolean).length;
+	});
 
 	public setFilter<K extends keyof ListFilters>(
 		key: K,

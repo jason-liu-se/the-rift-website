@@ -6,6 +6,8 @@ export interface ItemNoun {
 	many: string;
 }
 
+export const DRAFT_NOUN: ItemNoun = { one: 'draft', many: 'drafts' };
+
 /** What a bulk action did, for messages: "Deleted", "Moved". */
 export type BulkActionName =
 	'create' | 'delete' | 'show' | 'hide' | 'move' | 'add-tags' | 'remove-tags';

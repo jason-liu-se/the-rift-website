@@ -11,23 +11,15 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { MatButton } from '@angular/material/button';
-import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
-import { filter, skip, switchMap } from 'rxjs';
-import {
-	DraftSaveRequest,
-	EditorContentType
-} from 'src/app/interfaces/api-requests';
-import { DraftSummary } from 'src/app/interfaces/api-responses';
-import { DraftsService } from 'src/app/services/drafts/drafts.service';
-import { SummaryOf } from 'src/app/services/editor-content/editor-content-types';
-import { EditorContentService } from 'src/app/services/editor-content/editor-content.service';
-import { pickFields } from '../../drafts/draft-fields';
+import { RouterOutlet } from '@angular/router';
+import { skip } from 'rxjs';
+import { EditorContentType } from 'src/app/interfaces/api-requests';
 import { EDITOR_TYPES, toCollectionType } from '../../editor-types';
-import { EditorWriteService } from '../../services/editor-write.service';
-import { describeWriteError } from '../../utilities/write-errors';
 import { CollectionsManagerComponent } from '../collections-manager/collections-manager.component';
 import { CreateButtonComponent } from '../create-button/create-button.component';
 import { EditorListComponent } from '../editor-list/editor-list.component';
+import { BULK_ACTION_HOST } from '../editor-list/bulk-action-host';
+import { EditorListActions } from '../editor-list/editor-list.actions';
 import { EditorListStore } from '../editor-list/editor-list.store';
 
 /**
@@ -45,14 +37,13 @@ import { EditorListStore } from '../editor-list/editor-list.store';
 		MatButton,
 		RouterOutlet
 	],
-	providers: [EditorListStore]
+	providers: [
+		EditorListStore,
+		EditorListActions,
+		{ provide: BULK_ACTION_HOST, useExisting: EditorListActions }
+	]
 })
 export class EditorListPageComponent {
-	private router = inject(Router);
-	private route = inject(ActivatedRoute);
-	private editorContent = inject(EditorContentService);
-	private drafts = inject(DraftsService);
-	private writer = inject(EditorWriteService);
 	private injector = inject(Injector);
 	private heading = viewChild.required<ElementRef<HTMLElement>>('heading');
 
@@ -79,47 +70,5 @@ export class EditorListPageComponent {
 					injector: this.injector
 				});
 			});
-	}
-
-	protected openItem(item: SummaryOf<EditorContentType>): void {
-		this.openModal([item.id]);
-	}
-
-	protected openDraft(draft: DraftSummary): void {
-		this.openModal(['drafts', draft.id]);
-	}
-
-	/** Saves a copy of the item as a new draft, then opens it. */
-	protected duplicate(item: SummaryOf<EditorContentType>): void {
-		const type = this.type();
-		const draftId = crypto.randomUUID();
-		this.writer
-			.run({
-				request: () =>
-					this.editorContent.fetchItem(type, item.id).pipe(
-						switchMap((published) =>
-							this.drafts.saveDraft(draftId, {
-								type,
-								fields: pickFields(type, published)
-							} as DraftSaveRequest)
-						)
-					),
-				describeFailure: (error) =>
-					`Couldn't duplicate it. ${describeWriteError(error)}`
-			})
-			.pipe(filter(Boolean))
-			.subscribe(() => {
-				this.store.reload();
-				this.openModal(['drafts', draftId]);
-			});
-	}
-
-	/** Opens a modal route over the list, keeping its filters and scroll. */
-	private openModal(path: string[]): void {
-		this.router.navigate(path, {
-			relativeTo: this.route,
-			queryParamsHandling: 'preserve',
-			scroll: 'manual'
-		});
 	}
 }

@@ -36,15 +36,18 @@ export class EditorWriteService {
 	private dialog = inject(MatDialog);
 	private notifier = inject(AdminNotifierService);
 
+	/** Asks before a destructive action; emits once whether it was confirmed. */
+	public confirm(confirmation: ConfirmDialogData): Observable<boolean> {
+		return confirmAction(this.dialog, confirmation);
+	}
+
 	public run({
 		confirm,
 		request,
 		success,
 		describeFailure = describeWriteError
 	}: EditorWrite): Observable<boolean> {
-		const confirmed = confirm
-			? confirmAction(this.dialog, confirm)
-			: of(true);
+		const confirmed = confirm ? this.confirm(confirm) : of(true);
 		return confirmed.pipe(
 			filter(Boolean),
 			switchMap(() => request().pipe(defaultIfEmpty(undefined))),

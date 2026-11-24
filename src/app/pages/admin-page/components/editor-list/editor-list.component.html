@@ -1,73 +1,58 @@
-<app-list-filters
-	[filters]="filters()"
-	[statuses]="statuses()"
-	[searchFields]="searchFields()"
-	[collections]="collections()"
-	(filtersChange)="setFilters($event)"
-/>
+<div class="list-head" [class.selecting]="store.selectedCount() > 0">
+	<app-list-filters
+		class="filters"
+		[filters]="store.filters()"
+		[statuses]="store.config().statuses"
+		[searchFields]="store.config().searchFields"
+		[collections]="collections()"
+		(filtersChange)="store.setFilters($event)"
+	/>
+	@if (store.selectedCount() > 0) {
+		<app-bulk-action-bar class="bulk-bar" />
+	}
+</div>
 <p class="cdk-visually-hidden" role="status">
-	@if (selectedCount() > 0) {
-		{{ selectedCount() }} of {{ selectableCount() }} selected
+	@if (store.selectedCount() > 0) {
+		{{ store.selectedCount() }} of {{ store.selectableCount() }} selected
 	}
 </p>
-@if (selectedCount() > 0) {
-	<app-bulk-action-bar
-		[selectedCount]="selectedCount()"
-		[total]="selectableCount()"
-		[matchingCount]="total()"
-		[noun]="noun()"
-		[canSelectAllMatching]="
-			selection.isPageSelected(pageRows()) && total() > items().length
-		"
-		[isAllMatching]="selection.isAllMatching()"
-		[isBusy]="isBusy()"
-		(runAction)="runCommonAction($event)"
-		(selectAllMatching)="selectAllMatching()"
-		(clearSelection)="selection.clear()"
-	>
-		<ng-container ngProjectAs="[bulkActions]">
-			<ng-container *ngComponentOutlet="config().bulkActions ?? null" />
-		</ng-container>
-	</app-bulk-action-bar>
-}
-@if (selection.isPreviewingPage()) {
+@if (store.selection.isPreviewingPage()) {
 	<p class="preview-hint">
-		Select all {{ pageRowCount() }} on this page? Press Enter or Space to
+		Select all {{ pageRowsText() }} on this page? Press Enter or Space to
 		select them, or Escape to cancel.
 	</p>
 }
-@if (loadState.failed()) {
+@if (store.loadState.failed()) {
 	<app-fallback-panel
 		[heading]="'Couldn\'t load the ' + noun().many"
-		[busy]="loadState.retrying()"
-		(action)="reloadItems()"
+		[busy]="store.loadState.retrying()"
+		(action)="store.reload()"
 	>
 		The server didn't answer. Check your connection and try again.
 	</app-fallback-panel>
+} @else if (!store.hasLoaded()) {
+	<p class="placeholder" role="status">Loading {{ noun().many }}…</p>
+	<div class="skeleton" aria-hidden="true">
+		@for (row of [1, 2, 3, 4, 5]; track row) {
+			<div class="skeleton-row"></div>
+		}
+	</div>
 } @else {
-	<table
-		class="editor-table"
-		[class.previewing]="selection.isPreviewingPage()"
-	>
+	<div class="progress">
+		@if (store.isLoading()) {
+			<mat-progress-bar mode="indeterminate" aria-label="Updating" />
+		}
+	</div>
+	<table class="editor-table">
 		<caption class="cdk-visually-hidden">
 			{{
-				noun().many
+				store.config().label
 			}}
 		</caption>
 		<thead>
 			<tr>
 				<th scope="col" class="select">
-					<mat-checkbox
-						color="primary"
-						aria-label="Select every row on this page"
-						[checked]="selection.isPageSelected(pageRows())"
-						[indeterminate]="
-							selectedCount() > 0 &&
-							!selection.isPageSelected(pageRows())
-						"
-						[disabled]="!hasRows()"
-						(change)="togglePage($event.checked)"
-					/>
+					<span class="cdk-visually-hidden">Select</span>
 				</th>
 				<th scope="col">{{ noun().one }}</th>
 				<th scope="col">Status</th>
@@ -77,142 +62,36 @@
 				</th>
 			</tr>
 		</thead>
-		<tbody>
-			@for (draft of newDrafts(); track draft.id) {
-				<tr
-					class="openable"
-					tabindex="0"
-					[class.selected]="selection.isDraftSelected(draft.id)"
-					(click)="openFromRow($event, () => openDraft.emit(draft))"
-					(keydown.enter)="
-						openFromRow($event, () => openDraft.emit(draft))
-					"
-				>
-					<td class="select">
-						<mat-checkbox
-							color="primary"
-							[aria-label]="
-								'Select draft ' + itemName(draft.fields)
-							"
-							[checked]="selection.isDraftSelected(draft.id)"
-							(change)="selection.toggleDraft(draft.id)"
-						/>
-					</td>
-					<td class="item">
-						<span class="draft-item">
-							@if (draft.fields.imageUrl) {
-								<img
-									class="draft-thumbnail"
-									[src]="draft.fields.imageUrl"
-									alt=""
-									loading="lazy"
-								/>
-							}
-							{{ itemName(draft.fields) }}
-						</span>
-					</td>
-					<td data-label="Status">
-						<app-status-badge status="draft" />
-					</td>
-					<td data-label="Last edited by">
-						<app-editor-avatar [editor]="currentUser()" />
-					</td>
-					<td class="actions">
-						<button
-							mat-icon-button
-							type="button"
-							[attr.aria-label]="
-								'Delete draft ' + itemName(draft.fields)
-							"
-							(click)="deleteDraft(draft)"
-						>
-							<mat-icon>delete</mat-icon>
-						</button>
+		@if (store.draftRows().length > 0) {
+			<tbody
+				app-row-group
+				label="Drafts"
+				[rows]="store.draftRows()"
+			></tbody>
+		}
+		@if (showsPublished()) {
+			<tbody
+				app-row-group
+				label="Published"
+				[rows]="store.itemRows()"
+				[count]="store.total()"
+			></tbody>
+		}
+		@if (store.pageRowCount() === 0) {
+			<tbody>
+				<tr>
+					<td class="empty" colspan="5">
+						No {{ noun().many }} match.
 					</td>
 				</tr>
-			}
-			@for (item of items(); track item.id) {
-				<tr
-					class="openable"
-					tabindex="0"
-					[class.selected]="selection.isSelected(item.id)"
-					(click)="openFromRow($event, () => editItem.emit(item))"
-					(keydown.enter)="
-						openFromRow($event, () => editItem.emit(item))
-					"
-				>
-					<td class="select">
-						<mat-checkbox
-							color="primary"
-							[aria-label]="'Select ' + itemName(item)"
-							[checked]="selection.isSelected(item.id)"
-							(change)="toggleRow(item)"
-						/>
-					</td>
-					<td class="item">
-						<ng-container
-							*ngComponentOutlet="
-								config().itemCell;
-								inputs: { item }
-							"
-						/>
-					</td>
-					<td data-label="Status">
-						<app-status-badge
-							[status]="item.status"
-							[date]="$any(item).date"
-							[hasDraft]="idsWithDrafts().has(item.id)"
-						/>
-					</td>
-					<td data-label="Last edited by">
-						<app-editor-avatar [editor]="item.lastUpdatedBy" />
-					</td>
-					<td class="actions">
-						<button
-							mat-icon-button
-							type="button"
-							[attr.aria-label]="
-								'More actions for ' + itemName(item)
-							"
-							[matMenuTriggerFor]="rowMenu"
-						>
-							<mat-icon>more_vert</mat-icon>
-						</button>
-						<mat-menu #rowMenu="matMenu">
-							<button
-								mat-menu-item
-								(click)="duplicateItem.emit(item)"
-							>
-								Duplicate as a new draft
-							</button>
-							<button
-								mat-menu-item
-								(click)="toggleVisibility(item)"
-							>
-								{{ item.visible ? "Hide" : "Show" }}
-							</button>
-							<button mat-menu-item (click)="deleteItem(item)">
-								Delete
-							</button>
-						</mat-menu>
-					</td>
-				</tr>
-			} @empty {
-				@if (page() && newDrafts().length === 0) {
-					<tr>
-						<td class="empty" colspan="6">
-							No {{ noun().many }} match.
-						</td>
-					</tr>
-				}
-			}
-		</tbody>
+			</tbody>
+		}
 	</table>
-	@if (total() > pageSize) {
+	@if (store.total() > pageSize) {
 		<mat-paginator
-			[length]="total()"
+			[length]="store.total()"
 			[pageSize]="pageSize"
-			[pageIndex]="pageIndex()"
+			[pageIndex]="store.pageIndex()"
 			[hidePageSize]="true"
 			[showFirstLastButtons]="true"
 			aria-label="Select page"

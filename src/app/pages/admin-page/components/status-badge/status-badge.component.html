@@ -1,8 +1,5 @@
 <span class="badge" [class]="status()">
 	{{ labels[status()] }}
-	@if (status() === "scheduled" && date()) {
-		<time [attr.datetime]="date()">{{ formatDateTime(date()!) }}</time>
-	}
 </span>
 @if (hasDraft()) {
 	<span class="badge has-draft">Has your draft</span>

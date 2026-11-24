@@ -14,6 +14,7 @@
 @include mat.radio-theme($app-theme);
 @include mat.chips-theme($app-theme);
 @include mat.autocomplete-theme($app-theme);
+@include mat.progress-bar-theme($app-theme);
 
 // The admin tools' modals (editor, bulk creation): full screen on mobile,
 // large on desktop.
@@ -36,4 +37,10 @@
 			border-radius: 12px;
 		}
 	}
+}
+
+// Admin list filters other than search: compact fields.
+.mat-mdc-form-field.compact {
+	@include mat.form-field-density(-3);
+	@include mat.select-density(-3);
 }

@@ -30,12 +30,11 @@ import { EditorContentService } from 'src/app/services/editor-content/editor-con
 import { describeWriteError } from '../../utilities/write-errors';
 import {
 	BulkSummary,
+	DRAFT_NOUN,
 	ItemNoun,
 	summarizeBulkResults,
 	toChunks
 } from './bulk-results';
-
-const DRAFTS = { one: 'draft', many: 'drafts' };
 
 /**
  * Runs a bulk action on a selection: in requests of at most MAX_BULK_ITEMS,
@@ -102,7 +101,9 @@ export class BulkActionRunnerService {
 				)
 			),
 			toArray(),
-			map((results) => summarizeBulkResults('delete', results, DRAFTS))
+			map((results) =>
+				summarizeBulkResults('delete', results, DRAFT_NOUN)
+			)
 		);
 	}
 
