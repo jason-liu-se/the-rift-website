@@ -10,6 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ADMIN_LOGIN_PATH } from 'src/app/config/admin';
 import { saveLoginReturnUrl } from 'src/app/guards/login-return-url';
+import { BrowserStorage } from 'src/app/services/browser-storage/browser-storage.service';
 import { isOnProtectedPage } from 'src/app/guards/requires-login';
 import {
 	AuthService,
@@ -28,6 +29,7 @@ import {
 export class SessionEndedService {
 	private auth = inject(AuthService);
 	private router = inject(Router);
+	private storage = inject(BrowserStorage);
 	private injector = inject(Injector);
 	private destroyRef = inject(DestroyRef);
 	private isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
@@ -53,7 +55,7 @@ export class SessionEndedService {
 				// Its code is gone (a deploy replaced it). A protected page no
 				// longer works: log in again as the dialog would, returning here.
 				if (onProtectedPage) {
-					saveLoginReturnUrl(this.router.url);
+					saveLoginReturnUrl(this.storage, this.router.url);
 					void this.router.navigateByUrl(ADMIN_LOGIN_PATH);
 				}
 			});

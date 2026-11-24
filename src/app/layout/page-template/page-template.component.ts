@@ -19,9 +19,10 @@ import { NavbarComponent } from '../navbar/navbar.component';
 import { ContactComponent } from '../../components/contact/contact.component';
 import { FooterComponent } from '../footer/footer.component';
 import { StatusBannerComponent } from '../status-banner/status-banner.component';
-
-/** sessionStorage key set while reloading after a page chunk failed to load. */
-export const CHUNK_RELOAD_KEY = 'reloaded-after-chunk-error';
+import {
+	BrowserStorage,
+	STORAGE_KEYS
+} from 'src/app/services/browser-storage/browser-storage.service';
 
 @Component({
 	selector: 'app-page-template',
@@ -44,9 +45,8 @@ export class PageTemplateComponent implements OnInit {
 	private injector = inject(Injector);
 	// Read now: by the time the page has loaded, the first navigation has ended.
 	private isInAppNavigation = this.router.navigated;
-	private storage = isPlatformBrowser(inject(PLATFORM_ID))
-		? sessionStorage
-		: null;
+	private storage = inject(BrowserStorage);
+	private isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 	private mainContent =
 		viewChild.required<ElementRef<HTMLElement>>('mainContent');
 
@@ -117,13 +117,15 @@ export class PageTemplateComponent implements OnInit {
 			this.route.snapshot.data['loadComponent'];
 		try {
 			const component = await loadComponent();
-			this.storage?.removeItem(CHUNK_RELOAD_KEY);
+			this.storage.remove('session', STORAGE_KEYS.chunkReload);
 			return component;
 		} catch (error) {
-			if (!this.storage || this.storage.getItem(CHUNK_RELOAD_KEY)) {
+			const hasReloaded =
+				this.storage.get('session', STORAGE_KEYS.chunkReload) !== null;
+			if (!this.isBrowser || hasReloaded) {
 				throw error;
 			}
-			this.storage.setItem(CHUNK_RELOAD_KEY, 'true');
+			this.storage.set('session', STORAGE_KEYS.chunkReload, 'true');
 			this.document.location.reload();
 			return null;
 		}

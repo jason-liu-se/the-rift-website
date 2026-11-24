@@ -1,12 +1,13 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
 	DraftContent,
 	DraftTarget,
 	EditorContentType
 } from '../../interfaces/api-requests';
-
-/** The `localStorage` key prefix for drafts; the draft's ID follows. */
-export const LOCAL_DRAFT_KEY_PREFIX = 'draft:';
+import {
+	BrowserStorage,
+	STORAGE_KEYS
+} from '../browser-storage/browser-storage.service';
 
 /** A draft as this browser last saw it, saved as the editor types. */
 export type LocalDraft = DraftContent & {
@@ -24,57 +25,41 @@ export type LocalDraft = DraftContent & {
 
 /**
  * Drafts kept in `localStorage`, so editing works offline and survives a
- * closed tab; DraftSyncService sends pending ones to the server. Storage can
- * be blocked or full: then only the offline copy is lost.
+ * closed tab; DraftSyncService sends pending ones to the server. If storage
+ * is blocked or full, only the offline copy is lost.
  */
 @Injectable({
 	providedIn: 'root'
 })
 export class LocalDraftsService {
+	private storage = inject(BrowserStorage);
+
 	public save(draft: LocalDraft): void {
-		try {
-			localStorage.setItem(keyFor(draft.id), JSON.stringify(draft));
-		} catch {
-			// Nothing to do: the server copy still autosaves.
-		}
+		this.storage.setJson('local', keyFor(draft.id), draft);
 	}
 
 	public find(id: string): LocalDraft | undefined {
-		try {
-			const saved = localStorage.getItem(keyFor(id));
-			return saved ? (JSON.parse(saved) as LocalDraft) : undefined;
-		} catch {
-			return undefined;
-		}
+		return this.storage.getJson<LocalDraft>('local', keyFor(id));
 	}
 
 	public remove(id: string): void {
-		try {
-			localStorage.removeItem(keyFor(id));
-		} catch {
-			// Nothing to do.
-		}
+		this.storage.remove('local', keyFor(id));
 	}
 
 	/** The owner's drafts in this browser, optionally of one type. */
 	public list(owner: string, type?: EditorContentType): LocalDraft[] {
-		try {
-			return Object.keys(localStorage)
-				.filter((key) => key.startsWith(LOCAL_DRAFT_KEY_PREFIX))
-				.map(
-					(key) =>
-						JSON.parse(localStorage.getItem(key)!) as LocalDraft
-				)
-				.filter(
-					(draft) =>
-						draft.owner === owner && (!type || draft.type === type)
-				);
-		} catch {
-			return [];
-		}
+		return this.storage
+			.keys('local', STORAGE_KEYS.draftPrefix)
+			.flatMap(
+				(key) => this.storage.getJson<LocalDraft>('local', key) ?? []
+			)
+			.filter(
+				(draft) =>
+					draft.owner === owner && (!type || draft.type === type)
+			);
 	}
 }
 
 function keyFor(id: string): string {
-	return `${LOCAL_DRAFT_KEY_PREFIX}${id}`;
+	return `${STORAGE_KEYS.draftPrefix}${id}`;
 }

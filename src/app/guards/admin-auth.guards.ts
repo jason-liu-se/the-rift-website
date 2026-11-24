@@ -3,6 +3,7 @@ import { CanActivateFn, Router } from '@angular/router';
 import { map } from 'rxjs';
 import { ADMIN_LOGIN_PATH, ADMIN_PATH } from '../config/admin';
 import { AuthService } from '../services/auth/auth.service';
+import { BrowserStorage } from '../services/browser-storage/browser-storage.service';
 import { takeLoginReturnUrl } from './login-return-url';
 
 /**
@@ -12,6 +13,7 @@ import { takeLoginReturnUrl } from './login-return-url';
  */
 export const requireLoggedIn: CanActivateFn = (_route, state) => {
 	const router = inject(Router);
+	const storage = inject(BrowserStorage);
 	return inject(AuthService)
 		.checkSession()
 		.pipe(
@@ -19,7 +21,7 @@ export const requireLoggedIn: CanActivateFn = (_route, state) => {
 				if (!user) {
 					return router.parseUrl(ADMIN_LOGIN_PATH);
 				}
-				const returnUrl = takeLoginReturnUrl();
+				const returnUrl = takeLoginReturnUrl(storage);
 				return returnUrl && returnUrl !== state.url
 					? router.parseUrl(returnUrl)
 					: true;
