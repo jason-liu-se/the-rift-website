@@ -1,26 +1,14 @@
 import { DOCUMENT, IMAGE_LOADER } from '@angular/common';
-import {
-	Component,
-	ElementRef,
-	Injector,
-	afterNextRender,
-	computed,
-	effect,
-	inject,
-	viewChild
-} from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { Component, inject } from '@angular/core';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
-import { Title } from '@angular/platform-browser';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { ContentToolComponent } from './components/content-tool/content-tool.component';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { EDITOR_TYPES, EDITOR_TYPE_ORDER } from './editor-types';
+import { OpenDraftService } from './drafts/open-draft.service';
 import { CollectionsStore } from './services/collections-store.service';
-import { SITE_NAME } from 'src/app/config/site';
 import { originalImageLoader } from 'src/app/utilities/image-loaders';
 
-/** The tools, in sidebar order; each opens by its URL fragment, e.g. /admin#news. */
+/** The tools, in sidebar order; each at /admin/<type>. */
 export const ADMIN_TOOLS = EDITOR_TYPE_ORDER.map((id) => ({
 	id,
 	label: EDITOR_TYPES[id].label,
@@ -28,18 +16,19 @@ export const ADMIN_TOOLS = EDITOR_TYPE_ORDER.map((id) => ({
 }));
 
 /**
- * A dashboard of tools for creating site content, one at a time, picked by URL
- * fragment from the sidebar (a tab bar on mobile).
+ * The admin shell: the tools' sidebar (a tab bar on mobile) beside the open
+ * tool (a child route).
  */
 @Component({
 	selector: 'app-admin-page',
 	templateUrl: './admin-page.component.html',
 	styleUrls: ['./admin-page.component.scss'],
-	imports: [ContentToolComponent, MatIcon, RouterLink],
+	imports: [MatIcon, RouterLink, RouterLinkActive, RouterOutlet],
 	// Previews show whatever URL an editor types: don't spend Cloudflare
 	// transformations on them.
 	providers: [
 		CollectionsStore,
+		OpenDraftService,
 		{ provide: IMAGE_LOADER, useValue: originalImageLoader },
 		// Outlined, not filled: a focused label on the fill's grey is under
 		// 4.5:1 contrast.
@@ -50,37 +39,12 @@ export const ADMIN_TOOLS = EDITOR_TYPE_ORDER.map((id) => ({
 	]
 })
 export class AdminPageComponent {
-	private title = inject(Title);
-	private injector = inject(Injector);
-	private fragment = toSignal(inject(ActivatedRoute).fragment);
-	private toolTitle =
-		viewChild.required<ElementRef<HTMLElement>>('toolTitle');
-
-	public readonly tools = ADMIN_TOOLS;
-	/** An unknown or missing fragment opens the first tool. */
-	public readonly activeTool = computed(
-		() =>
-			this.tools.find((tool) => tool.id === this.fragment()) ??
-			this.tools[0]
-	);
+	protected readonly tools = ADMIN_TOOLS;
 
 	constructor() {
 		loadAdminTheme(inject(DOCUMENT));
-		let isFirstTool = true;
-		// Switching tools only changes the fragment, so say so: retitle the
-		// document, and move focus to the new heading (not on first load, when
-		// PageTemplateComponent handles focus).
-		effect(() => {
-			const tool = this.activeTool();
-			this.title.setTitle(`${tool.label} · Admin | ${SITE_NAME}`);
-			if (isFirstTool) {
-				isFirstTool = false;
-				return;
-			}
-			afterNextRender(() => this.toolTitle().nativeElement.focus(), {
-				injector: this.injector
-			});
-		});
+		// Starts syncing drafts saved only in this browser.
+		inject(OpenDraftService);
 	}
 }
 

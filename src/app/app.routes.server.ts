@@ -22,9 +22,10 @@ export const serverRoutes: ServerRoute[] = [
 	{ path: 'downloads', renderMode: RenderMode.Server },
 	{ path: 'map', renderMode: RenderMode.Server },
 	// Admin pages: the API's login cookies only reach the browser.
+	// (admin/login and every tool, item, and modal under admin/).
 	{ path: 'admin', renderMode: RenderMode.Client, headers: NOINDEX_HEADERS },
 	{
-		path: 'admin/login',
+		path: 'admin/**',
 		renderMode: RenderMode.Client,
 		headers: NOINDEX_HEADERS
 	},

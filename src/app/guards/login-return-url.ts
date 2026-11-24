@@ -1,7 +1,7 @@
 /**
  * The `sessionStorage` key holding the page to return to after logging in
  * again. The API's login always lands on the admin page, so the app remembers
- * the rest (e.g. the tool's fragment, `/admin#news`) itself. `sessionStorage`
+ * the rest (e.g. the tool and item, `/admin/news/<id>`) itself. `sessionStorage`
  * keeps it through the Discord round trip in the same tab.
  */
 export const LOGIN_RETURN_URL_KEY = 'login-return-url';

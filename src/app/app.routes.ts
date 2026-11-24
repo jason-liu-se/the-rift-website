@@ -146,22 +146,6 @@ export const routes: Routes = [
 		}
 	},
 	{
-		path: 'admin',
-		component: PageTemplateComponent,
-		title: 'Admin',
-		canActivate: [requireLoggedIn],
-		data: {
-			description: 'Tools for editors of The Rift website.',
-			noindex: true,
-			loadComponent: () =>
-				import('./pages/admin-page/admin-page.component').then(
-					(m) => m.AdminPageComponent
-				),
-			isTransparent: false,
-			showFooter: false
-		}
-	},
-	{
 		path: 'admin/login',
 		component: PageTemplateComponent,
 		title: 'Admin Login',
@@ -176,6 +160,23 @@ export const routes: Routes = [
 			isTransparent: false,
 			showFooter: false
 		}
+	},
+	{
+		path: 'admin',
+		component: PageTemplateComponent,
+		title: 'Admin',
+		canActivate: [requireLoggedIn],
+		data: {
+			description: 'Tools for editors of The Rift website.',
+			noindex: true,
+			loadComponent: () =>
+				import('./pages/admin-page/admin-page.component').then(
+					(m) => m.AdminPageComponent
+				),
+			isTransparent: false,
+			showFooter: false
+		},
+		loadChildren: () => import('./pages/admin-page/admin.routes')
 	},
 	{
 		path: '**',

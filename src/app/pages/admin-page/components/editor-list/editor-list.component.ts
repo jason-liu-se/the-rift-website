@@ -67,6 +67,7 @@ import { CollectionsStore } from '../../services/collections-store.service';
 import { EditorWriteService } from '../../services/editor-write.service';
 import { describeWriteError } from '../../utilities/write-errors';
 import { BULK_ACTION_HOST, BulkActionHost } from './bulk-action-host';
+import { EditorListStore } from './editor-list.store';
 import { confirmAction } from '../confirm-dialog/confirm-dialog.component';
 import { EditorAvatarComponent } from '../editor-avatar/editor-avatar.component';
 import { StatusBadgeComponent } from '../status-badge/status-badge.component';
@@ -233,7 +234,7 @@ export class EditorListComponent<
 			toObservable(this.query),
 			toObservable(this.pageIndex)
 		]);
-		merge(requests, this.reloads)
+		merge(requests, this.reloads, inject(EditorListStore).reloads)
 			.pipe(
 				map(() => ({
 					query: this.query(),
@@ -463,7 +464,6 @@ export class EditorListComponent<
 				relativeTo: this.route,
 				queryParams: params,
 				queryParamsHandling: 'merge',
-				preserveFragment: true,
 				replaceUrl: true
 			});
 		}

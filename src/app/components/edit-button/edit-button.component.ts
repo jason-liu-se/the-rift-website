@@ -1,13 +1,13 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
-import { ADMIN_PATH, EDITOR_PARAMS } from 'src/app/config/admin';
+import { ADMIN_PATH } from 'src/app/config/admin';
 import { EditorContentType } from 'src/app/interfaces/api-requests';
 import { AuthService } from 'src/app/services/auth/auth.service';
 
 /**
  * "Edit" on a piece of public content, for logged-in editors only: opens the
- * item in its admin tool (whose fragment is the content type) in a new tab. The server never knows the user, so
- * server-rendered HTML never has it.
+ * item in its admin tool's editor in a new tab. The server never knows the
+ * user, so server-rendered HTML never has it.
  */
 @Component({
 	selector: 'app-edit-button',
@@ -26,6 +26,6 @@ export class EditButtonComponent {
 	protected readonly isEditor = computed(() => !!this.user());
 	protected readonly href = computed(
 		() =>
-			`${ADMIN_PATH}?${EDITOR_PARAMS.edit}=${encodeURIComponent(this.itemId())}#${this.type()}`
+			`${ADMIN_PATH}/${this.type()}/${encodeURIComponent(this.itemId())}`
 	);
 }

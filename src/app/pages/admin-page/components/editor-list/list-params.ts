@@ -3,8 +3,7 @@ import { ListFilters, NO_FILTERS } from './list-filters/list-filters.component';
 
 /**
  * The list's filters and page in the URL's query parameters, so they're still
- * set after opening an item and coming back, or reloading. Distinct from the
- * editor's (EDITOR_PARAMS).
+ * set after reloading or going Back.
  */
 export const LIST_PARAMS = {
 	search: 'search',

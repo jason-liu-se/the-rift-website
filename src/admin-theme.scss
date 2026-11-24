@@ -14,3 +14,26 @@
 @include mat.radio-theme($app-theme);
 @include mat.chips-theme($app-theme);
 @include mat.autocomplete-theme($app-theme);
+
+// The admin tools' modals (editor, bulk creation): full screen on mobile,
+// large on desktop.
+.admin-modal {
+	width: 100vw;
+	height: 100dvh;
+
+	.mat-mdc-dialog-surface {
+		padding: 16px;
+		border-radius: 0;
+	}
+
+	@media (min-width: 60rem) {
+		width: min(64rem, 92vw);
+		height: auto;
+
+		.mat-mdc-dialog-surface {
+			max-height: 92dvh;
+			padding: 24px 32px;
+			border-radius: 12px;
+		}
+	}
+}
