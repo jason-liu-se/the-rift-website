@@ -69,6 +69,13 @@ Before launching, settle each of these that isn't already decided:
 - **Order**: tasks that depend on another's output run after it, or after its
   contract is merged. Parallelize only independent tasks.
 - **Design direction and scope cuts**, when the issue leaves them open.
+- **Architecture**, for a feature of several tasks: the design `CLAUDE.md`
+  "Design before building" asks for (component tree and ownership, where state
+  lives, routes, data flow, write sequencing), checked against
+  `.claude/rules/component-design.md`. It goes in the plan of record, and the
+  user approves it before any task launches.
+- **Task size**: split any task likely to exceed about 500 lines of non-test
+  code (`CLAUDE.md` "Git workflow").
 
 Ask in one round with the `grilling` skill's format (numbered questions, each
 with your recommended answer), and only about what you can't decide from the

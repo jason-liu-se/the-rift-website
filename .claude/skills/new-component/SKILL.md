@@ -55,7 +55,9 @@ and the `app` selector prefix comes from the project config.
   outputs, and control flow.
 - Give it one responsibility. Pass data in through inputs and events out through
   outputs; leave API calls to the page or a service unless the component owns
-  that data.
+  that data. Follow `.claude/rules/component-design.md` (state, data flow,
+  variants, size, class layout). Follow `.claude/rules/component-design.md`
+  (state, data flow, variants, size, class layout).
 - Build interactive behaviour on Angular Aria, not Material (outside the admin
   pages). Keep its stylesheet small and use only palette colours
   (`.claude/rules/ui-standards.md`).
@@ -63,9 +65,12 @@ and the `app` selector prefix comes from the project config.
 
 ## 5. Tests
 
-Replace the generated "should create" spec with tests of real behaviour (inputs,
-outputs, rendered state, requests), using `.claude/rules/testing.md`. If you
-extended or extracted from an existing component, update its spec too. Run:
+Replace the generated "should create" spec with tests of the behaviour callers
+rely on (outputs emitted, requests sent, where an action leads), not its markup,
+following `.claude/rules/testing.md` "What to test". A component that only
+presents data may need no spec if an e2e flow covers it; then delete the
+generated one. If you extended or extracted from an existing component, update
+its spec too. Run:
 
 ```bash
 npm test -- --watch=false --include <folder>/<name>

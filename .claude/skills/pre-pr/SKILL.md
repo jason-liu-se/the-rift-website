@@ -27,8 +27,10 @@ the targeted e2e specs for the affected routes (`.claude/rules/testing.md` "When
 to run"). Run the full suite only for high-risk changes (see the `orchestrate`
 skill's tiers) or when the user asks.
 
-If the change is UI-facing, capture and upload screenshots of the affected
-feature for the PR description (`.claude/rules/testing.md` "PR screenshots").
+If the change is UI-facing, capture the affected feature in each of its states
+on desktop and mobile, look at every image, and fix what looks wrong
+(`.claude/rules/testing.md` "Looking at the UI"). Then upload the final captures
+for the PR description ("PR screenshots").
 
 ## 2. Code review
 

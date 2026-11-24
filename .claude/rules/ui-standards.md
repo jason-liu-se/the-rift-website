@@ -66,6 +66,21 @@ The whole site works by keyboard alone:
 - Async results: ignore any response but the latest request's (a request counter
   or `switchMap`), not "is this still the current page".
 
+## States and layout
+
+- Every view backed by data has a loading, an empty, and an error state, and
+  shows when a refetch is under way instead of leaving stale content looking
+  current.
+- Show each fact once: don't repeat a date or status in a badge and the text
+  beside it.
+- Bars and messages that appear on interaction (a selection bar, a hint) take
+  reserved space or overlay the page, instead of pushing down the content the
+  user is acting on.
+- Keep secondary text (hints, metadata) visibly quieter than labels and content.
+- On narrow screens, show what a row is for (its name and main status) and move
+  the rest into its detail or a menu. Don't stack every column into labelled
+  lines.
+
 ## Responsive
 
 - Mobile-first `min-width` queries reusing the breakpoints in
