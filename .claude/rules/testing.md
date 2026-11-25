@@ -103,7 +103,7 @@ on desktop and mobile, before and after where it changed something existing
 (capture "before" from the base branch). Capture with the mocks applied:
 
 ```bash
-PR_SCREENSHOTS='/news, /admin|.admin-sidebar' npm run e2e -- e2e/pr-screenshots.spec.ts
+PR_SCREENSHOTS='/news, /admin|.tool-nav' npm run e2e -- e2e/pr-screenshots.spec.ts
 node scripts/pr-screenshots/upload.mjs test-results/pr-screenshots/*.png
 ```
 

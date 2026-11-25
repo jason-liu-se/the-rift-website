@@ -1,6 +1,6 @@
 // Screenshots for a pull request, not a test: runs only when PR_SCREENSHOTS
 // lists what to capture (playwright.config.ts ignores it otherwise), e.g.
-//   PR_SCREENSHOTS='/news, /admin|.admin-sidebar' npm run e2e -- e2e/pr-screenshots.spec.ts
+//   PR_SCREENSHOTS='/news, /admin|.tool-nav' npm run e2e -- e2e/pr-screenshots.spec.ts
 // Each entry is a route path, optionally `|<CSS selector>` to crop to one
 // feature. Images go to test-results/pr-screenshots/; upload them with
 // scripts/pr-screenshots/upload.mjs (.claude/rules/testing.md).
