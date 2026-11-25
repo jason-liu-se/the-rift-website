@@ -28,9 +28,10 @@ The decisions are in issue #101; the API's side is in the web-server's
   `/admin/<type>/<id>` with `<app-edit-button>` (`components/edit-button/`).
 - **The editor** shows the type's form beside its `preview` (Edit and Preview
   tabs on mobile). `PublishSettings` (`draft-editor/publish-settings.ts`,
-  provided per editor modal) holds how it'll publish (visibility, news's date)
-  and whether publishing was tried, shared by the footer and the form's fields;
-  its `ErrorStateMatcher` marks blank required fields only after that.
+  provided per editor modal) holds when it'll publish (news's date) and whether
+  publishing was tried (visibility is the draft's own `visible`), shared by the
+  footer and the form's fields; its `ErrorStateMatcher` marks blank required
+  fields only after that.
 - **Per-type differences live in `EDITOR_TYPES`**
   (`pages/admin-page/editor-types.ts`): noun, statuses, search fields, field
   labels, flags, sortable columns (`nameColumn`, an `extraColumn`) and
@@ -54,8 +55,9 @@ The decisions are in issue #101; the API's side is in the web-server's
   modal lists them beside `collection-form/`, which creates one or edits one's
   title and dimensions. Dimensions (a name and image each) use the same
   `dimensions-editor/` as map seasons, which add BlueMap fields
-  (`withMapFields`). The `/gallery` card shows the collection's first
-  dimension's image, or none.
+  (`withMapFields`). The form's save button sits in the modal's footer through
+  `ModalFooterSlot` (`modal-shell/modal-footer-slot.ts`). The `/gallery` card
+  shows the collection's first dimension's image, or none.
 - **Writes** (confirm, send, snackbar) go through `EditorWriteService.run()`.
 - **API:** `EditorContentService` (items, bulk actions, collections),
   `DraftsService`, and `ImageUploadService`, typed per content type by
