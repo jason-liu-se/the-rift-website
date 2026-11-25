@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import {
 	Component,
 	DestroyRef,
@@ -10,6 +11,7 @@ import { EDITOR_TYPES, toCollectionType } from '../../editor-types';
 import { openModalRoute } from '../../utilities/modal-route';
 import { CollectionsManagerComponent } from '../collections-manager/collections-manager.component';
 import { EditorListStore } from '../editor-list/editor-list.store';
+import { ModalFooterSlot } from '../modal-shell/modal-footer-slot';
 import { ModalShellComponent } from '../modal-shell/modal-shell.component';
 
 /** A type's collections, in a modal over its list (`/admin/<type>/collections`). */
@@ -27,9 +29,17 @@ import { ModalShellComponent } from '../modal-shell/modal-shell.component';
 					(changed)="isChanged = true"
 				/>
 			}
+			<div modalFooter>
+				<ng-container *ngTemplateOutlet="footer.template() ?? null" />
+			</div>
 		</app-modal-shell>
 	</ng-template>`,
-	imports: [CollectionsManagerComponent, ModalShellComponent]
+	imports: [
+		CollectionsManagerComponent,
+		ModalShellComponent,
+		NgTemplateOutlet
+	],
+	providers: [ModalFooterSlot]
 })
 export class CollectionsModalComponent {
 	private content = viewChild.required<TemplateRef<unknown>>('content');
@@ -45,6 +55,8 @@ export class CollectionsModalComponent {
 	protected readonly close = openModalRoute(() => this.content(), {
 		wide: true
 	});
+	/** The form's save button, kept in view below the list and form. */
+	protected readonly footer = inject(ModalFooterSlot);
 	protected isChanged = false;
 
 	constructor() {
