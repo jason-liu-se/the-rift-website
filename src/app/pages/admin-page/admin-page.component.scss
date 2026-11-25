@@ -118,6 +118,7 @@ $tab-bar-height: 4rem;
 
 	.tool-nav {
 		position: sticky;
+		box-sizing: border-box;
 		top: calc($bar-height + var(--status-banner-height, 0px));
 		align-self: flex-start;
 		flex: 0 0 14rem;

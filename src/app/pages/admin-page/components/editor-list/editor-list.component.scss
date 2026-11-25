@@ -15,8 +15,18 @@
 		grid-area: 1 / 1;
 	}
 
-	// Desktop: the bar stands in for the filters (on mobile it floats).
+	// Desktop: the bar stands in for the filters, and stays in view while
+	// scrolling a long selection (on mobile it floats).
 	@media (min-width: 60rem) {
+		&.selecting {
+			position: sticky;
+			z-index: 2;
+			top: calc(
+				var(--navbar-height, 0px) + var(--status-banner-height, 0px) +
+					8px
+			);
+		}
+
 		&.selecting .filters {
 			visibility: hidden;
 		}
