@@ -61,7 +61,7 @@ export interface GalleryCollectionFixture extends GalleryCollection {
 }
 
 export const GALLERY_COLLECTIONS: GalleryCollectionFixture[] = [
-	// Season 5 has dimensions (its Overworld is its card); season 6 has none.
+	// Season 5 has dimensions (the first is its card); season 6 has none.
 	{
 		slug: 'season5',
 		title: 'Season 5',

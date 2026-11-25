@@ -1,7 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { forkJoin, map, Observable, of, switchMap } from 'rxjs';
-import { GALLERY_CARD_DIMENSION } from 'src/app/config/gallery';
-import { Dimension, GalleryCollection } from 'src/app/interfaces/api-responses';
+import { GalleryCollection } from 'src/app/interfaces/api-responses';
 import { ICardSelection } from 'src/app/interfaces/card-selection.interface';
 import { GalleryProviderService } from 'src/app/services/gallery-provider/gallery-provider.service';
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
@@ -58,7 +57,7 @@ export class GalleryPageComponent {
 			});
 	}
 
-	/** A collection's card: its card dimension's image, and its photo count. */
+	/** A collection's card: its first dimension's image (or none), and photo count. */
 	private toCard = ({
 		slug,
 		title,
@@ -66,21 +65,12 @@ export class GalleryPageComponent {
 	}: GalleryCollection): Observable<ICardSelection> =>
 		this.galleryProvider.fetchCollectionImages(slug, 0, 1).pipe(
 			map(({ total }) => ({
-				imageUrl: cardImageOf(dimensions),
+				imageUrl: dimensions[0]?.imageUrl ?? '',
 				routerLink: `/gallery/${encodeURIComponent(slug)}`,
 				title,
 				desc: `${total} photos`
 			}))
 		);
-}
-
-/** The card dimension's image, or none (a blank card). */
-function cardImageOf(dimensions: readonly Dimension[]): string {
-	const name = GALLERY_CARD_DIMENSION.toLowerCase();
-	return (
-		dimensions.find((dimension) => dimension.name.toLowerCase() === name)
-			?.imageUrl ?? ''
-	);
 }
 
 /** `season5` before `season10`, which the API's plain slug sort gets wrong. */

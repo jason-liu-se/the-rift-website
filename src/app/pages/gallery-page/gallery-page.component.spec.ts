@@ -32,14 +32,14 @@ describe('GalleryPageComponent', () => {
 			card.querySelector('.description')?.textContent?.trim()
 		);
 	/**
-	 * Answers GET /gallery; each title is its slug in capitals, each with an
-	 * Overworld (its card) and a Nether.
+	 * Answers GET /gallery; each title is its slug in capitals, each with two
+	 * dimensions (the first is its card).
 	 */
 	const flushCollections = (
 		slugs: string[],
 		dimensionsOf = (slug: string): Dimension[] => [
-			{ name: 'Nether', imageUrl: `${slug}-nether.webp` },
-			{ name: 'Overworld', imageUrl: `${slug}-overworld.webp` }
+			{ name: 'Overworld', imageUrl: `${slug}-overworld.webp` },
+			{ name: 'Nether', imageUrl: `${slug}-nether.webp` }
 		]
 	) =>
 		httpTesting.expectOne(galleryUrl).flush(
@@ -88,7 +88,7 @@ describe('GalleryPageComponent', () => {
 		).toEqual(['/gallery/season5', '/gallery/season6']);
 	});
 
-	it("shows each collection's photo count and its Overworld's image", () => {
+	it("shows each collection's photo count and its first dimension's image", () => {
 		expect(descriptions()).toEqual([]);
 
 		loadSeasons5And6();
@@ -99,10 +99,8 @@ describe('GalleryPageComponent', () => {
 		expect(images[1]).toContain('season6-overworld.webp');
 	});
 
-	it('leaves the card blank for a collection without that dimension', () => {
-		flushCollections(['season7'], () => [
-			{ name: 'Nether', imageUrl: 'nether.webp' }
-		]);
+	it('leaves the card blank for a collection without dimensions', () => {
+		flushCollections(['season7'], () => []);
 		flushCover('season7', 0, []);
 		fixture.detectChanges();
 

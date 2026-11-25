@@ -54,8 +54,8 @@ The decisions are in issue #101; the API's side is in the web-server's
   modal lists them beside `collection-form/`, which creates one or edits one's
   title and dimensions. Dimensions (a name and image each) use the same
   `dimensions-editor/` as map seasons, which add BlueMap fields
-  (`withMapFields`). The `/gallery` card shows the collection's
-  `GALLERY_CARD_DIMENSION` image (`config/gallery.ts`), or none.
+  (`withMapFields`). The `/gallery` card shows the collection's first
+  dimension's image, or none.
 - **Writes** (confirm, send, snackbar) go through `EditorWriteService.run()`.
 - **API:** `EditorContentService` (items, bulk actions, collections),
   `DraftsService`, and `ImageUploadService`, typed per content type by
