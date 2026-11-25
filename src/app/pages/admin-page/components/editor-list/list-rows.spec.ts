@@ -1,6 +1,6 @@
 import { DraftSummary } from 'src/app/interfaces/api-responses';
 import { NO_FILTERS } from './list-filters/list-filters.component';
-import { filterDrafts, toListQuery } from './list-rows';
+import { filterDrafts, toDraftRow, toListQuery } from './list-rows';
 
 const DRAFTS = [
 	{ id: 'a', type: 'news', fields: { title: 'Spawn **update**' } },
@@ -90,5 +90,33 @@ describe('toListQuery', () => {
 				DEFAULT_SORT
 			)
 		).toEqual(query);
+	});
+});
+
+describe('toDraftRow', () => {
+	const POST = { id: 'post-1', date: '2026-01-01T00:00:00.000Z' };
+
+	it.each([
+		{ case: 'a new post', target: undefined, date: 'now' },
+		{ case: 'an edit', target: POST, date: POST.date },
+		{
+			case: "an edit of a post that isn't loaded",
+			target: undefined,
+			date: undefined
+		}
+	])("shows $case's post date", ({ target, date }) => {
+		const draft = {
+			id: 'd',
+			type: 'news',
+			fields: { title: 'Hi' },
+			...(target || date === undefined
+				? { target: { id: 'post-1', startingRevision: 1 } }
+				: {})
+		} as DraftSummary;
+
+		expect(toDraftRow(draft, target as never).cellItem).toEqual({
+			title: 'Hi',
+			date
+		});
 	});
 });

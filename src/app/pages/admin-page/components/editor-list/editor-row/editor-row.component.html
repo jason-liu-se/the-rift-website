@@ -23,32 +23,14 @@
 		new-tab way in (Ctrl or middle click, as right-click opens the
 		row's menu). -->
 	<a class="open" [href]="href()" (click)="openFromLink($event)">
-		@if (row.kind === "item") {
-			<ng-container
-				*ngComponentOutlet="itemCell(); inputs: { item: row.item }"
-			/>
-		} @else {
-			<span class="draft">
-				@if (row.draft.fields.imageUrl) {
-					<img
-						class="thumbnail"
-						[src]="row.draft.fields.imageUrl"
-						alt=""
-						loading="lazy"
-					/>
-				}
-				<span>{{ row.name }}</span>
-			</span>
-		}
+		<ng-container
+			*ngComponentOutlet="itemCell(); inputs: { item: cellItem() }"
+		/>
 	</a>
 </td>
 @if (store.extraCell(); as cell) {
 	<td class="extra" role="cell" [matContextMenuTriggerFor]="rowMenu">
-		@if (row.kind === "item") {
-			<ng-container
-				*ngComponentOutlet="cell; inputs: { item: row.item }"
-			/>
-		}
+		<ng-container *ngComponentOutlet="cell; inputs: { item: cellItem() }" />
 	</td>
 }
 <td class="status" role="cell" [matContextMenuTriggerFor]="rowMenu">

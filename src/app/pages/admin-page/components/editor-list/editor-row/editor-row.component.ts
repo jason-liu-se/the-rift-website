@@ -67,6 +67,10 @@ export class EditorRowComponent {
 
 	protected readonly actions = inject(EditorListActions);
 	protected readonly itemCell = computed(() => this.store.config().itemCell);
+	protected readonly cellItem = computed(() => {
+		const row = this.row();
+		return row.kind === 'item' ? row.item : row.cellItem;
+	});
 	/** Who last changed it: for a draft, the editor, who made every one listed. */
 	protected readonly updatedBy = computed(() => {
 		const row = this.row();

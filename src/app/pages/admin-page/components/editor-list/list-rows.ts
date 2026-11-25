@@ -31,6 +31,8 @@ export type ListRow =
 			draft: DraftSummary;
 			/** An edit of a published item, rather than a new one. */
 			isEdit: boolean;
+			/** What the type's cells show of it (they take an `item`). */
+			cellItem: object;
 	  };
 
 export type ItemRow = Extract<ListRow, { kind: 'item' }>;
@@ -47,13 +49,34 @@ export function toItemRow(item: Item, hasDraft: boolean): ItemRow {
 	};
 }
 
-export function toDraftRow(draft: DraftSummary): DraftRow {
+/** `published`: the item an edit draft is of, if it's loaded. */
+export function toDraftRow(draft: DraftSummary, published?: Item): DraftRow {
 	return {
 		kind: 'draft',
 		id: draft.id,
 		name: itemName(draft.fields),
 		draft,
-		isEdit: !!draft.target
+		isEdit: !!draft.target,
+		cellItem: toDraftCellItem(draft, published)
+	};
+}
+
+/**
+ * A draft as the type's cells show it: its fields so far, a season's
+ * dimension count, and a news post's date: "now" (publishing's default) for
+ * a new post, or the post's own for an edit (which keeps it by default).
+ */
+function toDraftCellItem(draft: DraftSummary, published?: Item): object {
+	return {
+		...draft.fields,
+		...(draft.type === 'maps' && {
+			dimensionCount: draft.dimensionCount
+		}),
+		...(draft.type === 'news' && {
+			date: draft.target
+				? (published as { date?: string } | undefined)?.date
+				: 'now'
+		})
 	};
 }
 

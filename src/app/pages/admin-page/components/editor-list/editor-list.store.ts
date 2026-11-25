@@ -138,9 +138,13 @@ export class EditorListStore {
 	});
 	public readonly draftRows = computed(() => {
 		const loaded = this.loaded();
-		return this.hasLoaded() && loaded
-			? filterDrafts(loaded.drafts, this.filters()).map(toDraftRow)
-			: [];
+		if (!this.hasLoaded() || !loaded) {
+			return [];
+		}
+		const items = new Map(loaded.page.items.map((item) => [item.id, item]));
+		return filterDrafts(loaded.drafts, this.filters()).map((draft) =>
+			toDraftRow(draft, items.get(draft.target?.id ?? ''))
+		);
 	});
 	/** What Ctrl+A and the header checkbox select: every row on this page. */
 	public readonly pageRows = computed(() => ({
