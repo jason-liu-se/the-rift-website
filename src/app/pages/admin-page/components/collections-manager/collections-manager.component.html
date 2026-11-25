@@ -5,7 +5,7 @@
 	</h3>
 	<ul class="collection-list">
 		@for (collection of collections(); track collection.slug) {
-			<li>
+			<li [class.hidden-collection]="!collection.visible">
 				<span class="name">
 					<input
 						class="title"

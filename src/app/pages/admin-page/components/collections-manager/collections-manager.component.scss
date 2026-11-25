@@ -14,7 +14,10 @@
 	text-transform: uppercase;
 }
 
+// Each collection a card of its own.
 .collection-list {
+	display: grid;
+	gap: 8px;
 	margin: 0;
 	padding: 0;
 	list-style: none;
@@ -23,13 +26,20 @@
 		display: flex;
 		align-items: center;
 		gap: 4px;
-		padding: 4px 0;
-		border-bottom: 1px solid $colour-light-grey;
+		padding: 6px 6px 6px 16px;
+		border: 1px solid rgba($colour-dark-text, 0.18);
+		border-radius: 8px;
+		background-color: rgba($colour-light-grey, 0.25);
+	}
+
+	li.hidden-collection {
+		border-style: dashed;
+		background-color: transparent;
 	}
 }
 
 .empty {
-	padding: 24px 0;
+	padding: 24px 16px;
 }
 
 .name {
@@ -40,9 +50,9 @@
 
 // Looks like text until hovered or focused, then like the field it is.
 .title {
-	min-height: 44px;
+	min-height: 40px;
 	padding: 0 8px;
-	margin-left: -8px;
+	margin-left: -9px;
 	border: 1px solid transparent;
 	border-radius: 4px;
 	background: none;
@@ -61,7 +71,7 @@
 }
 
 .details {
-	font-size: $font-size-small;
+	font-size: $font-size-x-small;
 	overflow-wrap: anywhere;
 }
 

@@ -5,8 +5,8 @@
 	display: block;
 }
 
-// Mobile: the whole screen. Desktop: as tall as the content, up to most of
-// the screen; only the body scrolls.
+// Mobile: the whole screen. Desktop: one fixed height, so the header and
+// footer stay put as the content grows or shrinks; only the body scrolls.
 .modal {
 	display: flex;
 	flex-direction: column;
@@ -71,7 +71,7 @@
 .modal-body {
 	flex: 1 1 auto;
 	min-height: 0;
-	padding: 16px;
+	padding: 16px 16px 32px;
 	overflow-y: auto;
 	overscroll-behavior: contain;
 }
@@ -88,8 +88,7 @@
 
 @media (min-width: 60rem) {
 	.modal {
-		height: auto;
-		max-height: 92dvh;
+		height: min(88dvh, 64rem);
 	}
 
 	.modal-header {
@@ -113,8 +112,9 @@
 		}
 	}
 
+	// Room above the footer, so the last field doesn't run into it.
 	.modal-body {
-		padding: 24px;
+		padding: 24px 24px 40px;
 	}
 
 	.modal-footer {

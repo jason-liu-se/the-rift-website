@@ -116,14 +116,14 @@
 }
 
 .visibility {
-	--mat-standard-button-toggle-height: 36px;
+	margin-right: 8px;
+	font-size: $font-size-small;
 
-	mat-icon {
-		margin-right: 4px;
-		font-size: 18px;
-		width: 18px;
-		height: 18px;
-		vertical-align: -3px;
+	span {
+		display: inline-block;
+		// The wider word, so the switch doesn't move when it changes.
+		min-width: 3.5rem;
+		font-size: $font-size-small;
 	}
 }
 
@@ -131,8 +131,7 @@
 	min-height: 40px;
 }
 
-// Narrow screens: the footer's actions fit one row, the toggle as icons
-// (its labels stay for screen readers and as tooltips).
+// Narrow screens: the footer's actions fit one row.
 @media (max-width: 39.99rem) {
 	.actions {
 		flex-wrap: nowrap;
@@ -141,19 +140,6 @@
 
 	.publish {
 		margin-left: auto;
-	}
-
-	.toggle-label {
-		position: absolute;
-		width: 1px;
-		height: 1px;
-		overflow: hidden;
-		clip-path: inset(50%);
-		white-space: nowrap;
-	}
-
-	.visibility mat-icon {
-		margin-right: 0;
 	}
 }
 

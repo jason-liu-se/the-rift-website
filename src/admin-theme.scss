@@ -19,6 +19,7 @@
 @include mat.progress-bar-theme($app-theme);
 @include mat.tooltip-theme($app-theme);
 @include mat.button-toggle-theme($app-theme);
+@include mat.slide-toggle-theme($app-theme);
 
 // The admin tools' modals: full screen on mobile, centred on desktop. Each
 // lays itself out with ModalShellComponent, which scrolls its own body.
@@ -51,17 +52,24 @@
 	width: auto;
 }
 
-// Admin list filters other than search: compact fields.
+// Admin list search and filters: compact fields, all one height (44px).
+.mat-mdc-form-field.search,
 .mat-mdc-form-field.compact {
 	@include mat.form-field-density(-3);
 	@include mat.select-density(-3);
 }
 
-// Hints under admin fields: quieter than the fields they explain.
-.mat-mdc-form-field-hint-wrapper,
-.mat-mdc-form-field-bottom-align::before {
-	color: rgba(colours.$colour-dark-text, 0.75);
+// Hints and errors under admin fields: smaller and quieter than the fields
+// they explain. (The site's base style sizes every element, so their
+// children too.)
+.mat-mdc-form-field-subscript-wrapper,
+.mat-mdc-form-field-subscript-wrapper * {
 	font-size: $font-size-x-small;
+	line-height: 1.4;
+}
+
+.mat-mdc-form-field-hint-wrapper {
+	color: rgba(colours.$colour-dark-text, 0.75);
 }
 
 // Phones: focus scrolled into view stays clear of the fixed tab bar, and of

@@ -146,28 +146,24 @@
 					{{ isEdit() ? "Discard changes" : "Discard" }}
 				</button>
 			}
-			<mat-button-toggle-group
+			<!-- One switch: on (coloured) is visible to everyone. Named for
+				what "on" means; the visible text says the state. -->
+			<mat-slide-toggle
 				class="visibility"
-				hideSingleSelectionIndicator
-				aria-label="Who can see it"
+				color="primary"
+				aria-label="Visible on the site"
+				[matTooltip]="
+					settings.isVisible()
+						? 'Everyone can see it'
+						: 'Only editors can see it'
+				"
 				[ngModel]="settings.isVisible()"
 				(ngModelChange)="settings.isVisible.set($event)"
 			>
-				<mat-button-toggle
-					[value]="true"
-					matTooltip="Everyone can see it"
-				>
-					<mat-icon aria-hidden="true">visibility</mat-icon>
-					<span class="toggle-label">Visible</span>
-				</mat-button-toggle>
-				<mat-button-toggle
-					[value]="false"
-					matTooltip="Only editors can see it"
-				>
-					<mat-icon aria-hidden="true">visibility_off</mat-icon>
-					<span class="toggle-label">Hidden</span>
-				</mat-button-toggle>
-			</mat-button-toggle-group>
+				<span aria-hidden="true">{{
+					settings.isVisible() ? "Visible" : "Hidden"
+				}}</span>
+			</mat-slide-toggle>
 			<button
 				mat-flat-button
 				color="primary"

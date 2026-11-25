@@ -20,6 +20,7 @@ import {
 } from '@angular/material/button-toggle';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { MatTooltip } from '@angular/material/tooltip';
 import { EMPTY, Observable, catchError, filter } from 'rxjs';
 import { EditorContentType } from 'src/app/interfaces/api-requests';
@@ -69,6 +70,7 @@ export interface PublishedItemActions {
 		MatButton,
 		MatButtonToggle,
 		MatButtonToggleGroup,
+		MatSlideToggle,
 		MatIcon,
 		MatIconButton,
 		MatMenu,
