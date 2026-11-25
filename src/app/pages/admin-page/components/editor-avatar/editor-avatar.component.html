@@ -1,16 +1,5 @@
-@if (editor(); as editor) {
-	@if (avatarUrl(); as url) {
-		<img
-			class="avatar"
-			[src]="url"
-			[alt]="editor.username"
-			tabindex="0"
-			[matTooltip]="editor.username"
-			(error)="markFailed(url)"
-		/>
-	} @else {
-		{{ editor.username }}
-	}
+@if (avatarUrl(); as url) {
+	<img class="avatar" [src]="url" alt="" (error)="markFailed(url)" />
 } @else {
-	unknown
+	<span class="avatar placeholder"></span>
 }

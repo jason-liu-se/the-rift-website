@@ -12,6 +12,7 @@ export const LIST_PARAMS = {
 	collection: 'collection',
 	scope: 'by',
 	sort: 'sort',
+	order: 'order',
 	/** 1-based, as people read it. */
 	page: 'page'
 } as const;
@@ -31,7 +32,8 @@ export function fromListParams(params: ParamMap): {
 			collection:
 				params.get(LIST_PARAMS.collection) ?? NO_FILTERS.collection,
 			scope: params.get(LIST_PARAMS.scope) === 'mine' ? 'mine' : 'all',
-			sort: params.get(LIST_PARAMS.sort) ?? NO_FILTERS.sort
+			sort: params.get(LIST_PARAMS.sort) ?? NO_FILTERS.sort,
+			order: params.get(LIST_PARAMS.order) ?? NO_FILTERS.order
 		},
 		pageIndex: Number.isInteger(page) && page > 1 ? page - 1 : 0
 	};
@@ -50,6 +52,7 @@ export function toListParams(filters: ListFilters, pageIndex: number): Params {
 		[LIST_PARAMS.collection]: orNull(filters.collection),
 		[LIST_PARAMS.scope]: filters.scope === 'mine' ? 'mine' : null,
 		[LIST_PARAMS.sort]: orNull(filters.sort),
+		[LIST_PARAMS.order]: orNull(filters.order),
 		[LIST_PARAMS.page]: pageIndex > 0 ? String(pageIndex + 1) : null
 	};
 }

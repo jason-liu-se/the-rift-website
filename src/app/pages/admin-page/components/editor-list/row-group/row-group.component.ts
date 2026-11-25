@@ -20,7 +20,8 @@ import { ListRow } from '../list-rows';
 	templateUrl: './row-group.component.html',
 	styleUrl: './row-group.component.scss',
 	imports: [CdkDrag, EditorRowComponent, MatCheckbox, MatIcon],
-	hostDirectives: [CdkDropList]
+	hostDirectives: [CdkDropList],
+	host: { role: 'rowgroup' }
 })
 export class RowGroupComponent {
 	private store = inject(EditorListStore);
@@ -32,6 +33,9 @@ export class RowGroupComponent {
 	public readonly count = input<number>();
 
 	protected readonly isExpanded = signal(true);
+	protected readonly headerSpan = computed(
+		() => this.store.columnCount() - 1
+	);
 	protected readonly isReorderable = computed(
 		() =>
 			this.store.isReorderable() &&

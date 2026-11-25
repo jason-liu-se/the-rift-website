@@ -5,6 +5,7 @@ import {
 	inject,
 	input,
 	model,
+	output,
 	signal
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -21,7 +22,7 @@ import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { MatTooltip } from '@angular/material/tooltip';
 import { EditorCollection } from 'src/app/interfaces/api-responses';
-import { SortOption } from '../../../editor-types';
+import { ListSort, SortColumn } from '../list-sort';
 
 /** A choice in a filter: what's sent, and what the editor sees. */
 export interface FilterOption {
@@ -39,8 +40,10 @@ export interface ListFilters {
 	search: string;
 	/** The fields `search` looks in; none means every field. */
 	searchFields: string[];
-	/** A sort option's `sort`, or '' for the type's first (default) one. */
+	/** A sort column's `sort`, or '' for the type's default order. */
 	sort: string;
+	/** `asc` or `desc`, or '' for the column's first direction. */
+	order: string;
 }
 
 export const NO_FILTERS: ListFilters = {
@@ -49,7 +52,8 @@ export const NO_FILTERS: ListFilters = {
 	collection: '',
 	search: '',
 	searchFields: [],
-	sort: ''
+	sort: '',
+	order: ''
 };
 
 /** The search, filters, and sort above an admin list. */
@@ -81,7 +85,11 @@ export class ListFiltersComponent {
 	public readonly filters = model.required<ListFilters>();
 	public readonly statuses = input.required<readonly FilterOption[]>();
 	public readonly searchFields = input.required<readonly FilterOption[]>();
-	public readonly sortOptions = input.required<readonly SortOption[]>();
+	public readonly sortColumns = input.required<readonly SortColumn[]>();
+	public readonly sort = input.required<ListSort>();
+	/** On desktop too: a list without column headings (the gallery's cards). */
+	public readonly isSortShown = input(false);
+	public readonly sortChange = output<ListSort>();
 	/** Shown as a filter when the content type has collections. */
 	public readonly collections = input<readonly EditorCollection[]>();
 
@@ -98,9 +106,6 @@ export class ListFiltersComponent {
 			searchFields.length > 0
 		].filter(Boolean).length;
 	});
-	protected readonly selectedSort = computed(
-		() => this.filters().sort || this.sortOptions()[0]?.sort
-	);
 	protected readonly searchInText = computed(() => {
 		const chosen = this.filters().searchFields;
 		const labels = this.searchFields()
@@ -130,17 +135,23 @@ export class ListFiltersComponent {
 		);
 	}
 
-	/** The default sort leaves the URL. */
-	protected setSort(sort: string): void {
-		this.setFilter(
-			'sort',
-			sort === this.sortOptions()[0]?.sort ? '' : sort
-		);
+	/** A column, in the direction it sorts in first. */
+	protected sortBy(sort: string): void {
+		const column = this.sortColumns().find((each) => each.sort === sort);
+		if (column) {
+			this.sortChange.emit({ sort, order: column.firstOrder });
+		}
+	}
+
+	protected reverseSort(): void {
+		const { sort, order } = this.sort();
+		this.sortChange.emit({ sort, order: order === 'asc' ? 'desc' : 'asc' });
 	}
 
 	/** Clears the search and filters, keeping the sort. */
 	protected clear(): void {
-		this.filters.set({ ...NO_FILTERS, sort: this.filters().sort });
+		const { sort, order } = this.filters();
+		this.filters.set({ ...NO_FILTERS, sort, order });
 	}
 
 	public focusSearch(): void {

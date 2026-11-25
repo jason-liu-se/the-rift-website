@@ -96,19 +96,38 @@
 			<mat-option value="mine">Me</mat-option>
 		</mat-select>
 	</mat-form-field>
-	<mat-form-field class="compact sort" subscriptSizing="dynamic">
-		<mat-label>Sort by</mat-label>
-		<mat-select
-			[ngModel]="selectedSort()"
-			(ngModelChange)="setSort($event)"
+	<!-- Tables sort from their headings; cards and phones have none. -->
+	<div class="sort" [class.always]="isSortShown()">
+		<mat-form-field class="compact" subscriptSizing="dynamic">
+			<mat-label>Sort by</mat-label>
+			<mat-select
+				[ngModel]="sort().sort"
+				(ngModelChange)="sortBy($event)"
+			>
+				@for (column of sortColumns(); track column.sort) {
+					<mat-option [value]="column.sort">{{
+						column.label
+					}}</mat-option>
+				}
+			</mat-select>
+		</mat-form-field>
+		<button
+			mat-stroked-button
+			type="button"
+			class="direction"
+			[attr.aria-label]="
+				'Reverse the order (now ' +
+				(sort().order === 'asc' ? 'ascending' : 'descending') +
+				')'
+			"
+			matTooltip="Reverse the order"
+			(click)="reverseSort()"
 		>
-			@for (option of sortOptions(); track option.sort) {
-				<mat-option [value]="option.sort">{{
-					option.label
-				}}</mat-option>
-			}
-		</mat-select>
-	</mat-form-field>
+			<mat-icon>{{
+				sort().order === "asc" ? "arrow_upward" : "arrow_downward"
+			}}</mat-icon>
+		</button>
+	</div>
 	@if (activeCount() > 0 || filters().search) {
 		<button mat-button type="button" class="clear" (click)="clear()">
 			<mat-icon>close</mat-icon>

@@ -14,7 +14,7 @@
 }
 
 .more-toggle {
-	height: 56px;
+	height: 44px;
 }
 
 // Mobile: the other filters and the sort show from the Filters button.
@@ -27,6 +27,27 @@
 
 	&.shown {
 		display: grid;
+	}
+}
+
+.sort {
+	display: flex;
+	gap: 4px;
+	align-items: center;
+
+	mat-form-field {
+		flex: 1;
+		min-width: 0;
+	}
+}
+
+.direction {
+	min-width: 44px;
+	height: 44px;
+	padding: 0;
+
+	mat-icon {
+		margin: 0;
 	}
 }
 
@@ -58,7 +79,19 @@
 		width: 10.5rem;
 	}
 
+	// Tables sort from their column headings instead.
 	.sort {
-		width: 13rem;
+		display: none;
+
+		&.always {
+			display: flex;
+		}
 	}
+}
+
+// The Search in button, sized to the compact field.
+.search [matSuffix] {
+	--mat-icon-button-state-layer-size: 36px;
+	padding: 6px;
+	margin-right: 4px;
 }

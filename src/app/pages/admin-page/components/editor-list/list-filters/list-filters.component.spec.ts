@@ -17,9 +17,13 @@ describe('ListFiltersComponent', () => {
 		fixture.componentRef.setInput('searchFields', [
 			{ value: 'title', label: 'Title' }
 		]);
-		fixture.componentRef.setInput('sortOptions', [
-			{ label: 'Last updated', sort: 'updatedAt', order: 'desc' }
+		fixture.componentRef.setInput('sortColumns', [
+			{ label: 'Updated', sort: 'updatedAt', firstOrder: 'desc' }
 		]);
+		fixture.componentRef.setInput('sort', {
+			sort: 'updatedAt',
+			order: 'desc'
+		});
 		fixture.componentRef.setInput('collections', collections);
 		fixture.detectChanges();
 		return fixture;

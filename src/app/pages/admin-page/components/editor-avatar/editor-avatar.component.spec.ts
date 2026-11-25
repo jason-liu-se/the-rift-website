@@ -13,20 +13,15 @@ describe('EditorAvatarComponent', () => {
 		fixture.detectChanges();
 	}
 
-	it('shows only the avatar, named by its alt text and tooltip', () => {
+	it('shows the avatar', () => {
 		render({ id: '1', username: 'editor', avatarUrl: 'https://cdn/a.png' });
-		const image = element().querySelector('img')!;
 
-		expect(image.getAttribute('src')).toBe('https://cdn/a.png');
-		expect(image.alt).toBe('editor');
-		expect(element().textContent?.trim()).toBe('');
+		expect(element().querySelector('img')?.getAttribute('src')).toBe(
+			'https://cdn/a.png'
+		);
 	});
 
-	it('shows the name when there is no avatar, or it fails to load', () => {
-		render({ id: '1', username: 'editor' });
-		expect(element().textContent?.trim()).toBe('editor');
-
-		TestBed.resetTestingModule();
+	it('shows a placeholder when the avatar fails to load', () => {
 		render({
 			id: '1',
 			username: 'editor',
@@ -34,13 +29,14 @@ describe('EditorAvatarComponent', () => {
 		});
 		element().querySelector('img')!.dispatchEvent(new Event('error'));
 		fixture.detectChanges();
+
 		expect(element().querySelector('img')).toBeNull();
-		expect(element().textContent?.trim()).toBe('editor');
+		expect(element().querySelector('.placeholder')).not.toBeNull();
 	});
 
-	it('says "unknown" for an item older than the edit history', () => {
+	it('shows a placeholder for an unknown editor', () => {
 		render(undefined);
 
-		expect(element().textContent?.trim()).toBe('unknown');
+		expect(element().querySelector('.placeholder')).not.toBeNull();
 	});
 });

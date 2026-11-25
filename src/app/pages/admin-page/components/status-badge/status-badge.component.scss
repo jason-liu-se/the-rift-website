@@ -35,3 +35,13 @@
 .edit {
 	color: $colour-warning;
 }
+
+// Over a gallery card's image: opaque, to stay readable on any picture.
+:host-context(.grid) {
+	flex-direction: column;
+	align-items: flex-end;
+
+	.badge {
+		background-color: $colour-light-background;
+	}
+}

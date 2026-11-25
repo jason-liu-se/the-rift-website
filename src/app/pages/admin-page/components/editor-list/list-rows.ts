@@ -7,9 +7,9 @@ import {
 	ListQueryOf,
 	SummaryOf
 } from 'src/app/services/editor-content/editor-content-types';
-import { SortOption } from '../../editor-types';
 import { itemName } from './item-name';
 import { ListFilters } from './list-filters/list-filters.component';
+import { ListSort, toQuerySort } from './list-sort';
 
 type Item = SummaryOf<EditorContentType>;
 
@@ -78,22 +78,20 @@ export function filterDrafts(
 
 /**
  * The API query for the filters; undefined when only drafts are wanted. An
- * unknown sort is the first option, the default.
+ * order is the one the filters chose (see `currentSort`).
  */
 export function toListQuery(
-	{ scope, status, collection, searchFields, sort }: ListFilters,
+	{ scope, status, collection, searchFields }: ListFilters,
 	search: string,
 	userId: string | undefined,
-	sortOptions: readonly SortOption[]
+	sort: ListSort
 ): ListQueryOf<EditorContentType> | undefined {
 	if (status === 'draft') {
 		return undefined;
 	}
 	const words = search.trim();
-	const sortOption =
-		sortOptions.find((option) => option.sort === sort) ?? sortOptions[0];
 	return {
-		...(sortOption && { sort: sortOption.sort, order: sortOption.order }),
+		...toQuerySort(sort),
 		...(status && {
 			status: status as ListQueryOf<EditorContentType>['status']
 		}),

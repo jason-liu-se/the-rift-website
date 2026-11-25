@@ -1,5 +1,5 @@
-<tr class="group-header">
-	<td class="select">
+<tr class="group-header" role="row">
+	<td class="select" role="cell">
 		<mat-checkbox
 			color="primary"
 			[aria-label]="'Select every ' + label() + ' row on this page'"
@@ -9,7 +9,7 @@
 			(change)="toggleSelected($event.checked)"
 		/>
 	</td>
-	<th scope="rowgroup" colspan="4">
+	<th scope="rowgroup" role="rowheader" [attr.colspan]="headerSpan()">
 		<button
 			type="button"
 			class="toggle"

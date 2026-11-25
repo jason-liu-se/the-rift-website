@@ -18,7 +18,8 @@ import { ListRow } from '../list-rows';
 
 /**
  * One row of an admin list, a published item or a draft alike: select it,
- * open it (a click anywhere on it, or Enter), or its menu's actions.
+ * open it (its name's link, or a click anywhere on it), or its menu's
+ * actions.
  */
 @Component({
 	// A table's rows must be its own elements.
@@ -41,12 +42,11 @@ import { ListRow } from '../list-rows';
 		StatusBadgeComponent
 	],
 	host: {
-		tabindex: '0',
+		role: 'row',
 		// Ctrl+A's preview shows every row on the page as selected.
 		'[class.selected]':
 			'isSelected() || store.selection.isPreviewingPage()',
-		'(click)': 'openFromRow($event)',
-		'(keydown.enter)': 'openFromRow($event)'
+		'(click)': 'openFromRow($event)'
 	}
 })
 export class EditorRowComponent {
@@ -99,6 +99,13 @@ export class EditorRowComponent {
 				)
 			: undefined;
 	});
+	/** The editor's URL, for the name's link (and opening it in a new tab). */
+	protected readonly href = computed(() => {
+		// The link keeps the list's query, so it changes with it.
+		this.store.filters();
+		this.store.pageIndex();
+		return this.store.hrefOf(this.row());
+	});
 	protected readonly isSelected = computed(() => {
 		const row = this.row();
 		return row.kind === 'draft'
@@ -125,6 +132,15 @@ export class EditorRowComponent {
 
 	protected open(): void {
 		this.store.open(this.row());
+	}
+
+	/** Opens in the modal, unless asked for a new tab or window. */
+	protected openFromLink(event: MouseEvent): void {
+		if (event.ctrlKey || event.metaKey || event.shiftKey || event.button) {
+			return;
+		}
+		event.preventDefault();
+		this.open();
 	}
 
 	/** Opens the row unless the click was on one of its own controls. */

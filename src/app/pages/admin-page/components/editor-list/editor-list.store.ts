@@ -44,6 +44,12 @@ import {
 } from './list-rows';
 import { ListFilters } from './list-filters/list-filters.component';
 import { fromListParams, toListParams } from './list-params';
+import {
+	ListSort,
+	currentSort,
+	sortColumnsOf,
+	toSortParams
+} from './list-sort';
 import { ListSelection } from './list-selection';
 
 type Item = SummaryOf<EditorContentType>;
@@ -91,6 +97,22 @@ export class EditorListStore {
 	public readonly config = computed(() => EDITOR_TYPES[this.type()]);
 	public readonly filters = computed(() => this.params().filters);
 	public readonly pageIndex = computed(() => this.params().pageIndex);
+	public readonly sortColumns = computed(() => sortColumnsOf(this.config()));
+	public readonly sort = computed(() =>
+		currentSort(
+			this.filters(),
+			this.sortColumns(),
+			this.config().defaultSort
+		)
+	);
+	/** The type's column between the name and status, in tables. */
+	public readonly extraCell = computed(() => this.config().extraColumn?.cell);
+	public readonly columnCount = computed(() => (this.extraCell() ? 6 : 5));
+	/** In the type's default order: for orderable types, the site's. */
+	public readonly isDefaultSort = computed(() => {
+		const { sort, order } = this.config().defaultSort;
+		return this.sort().sort === sort && this.sort().order === order;
+	});
 	/** Something has loaded for this type (until then, a placeholder). */
 	public readonly hasLoaded = computed(
 		() => this.loaded()?.type === this.type()
@@ -131,20 +153,20 @@ export class EditorListStore {
 		() => this.selectedCount() - this.selection.selectedDraftIds().length
 	);
 	/**
-	 * The rows can be put in order: the type has an order, it's sorted by it,
-	 * one collection is chosen and nothing else filtered, every item is on
-	 * this page, and nothing is saving.
+	 * The rows can be put in order: the type has an order, it's sorted by it
+	 * (its default sort), one collection is chosen and nothing else filtered,
+	 * every item is on this page, and nothing is saving.
 	 */
 	public readonly isReorderable = computed(() => {
 		const config = this.config();
-		const { collection, search, status, scope, sort } = this.filters();
+		const { collection, search, status, scope } = this.filters();
 		return (
 			config.isOrderable &&
 			!!collection &&
 			!search &&
 			!status &&
 			scope === 'all' &&
-			(!sort || sort === config.sortOptions[0]?.sort) &&
+			this.isDefaultSort() &&
 			this.total() <= EDITOR_PAGE_SIZE &&
 			!this.isBusy()
 		);
@@ -168,7 +190,7 @@ export class EditorListStore {
 				this.filters(),
 				this.search(),
 				this.auth.user()?.id,
-				this.config().sortOptions
+				this.sort()
 			),
 			pageIndex: this.pageIndex()
 		}),
@@ -204,13 +226,30 @@ export class EditorListStore {
 		this.navigate(toListParams(filters, 0));
 	}
 
+	public setSort(sort: ListSort): void {
+		this.setFilters({
+			...this.filters(),
+			...toSortParams(sort, this.config().defaultSort)
+		});
+	}
+
 	public setPage(pageIndex: number): void {
 		this.navigate(toListParams(this.filters(), pageIndex));
 	}
 
 	/** Opens a row in the editor modal, keeping the list's filters and scroll. */
 	public open(row: ListRow): void {
-		this.openModal(row.kind === 'draft' ? ['drafts', row.id] : [row.id]);
+		this.openModal(pathOf(row));
+	}
+
+	/** A row's editor URL, with the list's query. */
+	public hrefOf(row: ListRow): string {
+		return this.router.serializeUrl(
+			this.router.createUrlTree(pathOf(row), {
+				relativeTo: this.route,
+				queryParamsHandling: 'preserve'
+			})
+		);
 	}
 
 	public openDraft(draftId: string): void {
@@ -272,4 +311,8 @@ export class EditorListStore {
 			scroll: 'manual'
 		});
 	}
+}
+
+function pathOf(row: ListRow): string[] {
+	return row.kind === 'draft' ? ['drafts', row.id] : [row.id];
 }

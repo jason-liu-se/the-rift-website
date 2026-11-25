@@ -1,7 +1,4 @@
 @if (item().imageUrl; as imageUrl) {
 	<img class="thumbnail" [src]="imageUrl" alt="" loading="lazy" />
 }
-<span>
-	{{ item().title }}
-	<span class="details">{{ collectionTitle() }}</span>
-</span>
+<span>{{ item().title }}</span>

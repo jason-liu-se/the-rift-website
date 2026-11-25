@@ -5,9 +5,12 @@
 		[filters]="store.filters()"
 		[statuses]="store.config().statuses"
 		[searchFields]="store.config().searchFields"
-		[sortOptions]="store.config().sortOptions"
+		[sortColumns]="store.sortColumns()"
+		[sort]="store.sort()"
+		[isSortShown]="isGrid()"
 		[collections]="collections()"
 		(filtersChange)="store.setFilters($event)"
+		(sortChange)="store.setSort($event)"
 	/>
 	@if (store.selectedCount() > 0) {
 		<app-bulk-action-bar
@@ -54,28 +57,75 @@
 			<mat-progress-bar mode="indeterminate" aria-label="Updating" />
 		}
 	</div>
-	<table
-		class="editor-table"
-		[class.grid]="store.config().listLayout === 'grid'"
-	>
+	<!-- Explicit roles: phones and the gallery lay rows out as cards, which
+		some browsers would otherwise stop reading as a table. -->
+	<table class="editor-table" role="table" [class.grid]="isGrid()">
 		<caption class="cdk-visually-hidden">
 			{{
 				store.config().label
 			}}
 		</caption>
-		<thead>
-			<tr>
-				<th scope="col" class="select">
+		<!-- Fixed widths, so collapsing a group doesn't move the columns. -->
+		<colgroup>
+			<col class="col-select" />
+			<col />
+			@if (store.extraCell()) {
+				<col class="col-extra" />
+			}
+			<col class="col-status" />
+			<col class="col-updated" />
+			<col class="col-actions" />
+		</colgroup>
+		<thead role="rowgroup">
+			<tr role="row">
+				<th scope="col" role="columnheader" class="select">
 					<span class="cdk-visually-hidden">Select</span>
 				</th>
-				<th scope="col">{{ noun().one }}</th>
-				<th scope="col">Status</th>
-				<th scope="col">Updated</th>
-				<th scope="col">
+				<ng-container
+					*ngTemplateOutlet="
+						sortHeading;
+						context: { $implicit: store.config().nameColumn }
+					"
+				/>
+				@if (store.extraCell()) {
+					<ng-container
+						*ngTemplateOutlet="
+							sortHeading;
+							context: { $implicit: store.config().extraColumn }
+						"
+					/>
+				}
+				<th scope="col" role="columnheader">Status</th>
+				<ng-container
+					*ngTemplateOutlet="
+						sortHeading;
+						context: { $implicit: updatedColumn }
+					"
+				/>
+				<th scope="col" role="columnheader">
 					<span class="cdk-visually-hidden">Actions</span>
 				</th>
 			</tr>
 		</thead>
+		<ng-template #sortHeading let-column>
+			<th
+				scope="col"
+				role="columnheader"
+				[attr.aria-sort]="ariaSort(column)"
+			>
+				<button
+					type="button"
+					class="sort-button"
+					[class.active]="!!ariaSort(column)"
+					(click)="sortBy(column)"
+				>
+					{{ column.label }}
+					<mat-icon aria-hidden="true">{{
+						sortIcon(column)
+					}}</mat-icon>
+				</button>
+			</th>
+		</ng-template>
 		@if (store.draftRows().length > 0) {
 			<tbody
 				app-row-group
@@ -92,9 +142,13 @@
 			></tbody>
 		}
 		@if (store.pageRowCount() === 0) {
-			<tbody>
-				<tr>
-					<td class="empty" colspan="5">
+			<tbody role="rowgroup">
+				<tr role="row">
+					<td
+						class="empty"
+						role="cell"
+						[attr.colspan]="store.columnCount()"
+					>
 						@if (hasFilters()) {
 							<p>No {{ noun().many }} match these filters.</p>
 							<button

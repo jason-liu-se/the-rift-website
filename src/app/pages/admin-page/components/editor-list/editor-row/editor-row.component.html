@@ -1,5 +1,5 @@
 @let row = this.row();
-<td class="select">
+<td class="select" role="cell">
 	@if (index() !== undefined) {
 		<span
 			class="drag-handle"
@@ -17,26 +17,39 @@
 		(change)="toggleSelected()"
 	/>
 </td>
-<td class="main">
-	@if (row.kind === "item") {
-		<ng-container
-			*ngComponentOutlet="itemCell(); inputs: { item: row.item }"
-		/>
-	} @else {
-		<span class="draft">
-			@if (row.draft.fields.imageUrl) {
-				<img
-					class="thumbnail"
-					[src]="row.draft.fields.imageUrl"
-					alt=""
-					loading="lazy"
-				/>
-			}
-			<span>{{ row.name }}</span>
-		</span>
-	}
+<td class="main" role="cell">
+	<!-- The row opens on a click anywhere; this is its keyboard and
+		new-tab way in. -->
+	<a class="open" [href]="href()" (click)="openFromLink($event)">
+		@if (row.kind === "item") {
+			<ng-container
+				*ngComponentOutlet="itemCell(); inputs: { item: row.item }"
+			/>
+		} @else {
+			<span class="draft">
+				@if (row.draft.fields.imageUrl) {
+					<img
+						class="thumbnail"
+						[src]="row.draft.fields.imageUrl"
+						alt=""
+						loading="lazy"
+					/>
+				}
+				<span>{{ row.name }}</span>
+			</span>
+		}
+	</a>
 </td>
-<td class="status">
+@if (store.extraCell(); as cell) {
+	<td class="extra" role="cell">
+		@if (row.kind === "item") {
+			<ng-container
+				*ngComponentOutlet="cell; inputs: { item: row.item }"
+			/>
+		}
+	</td>
+}
+<td class="status" role="cell">
 	@if (row.kind === "item") {
 		<app-status-badge
 			[status]="row.item.status"
@@ -46,13 +59,22 @@
 		<app-status-badge [status]="row.isEdit ? 'edit' : 'draft'" />
 	}
 </td>
-<td class="updated">
-	<app-editor-avatar [editor]="updatedBy()" />
-	<time [attr.datetime]="updatedAt()" [title]="updatedAtText()">{{
-		updatedAgo()
-	}}</time>
+<td class="updated" role="cell">
+	<span class="updated-layout">
+		<app-editor-avatar [editor]="updatedBy()" />
+		<span class="updated-text">
+			<span class="updated-by">{{
+				updatedBy()?.username ?? "(unknown)"
+			}}</span>
+			@if (updatedAt(); as updatedAt) {
+				<time [attr.datetime]="updatedAt" [title]="updatedAtText()">{{
+					updatedAgo()
+				}}</time>
+			}
+		</span>
+	</span>
 </td>
-<td class="actions">
+<td class="actions" role="cell">
 	<button
 		mat-icon-button
 		type="button"

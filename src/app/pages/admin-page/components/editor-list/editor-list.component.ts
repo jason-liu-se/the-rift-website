@@ -1,4 +1,5 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -17,6 +18,12 @@ import {
 	NO_FILTERS
 } from './list-filters/list-filters.component';
 import { RowGroupComponent } from './row-group/row-group.component';
+import {
+	SortColumn,
+	UPDATED_COLUMN,
+	currentSort,
+	sortByColumn
+} from './list-sort';
 
 /**
  * A tool's list: filters (or, while rows are selected, bulk actions in their
@@ -36,6 +43,7 @@ import { RowGroupComponent } from './row-group/row-group.component';
 		MatIcon,
 		MatPaginator,
 		MatProgressBar,
+		NgTemplateOutlet,
 		RouterLink,
 		RowGroupComponent
 	],
@@ -47,12 +55,16 @@ export class EditorListComponent {
 
 	protected readonly store = inject(EditorListStore);
 	protected readonly pageSize = EDITOR_PAGE_SIZE;
+	protected readonly updatedColumn = UPDATED_COLUMN;
 
 	protected readonly noun = computed(() => this.store.config().noun);
 	protected readonly collections = computed(() => {
 		const type = toCollectionType(this.store.type());
 		return type ? this.collectionsStore.collections(type)() : undefined;
 	});
+	protected readonly isGrid = computed(
+		() => this.store.config().listLayout === 'grid'
+	);
 	protected readonly showsPublished = computed(
 		() => this.store.filters().status !== 'draft'
 	);
@@ -69,28 +81,54 @@ export class EditorListComponent {
 
 	/** In the site's order, but across collections: say how to reorder. */
 	protected readonly isOrderHintShown = computed(() => {
-		const config = this.store.config();
-		const { sort, collection } = this.store.filters();
 		return (
-			config.isOrderable &&
-			!collection &&
-			(!sort || sort === config.sortOptions[0]?.sort)
+			this.store.config().isOrderable &&
+			!this.store.filters().collection &&
+			this.store.isDefaultSort()
 		);
 	});
 	/** Anything but the sort is set, so an empty list means "no matches". */
 	protected readonly hasFilters = computed(() => {
 		const filters = this.store.filters();
+		const { sort, order } = filters;
 		return (
 			JSON.stringify(filters) !==
-			JSON.stringify({ ...NO_FILTERS, sort: filters.sort })
+			JSON.stringify({ ...NO_FILTERS, sort, order })
 		);
 	});
 
 	protected clearFilters(): void {
-		this.store.setFilters({
-			...NO_FILTERS,
-			sort: this.store.filters().sort
-		});
+		const { sort, order } = this.store.filters();
+		this.store.setFilters({ ...NO_FILTERS, sort, order });
+	}
+
+	protected ariaSort(column: SortColumn): string | null {
+		const { sort, order } = this.store.sort();
+		if (sort !== column.sort) {
+			return null;
+		}
+		return order === 'asc' ? 'ascending' : 'descending';
+	}
+
+	/** The current direction, or (dimmed) the one it would sort in. */
+	protected sortIcon(column: SortColumn): string {
+		const { sort, order } = this.store.sort();
+		const shown = sort === column.sort ? order : column.firstOrder;
+		return shown === 'asc' ? 'expand_less' : 'expand_more';
+	}
+
+	protected sortBy(column: SortColumn): void {
+		const { defaultSort } = this.store.config();
+		const params = sortByColumn(this.store.sort(), column, defaultSort);
+		this.store.setFilters({ ...this.store.filters(), ...params });
+		const { order } = currentSort(
+			params,
+			this.store.sortColumns(),
+			defaultSort
+		);
+		this.announcer.announce(
+			`Sorted by ${column.label}, ${order === 'asc' ? 'ascending' : 'descending'}.`
+		);
 	}
 
 	protected changePage({ pageIndex }: PageEvent): void {

@@ -14,7 +14,8 @@ The decisions are in issue #101; the API's side is in the web-server's
 
 - **Shell:** admin routes hide the site navbar (`data.showNavbar: false`) for
   the slim `admin-bar/`; tools are a sidebar on desktop and a bottom tab bar on
-  mobile.
+  mobile. Without the navbar, `PageTemplateComponent` leaves `<main>` to the
+  page, so the admin bar and tools sit outside it.
 - **Routes** (`pages/admin-page/admin.routes.ts`, under `/admin`): each tool's
   list at `/admin/<type>` (`editor-list-page/`), with routed modals over it:
   `new`, `drafts/<draftId>`, `<id>` (`editor-modal/`, the shared `draft-editor/`
@@ -32,18 +33,22 @@ The decisions are in issue #101; the API's side is in the web-server's
   its `ErrorStateMatcher` marks blank required fields only after that.
 - **Per-type differences live in `EDITOR_TYPES`**
   (`pages/admin-page/editor-types.ts`): noun, statuses, search fields, field
-  labels, flags, sort options (the first is the default), list layout, public
-  page, new-item fields, and the type's form, preview, list cell, and bulk
-  actions (`components/<type>/`). Shared code reads it; never check
-  `type === …`. A type's bulk actions run through `BULK_ACTION_HOST`.
+  labels, flags, sortable columns (`nameColumn`, an `extraColumn`) and
+  `defaultSort`, list layout, public page, new-item fields, and the type's form,
+  preview, list cell, and bulk actions (`components/<type>/`). Shared code reads
+  it; never check `type === …`. A type's bulk actions run through
+  `BULK_ACTION_HOST`.
 - **The list** (`editor-list/`): `EditorListStore` owns its state (type and
   filters from the URL, the loaded items and drafts, the selection, cleared on
   every load) and `EditorListActions` every write from it (row actions, bulk
   actions, also as the `BULK_ACTION_HOST`); both are provided by the list page.
   Unpublished changes and every item are two collapsible groups of one table,
   with the same row component (`ListRow`, `list-rows.ts`); the gallery lays the
-  same table out as a grid of cards in CSS. An `isOrderable` type, filtered to
-  one collection, drags into order (`list-order.ts`, one update per moved item).
+  same table out as a grid of cards in CSS (rows keep explicit table roles). A
+  row's name links to its editor. Tables sort from their column headings
+  (`list-sort.ts`, `sort` and `order` in the URL); phones and the gallery's grid
+  use a Sort by field instead. An `isOrderable` type, filtered to one
+  collection, drags into order (`list-order.ts`, one update per moved item).
 - **Collections** come from `CollectionsStore` (provided by the admin page):
   fetched once per type, reloaded after a collection write.
 - **Writes** (confirm, send, snackbar) go through `EditorWriteService.run()`.
