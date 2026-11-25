@@ -118,16 +118,6 @@ td {
 		display: table-cell;
 	}
 
-	// The menu shows it's there on hover, without hiding it from touch.
-	.actions button {
-		opacity: 0.6;
-	}
-
-	:host(:hover) .actions button,
-	:host(:focus-within) .actions button,
-	.actions button[aria-expanded="true"] {
-		opacity: 1;
-	}
 
 	.actions {
 		text-align: right;

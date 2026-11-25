@@ -42,16 +42,18 @@ test.describe('news list', () => {
 			.focus();
 		await page.keyboard.press('Control+a');
 		await expect(
-			page.getByText('Select all 13 posts on this page?')
+			page.getByRole('paragraph').filter({
+				hasText: 'Select all 13 posts on this page?'
+			})
 		).toBeVisible();
 
 		await page.keyboard.press('Enter');
-		await expect(page.getByText('13 of 13 selected').first()).toBeVisible();
+		await expect(page.getByText('13 selected').first()).toBeVisible();
 		// The bulk action bar, too.
 		expect(await scanForViolations(page)).toEqual([]);
 
 		await page.keyboard.press('Escape');
-		await expect(page.getByText('13 of 13 selected')).toHaveCount(0);
+		await expect(page.getByText('13 selected')).toHaveCount(0);
 	});
 
 	test('hides the selection in one request and confirms it', async ({
@@ -130,7 +132,9 @@ test.describe('news editor', () => {
 		});
 		expect(await scanForViolations(page)).toEqual([]);
 
-		await page.getByRole('button', { name: 'Publish' }).click();
+		await page
+			.getByRole('button', { name: 'Publish', exact: true })
+			.click();
 		await expect(page.getByText('Published Fresh.')).toBeVisible();
 		expect(publishRequest).toEqual({ visible: true, date: 'now' });
 		await expect(page).toHaveURL(/\/admin\/news$/);
@@ -155,7 +159,7 @@ test.describe('news editor', () => {
 		await expect(page.getByRole('textbox', { name: 'Title' })).toHaveValue(
 			EDITOR_NEWS_POSTS[1].title
 		);
-		await expect(page.getByLabel('Keep its date')).toBeChecked();
+		await expect(page.getByLabel(/^As before/)).toBeChecked();
 		await page.waitForTimeout(500);
 		expect(saves).toEqual([]);
 	});
@@ -227,12 +231,13 @@ test('opens an item from its link (an Edit button) over its list, and Back close
 test.describe('gallery collections', () => {
 	test.beforeEach(async ({ page }) => {
 		await openTool(page, 'gallery', 'Spawn walkway');
-		await page.getByRole('button', { name: 'Collections' }).click();
+		await page.getByRole('link', { name: 'Collections' }).click();
+		await expect(page).toHaveURL(/\/admin\/gallery\/collections$/);
 		await expect(
-			page.getByRole('heading', { name: 'Collections' })
-		).toBeVisible();
+			page.getByRole('heading', { name: 'Gallery collections' })
+		).toBeFocused();
 		await expect(
-			page.getByText('Season 5', { exact: true }).first()
+			page.getByRole('textbox', { name: 'Title of Season 5' })
 		).toBeVisible();
 	});
 
@@ -240,7 +245,7 @@ test.describe('gallery collections', () => {
 		expect(await scanForViolations(page)).toEqual([]);
 	});
 
-	test('creates a collection from a title and a valid slug', async ({
+	test('creates a collection, its slug following the title', async ({
 		page
 	}) => {
 		let body: unknown;
@@ -252,10 +257,9 @@ test.describe('gallery collections', () => {
 			return route.fulfill({ status: 201, json: {} });
 		});
 		await page.getByRole('textbox', { name: 'Title' }).fill('Season 7');
-		await page.getByRole('textbox', { name: /Slug/ }).fill('Season 7');
-		await expect(page.getByText('Use lowercase letters')).toBeVisible();
-
-		await page.getByRole('textbox', { name: /Slug/ }).fill('season-7');
+		await expect(page.getByRole('textbox', { name: 'Slug' })).toHaveValue(
+			'season-7'
+		);
 		await page.getByRole('button', { name: 'Create collection' }).click();
 
 		await expect(page.getByText('Created Season 7.')).toBeVisible();
@@ -283,9 +287,8 @@ test.describe('gallery images', () => {
 		await page
 			.getByRole('checkbox', { name: 'Select Iron farm', exact: true })
 			.check();
-		await page.getByRole('combobox', { name: 'Move to' }).click();
-		await page.getByRole('option', { name: 'Season 6' }).click();
-		await page.getByRole('button', { name: 'Move', exact: true }).click();
+		await page.getByRole('button', { name: 'Move to' }).click();
+		await page.getByRole('menuitem', { name: 'Season 6' }).click();
 
 		await expect(page.getByText('Moved 1 image.')).toBeVisible();
 		expect(body).toEqual({
@@ -298,12 +301,12 @@ test.describe('gallery images', () => {
 	test('asks before closing with images not yet published', async ({
 		page
 	}) => {
+		await page.getByRole('link', { name: 'Upload images' }).click();
+		await page.getByText('Add by link instead').click();
 		await page
-			.getByRole('button', { name: 'More ways to add images' })
-			.click();
-		await page.getByRole('menuitem', { name: 'Add many images' }).click();
-		await page
-			.getByRole('textbox', { name: 'Or paste links, one per line' })
+			.getByRole('textbox', {
+				name: 'imgur or imgbb links, one per line'
+			})
 			.fill('https://i.ibb.co/a/one.png\nhttps://i.ibb.co/a/two.png');
 		await page.getByRole('button', { name: 'Add links' }).click();
 
@@ -335,12 +338,12 @@ test.describe('gallery images', () => {
 				}
 			});
 		});
+		await page.getByRole('link', { name: 'Upload images' }).click();
+		await page.getByText('Add by link instead').click();
 		await page
-			.getByRole('button', { name: 'More ways to add images' })
-			.click();
-		await page.getByRole('menuitem', { name: 'Add many images' }).click();
-		await page
-			.getByRole('textbox', { name: 'Or paste links, one per line' })
+			.getByRole('textbox', {
+				name: 'imgur or imgbb links, one per line'
+			})
 			.fill('https://i.ibb.co/a/one.png\nhttps://i.ibb.co/a/two.png');
 		await page.getByRole('button', { name: 'Add links' }).click();
 		await page
@@ -364,9 +367,7 @@ test.describe('gallery images', () => {
 			'One',
 			'Two'
 		]);
-		await expect(
-			page.getByText('Pick files or paste links to start.')
-		).toBeVisible();
+		await expect(page.getByText('No images yet.')).toBeVisible();
 	});
 });
 
@@ -389,11 +390,14 @@ test.describe('downloads', () => {
 		await page
 			.getByRole('textbox', { name: 'Title' })
 			.fill('Season 5 world');
-		await expect(
-			page
-				.locator('.preview')
-				.getByRole('heading', { name: 'Season 5 world' })
-		).toBeVisible();
+		// On mobile, the preview is a tab beside the fields.
+		const previewTab = page.getByRole('radio', { name: 'Preview' });
+		if (await previewTab.isVisible()) {
+			await previewTab.click();
+		}
+		await expect(page.locator('section.preview')).toContainText(
+			'Season 5 world'
+		);
 		expect(await scanForViolations(page)).toEqual([]);
 	});
 });
@@ -401,26 +405,21 @@ test.describe('downloads', () => {
 test.describe('maps', () => {
 	test.beforeEach(({ page }) => openTool(page, 'maps', 'Season 5'));
 
-	test('starts a season with three dimensions, reorderable by keyboard', async ({
+	test('starts the next season with three dimensions, reorderable by keyboard', async ({
 		page
 	}) => {
 		await page.getByRole('link', { name: 'New season' }).click();
+		await expect(
+			page.getByRole('spinbutton', { name: 'Season' })
+		).toHaveValue('6');
 		const legends = page.locator('.dimension legend');
-		await expect(legends).toHaveText([
-			'1. Overworld',
-			'2. Nether',
-			'3. End'
-		]);
+		await expect(legends).toHaveText(['Overworld', 'Nether', 'End']);
 		expect(await scanForViolations(page)).toEqual([]);
 
 		await page.getByRole('button', { name: 'Move down Overworld' }).focus();
 		await page.keyboard.press('Enter');
 
-		await expect(legends).toHaveText([
-			'1. Nether',
-			'2. Overworld',
-			'3. End'
-		]);
+		await expect(legends).toHaveText(['Nether', 'Overworld', 'End']);
 		await expect(
 			page.getByRole('button', { name: 'Move down Overworld' })
 		).toBeFocused();
@@ -448,7 +447,7 @@ test.describe('list quality of life', () => {
 			.getByRole('cell', { name: 'Live' })
 			.click();
 		await expect(page).toHaveURL(/\/admin\/news\/news-2\?status=live$/);
-		await page.getByRole('button', { name: 'Close' }).click();
+		await page.getByRole('button', { name: 'Close', exact: true }).click();
 
 		await expect(page).toHaveURL(/\/admin\/news\?status=live$/);
 		await expect(
@@ -485,8 +484,8 @@ test.describe('list quality of life', () => {
 			/sunrise-1\.webp$/
 		);
 		await page
-			.getByRole('checkbox', { name: 'Select draft Draft image' })
+			.getByRole('checkbox', { name: 'Select Draft image' })
 			.check();
-		await expect(page.getByText('1 of 6 selected').first()).toBeVisible();
+		await expect(page.getByText('1 selected').first()).toBeVisible();
 	});
 });
