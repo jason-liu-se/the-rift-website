@@ -147,7 +147,8 @@ export class EditorListStore {
 			query: toListQuery(
 				this.filters(),
 				this.search(),
-				this.auth.user()?.id
+				this.auth.user()?.id,
+				this.config().sortOptions
 			),
 			pageIndex: this.pageIndex()
 		}),

@@ -1,55 +1,78 @@
 @use "../../../../../theme-colours" as *;
 @use "../../../../../font-sizes" as *;
 
-.collections {
+:host {
 	display: grid;
-	gap: 16px;
-	padding: 16px;
-	border: 1px solid $colour-light-grey;
-	border-radius: 8px;
+	gap: 32px;
 }
 
-.heading,
 .subheading {
-	margin: 0;
-	font-size: $font-size-medium;
+	margin: 0 0 12px;
+	font-size: $font-size-small;
+	font-weight: 600;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
 }
 
 .collection-list {
-	display: grid;
-	gap: 8px;
 	margin: 0;
 	padding: 0;
 	list-style: none;
 
 	li {
 		display: flex;
-		flex-wrap: wrap;
 		align-items: center;
-		justify-content: space-between;
-		gap: 8px;
-		padding-bottom: 8px;
+		gap: 4px;
+		padding: 4px 0;
 		border-bottom: 1px solid $colour-light-grey;
 	}
 }
 
+.empty {
+	padding: 24px 0;
+}
+
 .name {
 	display: grid;
-	overflow-wrap: anywhere;
+	flex: 1;
+	min-width: 0;
+}
+
+// Looks like text until hovered or focused, then like the field it is.
+.title {
+	min-height: 44px;
+	padding: 0 8px;
+	margin-left: -8px;
+	border: 1px solid transparent;
+	border-radius: 4px;
+	background: none;
+	color: inherit;
+	font: inherit;
+	font-weight: 600;
+
+	&:hover {
+		border-color: $colour-light-grey;
+	}
+
+	&:focus-visible {
+		border-color: $colour-primary;
+		outline: 2px solid $colour-primary;
+	}
 }
 
 .details {
 	font-size: $font-size-small;
+	overflow-wrap: anywhere;
 }
 
-.actions {
-	display: flex;
-	gap: 8px;
+.danger {
+	color: $colour-error;
 }
 
 .create {
 	display: grid;
 	gap: 12px;
+	align-content: start;
 	justify-items: start;
 
 	mat-form-field {
@@ -57,8 +80,14 @@
 	}
 }
 
-.slug-problem {
+.problem {
 	margin: 0;
 	color: $colour-error;
 	font-size: $font-size-small;
+}
+
+@media (min-width: 48rem) {
+	:host {
+		grid-template-columns: 3fr 2fr;
+	}
 }

@@ -1,85 +1,114 @@
-<div class="filters">
-	<div class="search-row">
-		<mat-form-field class="search" subscriptSizing="dynamic">
-			<mat-label>Search</mat-label>
-			<input
-				matInput
-				type="search"
-				maxlength="100"
-				[ngModel]="filters().search"
-				(ngModelChange)="setFilter('search', $event)"
-			/>
-		</mat-form-field>
-		<button
-			mat-stroked-button
-			type="button"
-			class="more-toggle"
-			aria-controls="more-filters"
-			[attr.aria-expanded]="isShowingMore()"
-			(click)="isShowingMore.set(!isShowingMore())"
-		>
-			Filters
-			@if (activeCount() > 0) {
-				({{ activeCount() }})
-			}
-		</button>
-	</div>
-	<div id="more-filters" class="more" [class.shown]="isShowingMore()">
-		<mat-form-field class="compact" subscriptSizing="dynamic">
-			<mat-label>Search in</mat-label>
-			<mat-select
-				multiple
-				placeholder="Everything"
-				[ngModel]="filters().searchFields"
-				(ngModelChange)="setFilter('searchFields', $event)"
+<div class="search-row">
+	<mat-form-field class="search" subscriptSizing="dynamic">
+		<mat-icon matPrefix aria-hidden="true">search</mat-icon>
+		<mat-label>{{ searchLabel() }}</mat-label>
+		<input
+			matInput
+			type="search"
+			maxlength="100"
+			[ngModel]="filters().search"
+			(ngModelChange)="setFilter('search', $event)"
+		/>
+		@if (searchFields().length > 1) {
+			<button
+				mat-icon-button
+				matSuffix
+				type="button"
+				matTooltip="Search in"
+				[attr.aria-label]="'Search in: ' + searchInText()"
+				[matMenuTriggerFor]="searchInMenu"
 			>
-				@for (field of searchFields(); track field.value) {
-					<mat-option [value]="field.value">{{
-						field.label
-					}}</mat-option>
-				}
-			</mat-select>
-		</mat-form-field>
+				<mat-icon>tune</mat-icon>
+			</button>
+		}
+	</mat-form-field>
+	<mat-menu #searchInMenu="matMenu">
+		@for (field of searchFields(); track field.value) {
+			<button
+				mat-menu-item
+				role="menuitemcheckbox"
+				[attr.aria-checked]="isSearchedIn(field.value)"
+				(click)="toggleSearchField(field.value, $event)"
+			>
+				<mat-icon>{{
+					isSearchedIn(field.value)
+						? "check_box"
+						: "check_box_outline_blank"
+				}}</mat-icon>
+				{{ field.label }}
+			</button>
+		}
+	</mat-menu>
+	<button
+		mat-stroked-button
+		type="button"
+		class="more-toggle"
+		aria-controls="more-filters"
+		[attr.aria-expanded]="isShowingMore()"
+		(click)="isShowingMore.set(!isShowingMore())"
+	>
+		<mat-icon>filter_list</mat-icon>
+		Filters
+		@if (activeCount() > 0) {
+			({{ activeCount() }})
+		}
+	</button>
+</div>
+<div id="more-filters" class="more" [class.shown]="isShowingMore()">
+	<mat-form-field class="compact" subscriptSizing="dynamic">
+		<mat-label>Status</mat-label>
+		<mat-select
+			[ngModel]="filters().status"
+			(ngModelChange)="setFilter('status', $event)"
+		>
+			<mat-option value="">Any</mat-option>
+			@for (status of statuses(); track status.value) {
+				<mat-option [value]="status.value">{{ status.label }}</mat-option>
+			}
+			<mat-option value="draft">Unpublished changes</mat-option>
+		</mat-select>
+	</mat-form-field>
+	@if (collections(); as collections) {
 		<mat-form-field class="compact" subscriptSizing="dynamic">
-			<mat-label>Status</mat-label>
+			<mat-label>Collection</mat-label>
 			<mat-select
-				[ngModel]="filters().status"
-				(ngModelChange)="setFilter('status', $event)"
+				[ngModel]="filters().collection"
+				(ngModelChange)="setFilter('collection', $event)"
 			>
 				<mat-option value="">Any</mat-option>
-				@for (status of statuses(); track status.value) {
-					<mat-option [value]="status.value">{{
-						status.label
+				@for (collection of collections; track collection.slug) {
+					<mat-option [value]="collection.slug">{{
+						collection.title
 					}}</mat-option>
 				}
-				<mat-option value="draft">Draft</mat-option>
 			</mat-select>
 		</mat-form-field>
-		@if (collections(); as collections) {
-			<mat-form-field class="compact" subscriptSizing="dynamic">
-				<mat-label>Collection</mat-label>
-				<mat-select
-					[ngModel]="filters().collection"
-					(ngModelChange)="setFilter('collection', $event)"
-				>
-					<mat-option value="">Any</mat-option>
-					@for (collection of collections; track collection.slug) {
-						<mat-option [value]="collection.slug">{{
-							collection.title
-						}}</mat-option>
-					}
-				</mat-select>
-			</mat-form-field>
-		}
-		<mat-form-field class="compact" subscriptSizing="dynamic">
-			<mat-label>Created by</mat-label>
-			<mat-select
-				[ngModel]="filters().scope"
-				(ngModelChange)="setFilter('scope', $event)"
-			>
-				<mat-option value="all">Anyone</mat-option>
-				<mat-option value="mine">Me</mat-option>
-			</mat-select>
-		</mat-form-field>
-	</div>
+	}
+	<mat-form-field class="compact" subscriptSizing="dynamic">
+		<mat-label>Created by</mat-label>
+		<mat-select
+			[ngModel]="filters().scope"
+			(ngModelChange)="setFilter('scope', $event)"
+		>
+			<mat-option value="all">Anyone</mat-option>
+			<mat-option value="mine">Me</mat-option>
+		</mat-select>
+	</mat-form-field>
+	<mat-form-field class="compact" subscriptSizing="dynamic">
+		<mat-label>Sort by</mat-label>
+		<mat-select
+			[ngModel]="selectedSort()"
+			(ngModelChange)="setSort($event)"
+		>
+			@for (option of sortOptions(); track option.sort) {
+				<mat-option [value]="option.sort">{{ option.label }}</mat-option>
+			}
+		</mat-select>
+	</mat-form-field>
+	@if (activeCount() > 0 || filters().search) {
+		<button mat-button type="button" class="clear" (click)="clear()">
+			<mat-icon>close</mat-icon>
+			Clear filters
+		</button>
+	}
 </div>

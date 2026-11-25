@@ -8,10 +8,12 @@ import {
 	signal
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatButton } from '@angular/material/button';
+import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatFormField, MatHint, MatLabel } from '@angular/material/form-field';
+import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
+import { MatTooltip } from '@angular/material/tooltip';
 import { Observable, tap } from 'rxjs';
 import {
 	MAX_COLLECTION_SLUG_LENGTH,
@@ -31,10 +33,19 @@ import { ItemNoun, countItems } from '../editor-list/bulk-results';
 /** A collection's slug, as the API takes it: kebab-case. */
 const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
+/** A title as a slug: "Season 7!" is "season-7". */
+export function toSlug(title: string): string {
+	return title
+		.toLowerCase()
+		.normalize('NFKD')
+		.replace(/[^a-z0-9]+/g, '-')
+		.replace(/^-+|-+$/g, '');
+}
+
 /** Why `slug` can't be used, or undefined if it can. */
 export function findSlugProblem(slug: string): string | undefined {
 	if (!slug) {
-		return undefined;
+		return 'Enter a slug.';
 	}
 	if (!SLUG_PATTERN.test(slug)) {
 		return 'Use lowercase letters and numbers, with single hyphens between words (e.g. season-5).';
@@ -43,8 +54,9 @@ export function findSlugProblem(slug: string): string | undefined {
 }
 
 /**
- * A gallery's or downloads' collections: create one (its slug is fixed once
- * created), show or hide one, or delete one with everything in it.
+ * A gallery's or downloads' collections: rename one in place, show or hide
+ * it, or delete it with everything in it; or create one, its slug following
+ * the title until edited (and fixed once created).
  */
 @Component({
 	selector: 'app-collections-manager',
@@ -56,8 +68,11 @@ export function findSlugProblem(slug: string): string | undefined {
 		MatCheckbox,
 		MatFormField,
 		MatHint,
+		MatIcon,
+		MatIconButton,
 		MatInput,
-		MatLabel
+		MatLabel,
+		MatTooltip
 	]
 })
 export class CollectionsManagerComponent {
@@ -77,24 +92,48 @@ export class CollectionsManagerComponent {
 	protected readonly title = signal('');
 	protected readonly isVisible = signal(true);
 	protected readonly isSaving = signal(false);
+	/** The slug was typed, so it no longer follows the title. */
+	private readonly isSlugEdited = signal(false);
+	/** Problems show once creating was tried. */
+	private readonly wasAttempted = signal(false);
 
 	protected readonly collections = computed(
 		() => this.store.collections(this.type())() ?? []
 	);
-	protected readonly slugProblem = computed(() =>
-		findSlugProblem(this.slug())
+	protected readonly urlPrefix = computed(() =>
+		this.type() === 'gallery' ? '/gallery/' : undefined
 	);
-	protected readonly canCreate = computed(
-		() =>
-			!!this.slug() &&
-			!this.slugProblem() &&
-			!!this.title().trim() &&
-			!this.isSaving()
+	protected readonly shownSlugProblem = computed(() =>
+		this.wasAttempted() ? findSlugProblem(this.slug()) : undefined
 	);
+
+	protected pathOf(collection: EditorCollection): string {
+		return `${this.urlPrefix() ?? ''}${collection.slug}`;
+	}
+
+	protected countOf(collection: EditorCollection): string {
+		return countItems(collection.itemCount, this.itemNoun());
+	}
+
+	protected setTitle(title: string): void {
+		this.title.set(title);
+		if (!this.isSlugEdited()) {
+			this.slug.set(toSlug(title));
+		}
+	}
+
+	protected setSlug(slug: string): void {
+		this.isSlugEdited.set(true);
+		this.slug.set(slug);
+	}
 
 	protected createCollection(): void {
 		const title = this.title().trim();
 		const slug = this.slug();
+		this.wasAttempted.set(true);
+		if (!title || findSlugProblem(slug)) {
+			return;
+		}
 		this.isSaving.set(true);
 		this.write({
 			request: () =>
@@ -113,8 +152,28 @@ export class CollectionsManagerComponent {
 			if (isCreated) {
 				this.slug.set('');
 				this.title.set('');
+				this.isSlugEdited.set(false);
+				this.wasAttempted.set(false);
 			}
 		});
+	}
+
+	/** Saves a changed title; a blank one goes back to what it was. */
+	protected rename(collection: EditorCollection, input: HTMLInputElement): void {
+		const title = input.value.trim();
+		if (!title || title === collection.title) {
+			input.value = collection.title;
+			return;
+		}
+		this.write({
+			request: () =>
+				this.editorContent.updateCollection(
+					this.type(),
+					collection.slug,
+					{ title, startingRevision: collection.revision }
+				),
+			success: `Renamed ${collection.title} to ${title}.`
+		}).subscribe();
 	}
 
 	protected toggleVisibility(collection: EditorCollection): void {

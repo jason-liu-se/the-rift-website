@@ -1,5 +1,6 @@
 import {
 	Component,
+	afterNextRender,
 	ElementRef,
 	input,
 	output,
@@ -14,7 +15,8 @@ let nextId = 0;
 /**
  * The admin modals' frame: a header (title, the modal's own tools, Close)
  * and a footer that stay in view, with the content scrolling between them.
- * Project tools with `modalTools` and the footer with `modalFooter`.
+ * Project tools with `modalTools` and the footer with `modalFooter`. It
+ * focuses its heading on opening, so screen readers start there.
  */
 @Component({
 	selector: 'app-modal-shell',
@@ -31,7 +33,10 @@ export class ModalShellComponent {
 		viewChild.required<ElementRef<HTMLElement>>('headingElement');
 	private readonly body = viewChild.required<ElementRef<HTMLElement>>('body');
 
-	/** Starts screen readers at the modal's heading. */
+	constructor() {
+		afterNextRender(() => this.focusHeading());
+	}
+
 	public focusHeading(): void {
 		this.headingElement().nativeElement.focus();
 	}

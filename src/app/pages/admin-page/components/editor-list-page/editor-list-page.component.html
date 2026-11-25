@@ -2,29 +2,35 @@
 	<h1 class="tool-title" tabindex="-1" #heading>
 		{{ config().label }}<span class="cdk-visually-hidden"> – Admin</span>
 	</h1>
-</header>
-<div class="tool-card">
 	<div class="tool-actions">
-		<app-create-button [type]="type()" />
-		@if (collectionType(); as collectionType) {
-			<button
+		@if (config().hasCollections) {
+			<a
 				mat-stroked-button
-				type="button"
-				[attr.aria-expanded]="isManagingCollections()"
-				(click)="isManagingCollections.set(!isManagingCollections())"
+				routerLink="collections"
+				queryParamsHandling="preserve"
 			>
+				<mat-icon>folder_open</mat-icon>
 				Collections
-			</button>
-			@if (isManagingCollections()) {
-				<app-collections-manager
-					class="collections"
-					[type]="collectionType"
-					[itemNoun]="config().noun"
-					(changed)="store.reload()"
-				/>
-			}
+			</a>
+		}
+		@if (config().hasBulkCreate) {
+			<a
+				mat-flat-button
+				routerLink="bulk"
+				queryParamsHandling="preserve"
+			>
+				<mat-icon>upload</mat-icon>
+				Upload {{ config().noun.many }}
+			</a>
+		} @else {
+			<a mat-flat-button routerLink="new" queryParamsHandling="preserve">
+				<mat-icon>add</mat-icon>
+				New {{ config().noun.one }}
+			</a>
 		}
 	</div>
+</header>
+<div class="tool-card">
 	<app-editor-list />
 </div>
 <router-outlet />

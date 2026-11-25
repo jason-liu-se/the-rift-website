@@ -152,10 +152,6 @@ export class DraftEditorComponent<T extends EditorContentType> {
 	/** There's a draft to discard (anything saved here or on the server). */
 	protected readonly hasDraft = computed(() => this.status() !== 'unchanged');
 
-	constructor() {
-		afterNextRender(() => this.shell().focusHeading());
-	}
-
 	protected publish(): void {
 		this.runPublish(() =>
 			this.session().publish(this.settings.toRequest(this.config().hasDate))

@@ -46,9 +46,27 @@ describe('filterDrafts', () => {
 	});
 });
 
+const SORT_OPTIONS = [
+	{ label: 'Last updated', sort: 'updatedAt', order: 'desc' },
+	{ label: 'Title (A–Z)', sort: 'title', order: 'asc' }
+];
+const DEFAULT_SORT = { sort: 'updatedAt', order: 'desc' };
+
 describe('toListQuery', () => {
 	it.each([
-		{ case: 'no filters', filters: {}, search: '', query: {} },
+		{ case: 'no filters', filters: {}, search: '', query: DEFAULT_SORT },
+		{
+			case: 'a chosen sort',
+			filters: { sort: 'title' },
+			search: '',
+			query: { sort: 'title', order: 'asc' }
+		},
+		{
+			case: 'an unknown sort, as the default',
+			filters: { sort: 'nope' },
+			search: '',
+			query: DEFAULT_SORT
+		},
 		{
 			case: 'the Draft status (no items)',
 			filters: { status: 'draft' },
@@ -65,6 +83,7 @@ describe('toListQuery', () => {
 			},
 			search: ' night ',
 			query: {
+				...DEFAULT_SORT,
 				status: 'hidden',
 				collection: 'season5',
 				createdBy: 'me',
@@ -76,11 +95,11 @@ describe('toListQuery', () => {
 			case: 'search fields without a search',
 			filters: { searchFields: ['title'] },
 			search: '  ',
-			query: {}
+			query: DEFAULT_SORT
 		}
 	])('sends $case', ({ filters, search, query }) => {
 		expect(
-			toListQuery({ ...NO_FILTERS, ...filters }, search, 'me')
+			toListQuery({ ...NO_FILTERS, ...filters }, search, 'me', SORT_OPTIONS)
 		).toEqual(query);
 	});
 });

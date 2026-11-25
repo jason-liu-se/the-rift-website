@@ -4,6 +4,7 @@
 		[filters]="store.filters()"
 		[statuses]="store.config().statuses"
 		[searchFields]="store.config().searchFields"
+		[sortOptions]="store.config().sortOptions"
 		[collections]="collections()"
 		(filtersChange)="store.setFilters($event)"
 	/>

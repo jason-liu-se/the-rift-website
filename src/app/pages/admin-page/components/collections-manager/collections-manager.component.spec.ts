@@ -12,7 +12,8 @@ import { environment } from 'src/environments/environment';
 import { CollectionsStore } from '../../services/collections-store.service';
 import {
 	CollectionsManagerComponent,
-	findSlugProblem
+	findSlugProblem,
+	toSlug
 } from './collections-manager.component';
 
 const COLLECTIONS_URL = `${environment.API_URL}/editor/gallery/collections`;
@@ -32,6 +33,16 @@ describe('findSlugProblem', () => {
 	);
 });
 
+describe('toSlug', () => {
+	it.each([
+		['Season 7', 'season-7'],
+		['  Spawn & Shops! ', 'spawn-shops'],
+		['Café', 'cafe']
+	])('makes %s into %s', (title, slug) => {
+		expect(toSlug(title)).toBe(slug);
+	});
+});
+
 describe('CollectionsManagerComponent', () => {
 	let fixture: ComponentFixture<CollectionsManagerComponent>;
 	let element: HTMLElement;
@@ -43,7 +54,14 @@ describe('CollectionsManagerComponent', () => {
 	const button = (name: string) =>
 		[...element.querySelectorAll<HTMLButtonElement>('button')].find(
 			(candidate) =>
-				candidate.textContent?.replace(/\s+/g, ' ').trim() === name
+				(candidate.getAttribute('aria-label') ??
+					candidate.textContent
+						?.replace(
+							candidate.querySelector('mat-icon')?.textContent ?? '',
+							''
+						)
+						.replace(/\s+/g, ' ')
+						.trim()) === name
 		)!;
 	const type = (name: string, value: string) => {
 		const input = element.querySelector<HTMLInputElement>(
@@ -100,21 +118,14 @@ describe('CollectionsManagerComponent', () => {
 
 	afterEach(() => httpTesting.verify());
 
-	it('lists each collection with its slug, item count, and visibility', () => {
+	it('lists each collection with its URL and item count', () => {
 		expect(
 			element.querySelector('li')?.textContent?.replace(/\s+/g, ' ')
-		).toContain('Season 5 season5 · 3 images · Visible');
+		).toContain('/gallery/season5 · 3 images');
 	});
 
-	it('checks the slug as typed, and creates the collection', () => {
+	it('fills the slug in from the title, and creates the collection', () => {
 		type('title', 'Season 7');
-		type('slug', 'Season 7');
-		expect(element.querySelector('.slug-problem')?.textContent).toContain(
-			'lowercase letters'
-		);
-		expect(button('Create collection').disabled).toBe(true);
-
-		type('slug', 'season-7');
 		button('Create collection').click();
 		const create = httpTesting.expectOne({
 			method: 'POST',
@@ -131,6 +142,32 @@ describe('CollectionsManagerComponent', () => {
 			.flush(EDITOR_GALLERY_COLLECTIONS);
 
 		expect(changed).toHaveBeenCalled();
+	});
+
+	it('checks an edited slug when creating', () => {
+		type('title', 'Season 7');
+		type('slug', 'Season 7');
+		button('Create collection').click();
+		fixture.detectChanges();
+
+		httpTesting.expectNone({ method: 'POST', url: COLLECTIONS_URL });
+		expect(element.querySelector('.problem')?.textContent).toContain(
+			'lowercase letters'
+		);
+	});
+
+	it('renames a collection when its title is changed', () => {
+		const title = element.querySelector<HTMLInputElement>('input.title')!;
+		title.value = 'Season Five';
+		title.dispatchEvent(new Event('blur'));
+
+		const update = httpTesting.expectOne(`${COLLECTIONS_URL}/season5`);
+		expect(update.request.body).toEqual({
+			title: 'Season Five',
+			startingRevision: 1
+		});
+		update.flush({});
+		httpTesting.expectOne(COLLECTIONS_URL).flush([]);
 	});
 
 	it('says when the slug is taken', () => {

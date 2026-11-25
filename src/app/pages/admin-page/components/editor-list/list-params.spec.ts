@@ -8,7 +8,8 @@ describe('list params', () => {
 		searchFields: ['title', 'content'],
 		status: 'hidden',
 		collection: 'season5',
-		scope: 'mine' as const
+		scope: 'mine' as const,
+		sort: 'title'
 	};
 
 	it('round-trips the filters and page through the URL', () => {
@@ -20,6 +21,7 @@ describe('list params', () => {
 			status: 'hidden',
 			collection: 'season5',
 			by: 'mine',
+			sort: 'title',
 			page: '3'
 		});
 		expect(fromListParams(convertToParamMap(params))).toEqual({
@@ -30,7 +32,7 @@ describe('list params', () => {
 
 	it('removes defaults from the URL (null), and reads a bare URL as defaults', () => {
 		expect(Object.values(toListParams(NO_FILTERS, 0))).toEqual(
-			Array(6).fill(null)
+			Array(7).fill(null)
 		);
 		expect(fromListParams(convertToParamMap({}))).toEqual({
 			filters: NO_FILTERS,

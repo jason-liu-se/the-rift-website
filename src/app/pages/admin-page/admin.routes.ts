@@ -9,6 +9,7 @@ import {
 	UrlMatcher
 } from '@angular/router';
 import { EditorContentType } from 'src/app/interfaces/api-requests';
+import { CollectionsModalComponent } from './components/collections-modal/collections-modal.component';
 import { BulkCreateModalComponent } from './components/bulk-create-modal/bulk-create-modal.component';
 import { EditorListPageComponent } from './components/editor-list-page/editor-list-page.component';
 import { EditorModalComponent } from './components/editor-modal/editor-modal.component';
@@ -20,14 +21,16 @@ const isEditorType: CanMatchFn = (_, [segment]) =>
 const toolTitle: ResolveFn<string> = (route) =>
 	`${EDITOR_TYPES[route.paramMap.get('type') as EditorContentType].label} · Admin`;
 
-/** Bulk creation only for the types that have it; others go to their list. */
-const hasBulkCreate: CanActivateFn = (route) => {
-	const type = route.parent!.paramMap.get('type') as EditorContentType;
-	return (
-		EDITOR_TYPES[type].hasBulkCreate ||
-		inject(Router).createUrlTree(['/admin', type])
-	);
-};
+/** A tool's page (`bulk`, `collections`) only for types with `feature`. */
+const typeHas =
+	(feature: 'hasBulkCreate' | 'hasCollections'): CanActivateFn =>
+	(route) => {
+		const type = route.parent!.paramMap.get('type') as EditorContentType;
+		return (
+			EDITOR_TYPES[type][feature] ||
+			inject(Router).createUrlTree(['/admin', type])
+		);
+	};
 
 /**
  * The editor modal's URLs, as one route so the modal stays open when a new
@@ -58,11 +61,16 @@ export default [
 		children: [
 			{
 				path: 'bulk',
-				canActivate: [hasBulkCreate],
+				canActivate: [typeHas('hasBulkCreate')],
 				canDeactivate: [
 					(modal: BulkCreateModalComponent) => modal.confirmLeave()
 				],
 				component: BulkCreateModalComponent
+			},
+			{
+				path: 'collections',
+				canActivate: [typeHas('hasCollections')],
+				component: CollectionsModalComponent
 			},
 			{ matcher: matchEditorItem, component: EditorModalComponent }
 		]

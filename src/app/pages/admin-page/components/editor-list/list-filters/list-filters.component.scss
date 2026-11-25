@@ -1,3 +1,7 @@
+:host {
+	display: block;
+}
+
 .search-row {
 	display: flex;
 	gap: 8px;
@@ -8,10 +12,15 @@
 	flex: 1;
 }
 
-// Mobile: the other filters show from the Filters button.
+.more-toggle {
+	height: 56px;
+}
+
+// Mobile: the other filters and the sort show from the Filters button.
 .more {
 	display: none;
 	grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+	align-items: center;
 	gap: 8px;
 	margin-top: 8px;
 
@@ -21,18 +30,30 @@
 }
 
 @media (min-width: 60rem) {
+	:host {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.search-row {
+		flex: 1 1 16rem;
+	}
+
 	.more-toggle {
 		display: none;
 	}
 
-	// Desktop: compact selects in one row under the search.
+	// Desktop: everything on one row (wrapping when it can't fit).
 	.more,
 	.more.shown {
 		display: flex;
 		flex-wrap: wrap;
+		margin-top: 0;
 	}
 
 	.compact {
-		width: 11rem;
+		width: 10.5rem;
 	}
 }
