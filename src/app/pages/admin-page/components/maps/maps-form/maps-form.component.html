@@ -14,6 +14,8 @@
 <section aria-labelledby="dimensions-heading">
 	<h3 id="dimensions-heading" class="dimensions-heading">Dimensions</h3>
 	<app-dimensions-editor
+		withMapFields
+		[album]="{ album: 'maps' }"
 		[dimensions]="fields().dimensions ?? []"
 		(dimensionsChange)="setDimensions($event)"
 	/>

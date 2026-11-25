@@ -180,7 +180,11 @@ export function respondTo(url: URL): IMockResponse {
 	}
 	if (url.pathname === '/gallery') {
 		return ok(
-			GALLERY_COLLECTIONS.map(({ slug, title }) => ({ slug, title }))
+			GALLERY_COLLECTIONS.map(({ slug, title, dimensions }) => ({
+				slug,
+				title,
+				...(dimensions && { dimensions })
+			}))
 		);
 	}
 	if (url.pathname === '/maps/seasons') {

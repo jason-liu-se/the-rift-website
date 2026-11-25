@@ -3,6 +3,8 @@
 
 :host {
 	display: grid;
+	// minmax(0, …): wide content (dimension cards) can't widen the modal.
+	grid-template-columns: minmax(0, 1fr);
 	gap: 32px;
 }
 
@@ -32,6 +34,11 @@
 		background-color: rgba($colour-light-grey, 0.25);
 	}
 
+	li.editing {
+		border-color: $colour-primary;
+		box-shadow: 0 0 0 1px $colour-primary;
+	}
+
 	li.hidden-collection {
 		border-style: dashed;
 		background-color: transparent;
@@ -50,6 +57,10 @@
 
 // Looks like text until hovered or focused, then like the field it is.
 .title {
+	// Fills its card instead of an input's default width.
+	box-sizing: border-box;
+	width: calc(100% + 9px);
+	min-width: 0;
 	min-height: 40px;
 	padding: 0 8px;
 	margin-left: -9px;
@@ -79,25 +90,10 @@
 	color: $colour-error;
 }
 
-.create {
-	display: grid;
-	gap: 12px;
-	align-content: start;
-	justify-items: start;
-
-	mat-form-field {
-		width: 100%;
-	}
-}
-
-.problem {
-	margin: 0;
-	color: $colour-error;
-	font-size: $font-size-small;
-}
-
-@media (min-width: 48rem) {
+// The list beside the form (which may hold dimension cards).
+@media (min-width: 60rem) {
 	:host {
-		grid-template-columns: 3fr 2fr;
+		grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+		align-items: start;
 	}
 }

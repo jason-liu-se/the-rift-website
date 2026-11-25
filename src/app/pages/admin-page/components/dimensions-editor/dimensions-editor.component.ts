@@ -8,6 +8,7 @@ import {
 import {
 	Component,
 	DestroyRef,
+	booleanAttribute,
 	ElementRef,
 	Injector,
 	afterNextRender,
@@ -22,21 +23,27 @@ import { MatFormField, MatHint, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatTooltip } from '@angular/material/tooltip';
 import {
-	MAX_MAP_DIMENSION_NAME_LENGTH,
-	MAX_MAP_DIMENSIONS,
+	MAX_DIMENSION_NAME_LENGTH,
+	MAX_DIMENSIONS,
 	MAX_MAP_WORLD_FIELD_LENGTH
 } from 'src/app/config/content-limits';
 import { DEFAULT_MAP_PERSPECTIVE } from 'src/app/config/maps';
-import { MapDimension } from 'src/app/interfaces/api-responses';
+import { ImageUploadForm } from 'src/app/interfaces/api-requests';
+import { Dimension, MapDimension } from 'src/app/interfaces/api-responses';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
-import { ImageFieldComponent } from '../../image-field/image-field.component';
+import { ImageFieldComponent } from '../image-field/image-field.component';
 import { parseBlueMapLink } from './bluemap-link';
 
+/** A dimension being edited: a map's also has its BlueMap fields. */
+export type EditableDimension = Dimension &
+	Partial<Pick<MapDimension, 'worldId' | 'perspective'>>;
+
 /**
- * A season's dimensions, in the order the map page shows them, as cards: add,
- * remove (with Undo), edit, and reorder by dragging or with Move up and Move
- * down (focus follows the moved dimension). A pasted BlueMap link fills in
- * the map ID and starting view.
+ * A map season's or collection's dimensions, in the order the site shows
+ * them, as cards: add, remove (with Undo), edit, and reorder by dragging or
+ * with Move up and Move down (focus follows the moved dimension). A map's
+ * (`withMapFields`) also have a BlueMap map ID and starting view, which a
+ * pasted BlueMap link fills in.
  */
 @Component({
 	selector: 'app-dimensions-editor',
@@ -66,11 +73,17 @@ export class DimensionsEditorComponent {
 	/** Undo outlives the editor (its toast stays), so it checks first. */
 	private isDestroyed = false;
 
-	public readonly dimensions = input.required<readonly MapDimension[]>();
-	public readonly dimensionsChange = output<MapDimension[]>();
+	public readonly dimensions = input.required<readonly EditableDimension[]>();
+	public readonly dimensionsChange = output<EditableDimension[]>();
+	public readonly withMapFields = input(false, {
+		transform: booleanAttribute
+	});
+	/** Where image uploads go; without one, uploads are off. */
+	public readonly album = input<ImageUploadForm>();
+	public readonly noAlbumHint = input('');
 
-	protected readonly maxDimensions = MAX_MAP_DIMENSIONS;
-	protected readonly maxNameLength = MAX_MAP_DIMENSION_NAME_LENGTH;
+	protected readonly maxDimensions = MAX_DIMENSIONS;
+	protected readonly maxNameLength = MAX_DIMENSION_NAME_LENGTH;
 	protected readonly maxWorldFieldLength = MAX_MAP_WORLD_FIELD_LENGTH;
 
 	constructor() {
@@ -79,7 +92,7 @@ export class DimensionsEditorComponent {
 
 	protected updateDimension(
 		index: number,
-		changes: Partial<MapDimension>
+		changes: Partial<EditableDimension>
 	): void {
 		this.dimensionsChange.emit(
 			this.dimensions().map((dimension, i) =>
@@ -97,15 +110,15 @@ export class DimensionsEditorComponent {
 	}
 
 	protected addDimension(): void {
-		this.dimensionsChange.emit([
-			...this.dimensions(),
-			{
-				name: '',
-				worldId: '',
-				imageUrl: '',
-				perspective: DEFAULT_MAP_PERSPECTIVE
-			}
-		]);
+		const dimension: EditableDimension = this.withMapFields()
+			? {
+					name: '',
+					worldId: '',
+					imageUrl: '',
+					perspective: DEFAULT_MAP_PERSPECTIVE
+				}
+			: { name: '', imageUrl: '' };
+		this.dimensionsChange.emit([...this.dimensions(), dimension]);
 		this.focusAfterRender(this.dimensions().length, 'input');
 	}
 

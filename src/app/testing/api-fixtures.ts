@@ -61,9 +61,20 @@ export interface GalleryCollectionFixture extends GalleryCollection {
 }
 
 export const GALLERY_COLLECTIONS: GalleryCollectionFixture[] = [
+	// Season 5 has dimensions (its Overworld is its card); season 6 has none.
 	{
 		slug: 'season5',
 		title: 'Season 5',
+		dimensions: [
+			{
+				name: 'Overworld',
+				imageUrl: '/assets/general-background-images/fancy-tree-1.webp'
+			},
+			{
+				name: 'Nether',
+				imageUrl: '/assets/general-background-images/sunrise-1.webp'
+			}
+		],
 		images: [
 			image('spawn-walkway-1.webp', 'Spawn walkway', ['spawn']),
 			image('iron-farm-1.webp', 'Iron farm', ['farm']),
@@ -185,8 +196,16 @@ export const EDITOR_GALLERY_IMAGES: EditorGalleryImage[] =
 	).map(withAudit);
 
 export const EDITOR_GALLERY_COLLECTIONS: EditorCollection[] =
-	GALLERY_COLLECTIONS.map(({ slug, title, images }, index) => ({
-		...withAudit({ slug, title, itemCount: images.length }, index)
+	GALLERY_COLLECTIONS.map(({ slug, title, dimensions, images }, index) => ({
+		...withAudit(
+			{
+				slug,
+				title,
+				...(dimensions && { dimensions }),
+				itemCount: images.length
+			},
+			index
+		)
 	}));
 
 export const EDITOR_DOWNLOAD_ITEM_ITEMS: EditorDownloadItem[] =
@@ -208,7 +227,7 @@ export const EDITOR_DOWNLOAD_COLLECTIONS: EditorCollection[] =
 export const EDITOR_MAP_SEASON_ITEMS: EditorMapSeason[] =
 	MAP_SEASONS.map(withAudit);
 export const EDITOR_MAP_SEASONS: EditorMapSeasonSummary[] =
-	EDITOR_MAP_SEASON_ITEMS.map(({ dimensions, ...season }) => ({
+	EDITOR_MAP_SEASON_ITEMS.map(({ dimensions = [], ...season }) => ({
 		...season,
 		dimensionCount: dimensions.length
 	}));

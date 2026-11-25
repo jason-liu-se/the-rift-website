@@ -65,6 +65,7 @@
 						<mat-label>Name</mat-label>
 						<input
 							matInput
+							name="dimension-name"
 							required
 							[maxlength]="maxNameLength"
 							[ngModel]="dimension.name"
@@ -73,37 +74,40 @@
 							"
 						/>
 					</mat-form-field>
-					<mat-form-field subscriptSizing="dynamic">
-						<mat-label>BlueMap map ID</mat-label>
-						<input
-							matInput
-							required
-							spellcheck="false"
-							[maxlength]="maxWorldFieldLength"
-							[ngModel]="dimension.worldId"
-							(ngModelChange)="
-								updateDimension(index, { worldId: $event })
-							"
-						/>
-					</mat-form-field>
-					<mat-form-field class="wide" subscriptSizing="dynamic">
-						<mat-label>Starting view</mat-label>
-						<input
-							matInput
-							spellcheck="false"
-							[ngModel]="dimension.perspective"
-							(ngModelChange)="setStartingView(index, $event)"
-						/>
-						<mat-hint
-							>Paste a BlueMap link to fill this and the map
-							ID.</mat-hint
-						>
-					</mat-form-field>
+					@if (withMapFields()) {
+						<mat-form-field subscriptSizing="dynamic">
+							<mat-label>BlueMap map ID</mat-label>
+							<input
+								matInput
+								required
+								spellcheck="false"
+								[maxlength]="maxWorldFieldLength"
+								[ngModel]="dimension.worldId"
+								(ngModelChange)="
+									updateDimension(index, { worldId: $event })
+								"
+							/>
+						</mat-form-field>
+						<mat-form-field class="wide" subscriptSizing="dynamic">
+							<mat-label>Starting view</mat-label>
+							<input
+								matInput
+								spellcheck="false"
+								[ngModel]="dimension.perspective"
+								(ngModelChange)="setStartingView(index, $event)"
+							/>
+							<mat-hint
+								>Paste a BlueMap link to fill this and the map
+								ID.</mat-hint
+							>
+						</mat-form-field>
+					}
 				</div>
 				<app-image-field
 					required
 					[label]="nameOf(index) + ' image'"
-					[album]="{ album: 'maps' }"
+					[album]="album()"
+					[noAlbumHint]="noAlbumHint()"
 					[url]="dimension.imageUrl"
 					(urlChange)="updateDimension(index, { imageUrl: $event })"
 				/>

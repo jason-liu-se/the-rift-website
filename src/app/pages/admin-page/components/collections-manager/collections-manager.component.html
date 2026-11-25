@@ -5,7 +5,10 @@
 	</h3>
 	<ul class="collection-list">
 		@for (collection of collections(); track collection.slug) {
-			<li [class.hidden-collection]="!collection.visible">
+			<li
+				[class.hidden-collection]="!collection.visible"
+				[class.editing]="collection.slug === editingSlug()"
+			>
 				<span class="name">
 					<input
 						class="title"
@@ -21,11 +24,25 @@
 					/>
 					<span class="details">
 						{{ pathOf(collection) }} · {{ countOf(collection) }}
+						@if (collection.dimensions?.length; as count) {
+							· {{ count }}
+							{{ count === 1 ? "dimension" : "dimensions" }}
+						}
 						@if (!collection.visible) {
 							· Hidden
 						}
 					</span>
 				</span>
+				<button
+					mat-icon-button
+					type="button"
+					matTooltip="Edit title and dimensions"
+					[attr.aria-label]="'Edit ' + collection.title"
+					[attr.aria-pressed]="collection.slug === editingSlug()"
+					(click)="edit(collection)"
+				>
+					<mat-icon>edit</mat-icon>
+				</button>
 				<button
 					mat-icon-button
 					type="button"
@@ -58,61 +75,10 @@
 		}
 	</ul>
 </section>
-<form
-	class="create"
-	aria-labelledby="create-heading"
-	(submit)="$event.preventDefault(); createCollection()"
->
-	<h3 id="create-heading" class="subheading">New collection</h3>
-	<mat-form-field subscriptSizing="dynamic">
-		<mat-label>Title</mat-label>
-		<input
-			matInput
-			name="title"
-			required
-			[maxlength]="maxTitleLength"
-			[ngModel]="title()"
-			(ngModelChange)="setTitle($event)"
-		/>
-	</mat-form-field>
-	<mat-form-field subscriptSizing="dynamic">
-		<mat-label>Slug</mat-label>
-		<input
-			matInput
-			name="slug"
-			required
-			autocapitalize="off"
-			spellcheck="false"
-			[maxlength]="maxSlugLength"
-			[attr.aria-invalid]="shownSlugProblem() ? true : null"
-			[attr.aria-describedby]="'slug-problem'"
-			[ngModel]="slug()"
-			(ngModelChange)="setSlug($event)"
-		/>
-		<mat-hint>
-			@if (urlPrefix(); as prefix) {
-				{{ prefix }}{{ slug() || "…" }} ·
-			}
-			Can't be changed later</mat-hint
-		>
-	</mat-form-field>
-	<p id="slug-problem" class="problem" aria-live="polite">
-		{{ shownSlugProblem() }}
-	</p>
-	<mat-checkbox
-		color="primary"
-		name="visible"
-		[ngModel]="isVisible()"
-		(ngModelChange)="isVisible.set($event)"
-		>Show on the site</mat-checkbox
-	>
-	<button
-		mat-flat-button
-		color="primary"
-		type="submit"
-		[disabled]="isSaving()"
-	>
-		<mat-icon>add</mat-icon>
-		Create collection
-	</button>
-</form>
+<app-collection-form
+	class="form"
+	[type]="type()"
+	[collection]="editing()"
+	(saved)="changed.emit(); stopEditing()"
+	(cancelled)="stopEditing()"
+/>

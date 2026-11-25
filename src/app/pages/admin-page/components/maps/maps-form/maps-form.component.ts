@@ -4,7 +4,10 @@ import { MatFormField, MatHint, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MapDimension } from 'src/app/interfaces/api-responses';
 import { DraftSession } from '../../../drafts/draft-session';
-import { DimensionsEditorComponent } from '../dimensions-editor/dimensions-editor.component';
+import {
+	DimensionsEditorComponent,
+	EditableDimension
+} from '../../dimensions-editor/dimensions-editor.component';
 
 /**
  * A map season's fields: its number and dimensions. The season's own image is
@@ -35,7 +38,8 @@ export class MapsFormComponent {
 		this.session().update({ season });
 	}
 
-	protected setDimensions(dimensions: MapDimension[]): void {
-		this.session().update({ dimensions });
+	/** Its editor keeps the BlueMap fields (`withMapFields`). */
+	protected setDimensions(dimensions: EditableDimension[]): void {
+		this.session().update({ dimensions: dimensions as MapDimension[] });
 	}
 }

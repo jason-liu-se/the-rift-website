@@ -10,11 +10,8 @@ import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-noti
 import { EDITOR_GALLERY_COLLECTIONS } from 'src/app/testing/api-fixtures';
 import { environment } from 'src/environments/environment';
 import { CollectionsStore } from '../../services/collections-store.service';
-import {
-	CollectionsManagerComponent,
-	findSlugProblem,
-	toSlug
-} from './collections-manager.component';
+import { findSlugProblem, toSlug } from '../collection-form/collection-slug';
+import { CollectionsManagerComponent } from './collections-manager.component';
 
 const COLLECTIONS_URL = `${environment.API_URL}/editor/gallery/collections`;
 
@@ -85,7 +82,11 @@ describe('CollectionsManagerComponent', () => {
 				provideHttpClientTesting(),
 				{
 					provide: AdminNotifierService,
-					useValue: { notifySuccess: vi.fn(), notifyFailure }
+					useValue: {
+						notifySuccess: vi.fn(),
+						notifyFailure,
+						notifyWithUndo: vi.fn()
+					}
 				},
 				{
 					provide: MatDialog,
@@ -155,6 +156,64 @@ describe('CollectionsManagerComponent', () => {
 		expect(element.querySelector('.problem')?.textContent).toContain(
 			'lowercase letters'
 		);
+	});
+
+	it('adds a dimension when creating, and asks for its name and image', () => {
+		type('title', 'Season 7');
+		button('Add a dimension').click();
+		fixture.detectChanges();
+		button('Create collection').click();
+		fixture.detectChanges();
+
+		httpTesting.expectNone({ method: 'POST', url: COLLECTIONS_URL });
+		expect(element.textContent).toContain(
+			'Give every dimension a name and an image.'
+		);
+
+		type('dimension-name', ' Overworld ');
+		const image = element.querySelector<HTMLInputElement>(
+			'app-dimensions-editor app-image-field input'
+		)!;
+		image.value = 'https://i.imgur.com/a.png';
+		image.dispatchEvent(new Event('input'));
+		fixture.detectChanges();
+		button('Create collection').click();
+
+		const create = httpTesting.expectOne({
+			method: 'POST',
+			url: COLLECTIONS_URL
+		});
+		expect(create.request.body.dimensions).toEqual([
+			{ name: 'Overworld', imageUrl: 'https://i.imgur.com/a.png' }
+		]);
+		create.flush({});
+		httpTesting
+			.expectOne(COLLECTIONS_URL)
+			.flush(EDITOR_GALLERY_COLLECTIONS);
+	});
+
+	it("edits a collection's dimensions, from its Edit button", () => {
+		button('Edit Season 5').click();
+		fixture.detectChanges();
+		button('Remove Nether').click();
+		fixture.detectChanges();
+		button('Save changes').click();
+
+		const update = httpTesting.expectOne(`${COLLECTIONS_URL}/season5`);
+		expect(update.request.body).toEqual({
+			title: 'Season 5',
+			dimensions: [
+				{
+					name: 'Overworld',
+					imageUrl:
+						'/assets/general-background-images/fancy-tree-1.webp'
+				}
+			],
+			startingRevision: 1
+		});
+		update.flush({});
+		httpTesting.expectOne(COLLECTIONS_URL).flush([]);
+		expect(changed).toHaveBeenCalled();
 	});
 
 	it('renames a collection when its title is changed', () => {

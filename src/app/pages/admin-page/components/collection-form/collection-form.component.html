@@ -1,0 +1,93 @@
+<!-- A native form (Enter submits) without Angular's NgForm, which would
+	join the dimension cards' same-named fields into one control. Its own
+	messages replace the browser's validation. -->
+<form
+	ngNoForm
+	novalidate
+	class="form"
+	[attr.aria-labelledby]="'collection-form-heading'"
+	(submit)="$event.preventDefault(); save()"
+>
+	<h3 id="collection-form-heading" class="subheading">
+		{{ collection() ? "Edit " + collection()!.title : "New collection" }}
+	</h3>
+	<mat-form-field subscriptSizing="dynamic">
+		<mat-label>Title</mat-label>
+		<input
+			matInput
+			name="title"
+			required
+			[maxlength]="maxTitleLength"
+			[ngModel]="title()"
+			(ngModelChange)="setTitle($event)"
+		/>
+	</mat-form-field>
+	@if (collection()) {
+		<p class="fixed-slug">
+			{{ urlPrefix() ?? "Slug: " }}{{ slug() }} · Can't be changed
+		</p>
+	} @else {
+		<mat-form-field subscriptSizing="dynamic">
+			<mat-label>Slug</mat-label>
+			<input
+				matInput
+				name="slug"
+				required
+				autocapitalize="off"
+				spellcheck="false"
+				[maxlength]="maxSlugLength"
+				[attr.aria-invalid]="shownSlugProblem() ? true : null"
+				aria-describedby="slug-problem"
+				[ngModel]="slug()"
+				(ngModelChange)="setSlug($event)"
+			/>
+			<mat-hint>
+				@if (urlPrefix(); as prefix) {
+					{{ prefix }}{{ slug() || "…" }} ·
+				}
+				Can't be changed later</mat-hint
+			>
+		</mat-form-field>
+		<p id="slug-problem" class="problem" aria-live="polite">
+			{{ shownSlugProblem() }}
+		</p>
+	}
+	<section class="dimensions" aria-labelledby="dimensions-heading">
+		<h4 id="dimensions-heading" class="dimensions-heading">
+			Dimensions
+			<span class="optional">optional</span>
+		</h4>
+		<app-dimensions-editor
+			[album]="album()"
+			noAlbumHint="Enter a slug to upload images."
+			[dimensions]="dimensions()"
+			(dimensionsChange)="dimensions.set($event)"
+		/>
+		<p class="problem" aria-live="polite">{{ shownDimensionsProblem() }}</p>
+	</section>
+	@if (!collection()) {
+		<mat-checkbox
+			color="primary"
+			name="visible"
+			[ngModel]="isVisible()"
+			(ngModelChange)="isVisible.set($event)"
+			>Show on the site</mat-checkbox
+		>
+	}
+	<div class="actions">
+		<button
+			mat-flat-button
+			color="primary"
+			type="submit"
+			[disabled]="isSaving()"
+		>
+			<mat-icon>{{ collection() ? "save" : "add" }}</mat-icon>
+			{{ collection() ? "Save changes" : "Create collection" }}
+		</button>
+		@if (collection()) {
+			<button mat-button type="button" (click)="cancelled.emit()">
+				Cancel
+			</button>
+		}
+	</div>
+</form>

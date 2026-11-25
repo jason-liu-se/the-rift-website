@@ -6,8 +6,7 @@ import {
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
-import { GALLERY_FALLBACK_IMAGE } from 'src/app/config/gallery';
-import { GalleryImage } from 'src/app/interfaces/api-responses';
+import { Dimension, GalleryImage } from 'src/app/interfaces/api-responses';
 import { environment } from 'src/environments/environment';
 import { GalleryPageComponent } from './gallery-page.component';
 
@@ -32,11 +31,26 @@ describe('GalleryPageComponent', () => {
 		cards().map((card) =>
 			card.querySelector('.description')?.textContent?.trim()
 		);
-	/** Answers GET /gallery; each title is its slug in capitals. */
-	const flushCollections = (slugs: string[]) =>
-		httpTesting
-			.expectOne(galleryUrl)
-			.flush(slugs.map((slug) => ({ slug, title: slug.toUpperCase() })));
+	/**
+	 * Answers GET /gallery; each title is its slug in capitals, each with an
+	 * Overworld (its card) and a Nether.
+	 */
+	const flushCollections = (
+		slugs: string[],
+		dimensionsOf = (slug: string): Dimension[] => [
+			{ name: 'Nether', imageUrl: `${slug}-nether.webp` },
+			{ name: 'Overworld', imageUrl: `${slug}-overworld.webp` }
+		]
+	) =>
+		httpTesting.expectOne(galleryUrl).flush(
+			slugs.map((slug) => ({
+				slug,
+				title: slug.toUpperCase(),
+				dimensions: dimensionsOf(slug)
+			}))
+		);
+	const cardImage = (card: Element) =>
+		card.querySelector('.background-content img')?.getAttribute('src');
 	const flushCover = (collection: string, total: number, urls: string[]) =>
 		httpTesting
 			.expectOne(coverUrl(collection))
@@ -74,29 +88,25 @@ describe('GalleryPageComponent', () => {
 		).toEqual(['/gallery/season5', '/gallery/season6']);
 	});
 
-	it("shows each collection's photo count and first photo", () => {
+	it("shows each collection's photo count and its Overworld's image", () => {
 		expect(descriptions()).toEqual([]);
 
 		loadSeasons5And6();
 
 		expect(descriptions()).toEqual(['12 photos', '7 photos']);
-		const images = cards().map((card) =>
-			card.querySelector('.background-content img')?.getAttribute('src')
-		);
-		expect(images[0]).toContain('five.webp');
-		expect(images[1]).toContain('six.webp');
+		const images = cards().map(cardImage);
+		expect(images[0]).toContain('season5-overworld.webp');
+		expect(images[1]).toContain('season6-overworld.webp');
 	});
 
-	it('uses the fallback image for a collection with no photos', () => {
-		flushCollections(['season7']);
+	it('leaves the card blank for a collection without that dimension', () => {
+		flushCollections(['season7'], () => [
+			{ name: 'Nether', imageUrl: 'nether.webp' }
+		]);
 		flushCover('season7', 0, []);
 		fixture.detectChanges();
 
-		expect(
-			element
-				.querySelector('.background-content img')
-				?.getAttribute('src')
-		).toContain(GALLERY_FALLBACK_IMAGE);
+		expect(cards().map(cardImage)).toEqual([undefined]);
 		expect(descriptions()).toEqual(['0 photos']);
 	});
 

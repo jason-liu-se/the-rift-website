@@ -50,7 +50,12 @@ The decisions are in issue #101; the API's side is in the web-server's
   use a Sort by field instead. An `isOrderable` type, filtered to one
   collection, drags into order (`list-order.ts`, one update per moved item).
 - **Collections** come from `CollectionsStore` (provided by the admin page):
-  fetched once per type, reloaded after a collection write.
+  fetched once per type, reloaded after a collection write. The Collections
+  modal lists them beside `collection-form/`, which creates one or edits one's
+  title and dimensions. Dimensions (a name and image each) use the same
+  `dimensions-editor/` as map seasons, which add BlueMap fields
+  (`withMapFields`). The `/gallery` card shows the collection's
+  `GALLERY_CARD_DIMENSION` image (`config/gallery.ts`), or none.
 - **Writes** (confirm, send, snackbar) go through `EditorWriteService.run()`.
 - **API:** `EditorContentService` (items, bulk actions, collections),
   `DraftsService`, and `ImageUploadService`, typed per content type by

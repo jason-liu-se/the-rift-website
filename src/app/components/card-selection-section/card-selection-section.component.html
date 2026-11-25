@@ -2,12 +2,14 @@
 	<div class="collection-wrapper">
 		@for (item of items; track item) {
 			<div class="collection-card-grid collection-card">
-				<!-- sizes: $collection-card-width -->
-				<app-optimized-image
-					class="background-content"
-					[src]="item.imageUrl"
-					sizes="15rem"
-				/>
+				@if (item.imageUrl) {
+					<!-- sizes: $collection-card-width -->
+					<app-optimized-image
+						class="background-content"
+						[src]="item.imageUrl"
+						sizes="15rem"
+					/>
+				}
 				<a
 					class="overlay-content"
 					[routerLink]="item.routerLink"

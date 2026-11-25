@@ -23,7 +23,11 @@ const BLUEMAP_CAMERA_MODE = 'perspective';
  * One card per dimension, opening the map viewer with the same fragment
  * BlueMap uses (`#s6_overworld:0:0:0:1500:0:0:0:0:perspective`).
  */
-function toSeasonCards({ id, season, dimensions }: MapSeason): ISeasonCards {
+function toSeasonCards({
+	id,
+	season,
+	dimensions = []
+}: MapSeason): ISeasonCards {
 	return {
 		id,
 		title: `Season ${season}`,

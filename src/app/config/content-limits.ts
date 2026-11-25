@@ -19,7 +19,8 @@ export const MAX_TAG_LENGTH = 16;
 /** Any URL: images, downloads, links. */
 export const MAX_URL_LENGTH = 2000;
 
-/** A map season's dimensions, and each dimension's text fields. */
-export const MAX_MAP_DIMENSIONS = 10;
-export const MAX_MAP_DIMENSION_NAME_LENGTH = 60;
+/** A map season's or collection's dimensions, and each one's name. */
+export const MAX_DIMENSIONS = 10;
+export const MAX_DIMENSION_NAME_LENGTH = 60;
+/** A map dimension's BlueMap fields. */
 export const MAX_MAP_WORLD_FIELD_LENGTH = 200;

@@ -41,7 +41,10 @@ export class CollectionsModalComponent {
 	protected readonly collectionType = computed(() =>
 		toCollectionType(this.listStore.type())
 	);
-	protected readonly close = openModalRoute(() => this.content());
+	// Wide: the list beside a form that may hold dimension cards.
+	protected readonly close = openModalRoute(() => this.content(), {
+		wide: true
+	});
 	protected isChanged = false;
 
 	constructor() {
