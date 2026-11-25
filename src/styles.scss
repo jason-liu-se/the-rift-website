@@ -36,6 +36,9 @@ html {
 	scroll-padding-top: calc(
 		var(--status-banner-height, 0px) + var(--navbar-height, 0px)
 	);
+	// The scrollbar's space stays reserved, so content doesn't shift when a page
+	// grows or shrinks past the window (e.g. collapsing an admin list's groups).
+	scrollbar-gutter: stable;
 }
 
 body {

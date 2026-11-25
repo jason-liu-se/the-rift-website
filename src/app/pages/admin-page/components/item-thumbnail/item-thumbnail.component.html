@@ -1,0 +1,7 @@
+@if (imageSrc(); as src) {
+	<img [src]="src" alt="" loading="lazy" (error)="markFailed(src)" />
+} @else {
+	<span class="placeholder"
+		><mat-icon aria-hidden="true">image</mat-icon></span
+	>
+}

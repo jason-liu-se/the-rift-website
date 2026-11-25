@@ -1,3 +1,5 @@
-.title {
-	display: block;
+:host {
+	display: flex;
+	align-items: center;
+	gap: 12px;
 }

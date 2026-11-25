@@ -88,10 +88,14 @@ export class TagInputComponent {
 		event.option.deselect();
 	}
 
-	/** Focus goes back to the field, as the removed tag's button goes. */
+	/**
+	 * Focus goes back to the field, as the removed tag's button goes, without
+	 * the suggestions the autocomplete opens on focus.
+	 */
 	protected removeTag(tag: string): void {
 		this.tags.update((tags) => tags.filter((existing) => existing !== tag));
 		this.textInput().nativeElement.focus();
+		this.trigger().closePanel();
 	}
 
 	protected setTyped(event: Event): void {

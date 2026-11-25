@@ -1,4 +1,2 @@
-@if (item().imageUrl; as imageUrl) {
-	<img class="thumbnail" [src]="imageUrl" alt="" loading="lazy" />
-}
+<app-item-thumbnail [src]="item().imageUrl" />
 <span>{{ item().title }}</span>

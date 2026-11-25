@@ -34,15 +34,23 @@ describe('TagInputComponent', () => {
 		expect(fixture.componentInstance.tags()).toEqual(['night', 'spawn']);
 	});
 
-	it('removes a tag with its remove button', () => {
+	it('removes a tag with its remove button, without opening suggestions', () => {
+		fixture.componentRef.setInput('suggestions', [
+			'night',
+			'spawn',
+			'base'
+		]);
 		fixture.componentInstance.tags.set(['night', 'spawn']);
 		fixture.detectChanges();
 
 		fixture.nativeElement
 			.querySelector('button[aria-label="Remove tag night"]')
 			.click();
+		fixture.detectChanges();
 
 		expect(fixture.componentInstance.tags()).toEqual(['spawn']);
+		expect(document.activeElement).toBe(input);
+		expect(input.getAttribute('aria-expanded')).toBe('false');
 	});
 
 	it('stops at the most tags', () => {
