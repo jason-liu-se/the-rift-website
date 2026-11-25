@@ -3,21 +3,43 @@ import { DEFAULT_MAP_DIMENSIONS } from 'src/app/config/maps';
 import { EditorContentType } from 'src/app/interfaces/api-requests';
 import {
 	CollectionContentType,
-	FieldsOf
+	FieldsOf,
+	SummaryOf
 } from 'src/app/services/editor-content/editor-content-types';
 import { DownloadsFormComponent } from './components/downloads/downloads-form/downloads-form.component';
+import { DownloadsPreviewComponent } from './components/downloads/downloads-preview/downloads-preview.component';
 import { DownloadsItemCellComponent } from './components/downloads/downloads-item-cell/downloads-item-cell.component';
 import { ItemNoun } from './components/editor-list/bulk-results';
 import { FilterOption } from './components/editor-list/list-filters/list-filters.component';
 import { GalleryBulkActionsComponent } from './components/gallery/gallery-bulk-actions/gallery-bulk-actions.component';
 import { GalleryFormComponent } from './components/gallery/gallery-form/gallery-form.component';
+import { GalleryPreviewComponent } from './components/gallery/gallery-preview/gallery-preview.component';
 import { GalleryItemCellComponent } from './components/gallery/gallery-item-cell/gallery-item-cell.component';
 import { MapsFormComponent } from './components/maps/maps-form/maps-form.component';
 import { MapsItemCellComponent } from './components/maps/maps-item-cell/maps-item-cell.component';
 import { MoveBulkActionComponent } from './components/move-bulk-action/move-bulk-action.component';
 import { NewsFormComponent } from './components/news/news-form/news-form.component';
+import { NewsPreviewComponent } from './components/news/news-preview/news-preview.component';
 import { NewsItemCellComponent } from './components/news/news-item-cell/news-item-cell.component';
 import { DraftFields } from './drafts/draft-fields';
+
+/** A way to sort a list: the API's `sort` and `order` (comma-separated). */
+export interface SortOption {
+	label: string;
+	sort: string;
+	order: string;
+}
+
+const RECENTLY_UPDATED: SortOption = {
+	label: 'Last updated',
+	sort: 'updatedAt',
+	order: 'desc'
+};
+const RECENTLY_CREATED: SortOption = {
+	label: 'Newest',
+	sort: 'createdAt',
+	order: 'desc'
+};
 
 /** Everything that differs between the admin tools, per content type. */
 export interface EditorTypeConfig<T extends EditorContentType> {
@@ -44,6 +66,16 @@ export interface EditorTypeConfig<T extends EditorContentType> {
 	itemCell: Type<unknown>;
 	/** The type's own bulk actions, beside the common ones. */
 	bulkActions?: Type<unknown>;
+	/** The draft as the site shows it, given the `session`, beside the form. */
+	preview?: Type<unknown>;
+	/** The list's orders; the first is the default. */
+	sortOptions: readonly SortOption[];
+	/** Images list as a grid of cards; everything else as a table. */
+	listLayout: 'table' | 'grid';
+	/** Can be put in order by dragging, within one collection (`sortOrder`). */
+	isOrderable: boolean;
+	/** Where a live item shows on the site. */
+	publicPath: (item: SummaryOf<T>) => string;
 }
 
 const VISIBILITY_STATUSES: readonly FilterOption[] = [
@@ -76,7 +108,16 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 		hasBulkCreate: false,
 		newItemFields: () => ({}),
 		form: NewsFormComponent,
-		itemCell: NewsItemCellComponent
+		itemCell: NewsItemCellComponent,
+		preview: NewsPreviewComponent,
+		sortOptions: [
+			RECENTLY_UPDATED,
+			{ label: 'Post date', sort: 'date', order: 'desc' },
+			{ label: 'Title (A–Z)', sort: 'title', order: 'asc' }
+		],
+		listLayout: 'table',
+		isOrderable: false,
+		publicPath: () => '/news'
 	},
 	downloads: {
 		label: 'Downloads',
@@ -93,7 +134,7 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 			desc: 'Description',
 			downloadUrl: 'Download link',
 			imageUrl: 'Image',
-			sortOrder: 'Sort order'
+			sortOrder: 'Position'
 		},
 		requiredFields: [
 			'collection',
@@ -108,7 +149,21 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 		newItemFields: () => ({}),
 		form: DownloadsFormComponent,
 		itemCell: DownloadsItemCellComponent,
-		bulkActions: MoveBulkActionComponent
+		bulkActions: MoveBulkActionComponent,
+		preview: DownloadsPreviewComponent,
+		sortOptions: [
+			RECENTLY_UPDATED,
+			{
+				label: 'Order on the site',
+				sort: 'collection,sortOrder,title',
+				order: 'asc,asc,asc'
+			},
+			{ label: 'Title (A–Z)', sort: 'title', order: 'asc' },
+			RECENTLY_CREATED
+		],
+		listLayout: 'table',
+		isOrderable: true,
+		publicPath: () => '/downloads'
 	},
 	gallery: {
 		label: 'Gallery',
@@ -132,7 +187,16 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 		newItemFields: () => ({}),
 		form: GalleryFormComponent,
 		itemCell: GalleryItemCellComponent,
-		bulkActions: GalleryBulkActionsComponent
+		bulkActions: GalleryBulkActionsComponent,
+		preview: GalleryPreviewComponent,
+		sortOptions: [
+			RECENTLY_UPDATED,
+			RECENTLY_CREATED,
+			{ label: 'Caption (A–Z)', sort: 'caption', order: 'asc' }
+		],
+		listLayout: 'grid',
+		isOrderable: false,
+		publicPath: (image) => `/gallery/${image.collection}`
 	},
 	maps: {
 		label: 'Maps',
@@ -158,7 +222,14 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 			}))
 		}),
 		form: MapsFormComponent,
-		itemCell: MapsItemCellComponent
+		itemCell: MapsItemCellComponent,
+		sortOptions: [
+			RECENTLY_UPDATED,
+			{ label: 'Season (newest)', sort: 'season', order: 'desc' }
+		],
+		listLayout: 'table',
+		isOrderable: false,
+		publicPath: () => '/map'
 	}
 };
 

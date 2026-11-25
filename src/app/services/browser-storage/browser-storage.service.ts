@@ -14,6 +14,8 @@ export const STORAGE_KEYS = {
 	logoutPending: 'logout-pending',
 	/** localStorage: each draft (JSON), under this prefix and its ID. */
 	draftPrefix: 'draft:',
+	/** localStorage: the collection last published to, by content type. */
+	lastCollectionPrefix: 'last-collection:',
 	/**
 	 * sessionStorage: the page to return to after logging in again. It lasts
 	 * through the Discord round trip in the same tab.

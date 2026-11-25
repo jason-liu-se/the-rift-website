@@ -9,21 +9,22 @@
 		<p class="conflict-message">
 			@switch (conflict.kind) {
 				@case ("draft") {
-					This draft was saved somewhere else since (another tab or
-					device). Keep your version, or theirs?
+					These changes were also edited in another tab or on another
+					device. Which version do you want?
 				}
 				@case ("item") {
-					This {{ noun().one }} changed since you started. Overwrite
-					it with your version, or merge the two by hand?
+					Someone published changes to this {{ noun().one }} while you
+					were editing. Replace them with yours, or copy what you need
+					from theirs?
 				}
 				@case ("deleted") {
-					This {{ noun().one }} was deleted since you started. Publish
-					your version as a new {{ noun().one }}, or discard it?
+					Someone deleted this {{ noun().one }} while you were editing.
+					Publish yours as a new {{ noun().one }}, or discard it?
 				}
 			}
 		</p>
 		@if (conflictRows().length > 0) {
-			<p class="version-label">Their version</p>
+			<p class="version-label">The other version</p>
 			<dl class="version">
 				@for (row of conflictRows(); track row.name) {
 					<dt>{{ row.name }}</dt>
@@ -39,14 +40,14 @@
 						type="button"
 						(click)="keepDraft('mine')"
 					>
-						Keep mine
+						Keep this one
 					</button>
 					<button
 						mat-stroked-button
 						type="button"
 						(click)="keepDraft('theirs')"
 					>
-						Keep theirs
+						Use the other one
 					</button>
 				}
 				@case ("item") {
@@ -55,10 +56,10 @@
 						type="button"
 						(click)="overwrite.emit()"
 					>
-						Overwrite with mine
+						Replace with mine
 					</button>
 					<button mat-stroked-button type="button" (click)="merge()">
-						Merge by hand
+						Compare and copy
 					</button>
 				}
 				@case ("deleted") {
@@ -85,8 +86,7 @@
 @if (mergeRows().length > 0) {
 	<div class="merge">
 		<p>
-			Merging: copy what you want to keep from their version into yours,
-			then publish.
+			Copy what you want from their version into yours, then publish.
 		</p>
 		<p class="version-label">Their version</p>
 		<dl class="version">

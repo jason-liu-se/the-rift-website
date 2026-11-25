@@ -1,5 +1,6 @@
 import {
 	Component,
+	booleanAttribute,
 	ElementRef,
 	computed,
 	inject,
@@ -11,9 +12,9 @@ import {
 import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatFormField, MatHint, MatLabel } from '@angular/material/form-field';
+import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
 import { MAX_URL_LENGTH } from 'src/app/config/content-limits';
-import { IMAGE_URL_PREFIXES } from 'src/app/config/images';
 import { UPLOAD_IMAGE_TYPES } from 'src/app/config/uploads';
 import { ImageUploadForm } from 'src/app/interfaces/api-requests';
 import { ApiStatusService } from 'src/app/services/api-status/api-status.service';
@@ -28,16 +29,34 @@ type UploadState =
 	| { kind: 'uploading'; fraction: number }
 	| { kind: 'failed'; message: string; file?: File };
 
+export const LINK_PROBLEM =
+	"That link isn't from imgur or imgbb. Upload the image instead.";
+
 /**
- * An image for a tool's item: paste a link (checked against the allowlist) or
- * upload a file through the API to imgbb, into `album`. Uploads need the API,
- * so they're off while it can't be reached.
+ * An image for a tool's item: paste a link (checked against the allowlist), or
+ * upload, drop, or paste a file, which goes through the API to imgbb, into
+ * `album`. The editor's preview shows the image, so this field doesn't. Uploads
+ * need the API and an album, so they're off without either.
  */
 @Component({
 	selector: 'app-image-field',
 	templateUrl: './image-field.component.html',
 	styleUrl: './image-field.component.scss',
-	imports: [FormsModule, MatButton, MatFormField, MatHint, MatInput, MatLabel]
+	imports: [
+		FormsModule,
+		MatButton,
+		MatFormField,
+		MatHint,
+		MatIcon,
+		MatInput,
+		MatLabel
+	],
+	host: {
+		'[class.dragging]': 'isDragging()',
+		'(dragover)': 'allowDrop($event)',
+		'(dragleave)': 'isDragging.set(false)',
+		'(drop)': 'uploadDropped($event)'
+	}
 })
 export class ImageFieldComponent {
 	private uploads = inject(ImageUploadService);
@@ -47,28 +66,38 @@ export class ImageFieldComponent {
 
 	public readonly url = model('');
 	public readonly label = input('Image');
-	public readonly album = input.required<ImageUploadForm>();
+	public readonly required = input(false, { transform: booleanAttribute });
+	/** Where uploads go; without one, uploads are off (`noAlbumHint` says why). */
+	public readonly album = input<ImageUploadForm>();
+	public readonly noAlbumHint = input('');
 
 	protected readonly maxUrlLength = MAX_URL_LENGTH;
 	protected readonly acceptedTypes = UPLOAD_IMAGE_TYPES.join(',');
 	protected readonly upload = signal<UploadState>({ kind: 'idle' });
-	protected readonly canUpload = computed(
-		() =>
-			this.apiStatus.status() === 'up' &&
-			this.upload().kind !== 'uploading'
-	);
+	protected readonly isDragging = signal(false);
+	/** Only a link typed here is checked: a saved one was checked already. */
+	private readonly isEdited = signal(false);
+
 	protected readonly isOffline = computed(
 		() => this.apiStatus.status() !== 'up'
 	);
+	protected readonly canUpload = computed(
+		() =>
+			!this.isOffline() &&
+			!!this.album() &&
+			this.upload().kind !== 'uploading'
+	);
 	protected readonly linkProblem = computed(() => {
 		const url = this.url().trim();
-		return url && !isAllowedImageUrl(url)
-			? `Links must start with ${IMAGE_URL_PREFIXES.join(', ')}. Upload the image instead.`
+		return this.isEdited() && url && !isAllowedImageUrl(url)
+			? LINK_PROBLEM
 			: undefined;
 	});
-	protected readonly hasPreview = computed(
-		() => !!this.url().trim() && !this.linkProblem()
-	);
+
+	protected editLink(url: string): void {
+		this.isEdited.set(true);
+		this.url.set(url);
+	}
 
 	protected chooseFile(): void {
 		this.fileInput().nativeElement.click();
@@ -83,6 +112,32 @@ export class ImageFieldComponent {
 		}
 	}
 
+	protected allowDrop(event: DragEvent): void {
+		if (!this.canUpload() || !event.dataTransfer?.types.includes('Files')) {
+			return;
+		}
+		event.preventDefault();
+		this.isDragging.set(true);
+	}
+
+	protected uploadDropped(event: DragEvent): void {
+		this.isDragging.set(false);
+		const file = event.dataTransfer?.files[0];
+		if (file && this.canUpload()) {
+			event.preventDefault();
+			this.uploadFile(file);
+		}
+	}
+
+	/** A pasted image file uploads; pasted text goes into the link as usual. */
+	protected uploadPasted(event: ClipboardEvent): void {
+		const file = event.clipboardData?.files[0];
+		if (file && this.canUpload()) {
+			event.preventDefault();
+			this.uploadFile(file);
+		}
+	}
+
 	protected retryUpload(): void {
 		const state = this.upload();
 		if (state.kind === 'failed' && state.file) {
@@ -91,13 +146,17 @@ export class ImageFieldComponent {
 	}
 
 	private uploadFile(file: File): void {
+		const album = this.album();
+		if (!album) {
+			return;
+		}
 		const problem = findImageFileProblem(file);
 		if (problem) {
 			this.upload.set({ kind: 'failed', message: problem });
 			return;
 		}
 		this.upload.set({ kind: 'uploading', fraction: 0 });
-		this.uploads.uploadImages([file], this.album()).subscribe({
+		this.uploads.uploadImages([file], album).subscribe({
 			next: (event) => {
 				if (event.type === 'progress') {
 					this.upload.set({
@@ -108,6 +167,7 @@ export class ImageFieldComponent {
 				}
 				const [result] = event.response.results;
 				if (result && 'url' in result) {
+					this.isEdited.set(false);
 					this.url.set(result.url);
 					this.upload.set({ kind: 'idle' });
 				} else {

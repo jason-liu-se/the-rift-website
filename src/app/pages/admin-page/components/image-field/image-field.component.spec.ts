@@ -10,7 +10,7 @@ import {
 	ApiStatusService
 } from 'src/app/services/api-status/api-status.service';
 import { environment } from 'src/environments/environment';
-import { ImageFieldComponent } from './image-field.component';
+import { ImageFieldComponent, LINK_PROBLEM } from './image-field.component';
 
 const UPLOAD_URL = `${environment.API_URL}/editor/images`;
 
@@ -26,7 +26,10 @@ describe('ImageFieldComponent', () => {
 			.trim();
 	const button = (name: string) =>
 		[...element.querySelectorAll<HTMLButtonElement>('button')].find(
-			(candidate) => candidate.textContent?.trim() === name
+			(candidate) =>
+				candidate.textContent
+					?.replace(candidate.querySelector('mat-icon')?.textContent ?? '', '')
+					.trim() === name
 		)!;
 	function chooseFile(file: File) {
 		const input: HTMLInputElement =
@@ -58,18 +61,21 @@ describe('ImageFieldComponent', () => {
 
 	afterEach(() => TestBed.inject(HttpTestingController).verify());
 
-	it('flags a link outside the allowlist, and previews an allowed one', () => {
-		fixture.componentInstance.url.set('https://example.com/a.png');
-		fixture.detectChanges();
-		expect(messages()).toContain('Links must start with https://i.ibb.co/');
-		expect(element.querySelector('img')).toBeNull();
-
-		fixture.componentInstance.url.set('https://i.ibb.co/a/spawn.png');
+	it('flags a typed link outside the allowlist, but not a saved one', () => {
+		fixture.componentInstance.url.set('https://example.com/saved.png');
 		fixture.detectChanges();
 		expect(messages()).toBe('');
-		expect(element.querySelector('img')?.getAttribute('src')).toBe(
-			'https://i.ibb.co/a/spawn.png'
-		);
+
+		const link: HTMLInputElement = element.querySelector('input[type="url"]')!;
+		link.value = 'https://example.com/a.png';
+		link.dispatchEvent(new Event('input'));
+		fixture.detectChanges();
+		expect(messages()).toBe(LINK_PROBLEM);
+
+		link.value = 'https://i.ibb.co/a/spawn.png';
+		link.dispatchEvent(new Event('input'));
+		fixture.detectChanges();
+		expect(messages()).toBe('');
 	});
 
 	it('uploads a file into the album, shows progress, and uses its link', () => {
@@ -135,9 +141,17 @@ describe('ImageFieldComponent', () => {
 		status.set('offline');
 		fixture.detectChanges();
 
-		expect(button('Upload image').disabled).toBe(true);
+		expect(button('Upload').disabled).toBe(true);
 		expect(messages()).toBe(
 			'Uploads are off until the server can be reached. Links still work.'
 		);
+	});
+
+	it('turns uploads off without an album', () => {
+		fixture.componentRef.setInput('album', undefined);
+		fixture.componentRef.setInput('noAlbumHint', 'Choose a collection.');
+		fixture.detectChanges();
+		expect(button('Upload').disabled).toBe(true);
+		expect(messages()).toBe('Choose a collection.');
 	});
 });

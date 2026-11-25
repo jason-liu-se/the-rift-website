@@ -15,10 +15,11 @@ import { filter, merge } from 'rxjs';
  * function) leaves the route for the list, keeping its filters and scroll;
  * leaving the route any way (Back, too) closes the dialog. So a route's
  * `canDeactivate` guards every way out. Call from a routed component's
- * constructor.
+ * constructor. `wide` is for content in two columns (fields and a preview).
  */
 export function openModalRoute(
-	content: () => TemplateRef<unknown>
+	content: () => TemplateRef<unknown>,
+	{ wide = false } = {}
 ): () => void {
 	const dialog = inject(MatDialog);
 	const router = inject(Router);
@@ -37,7 +38,7 @@ export function openModalRoute(
 		dialogRef = dialog.open(content(), {
 			// Under the admin page, so the content gets its providers.
 			injector,
-			panelClass: 'admin-modal',
+			panelClass: wide ? ['admin-modal', 'admin-modal-wide'] : 'admin-modal',
 			maxWidth: '100vw',
 			// The content focuses its own heading.
 			autoFocus: false,

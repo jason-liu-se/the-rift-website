@@ -1,0 +1,32 @@
+<section class="modal" [attr.aria-labelledby]="headingId">
+	<header class="modal-header">
+		<h2
+			class="heading"
+			tabindex="-1"
+			#headingElement
+			[id]="headingId"
+			[title]="heading()"
+		>
+			{{ heading() }}
+		</h2>
+		<div class="tools">
+			<ng-content select="[modalTools]" />
+		</div>
+		<button
+			mat-icon-button
+			type="button"
+			class="close"
+			aria-label="Close"
+			matTooltip="Close (Esc)"
+			(click)="closed.emit()"
+		>
+			<mat-icon>close</mat-icon>
+		</button>
+	</header>
+	<div class="modal-body" #body>
+		<ng-content />
+	</div>
+	<footer class="modal-footer">
+		<ng-content select="[modalFooter]" />
+	</footer>
+</section>

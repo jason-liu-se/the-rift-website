@@ -2,7 +2,7 @@
 	@if (session(); as session) {
 		<app-draft-editor
 			[session]="session"
-			[published]="published()"
+			[itemActions]="itemActions()"
 			(publishedItem)="finishPublishing()"
 			(closed)="close()"
 		>
@@ -11,6 +11,6 @@
 			/>
 		</app-draft-editor>
 	} @else {
-		<p role="status">Opening…</p>
+		<p class="opening" role="status">Opening…</p>
 	}
 </ng-template>

@@ -7,28 +7,32 @@
 		[ngModel]="fields().title ?? ''"
 		(ngModelChange)="setTitle($event)"
 	/>
-	<mat-hint
-		>Markdown for *emphasis*, **bold**, and [links](https://…).</mat-hint
-	>
-	<mat-hint align="end"
-		>{{ (fields().title ?? "").length }} / {{ maxTitleLength }}</mat-hint
-	>
+	<mat-hint>Markdown works: *italic*, **bold**, [link](https://…)</mat-hint>
+	@if (isNearLimit(fields().title, maxTitleLength)) {
+		<mat-hint align="end"
+			>{{ (fields().title ?? "").length }} / {{ maxTitleLength }}</mat-hint
+		>
+	}
 </mat-form-field>
 <mat-form-field subscriptSizing="dynamic">
 	<mat-label>Content</mat-label>
 	<textarea
 		matInput
 		required
-		rows="10"
+		cdkTextareaAutosize
+		cdkAutosizeMinRows="8"
+		cdkAutosizeMaxRows="24"
 		[maxlength]="maxContentLength"
 		[ngModel]="fields().content ?? ''"
 		(ngModelChange)="setContent($event)"
 	></textarea>
-	<mat-hint>Markdown. Images only from imgbb or imgur.</mat-hint>
-	<mat-hint align="end"
-		>{{ (fields().content ?? "").length }} /
-		{{ maxContentLength }}</mat-hint
-	>
+	<mat-hint>Markdown. Images must be on imgur or imgbb.</mat-hint>
+	@if (isNearLimit(fields().content, maxContentLength)) {
+		<mat-hint align="end"
+			>{{ (fields().content ?? "").length }} /
+			{{ maxContentLength }}</mat-hint
+		>
+	}
 </mat-form-field>
 <app-image-field
 	label="Banner image"
@@ -36,10 +40,4 @@
 	[url]="fields().imageUrl ?? ''"
 	(urlChange)="setImageUrl($event)"
 />
-<section class="preview" aria-labelledby="news-preview-label">
-	<p class="preview-label" id="news-preview-label">Preview</p>
-	<!-- Shown as on the news page, but not usable. -->
-	<div inert>
-		<app-news-display [newsPosts]="preview()" />
-	</div>
-</section>
+<app-news-date-field />

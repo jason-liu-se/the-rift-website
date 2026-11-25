@@ -1,28 +1,29 @@
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { Component, computed, inject, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormField, MatHint, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatOption, MatSelect } from '@angular/material/select';
-import { DownloadCardComponent } from 'src/app/components/download-card/download-card.component';
 import {
 	MAX_DOWNLOAD_DESCRIPTION_LENGTH,
 	MAX_DOWNLOAD_TITLE_LENGTH,
 	MAX_URL_LENGTH
 } from 'src/app/config/content-limits';
 import { DraftSession } from '../../../drafts/draft-session';
-import { ImageFieldComponent } from '../../image-field/image-field.component';
 import { CollectionsStore } from '../../../services/collections-store.service';
+import { isNearLimit } from '../../../utilities/near-limit';
+import { ImageFieldComponent } from '../../image-field/image-field.component';
 
 /**
- * A download's fields: collection, title, description, download link, image,
- * and sort order, with a preview as the downloads page shows it.
+ * A download's fields: collection, title, description, download link, and
+ * image. Its position comes from dragging it in the list.
  */
 @Component({
 	selector: 'app-downloads-form',
 	templateUrl: './downloads-form.component.html',
-	styleUrl: './downloads-form.component.scss',
+	styles: ':host { display: grid; gap: 16px; }',
 	imports: [
-		DownloadCardComponent,
+		CdkTextareaAutosize,
 		FormsModule,
 		ImageFieldComponent,
 		MatFormField,
@@ -39,6 +40,7 @@ export class DownloadsFormComponent {
 	protected readonly maxTitleLength = MAX_DOWNLOAD_TITLE_LENGTH;
 	protected readonly maxDescLength = MAX_DOWNLOAD_DESCRIPTION_LENGTH;
 	protected readonly maxUrlLength = MAX_URL_LENGTH;
+	protected readonly isNearLimit = isNearLimit;
 	protected readonly fields = computed(() => this.session().fields());
 	private readonly allCollections =
 		inject(CollectionsStore).collections('downloads');
@@ -50,12 +52,5 @@ export class DownloadsFormComponent {
 		changes: Parameters<DraftSession<'downloads'>['update']>[0]
 	): void {
 		this.session().update(changes);
-	}
-
-	/** An empty sort order removes it (the item sorts by title). */
-	protected setSortOrder(value: number | string | null): void {
-		this.update({
-			sortOrder: value === '' || value === null ? null : Number(value)
-		});
 	}
 }

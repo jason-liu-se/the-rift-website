@@ -11,43 +11,36 @@
 			}}</mat-option>
 		}
 	</mat-select>
-	<mat-hint>Uploads go into its album, so choose it first.</mat-hint>
 </mat-form-field>
-@if (fields().collection; as collection) {
-	<app-image-field
-		[album]="{ album: 'gallery', collection }"
-		[url]="fields().imageUrl ?? ''"
-		(urlChange)="setImageUrl($event)"
-	/>
-}
+<app-image-field
+	required
+	[album]="album()"
+	noAlbumHint="Choose a collection to upload images."
+	[url]="fields().imageUrl ?? ''"
+	(urlChange)="setImageUrl($event)"
+/>
 <mat-form-field subscriptSizing="dynamic">
 	<mat-label>Caption</mat-label>
 	<textarea
 		matInput
 		required
 		rows="2"
+		cdkTextareaAutosize
+		cdkAutosizeMinRows="2"
+		cdkAutosizeMaxRows="6"
 		[maxlength]="maxCaptionLength"
 		[ngModel]="fields().caption ?? ''"
 		(ngModelChange)="setCaption($event)"
 	></textarea>
-	<mat-hint align="end"
-		>{{ (fields().caption ?? "").length }} /
-		{{ maxCaptionLength }}</mat-hint
-	>
+	@if (isNearLimit(fields().caption, maxCaptionLength)) {
+		<mat-hint align="end"
+			>{{ (fields().caption ?? "").length }} /
+			{{ maxCaptionLength }}</mat-hint
+		>
+	}
 </mat-form-field>
 <app-tag-input
 	[tags]="fields().tags ?? []"
 	[suggestions]="tagSuggestions()"
 	(tagsChange)="setTags($event)"
 />
-@if (fields().imageUrl; as imageUrl) {
-	<section class="preview" aria-labelledby="gallery-preview-label">
-		<p class="preview-label" id="gallery-preview-label">Preview</p>
-		<div inert>
-			<app-caption-card
-				[src]="imageUrl"
-				[caption]="fields().caption ?? ''"
-			/>
-		</div>
-	</section>
-}

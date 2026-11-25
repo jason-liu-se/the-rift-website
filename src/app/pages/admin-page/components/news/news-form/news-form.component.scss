@@ -1,16 +1,4 @@
-@use "../../../../../../theme-colours" as *;
-@use "../../../../../../font-sizes" as *;
-
 :host {
 	display: grid;
 	gap: 16px;
-}
-
-.preview-label {
-	margin: 0 0 8px;
-	color: rgba($colour-dark-text, 0.75);
-	font-size: $font-size-x-small;
-	font-weight: 600;
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
 }

@@ -1,28 +1,30 @@
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { Component, computed, inject, input } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatFormField, MatHint, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatOption, MatSelect } from '@angular/material/select';
-import { catchError, of, switchMap } from 'rxjs';
-import { CaptionCardComponent } from 'src/app/components/caption-card/caption-card.component';
+import { catchError, of } from 'rxjs';
 import { MAX_GALLERY_CAPTION_LENGTH } from 'src/app/config/content-limits';
-import { GalleryProviderService } from 'src/app/services/gallery-provider/gallery-provider.service';
+import { ImageUploadForm } from 'src/app/interfaces/api-requests';
+import { EditorContentService } from 'src/app/services/editor-content/editor-content.service';
 import { DraftSession } from '../../../drafts/draft-session';
+import { CollectionsStore } from '../../../services/collections-store.service';
+import { isNearLimit } from '../../../utilities/near-limit';
 import { ImageFieldComponent } from '../../image-field/image-field.component';
 import { TagInputComponent } from '../../tag-input/tag-input.component';
-import { CollectionsStore } from '../../../services/collections-store.service';
 
 /**
  * A gallery image's fields: its collection, image, caption, and tags (with
- * the collection's tags as suggestions), with a preview as the gallery shows it.
+ * every tag in use as suggestions).
  */
 @Component({
 	selector: 'app-gallery-form',
 	templateUrl: './gallery-form.component.html',
-	styleUrl: './gallery-form.component.scss',
+	styles: ':host { display: grid; gap: 16px; }',
 	imports: [
-		CaptionCardComponent,
+		CdkTextareaAutosize,
 		FormsModule,
 		ImageFieldComponent,
 		MatFormField,
@@ -35,28 +37,25 @@ import { CollectionsStore } from '../../../services/collections-store.service';
 	]
 })
 export class GalleryFormComponent {
-	private galleryProvider = inject(GalleryProviderService);
-
 	public readonly session = input.required<DraftSession<'gallery'>>();
 
 	protected readonly maxCaptionLength = MAX_GALLERY_CAPTION_LENGTH;
+	protected readonly isNearLimit = isNearLimit;
 	protected readonly fields = computed(() => this.session().fields());
 	private readonly allCollections =
 		inject(CollectionsStore).collections('gallery');
 	protected readonly collections = computed(
 		() => this.allCollections() ?? []
 	);
-	/** The tags already in the chosen collection's public images. */
+	/** Uploads go into the collection's album, so they wait for one. */
+	protected readonly album = computed((): ImageUploadForm | undefined => {
+		const collection = this.fields().collection;
+		return collection ? { album: 'gallery', collection } : undefined;
+	});
 	protected readonly tagSuggestions = toSignal(
-		toObservable(computed(() => this.fields().collection)).pipe(
-			switchMap((collection) =>
-				collection
-					? this.galleryProvider
-							.fetchCollectionTags(collection)
-							.pipe(catchError(() => of([])))
-					: of([])
-			)
-		),
+		inject(EditorContentService)
+			.fetchGalleryTags()
+			.pipe(catchError(() => of([]))),
 		{ initialValue: [] }
 	);
 

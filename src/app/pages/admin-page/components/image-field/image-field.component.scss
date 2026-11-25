@@ -1,16 +1,37 @@
 @use "../../../../../theme-colours" as *;
 @use "../../../../../font-sizes" as *;
 
-.image-field {
+:host {
 	display: grid;
+	gap: 8px;
+	border-radius: 8px;
+	outline: 2px dashed transparent;
+	outline-offset: 4px;
+}
+
+:host(.dragging) {
+	outline-color: $colour-primary;
+}
+
+.row {
+	display: flex;
+	align-items: flex-start;
 	gap: 8px;
 }
 
+.link {
+	flex: 1;
+	min-width: 0;
+}
+
+// Level with the outlined input beside it.
 .upload {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: 12px;
+	flex: none;
+	height: 56px;
+}
+
+progress {
+	width: 100%;
 }
 
 .messages p {
@@ -20,12 +41,4 @@
 
 .error {
 	color: $colour-error;
-}
-
-.preview {
-	max-width: 100%;
-	max-height: 12rem;
-	justify-self: start;
-	border-radius: 8px;
-	object-fit: contain;
 }

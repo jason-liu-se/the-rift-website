@@ -8,6 +8,7 @@ import { EditorNewsPost } from 'src/app/interfaces/api-responses';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
 import { DraftSession } from '../../drafts/draft-session';
 import { DraftEditorComponent } from './draft-editor.component';
+import { PublishSettings, providePublishSettings } from './publish-settings';
 
 const THEIRS = {
 	id: 'post-1',
@@ -51,7 +52,12 @@ describe('DraftEditorComponent', () => {
 		[...element.querySelectorAll<HTMLButtonElement>('button')].find(
 			(candidate) =>
 				(candidate.getAttribute('aria-label') ??
-					candidate.textContent?.trim()) === name
+					candidate.textContent
+						?.replace(
+							candidate.querySelector('mat-icon')?.textContent ?? '',
+							''
+						)
+						.trim()) === name
 		)!;
 	const text = () => element.textContent?.replace(/\s+/g, ' ') ?? '';
 
@@ -62,9 +68,14 @@ describe('DraftEditorComponent', () => {
 			providers: [
 				provideHttpClient(),
 				provideHttpClientTesting(),
+				providePublishSettings(),
 				{
 					provide: AdminNotifierService,
-					useValue: { notifySuccess: vi.fn(), notifyFailure: vi.fn() }
+					useValue: {
+						notify: vi.fn(),
+						notifySuccess: vi.fn(),
+						notifyFailure: vi.fn()
+					}
 				},
 				{
 					provide: MatDialog,
@@ -77,7 +88,7 @@ describe('DraftEditorComponent', () => {
 			'session',
 			session as unknown as DraftSession<'news'>
 		);
-		fixture.componentRef.setInput('published', {
+		TestBed.inject(PublishSettings).reset({
 			visible: false,
 			date: THEIRS.date
 		});
@@ -97,28 +108,31 @@ describe('DraftEditorComponent', () => {
 	});
 
 	it("publishes with the published item's visibility and date by default", () => {
-		button('Publish').click();
+		button('Save as hidden').click();
 
 		expect(session.publish).toHaveBeenCalledWith({ visible: false });
 	});
 
-	it("won't publish until the required fields are filled in, and says which", () => {
+	it("won't publish until the required fields are filled in", () => {
 		session.fields.set({ title: 'Mine', content: '' });
 		fixture.detectChanges();
 
-		expect(button('Publish').disabled).toBe(true);
-		expect(text()).toContain('Fill in Content to publish.');
+		button('Save as hidden').click();
+		fixture.detectChanges();
+
+		expect(session.publish).not.toHaveBeenCalled();
+		expect(text()).toContain('Fields marked * are required.');
 	});
 
 	it('shows their version when the item changed, to overwrite or merge', () => {
 		session.conflict.set({ kind: 'item', theirs: THEIRS });
 		fixture.detectChanges();
 
-		expect(text()).toContain('This post changed since you started.');
+		expect(text()).toContain('Someone published changes to this post');
 		expect(text()).toContain('Their title');
-		expect(button('Publish').disabled).toBe(true);
+		expect(button('Save as hidden').disabled).toBe(true);
 
-		button('Overwrite with mine').click();
+		button('Replace with mine').click();
 		expect(session.resolveItemConflict).toHaveBeenCalledWith('overwrite');
 		expect(session.publish).toHaveBeenCalled();
 	});
@@ -132,11 +146,11 @@ describe('DraftEditorComponent', () => {
 		expect(session.publishAsNew).toHaveBeenCalledWith({ visible: false });
 	});
 
-	it('discards the draft once confirmed', () => {
+	it('discards the changes once confirmed', () => {
 		const closed = vi.fn();
 		fixture.componentInstance.closed.subscribe(closed);
 
-		button('Discard draft').click();
+		button('Discard changes').click();
 
 		expect(session.discard).toHaveBeenCalled();
 		expect(closed).toHaveBeenCalled();

@@ -14,6 +14,7 @@ import {
 	BulkResponse,
 	EditorCollection,
 	EditorGalleryImage,
+	EditorGalleryTags,
 	PaginatedResponse
 } from '../../interfaces/api-responses';
 import {
@@ -119,6 +120,14 @@ export class EditorContentService {
 		return this.http.post<BulkResponse<EditorGalleryImage>>(
 			`${this.itemsUrl('gallery')}/bulk`,
 			request,
+			EDITOR_REQUEST_OPTIONS
+		);
+	}
+
+	/** Every tag in use on gallery images (and the editor's drafts). */
+	public fetchGalleryTags(): Observable<EditorGalleryTags> {
+		return this.http.get<EditorGalleryTags>(
+			`${this.editorUrl}/gallery/tags`,
 			EDITOR_REQUEST_OPTIONS
 		);
 	}

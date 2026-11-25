@@ -17,25 +17,29 @@
 @include mat.chips-theme($app-theme);
 @include mat.autocomplete-theme($app-theme);
 @include mat.progress-bar-theme($app-theme);
+@include mat.tooltip-theme($app-theme);
+@include mat.button-toggle-theme($app-theme);
 
-// The admin tools' modals (editor, bulk creation): full screen on mobile,
-// large on desktop.
+// The admin tools' modals: full screen on mobile, centred on desktop. Each
+// lays itself out with ModalShellComponent, which scrolls its own body.
 .admin-modal {
 	width: 100vw;
 	height: 100dvh;
 
 	.mat-mdc-dialog-surface {
-		padding: 16px;
+		overflow: hidden;
 		border-radius: 0;
 	}
 
 	@media (min-width: 60rem) {
-		width: min(64rem, 92vw);
+		width: min(48rem, 92vw);
 		height: auto;
 
+		&.admin-modal-wide {
+			width: min(80rem, 94vw);
+		}
+
 		.mat-mdc-dialog-surface {
-			max-height: 92dvh;
-			padding: 24px 32px;
 			border-radius: 12px;
 		}
 	}
