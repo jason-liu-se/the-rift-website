@@ -19,24 +19,53 @@ fieldset {
 	display: grid;
 	gap: 12px;
 	margin: 0;
-	padding: 16px;
+	padding: 4px 16px 16px;
 	border: 1px solid $colour-light-grey;
 	border-radius: 8px;
+	background-color: $colour-light-background;
 }
 
-legend {
-	padding: 0 4px;
+.card-header {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	margin: 0 -8px 0 -8px;
+}
+
+.title {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
 	font-weight: 600;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.drag-handle {
+	display: inline-flex;
+	padding: 10px 4px;
+	cursor: grab;
+	touch-action: none;
+}
+
+.danger {
+	color: $colour-error;
 }
 
 .fields {
 	display: grid;
-	// Fields keep a readable width instead of stretching across the modal.
-	grid-template-columns: repeat(auto-fill, minmax(14rem, 20rem));
+	grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
 	gap: 12px;
+
+	.wide {
+		grid-column: 1 / -1;
+	}
 }
 
-.dimension-actions {
-	display: flex;
-	justify-content: flex-end;
+.cdk-drag-preview fieldset {
+	box-shadow: 0 8px 24px rgba($colour-dark-text, 0.2);
+}
+
+.cdk-drag-placeholder {
+	opacity: 0.4;
 }

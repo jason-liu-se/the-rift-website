@@ -1,6 +1,8 @@
-import { Type } from '@angular/core';
+import { Type, inject } from '@angular/core';
+import { Observable, catchError, map, of } from 'rxjs';
 import { DEFAULT_MAP_DIMENSIONS } from 'src/app/config/maps';
 import { EditorContentType } from 'src/app/interfaces/api-requests';
+import { EditorContentService } from 'src/app/services/editor-content/editor-content.service';
 import {
 	CollectionContentType,
 	FieldsOf,
@@ -58,8 +60,11 @@ export interface EditorTypeConfig<T extends EditorContentType> {
 	hasCollections: boolean;
 	/** Takes many items at once (from the create button's menu). */
 	hasBulkCreate: boolean;
-	/** What a new item starts with (not counted as changes). */
-	newItemFields: () => DraftFields<T>;
+	/**
+	 * What a new item starts with (not counted as changes). Called in the
+	 * editor's injection context, so it can look something up.
+	 */
+	newItemFields: () => DraftFields<T> | Observable<DraftFields<T>>;
 	/** The fields, given the open `session` (a `DraftSession<T>`). */
 	form: Type<unknown>;
 	/** The list's main cell, given an `item` (a `SummaryOf<T>`). */
@@ -219,11 +224,7 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 		hasDate: false,
 		hasCollections: false,
 		hasBulkCreate: false,
-		newItemFields: () => ({
-			dimensions: DEFAULT_MAP_DIMENSIONS.map((dimension) => ({
-				...dimension
-			}))
-		}),
+		newItemFields: () => newMapSeasonFields(),
 		form: MapsFormComponent,
 		itemCell: MapsItemCellComponent,
 		sortOptions: [
@@ -235,6 +236,22 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 		publicPath: () => '/map'
 	}
 };
+
+/** A new season: the one after the latest, with BlueMap's default maps. */
+function newMapSeasonFields(): Observable<DraftFields<'maps'>> {
+	const dimensions = DEFAULT_MAP_DIMENSIONS.map((dimension) => ({
+		...dimension
+	}));
+	return inject(EditorContentService)
+		.fetchItems('maps', { sort: 'season', order: 'desc', limit: 1 })
+		.pipe(
+			map(({ items: [latest] }) => ({
+				season: (latest?.season ?? 0) + 1,
+				dimensions
+			})),
+			catchError(() => of({ dimensions }))
+		);
+}
 
 /** The admin tools, in sidebar order. */
 export const EDITOR_TYPE_ORDER: readonly EditorContentType[] = [

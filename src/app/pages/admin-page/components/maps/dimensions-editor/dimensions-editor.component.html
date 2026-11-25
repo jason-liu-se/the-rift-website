@@ -1,4 +1,10 @@
-<ol class="dimensions">
+<ol
+	class="dimensions"
+	cdkDropList
+	(cdkDropListDropped)="
+		moveDimension($event.previousIndex, $event.currentIndex)
+	"
+>
 	@for (
 		dimension of dimensions();
 		track $index;
@@ -6,9 +12,54 @@
 		let isFirst = $first;
 		let isLast = $last
 	) {
-		<li class="dimension">
+		<li class="dimension" cdkDrag cdkDragLockAxis="y">
 			<fieldset>
-				<legend>{{ index + 1 }}. {{ nameOf(index) }}</legend>
+				<legend class="cdk-visually-hidden">{{ nameOf(index) }}</legend>
+				<div class="card-header">
+					<span
+						class="drag-handle"
+						cdkDragHandle
+						matTooltip="Drag to reorder"
+						aria-hidden="true"
+					>
+						<mat-icon>drag_indicator</mat-icon>
+					</span>
+					<span class="title" aria-hidden="true">{{
+						nameOf(index)
+					}}</span>
+					<button
+						mat-icon-button
+						type="button"
+						class="move-up"
+						matTooltip="Move up"
+						[attr.aria-label]="'Move up ' + nameOf(index)"
+						[disabled]="isFirst"
+						(click)="moveDimension(index, index - 1)"
+					>
+						<mat-icon>arrow_upward</mat-icon>
+					</button>
+					<button
+						mat-icon-button
+						type="button"
+						class="move-down"
+						matTooltip="Move down"
+						[attr.aria-label]="'Move down ' + nameOf(index)"
+						[disabled]="isLast"
+						(click)="moveDimension(index, index + 1)"
+					>
+						<mat-icon>arrow_downward</mat-icon>
+					</button>
+					<button
+						mat-icon-button
+						type="button"
+						class="danger"
+						matTooltip="Remove"
+						[attr.aria-label]="'Remove ' + nameOf(index)"
+						(click)="removeDimension(index)"
+					>
+						<mat-icon>delete</mat-icon>
+					</button>
+				</div>
 				<div class="fields">
 					<mat-form-field subscriptSizing="dynamic">
 						<mat-label>Name</mat-label>
@@ -35,58 +86,27 @@
 							"
 						/>
 					</mat-form-field>
-					<mat-form-field subscriptSizing="dynamic">
-						<mat-label>BlueMap camera position</mat-label>
+					<mat-form-field class="wide" subscriptSizing="dynamic">
+						<mat-label>Starting view</mat-label>
 						<input
 							matInput
 							spellcheck="false"
-							[maxlength]="maxWorldFieldLength"
 							[ngModel]="dimension.perspective"
-							(ngModelChange)="
-								updateDimension(index, { perspective: $event })
-							"
+							(ngModelChange)="setStartingView(index, $event)"
 						/>
 						<mat-hint
-							>Where the map opens, from BlueMap's URL.</mat-hint
+							>Paste a BlueMap link to fill this and the map
+							ID.</mat-hint
 						>
 					</mat-form-field>
 				</div>
 				<app-image-field
+					required
 					[label]="nameOf(index) + ' image'"
 					[album]="{ album: 'maps' }"
 					[url]="dimension.imageUrl"
 					(urlChange)="updateDimension(index, { imageUrl: $event })"
 				/>
-				<div class="dimension-actions">
-					<button
-						mat-icon-button
-						type="button"
-						class="move-up"
-						[attr.aria-label]="'Move up ' + nameOf(index)"
-						[disabled]="isFirst"
-						(click)="moveDimension(index, -1)"
-					>
-						<mat-icon>arrow_upward</mat-icon>
-					</button>
-					<button
-						mat-icon-button
-						type="button"
-						class="move-down"
-						[attr.aria-label]="'Move down ' + nameOf(index)"
-						[disabled]="isLast"
-						(click)="moveDimension(index, 1)"
-					>
-						<mat-icon>arrow_downward</mat-icon>
-					</button>
-					<button
-						mat-icon-button
-						type="button"
-						[attr.aria-label]="'Remove ' + nameOf(index)"
-						(click)="removeDimension(index)"
-					>
-						<mat-icon>delete</mat-icon>
-					</button>
-				</div>
 			</fieldset>
 		</li>
 	}
@@ -98,5 +118,6 @@
 	[disabled]="dimensions().length >= maxDimensions"
 	(click)="addDimension()"
 >
+	<mat-icon>add</mat-icon>
 	Add a dimension
 </button>

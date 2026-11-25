@@ -2,10 +2,12 @@ import { NgComponentOutlet } from '@angular/common';
 import {
 	Component,
 	DestroyRef,
+	Injector,
 	TemplateRef,
 	computed,
 	inject,
 	input,
+	runInInjectionContext,
 	signal,
 	viewChild
 } from '@angular/core';
@@ -16,6 +18,7 @@ import {
 	Observable,
 	catchError,
 	filter,
+	isObservable,
 	map,
 	of,
 	switchMap
@@ -69,6 +72,7 @@ export class EditorModalComponent {
 	private route = inject(ActivatedRoute);
 	private sessions = inject(DraftSessionsService);
 	private editorContent = inject(EditorContentService);
+	private injector = inject(Injector);
 	private notifier = inject(AdminNotifierService);
 	private listStore = inject(EditorListStore);
 	private listActions = inject(EditorListActions);
@@ -172,12 +176,23 @@ export class EditorModalComponent {
 		this.close();
 	}
 
+	/** What a new item starts with: its type's fields, in a collection. */
+	private newItemFields(): Observable<DraftFields<EditorContentType>> {
+		const fields = runInInjectionContext(this.injector, () =>
+			this.config.newItemFields()
+		);
+		return (isObservable(fields) ? fields : of(fields)).pipe(
+			map((typeFields) => this.withDefaultCollection(typeFields))
+		);
+	}
+
 	/**
-	 * What a new item starts in: the collection the list shows, else the one
-	 * last published to, else the first.
+	 * The collection the list shows, else the one last published to, else the
+	 * first.
 	 */
-	private newItemFields(): DraftFields<EditorContentType> {
-		const fields = this.config.newItemFields();
+	private withDefaultCollection(
+		fields: DraftFields<EditorContentType>
+	): DraftFields<EditorContentType> {
 		const collectionType = toCollectionType(this.type);
 		if (!collectionType) {
 			return fields;
@@ -228,7 +243,9 @@ export class EditorModalComponent {
 							this.sessions.startEdit(this.type, item)
 						)
 					)
-				: of(this.sessions.startNew(this.type, this.newItemFields()));
+				: this.newItemFields().pipe(
+						map((fields) => this.sessions.startNew(this.type, fields))
+					);
 		return opening.pipe(
 			catchError((error: unknown) => {
 				this.notifier.notifyFailure(
