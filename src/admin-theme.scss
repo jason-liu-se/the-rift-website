@@ -63,3 +63,15 @@
 	color: rgba(colours.$colour-dark-text, 0.75);
 	font-size: $font-size-x-small;
 }
+
+// Phones: focus scrolled into view stays clear of the fixed tab bar, and of
+// the bulk bar above it while rows are selected.
+@media (max-width: 59.99rem) {
+	html:has(app-admin-page) {
+		scroll-padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+	}
+
+	html:has(app-admin-page app-bulk-action-bar) {
+		scroll-padding-bottom: calc(13rem + env(safe-area-inset-bottom));
+	}
+}

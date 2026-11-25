@@ -186,19 +186,32 @@
 						}
 					</div>
 					<div class="row-actions">
-						@if (index > 0) {
-							<button
-								mat-icon-button
-								type="button"
-								matTooltip="Move up"
-								[attr.aria-label]="
-									'Move image ' + (index + 1) + ' up'
-								"
-								(click)="moveRow(index, index - 1)"
-							>
-								<mat-icon>arrow_upward</mat-icon>
-							</button>
-						}
+						<button
+							mat-icon-button
+							type="button"
+							class="move-up"
+							matTooltip="Move up"
+							[attr.aria-label]="
+								'Move image ' + (index + 1) + ' up'
+							"
+							[disabled]="$first"
+							(click)="moveRow(index, index - 1)"
+						>
+							<mat-icon>arrow_upward</mat-icon>
+						</button>
+						<button
+							mat-icon-button
+							type="button"
+							class="move-down"
+							matTooltip="Move down"
+							[attr.aria-label]="
+								'Move image ' + (index + 1) + ' down'
+							"
+							[disabled]="$last"
+							(click)="moveRow(index, index + 1)"
+						>
+							<mat-icon>arrow_downward</mat-icon>
+						</button>
 						<button
 							mat-icon-button
 							type="button"

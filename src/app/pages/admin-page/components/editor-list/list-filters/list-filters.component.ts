@@ -1,4 +1,12 @@
-import { Component, computed, input, model, signal } from '@angular/core';
+import {
+	Component,
+	ElementRef,
+	computed,
+	inject,
+	input,
+	model,
+	signal
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import {
@@ -68,6 +76,8 @@ export const NO_FILTERS: ListFilters = {
 	]
 })
 export class ListFiltersComponent {
+	private host = inject<ElementRef<HTMLElement>>(ElementRef);
+
 	public readonly filters = model.required<ListFilters>();
 	public readonly statuses = input.required<readonly FilterOption[]>();
 	public readonly searchFields = input.required<readonly FilterOption[]>();
@@ -131,6 +141,12 @@ export class ListFiltersComponent {
 	/** Clears the search and filters, keeping the sort. */
 	protected clear(): void {
 		this.filters.set({ ...NO_FILTERS, sort: this.filters().sort });
+	}
+
+	public focusSearch(): void {
+		this.host.nativeElement
+			.querySelector<HTMLInputElement>('input[type="search"]')
+			?.focus();
 	}
 
 	public setFilter<K extends keyof ListFilters>(

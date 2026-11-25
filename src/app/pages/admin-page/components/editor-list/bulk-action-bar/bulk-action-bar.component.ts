@@ -1,5 +1,5 @@
 import { NgComponentOutlet } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, output } from '@angular/core';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
@@ -22,6 +22,9 @@ import { EditorListStore } from '../editor-list.store';
 export class BulkActionBarComponent {
 	protected readonly store = inject(EditorListStore);
 	protected readonly actions = inject(EditorListActions);
+
+	/** The selection was cleared here: its button is gone, so focus moves. */
+	public readonly cleared = output<void>();
 
 	/** Only drafts are selected: actions other than Delete don't apply. */
 	protected readonly hasItems = computed(
@@ -51,6 +54,11 @@ export class BulkActionBarComponent {
 		() =>
 			`Select all ${countItems(this.store.total(), this.store.config().noun)} matching`
 	);
+
+	protected clearSelection(): void {
+		this.store.selection.clear();
+		this.cleared.emit();
+	}
 
 	private countChanging(wouldChange: (visible: boolean) => boolean): string {
 		if (!this.hasItems()) {

@@ -1,3 +1,4 @@
+import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { Injectable, inject } from '@angular/core';
 import {
 	EMPTY,
@@ -67,6 +68,7 @@ export class EditorListActions implements BulkActionHost {
 	private bulkRunner = inject(BulkActionRunnerService);
 	private writer = inject(EditorWriteService);
 	private notifier = inject(AdminNotifierService);
+	private announcer = inject(LiveAnnouncer);
 
 	public readonly type = this.store.type;
 
@@ -104,7 +106,11 @@ export class EditorListActions implements BulkActionHost {
 		if (fromIndex === toIndex || this.store.isBusy()) {
 			return;
 		}
+		const name = this.store.itemRows()[fromIndex]?.name;
 		this.store.moveItem(fromIndex, toIndex);
+		this.announcer.announce(
+			`Moved ${name} to position ${toIndex + 1} of ${this.store.itemRows().length}.`
+		);
 		const type = this.type();
 		const updates = toOrderUpdates(
 			this.store.itemRows().map(({ item }) => item as OrderedItem)

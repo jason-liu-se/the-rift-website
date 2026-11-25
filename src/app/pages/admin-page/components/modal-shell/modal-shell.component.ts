@@ -7,6 +7,7 @@ import {
 	viewChild
 } from '@angular/core';
 import { MatIconButton } from '@angular/material/button';
+import { MatDialogTitle } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 
@@ -24,7 +25,7 @@ let nextId = 0;
 	selector: 'app-modal-shell',
 	templateUrl: './modal-shell.component.html',
 	styleUrl: './modal-shell.component.scss',
-	imports: [MatIcon, MatIconButton, MatTooltip]
+	imports: [MatDialogTitle, MatIcon, MatIconButton, MatTooltip]
 })
 export class ModalShellComponent {
 	public readonly heading = input.required<string>();

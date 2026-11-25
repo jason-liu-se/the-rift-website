@@ -4,9 +4,13 @@ import {
 	CdkDropList,
 	moveItemInArray
 } from '@angular/cdk/drag-drop';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
 import {
 	Component,
 	DestroyRef,
+	ElementRef,
+	Injector,
+	afterNextRender,
 	computed,
 	inject,
 	output,
@@ -98,6 +102,9 @@ export class GalleryBulkCreateComponent {
 	private editorContent = inject(EditorContentService);
 	private notifier = inject(AdminNotifierService);
 	private apiStatus = inject(ApiStatusService).status;
+	private announcer = inject(LiveAnnouncer);
+	private injector = inject(Injector);
+	private host = inject<ElementRef<HTMLElement>>(ElementRef);
 
 	/** Done: back to the list (after publishing anything, it reloads). */
 	public readonly closed = output<void>();
@@ -182,12 +189,40 @@ export class GalleryBulkCreateComponent {
 		}
 	}
 
+	/** Moves a row; from its Move buttons, focus follows it. */
 	protected moveRow(fromIndex: number, toIndex: number): void {
+		if (fromIndex === toIndex) {
+			return;
+		}
+		const wasButton = !!(
+			document.activeElement as HTMLElement | null
+		)?.closest('.row-actions');
 		this.rows.update((rows) => {
 			const reordered = [...rows];
 			moveItemInArray(reordered, fromIndex, toIndex);
 			return reordered;
 		});
+		this.announcer.announce(
+			`Moved image ${fromIndex + 1} to position ${toIndex + 1} of ${this.rows().length}.`
+		);
+		if (!wasButton) {
+			return;
+		}
+		const isUp = toIndex < fromIndex;
+		afterNextRender(
+			() => {
+				const row =
+					this.host.nativeElement.querySelectorAll('.row')[toIndex];
+				const same = row?.querySelector<HTMLButtonElement>(
+					isUp ? '.move-up' : '.move-down'
+				);
+				const other = row?.querySelector<HTMLButtonElement>(
+					isUp ? '.move-down' : '.move-up'
+				);
+				(same && !same.disabled ? same : other)?.focus();
+			},
+			{ injector: this.injector }
+		);
 	}
 
 	private addFiles(files: File[]): void {

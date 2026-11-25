@@ -1,5 +1,6 @@
 <div class="list-head" [class.selecting]="store.selectedCount() > 0">
 	<app-list-filters
+		#filters
 		class="filters"
 		[filters]="store.filters()"
 		[statuses]="store.config().statuses"
@@ -9,7 +10,10 @@
 		(filtersChange)="store.setFilters($event)"
 	/>
 	@if (store.selectedCount() > 0) {
-		<app-bulk-action-bar class="bulk-bar" />
+		<app-bulk-action-bar
+			class="bulk-bar"
+			(cleared)="filters.focusSearch()"
+		/>
 	}
 </div>
 <p class="cdk-visually-hidden" role="status">
