@@ -6,22 +6,28 @@ import {
 } from './draft-fields';
 
 describe('draft fields', () => {
-	it("picks a type's own fields, leaving out blank ones", () => {
+	it("picks a type's own fields and visibility, leaving out blank ones", () => {
 		expect(
 			pickFields('news', {
 				id: 'x',
 				title: 'Hi',
 				content: '',
 				imageUrl: undefined,
+				visible: false,
 				revision: 3
 			})
-		).toEqual({ title: 'Hi' });
+		).toEqual({ title: 'Hi', visible: false });
 	});
 
-	it('treats blank fields as empty', () => {
-		expect(isEmptyDraft({ title: ' ', tags: [], imageUrl: null })).toBe(
-			true
-		);
+	it('treats blank fields as empty, whatever its visibility', () => {
+		expect(
+			isEmptyDraft({
+				title: ' ',
+				tags: [],
+				imageUrl: null,
+				visible: false
+			})
+		).toBe(true);
 		expect(isEmptyDraft({ title: 'a' })).toBe(false);
 	});
 

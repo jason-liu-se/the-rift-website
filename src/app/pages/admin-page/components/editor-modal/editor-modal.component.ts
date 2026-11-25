@@ -165,7 +165,14 @@ export class EditorModalComponent {
 					scroll: 'manual'
 				})
 			);
-		inject(DestroyRef).onDestroy(() => this.setSession(undefined));
+		inject(DestroyRef).onDestroy(() => {
+			// Saved, changed, or discarded drafts change the list's drafts.
+			const status = this.session()?.status();
+			if (status && status !== 'unchanged' && status !== 'published') {
+				this.listStore.reload();
+			}
+			this.setSession(undefined);
+		});
 	}
 
 	protected finishPublishing(): void {
@@ -261,22 +268,19 @@ export class EditorModalComponent {
 		);
 	}
 
-	/** Fetches the published item, keeping its visibility and date. */
+	/** Fetches the published item, keeping its date. */
 	private fetchPublished(id: string): Observable<ItemOf<EditorContentType>> {
 		return this.editorContent.fetchItem(this.type, id).pipe(
 			map((item) => {
-				const { visible, date } = item as {
-					visible: boolean;
-					date?: string;
-				};
+				const { date } = item as { date?: string };
 				this.publishedItem.set(item);
-				this.settings.reset({ visible, date });
+				this.settings.reset({ date });
 				return item;
 			})
 		);
 	}
 
-	/** An edit draft's item's visibility and date (if it can be fetched). */
+	/** An edit draft's item and its date (if it can be fetched). */
 	private withPublished(
 		session: DraftSession<EditorContentType>
 	): Observable<DraftSession<EditorContentType>> {
