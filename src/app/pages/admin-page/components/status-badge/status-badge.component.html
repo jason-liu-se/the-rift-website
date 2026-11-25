@@ -1,0 +1,6 @@
+<span class="badge" [class]="status()">
+	{{ labels[status()] }}
+</span>
+@if (hasDraft()) {
+	<span class="badge has-draft">Has your draft</span>
+}

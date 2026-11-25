@@ -7,12 +7,9 @@
 					<li>
 						<a
 							class="tool-link"
-							routerLink="."
-							[fragment]="tool.id"
-							[class.active]="tool === activeTool()"
-							[attr.aria-current]="
-								tool === activeTool() ? 'page' : null
-							"
+							routerLinkActive="active"
+							ariaCurrentWhenActive="page"
+							[routerLink]="['/admin', tool.id]"
 						>
 							<mat-icon aria-hidden="true">{{
 								tool.icon
@@ -25,24 +22,6 @@
 		</div>
 	</nav>
 	<div class="workspace">
-		<header class="top-bar">
-			<h1 class="tool-title" tabindex="-1" #toolTitle>
-				{{ activeTool().label
-				}}<span class="cdk-visually-hidden"> – Admin</span>
-			</h1>
-		</header>
-		<div class="tool-card">
-			@switch (activeTool().id) {
-				@case ("downloads") {
-					<app-downloads-tool />
-				}
-				@case ("gallery") {
-					<app-gallery-tool />
-				}
-				@default {
-					<app-news-tool />
-				}
-			}
-		</div>
+		<router-outlet />
 	</div>
 </div>

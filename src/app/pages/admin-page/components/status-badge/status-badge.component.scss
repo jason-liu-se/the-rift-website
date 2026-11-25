@@ -1,0 +1,36 @@
+@use "../../../../../theme-colours" as *;
+@use "../../../../../font-sizes" as *;
+
+:host {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 4px;
+}
+
+.badge {
+	padding: 2px 8px;
+	border: 1px solid currentColor;
+	border-radius: 999px;
+	font-size: $font-size-x-small;
+	font-weight: 600;
+	white-space: nowrap;
+
+	// The site's base style sets every element's size; keep the badge's.
+	* {
+		font-size: inherit;
+	}
+}
+
+.live {
+	color: $colour-success;
+}
+
+.scheduled,
+.has-draft {
+	color: $colour-primary;
+}
+
+.hidden,
+.draft {
+	color: $colour-warning;
+}

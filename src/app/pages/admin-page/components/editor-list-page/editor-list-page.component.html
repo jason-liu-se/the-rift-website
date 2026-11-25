@@ -1,0 +1,30 @@
+<header class="top-bar">
+	<h1 class="tool-title" tabindex="-1" #heading>
+		{{ config().label }}<span class="cdk-visually-hidden"> – Admin</span>
+	</h1>
+</header>
+<div class="tool-card">
+	<div class="tool-actions">
+		<app-create-button [type]="type()" />
+		@if (collectionType(); as collectionType) {
+			<button
+				mat-stroked-button
+				type="button"
+				[attr.aria-expanded]="isManagingCollections()"
+				(click)="isManagingCollections.set(!isManagingCollections())"
+			>
+				Collections
+			</button>
+			@if (isManagingCollections()) {
+				<app-collections-manager
+					class="collections"
+					[type]="collectionType"
+					[itemNoun]="config().noun"
+					(changed)="store.reload()"
+				/>
+			}
+		}
+	</div>
+	<app-editor-list />
+</div>
+<router-outlet />
