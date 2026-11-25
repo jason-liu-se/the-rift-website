@@ -4,6 +4,7 @@
 <form
 	ngNoForm
 	novalidate
+	id="collection-form"
 	class="form"
 	[attr.aria-labelledby]="'collection-form-heading'"
 	(submit)="$event.preventDefault(); save()"
@@ -65,29 +66,27 @@
 		/>
 		<p class="problem" aria-live="polite">{{ shownDimensionsProblem() }}</p>
 	</section>
-	@if (!collection()) {
-		<mat-checkbox
-			color="primary"
-			name="visible"
-			[ngModel]="isVisible()"
-			(ngModelChange)="isVisible.set($event)"
-			>Show on the site</mat-checkbox
-		>
-	}
-	<div class="actions">
+</form>
+
+<!-- The modal's footer (see CollectionsModalComponent), outside the form. -->
+<ng-template appModalFooter>
+	<div class="footer">
+		@if (collection()) {
+			<button mat-button type="button" (click)="cancelled.emit()">
+				Cancel
+			</button>
+		} @else {
+			<app-visibility-toggle [(visible)]="isVisible" />
+		}
 		<button
 			mat-flat-button
 			color="primary"
 			type="submit"
+			form="collection-form"
 			[disabled]="isSaving()"
 		>
 			<mat-icon>{{ collection() ? "save" : "add" }}</mat-icon>
 			{{ collection() ? "Save changes" : "Create collection" }}
 		</button>
-		@if (collection()) {
-			<button mat-button type="button" (click)="cancelled.emit()">
-				Cancel
-			</button>
-		}
 	</div>
-</form>
+</ng-template>

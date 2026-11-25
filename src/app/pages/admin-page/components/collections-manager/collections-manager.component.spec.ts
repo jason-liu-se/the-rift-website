@@ -3,6 +3,8 @@ import {
 	HttpTestingController,
 	provideHttpClientTesting
 } from '@angular/common/http/testing';
+import { NgTemplateOutlet } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { of } from 'rxjs';
@@ -11,7 +13,24 @@ import { EDITOR_GALLERY_COLLECTIONS } from 'src/app/testing/api-fixtures';
 import { environment } from 'src/environments/environment';
 import { CollectionsStore } from '../../services/collections-store.service';
 import { findSlugProblem, toSlug } from '../collection-form/collection-slug';
+import { ModalFooterSlot } from '../modal-shell/modal-footer-slot';
 import { CollectionsManagerComponent } from './collections-manager.component';
+
+/** The manager as the Collections modal shows it, its form's footer below. */
+@Component({
+	template: `<app-collections-manager
+			type="gallery"
+			[itemNoun]="{ one: 'image', many: 'images' }"
+			(changed)="changed()"
+		/>
+		<ng-container *ngTemplateOutlet="footer.template() ?? null" />`,
+	imports: [CollectionsManagerComponent, NgTemplateOutlet],
+	providers: [ModalFooterSlot]
+})
+class ModalHostComponent {
+	protected readonly footer = inject(ModalFooterSlot);
+	public changed = (): void => undefined;
+}
 
 const COLLECTIONS_URL = `${environment.API_URL}/editor/gallery/collections`;
 
@@ -41,7 +60,7 @@ describe('toSlug', () => {
 });
 
 describe('CollectionsManagerComponent', () => {
-	let fixture: ComponentFixture<CollectionsManagerComponent>;
+	let fixture: ComponentFixture<ModalHostComponent>;
 	let element: HTMLElement;
 	let httpTesting: HttpTestingController;
 	let dialogMessages: string[];
@@ -75,7 +94,7 @@ describe('CollectionsManagerComponent', () => {
 		notifyFailure = vi.fn();
 		changed = vi.fn<() => void>();
 		TestBed.configureTestingModule({
-			imports: [CollectionsManagerComponent],
+			imports: [ModalHostComponent],
 			providers: [
 				CollectionsStore,
 				provideHttpClient(),
@@ -103,13 +122,8 @@ describe('CollectionsManagerComponent', () => {
 			]
 		});
 		httpTesting = TestBed.inject(HttpTestingController);
-		fixture = TestBed.createComponent(CollectionsManagerComponent);
-		fixture.componentRef.setInput('type', 'gallery');
-		fixture.componentRef.setInput('itemNoun', {
-			one: 'image',
-			many: 'images'
-		});
-		fixture.componentInstance.changed.subscribe(() => changed());
+		fixture = TestBed.createComponent(ModalHostComponent);
+		fixture.componentInstance.changed = () => changed();
 		element = fixture.nativeElement;
 		fixture.detectChanges();
 		httpTesting

@@ -10,7 +10,6 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
-import { MatCheckbox } from '@angular/material/checkbox';
 import { MatFormField, MatHint, MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
@@ -30,11 +29,14 @@ import { CollectionsStore } from '../../services/collections-store.service';
 import { EditorWriteService } from '../../services/editor-write.service';
 import { describeWriteError } from '../../utilities/write-errors';
 import { DimensionsEditorComponent } from '../dimensions-editor/dimensions-editor.component';
+import { ModalFooterDirective } from '../modal-shell/modal-footer-slot';
+import { VisibilityToggleComponent } from '../visibility-toggle/visibility-toggle.component';
 import { findSlugProblem, toSlug } from './collection-slug';
 
 /**
  * A collection's form: a new one (its slug following the title until edited,
- * fixed once created), or an existing one's title and dimensions.
+ * fixed once created), or an existing one's title and dimensions. Its save
+ * button (and a new one's visibility) go in the modal's footer.
  */
 @Component({
 	selector: 'app-collection-form',
@@ -44,12 +46,13 @@ import { findSlugProblem, toSlug } from './collection-slug';
 		DimensionsEditorComponent,
 		FormsModule,
 		MatButton,
-		MatCheckbox,
 		MatFormField,
 		MatHint,
 		MatIcon,
 		MatInput,
-		MatLabel
+		MatLabel,
+		ModalFooterDirective,
+		VisibilityToggleComponent
 	]
 })
 export class CollectionFormComponent {
