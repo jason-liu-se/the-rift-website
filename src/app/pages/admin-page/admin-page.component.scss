@@ -116,18 +116,19 @@ $tab-bar-height: 4rem;
 		flex-direction: row;
 	}
 
+	// Full height beside the workspace, however long it is; its links stay
+	// in view while it scrolls.
 	.tool-nav {
-		position: sticky;
+		position: static;
 		box-sizing: border-box;
-		top: calc($bar-height + var(--status-banner-height, 0px));
-		align-self: flex-start;
 		flex: 0 0 14rem;
-		height: calc(100dvh - $bar-height - var(--status-banner-height, 0px));
 		padding: 16px 12px;
 		border-top: none;
 	}
 
 	.tool-list {
+		position: sticky;
+		top: calc($bar-height + var(--status-banner-height, 0px) + 16px);
 		flex-direction: column;
 	}
 

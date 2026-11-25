@@ -46,6 +46,10 @@ for (const { path, name, href } of PAGES) {
 		});
 		await expect(link).toHaveAttribute('href', href);
 		await expect(link).toHaveAttribute('target', '_blank');
+		// Not covered by what it sits on (the gallery's image opened instead).
+		const popup = page.waitForEvent('popup');
+		await link.click();
+		await (await popup).close();
 		// Known issues are tracked (and checked) by accessibility.spec.ts.
 		const known = new Set(KNOWN_A11Y_ISSUES.map(violationKey));
 		const violations = await scanForViolations(page);

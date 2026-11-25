@@ -7,7 +7,6 @@ import {
 	OnInit,
 	PLATFORM_ID,
 	PendingTasks,
-	ViewChild,
 	Type,
 	afterNextRender,
 	inject,
@@ -56,8 +55,8 @@ export class PageTemplateComponent implements OnInit {
 	/** Off for pages with their own app bar (the admin tools). */
 	public showNavbar: boolean;
 
-	@ViewChild(PageTemplateDirective, { static: true })
-	appPageTemplateHost!: PageTemplateDirective;
+	// Rendered by the first change detection, before the page's chunk loads.
+	private pageHost = viewChild.required(PageTemplateDirective);
 
 	constructor() {
 		// setting values from the passed URL data
@@ -83,9 +82,7 @@ export class PageTemplateComponent implements OnInit {
 			const component = await this.loadPage();
 			// The user may have navigated away while the page's chunk was loading.
 			if (component && !this.destroyRef.destroyed) {
-				this.appPageTemplateHost.viewContainerRef.createComponent(
-					component
-				);
+				this.pageHost().viewContainerRef.createComponent(component);
 				this.focusContentAfterNavigation();
 			}
 		} finally {

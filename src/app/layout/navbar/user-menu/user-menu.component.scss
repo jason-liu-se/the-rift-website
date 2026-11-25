@@ -1,8 +1,8 @@
 @use "../../../../theme-colours" as *;
 
-$navbar-height: 3rem;
 $avatar-size: 36px;
 $panel-padding: 8px;
+$arrow-size: 8px;
 
 :host {
 	display: block;
@@ -25,10 +25,6 @@ $panel-padding: 8px;
 
 .icon {
 	font-size: 1.25rem;
-}
-
-.menu-item {
-	justify-content: space-between;
 }
 
 .mobile-item {
@@ -83,19 +79,17 @@ $panel-padding: 8px;
 			outline-offset: 2px;
 		}
 
-		// The menu's header shows the avatar now. The button itself stays
-		// visible: hiding a focused element would drop focus and close the menu.
-		&.open app-user-avatar {
-			visibility: hidden;
+		&.open {
+			outline: 2px solid rgba($colour-light-text, 0.5);
+			outline-offset: 2px;
 		}
 	}
 
-	// Sits over the button, offset so the header's avatar lands exactly on the
-	// button's: only one avatar is ever visible.
+	// Below the button, right-aligned with it; its arrow points at the avatar.
 	.panel {
 		display: none;
 		position: absolute;
-		top: calc(($navbar-height - $avatar-size) / 2 - $panel-padding);
+		top: calc(50% + $avatar-size / 2 + $arrow-size + 4px);
 		right: -$panel-padding;
 		z-index: 1;
 		min-width: 13rem;
@@ -104,6 +98,16 @@ $panel-padding: 8px;
 		background-color: $colour-dark-background;
 		box-shadow: 0 4px 12px rgba($colour-dark-background, 0.5);
 
+		&::before {
+			content: "";
+			position: absolute;
+			bottom: 100%;
+			right: calc($panel-padding + $avatar-size / 2 - $arrow-size);
+			border: $arrow-size solid transparent;
+			border-top: 0;
+			border-bottom-color: $colour-dark-background;
+		}
+
 		&.open {
 			display: block;
 			animation: panel-in 0.15s ease-out;
@@ -111,9 +115,8 @@ $panel-padding: 8px;
 	}
 
 	.panel-header {
-		--user-avatar-direction: row-reverse;
 		justify-content: flex-start;
-		padding-bottom: $panel-padding;
+		padding: 4px 0.75rem $panel-padding;
 		border-bottom: 1px solid rgba($colour-light-text, 0.2);
 	}
 
@@ -150,8 +153,7 @@ $panel-padding: 8px;
 	@keyframes panel-in {
 		from {
 			opacity: 0;
-			transform: scale(0.96);
-			transform-origin: top right;
+			transform: translateY(-4px);
 		}
 	}
 

@@ -104,16 +104,6 @@ describe('UserMenuComponent', () => {
 		);
 	});
 
-	it('closes when the panel header is pressed, and focuses the button', async () => {
-		await key(trigger(), 'Enter');
-
-		element.querySelector<HTMLElement>('.panel-header')!.click();
-		await settle();
-
-		expect(trigger().getAttribute('aria-expanded')).toBe('false');
-		expect(document.activeElement).toBe(trigger());
-	});
-
 	describe('keyboard', () => {
 		it('opens with Enter, ArrowDown or Space, and closes with Escape', async () => {
 			for (const name of ['Enter', 'ArrowDown', ' ']) {

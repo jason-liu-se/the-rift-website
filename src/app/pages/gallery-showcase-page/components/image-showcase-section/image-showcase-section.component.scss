@@ -28,6 +28,8 @@
 }
 
 .image-button {
+	// Keeps the caption card's layers under the Edit link.
+	isolation: isolate;
 	background-color: transparent;
 	border: none;
 	flex: 1 1 auto;
