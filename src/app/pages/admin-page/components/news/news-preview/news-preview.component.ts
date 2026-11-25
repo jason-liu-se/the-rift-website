@@ -15,21 +15,16 @@ export class NewsPreviewComponent {
 
 	public readonly session = input.required<DraftSession<'news'>>();
 
-	/** When it'll go live, as the date field says: as before, now, or later. */
+	/** When it'll go live, as the draft says: as before, now, or later. */
 	private readonly date = computed(() => {
-		const published = this.settings.published()?.date;
-		switch (this.settings.dateChoice()) {
-			case 'keep':
-				return published ?? new Date().toISOString();
-			case 'schedule': {
-				const scheduled = new Date(this.settings.scheduledAt());
-				return Number.isNaN(scheduled.getTime())
-					? new Date().toISOString()
-					: scheduled.toISOString();
-			}
-			default:
-				return new Date().toISOString();
+		const date = this.session().fields().date;
+		if (date && date !== 'now') {
+			return date;
 		}
+		return (
+			(!date && this.settings.published()?.date) ||
+			new Date().toISOString()
+		);
 	});
 
 	protected readonly preview = computed<NewsPost[]>(() => {

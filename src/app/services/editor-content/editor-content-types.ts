@@ -1,6 +1,7 @@
 import {
 	BulkDeleteRequest,
 	DownloadItemBulkUpdateRequest,
+	DraftOptions,
 	DownloadItemFields,
 	DownloadItemCreateRequest,
 	DownloadItemUpdateRequest,
@@ -16,6 +17,7 @@ import {
 	MapSeasonUpdateRequest,
 	NewsPostBulkUpdateRequest,
 	NewsPostFields,
+	NewsDraftOptions,
 	NewsPostCreateRequest,
 	NewsPostUpdateRequest
 } from '../../interfaces/api-requests';
@@ -34,6 +36,8 @@ import {
 /** What each content type's editor endpoints take and answer. */
 export interface EditorContentTypes {
 	news: {
+		/** The publish options a draft keeps beside the fields. */
+		draftOptions: NewsDraftOptions;
 		fields: NewsPostFields;
 		summary: EditorNewsPostSummary;
 		item: EditorNewsPost;
@@ -43,6 +47,7 @@ export interface EditorContentTypes {
 		bulkUpdate: NewsPostBulkUpdateRequest;
 	};
 	gallery: {
+		draftOptions: DraftOptions;
 		fields: GalleryImageFields;
 		summary: EditorGalleryImage;
 		item: EditorGalleryImage;
@@ -52,6 +57,7 @@ export interface EditorContentTypes {
 		bulkUpdate: GalleryImageBulkUpdateRequest;
 	};
 	downloads: {
+		draftOptions: DraftOptions;
 		fields: DownloadItemFields;
 		summary: EditorDownloadItemSummary;
 		item: EditorDownloadItem;
@@ -61,6 +67,7 @@ export interface EditorContentTypes {
 		bulkUpdate: DownloadItemBulkUpdateRequest;
 	};
 	maps: {
+		draftOptions: DraftOptions;
 		fields: MapSeasonFields;
 		summary: EditorMapSeasonSummary;
 		item: EditorMapSeason;
@@ -73,6 +80,8 @@ export interface EditorContentTypes {
 
 export type FieldsOf<T extends EditorContentType> =
 	EditorContentTypes[T]['fields'];
+export type DraftOptionsOf<T extends EditorContentType> =
+	EditorContentTypes[T]['draftOptions'];
 export type SummaryOf<T extends EditorContentType> =
 	EditorContentTypes[T]['summary'];
 export type ItemOf<T extends EditorContentType> = EditorContentTypes[T]['item'];
@@ -129,4 +138,17 @@ export const FIELD_KEYS: { [T in EditorContentType]: (keyof FieldsOf<T>)[] } = {
 		'sortOrder'
 	],
 	maps: ['season', 'imageUrl', 'dimensions']
+};
+
+/**
+ * Each content type's draft options: kept in drafts, but not taken from a
+ * published item (whose `date` an edit keeps unless the draft sets one).
+ */
+export const DRAFT_OPTION_KEYS: {
+	[T in EditorContentType]: (keyof DraftOptionsOf<T>)[];
+} = {
+	news: ['visible', 'date'],
+	gallery: ['visible'],
+	downloads: ['visible'],
+	maps: ['visible']
 };

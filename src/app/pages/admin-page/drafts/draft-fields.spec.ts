@@ -2,30 +2,44 @@ import {
 	findMissingFields,
 	isEmptyDraft,
 	isSameFields,
-	pickFields
+	pickDraftFields,
+	pickItemFields
 } from './draft-fields';
 
 describe('draft fields', () => {
-	it("picks a type's own fields and visibility, leaving out blank ones", () => {
-		expect(
-			pickFields('news', {
-				id: 'x',
-				title: 'Hi',
-				content: '',
-				imageUrl: undefined,
-				visible: false,
-				revision: 3
-			})
-		).toEqual({ title: 'Hi', visible: false });
+	const news = {
+		id: 'x',
+		title: 'Hi',
+		content: '',
+		imageUrl: undefined,
+		visible: false,
+		date: '2026-01-01T12:00:00.000Z',
+		revision: 3
+	};
+
+	it("picks a draft's fields and options, leaving out blank ones", () => {
+		expect(pickDraftFields('news', news)).toEqual({
+			title: 'Hi',
+			visible: false,
+			date: news.date
+		});
 	});
 
-	it('treats blank fields as empty, whatever its visibility', () => {
+	it("picks an item's fields and visibility, but not its date (kept by leaving it out)", () => {
+		expect(pickItemFields('news', news)).toEqual({
+			title: 'Hi',
+			visible: false
+		});
+	});
+
+	it('treats blank fields as empty, whatever its options', () => {
 		expect(
 			isEmptyDraft({
 				title: ' ',
 				tags: [],
 				imageUrl: null,
-				visible: false
+				visible: false,
+				date: 'now'
 			})
 		).toBe(true);
 		expect(isEmptyDraft({ title: 'a' })).toBe(false);

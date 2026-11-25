@@ -30,7 +30,8 @@ import {
 	DraftFields,
 	isEmptyDraft,
 	isSameFields,
-	pickFields
+	pickDraftFields,
+	pickItemFields
 } from './draft-fields';
 import { DraftStore } from './draft-store.service';
 
@@ -211,7 +212,7 @@ export class DraftSession<T extends EditorContentType> {
 		}
 		this.deps.store.noteRevision(theirs.id, theirs.revision);
 		this.target = theirs.target ?? this.target;
-		const theirFields = pickFields(this.type, theirs.fields);
+		const theirFields = pickDraftFields(this.type, theirs.fields);
 		this.savedFields.set(theirFields);
 		if (keep === 'theirs') {
 			this.fields.set(theirFields);
@@ -236,9 +237,9 @@ export class DraftSession<T extends EditorContentType> {
 		}
 		const { theirs } = conflict;
 		if (how === 'merge') {
-			this.mergeReference.set(pickFields(this.type, theirs));
+			this.mergeReference.set(pickItemFields(this.type, theirs));
 		}
-		this.baseline.set(pickFields(this.type, theirs));
+		this.baseline.set(pickItemFields(this.type, theirs));
 		this.target = { id: theirs.id, startingRevision: theirs.revision };
 		return this.moveToNewDraft();
 	}
@@ -372,7 +373,7 @@ export class DraftSession<T extends EditorContentType> {
 				map((saved) => {
 					if (saved) {
 						this.savedFields.set(
-							pickFields(this.type, saved.fields)
+							pickDraftFields(this.type, saved.fields)
 						);
 					}
 					const isPending = this.deps.store.isPending(this.id());

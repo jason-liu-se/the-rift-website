@@ -80,6 +80,8 @@ export class CollectionFormComponent {
 	protected readonly isSaving = signal(false);
 	/** The slug was typed, so it no longer follows the title. */
 	private readonly isSlugEdited = linkedSignal(() => !!this.collection());
+	/** Repeating the create (a retry) returns the collection it made. */
+	private createId = crypto.randomUUID();
 	/** Problems show once saving was tried. */
 	private readonly wasAttempted = linkedSignal({
 		source: this.collection,
@@ -153,6 +155,7 @@ export class CollectionFormComponent {
 								} satisfies CollectionUpdateRequest
 							)
 						: this.editorContent.createCollection(this.type(), {
+								createId: this.createId,
 								slug,
 								title,
 								...(dimensions.length > 0 && { dimensions }),
@@ -179,6 +182,7 @@ export class CollectionFormComponent {
 	}
 
 	private reset(): void {
+		this.createId = crypto.randomUUID();
 		this.title.set('');
 		this.slug.set('');
 		this.dimensions.set([]);

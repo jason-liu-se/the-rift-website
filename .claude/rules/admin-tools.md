@@ -27,11 +27,12 @@ The decisions are in issue #101; the API's side is in the web-server's
   it focuses its heading on opening). Public cards link editors to
   `/admin/<type>/<id>` with `<app-edit-button>` (`components/edit-button/`).
 - **The editor** shows the type's form beside its `preview` (Edit and Preview
-  tabs on mobile). `PublishSettings` (`draft-editor/publish-settings.ts`,
-  provided per editor modal) holds when it'll publish (news's date) and whether
-  publishing was tried (visibility is the draft's own `visible`), shared by the
-  footer and the form's fields; its `ErrorStateMatcher` marks blank required
-  fields only after that.
+  tabs on mobile). The draft holds the publish choices (`visible`, news's
+  `date`) beside its fields (`DRAFT_OPTION_KEYS`); `PublishSettings`
+  (`draft-editor/publish-settings.ts`, provided per editor modal) holds the
+  published item's date (for "As before") and whether publishing was tried,
+  shared by the footer and the form's fields; its `ErrorStateMatcher` marks
+  blank required fields only after that.
 - **Per-type differences live in `EDITOR_TYPES`**
   (`pages/admin-page/editor-types.ts`): noun, statuses, search fields, field
   labels, flags, sortable columns (`nameColumn`, an `extraColumn`) and

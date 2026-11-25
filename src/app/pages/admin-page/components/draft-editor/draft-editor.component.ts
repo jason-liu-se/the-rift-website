@@ -22,7 +22,10 @@ import { MatIcon } from '@angular/material/icon';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { MatTooltip } from '@angular/material/tooltip';
 import { EMPTY, Observable, catchError, filter } from 'rxjs';
-import { EditorContentType } from 'src/app/interfaces/api-requests';
+import {
+	EditorContentType,
+	NewsDraftOptions
+} from 'src/app/interfaces/api-requests';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
 import { ItemOf } from 'src/app/services/editor-content/editor-content-types';
 import { DraftSession, SaveStage } from '../../drafts/draft-session';
@@ -34,7 +37,11 @@ import { itemName } from '../editor-list/item-name';
 import { ModalShellComponent } from '../modal-shell/modal-shell.component';
 import { VisibilityToggleComponent } from '../visibility-toggle/visibility-toggle.component';
 import { DraftConflictComponent } from './draft-conflict/draft-conflict.component';
-import { PublishSettings } from './publish-settings';
+import {
+	PublishSettings,
+	findScheduleProblem,
+	toDateChoice
+} from './publish-settings';
 
 /** The publish button's labels (see `publishLabel`), widest included. */
 const PUBLISH_LABELS = [
@@ -136,6 +143,12 @@ export class DraftEditorComponent<T extends EditorContentType> {
 	protected readonly isVisible = computed(
 		() => this.session().fields().visible ?? true
 	);
+	/** News only: when it'll go live, as the draft says. */
+	private readonly date = computed(() =>
+		this.config().hasDate
+			? (this.session().fields() as NewsDraftOptions).date
+			: undefined
+	);
 	private readonly missingFields = computed(() =>
 		findMissingFields(
 			this.session().fields() as Record<string, unknown>,
@@ -150,16 +163,11 @@ export class DraftEditorComponent<T extends EditorContentType> {
 		if (this.missingFields().length > 0) {
 			return 'Fields marked * are required.';
 		}
-		return this.config().hasDate
-			? this.settings.scheduleProblem()
-			: undefined;
+		return findScheduleProblem(this.date());
 	});
 	protected readonly publishLabels = PUBLISH_LABELS;
 	protected readonly publishLabel = computed(() => {
-		if (
-			this.config().hasDate &&
-			this.settings.dateChoice() === 'schedule'
-		) {
+		if (toDateChoice(this.date(), this.isEdit()) === 'schedule') {
 			return 'Schedule';
 		}
 		if (!this.isVisible()) {
@@ -180,18 +188,13 @@ export class DraftEditorComponent<T extends EditorContentType> {
 
 	protected publish(): void {
 		this.runPublish(() =>
-			this.session().publish(
-				this.settings.toRequest(this.config().hasDate)
-			)
+			// The draft holds the choices (visibility, a news date).
+			this.session().publish({})
 		);
 	}
 
 	protected publishAsNew(): void {
-		this.runPublish(() =>
-			this.session().publishAsNew(
-				this.settings.toRequest(this.config().hasDate)
-			)
-		);
+		this.runPublish(() => this.session().publishAsNew({}));
 	}
 
 	protected overwrite(): void {

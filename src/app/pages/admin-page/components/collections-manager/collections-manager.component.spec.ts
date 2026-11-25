@@ -148,6 +148,7 @@ describe('CollectionsManagerComponent', () => {
 			url: COLLECTIONS_URL
 		});
 		expect(create.request.body).toEqual({
+			createId: expect.any(String),
 			slug: 'season-7',
 			title: 'Season 7',
 			visible: true
