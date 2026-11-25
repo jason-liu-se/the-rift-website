@@ -120,6 +120,8 @@ $tab-bar-height: 4rem;
 	// in view while it scrolls.
 	.tool-nav {
 		position: static;
+		// A flex item stacks by z-index even when static: under the admin bar.
+		z-index: auto;
 		box-sizing: border-box;
 		flex: 0 0 14rem;
 		padding: 16px 12px;
