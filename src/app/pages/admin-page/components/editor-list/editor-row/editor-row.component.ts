@@ -2,9 +2,12 @@ import { NgComponentOutlet } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
 import { MatIconButton } from '@angular/material/button';
 import { MatCheckbox } from '@angular/material/checkbox';
+import { MatDivider } from '@angular/material/divider';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { formatRelativeTime } from 'src/app/utilities/relative-time';
+import { formatDateTime } from '../../../utilities/format-date-time';
 import { EditorAvatarComponent } from '../../editor-avatar/editor-avatar.component';
 import { StatusBadgeComponent } from '../../status-badge/status-badge.component';
 import { EditorListActions } from '../editor-list.actions';
@@ -24,6 +27,7 @@ import { ListRow } from '../list-rows';
 	imports: [
 		EditorAvatarComponent,
 		MatCheckbox,
+		MatDivider,
 		MatIcon,
 		MatIconButton,
 		MatMenu,
@@ -49,8 +53,35 @@ export class EditorRowComponent {
 
 	protected readonly actions = inject(EditorListActions);
 	protected readonly itemCell = computed(() => this.store.config().itemCell);
-	/** The editor, who made every draft listed. */
-	protected readonly currentUser = computed(() => this.user() ?? undefined);
+	/** Who last changed it: for a draft, the editor, who made every one listed. */
+	protected readonly updatedBy = computed(() => {
+		const row = this.row();
+		return row.kind === 'item'
+			? row.item.lastUpdatedBy
+			: (this.user() ?? undefined);
+	});
+	protected readonly updatedAt = computed(() => {
+		const row = this.row();
+		return row.kind === 'item' ? row.item.updatedAt : row.draft.updatedAt;
+	});
+	/** Items older than the edit history have no time. */
+	protected readonly updatedAgo = computed(() => {
+		const updatedAt = this.updatedAt();
+		return updatedAt ? formatRelativeTime(updatedAt) : '';
+	});
+	protected readonly updatedAtText = computed(() => {
+		const updatedAt = this.updatedAt();
+		return updatedAt ? formatDateTime(updatedAt) : '';
+	});
+	/** Where a live item shows on the site. */
+	protected readonly publicPath = computed(() => {
+		const row = this.row();
+		return row.kind === 'item' && row.item.status === 'live'
+			? (this.store.config().publicPath as (item: object) => string)(
+					row.item
+				)
+			: undefined;
+	});
 	protected readonly isSelected = computed(() => {
 		const row = this.row();
 		return row.kind === 'draft'

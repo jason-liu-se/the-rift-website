@@ -20,17 +20,25 @@ describe('GalleryBulkActionsComponent', () => {
 		const fixture = TestBed.createComponent(GalleryBulkActionsComponent);
 		fixture.detectChanges();
 		const button = (name: string) =>
-			[...fixture.nativeElement.querySelectorAll('button')].find(
-				(candidate: HTMLButtonElement) =>
-					candidate.textContent?.trim() === name
-			) as HTMLButtonElement;
+			[...document.querySelectorAll('button')].find(
+				(candidate) =>
+					candidate.textContent
+						?.replace(
+							candidate.querySelector('mat-icon')?.textContent ?? '',
+							''
+						)
+						.trim() === name
+			)!;
+		const changeTags = (tags: string[], action: string) => {
+			button('Tags').click();
+			fixture.componentInstance['tags'].set(tags);
+			fixture.detectChanges();
+			button(action).click();
+			fixture.detectChanges();
+		};
 
-		fixture.componentInstance['tags'].set(['night']);
-		fixture.detectChanges();
-		button('Add tags').click();
-		fixture.componentInstance['tags'].set(['spawn']);
-		fixture.detectChanges();
-		button('Remove tags').click();
+		changeTags(['night'], 'Add tags');
+		changeTags(['spawn'], 'Remove tags');
 
 		expect(host.actions).toEqual([
 			{ action: 'add-tags', tags: ['night'] },

@@ -2,7 +2,7 @@
 <span>
 	{{ item().caption }}
 	<span class="details"
-		>{{ item().collection
+		>{{ collectionTitle()
 		}}{{ item().tags.length ? " · " + item().tags.join(", ") : "" }}</span
 	>
 </span>

@@ -1,19 +1,23 @@
 import { Component, input } from '@angular/core';
 import { NewsStatus } from 'src/app/interfaces/api-responses';
 
-/** What an admin list row is: a published item's status, or a draft. */
-export type ItemStatus = NewsStatus | 'draft';
+/**
+ * What an admin list row is: a published item's status, or the editor's
+ * unpublished changes, to a new item (`draft`) or a published one (`edit`).
+ */
+export type ItemStatus = NewsStatus | 'draft' | 'edit';
 
 const STATUS_LABELS: Record<ItemStatus, string> = {
 	live: 'Live',
 	hidden: 'Hidden',
 	scheduled: 'Scheduled',
-	draft: 'Draft'
+	draft: 'New',
+	edit: 'Edit'
 };
 
 /**
- * An item's status: Live, Scheduled, Hidden, or Draft, and
- * "Has your draft" when the editor has an unpublished edit of it.
+ * An item's status: Live, Scheduled, or Hidden (or New or Edit for
+ * unpublished changes), and "Unpublished changes" when the editor has some.
  */
 @Component({
 	selector: 'app-status-badge',

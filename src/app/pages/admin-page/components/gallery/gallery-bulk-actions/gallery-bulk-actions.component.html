@@ -1,24 +1,34 @@
 <app-move-bulk-action />
-<div class="bulk-tags">
-	<app-tag-input
-		label="Tags to add or remove"
-		[tags]="tags()"
-		(tagsChange)="tags.set($event)"
-	/>
-	<button
-		mat-stroked-button
-		type="button"
-		[disabled]="tags().length === 0"
-		(click)="changeTags('add-tags')"
-	>
-		Add tags
-	</button>
-	<button
-		mat-stroked-button
-		type="button"
-		[disabled]="tags().length === 0"
-		(click)="changeTags('remove-tags')"
-	>
-		Remove tags
-	</button>
-</div>
+<button mat-button type="button" (click)="openTags()">
+	<mat-icon>sell</mat-icon>
+	Tags
+</button>
+<ng-template #tagsDialog>
+	<h2 mat-dialog-title>Add or remove tags</h2>
+	<mat-dialog-content>
+		<app-tag-input
+			label="Tags"
+			[tags]="tags()"
+			(tagsChange)="tags.set($event)"
+		/>
+	</mat-dialog-content>
+	<mat-dialog-actions>
+		<button mat-button type="button" mat-dialog-close>Cancel</button>
+		<button
+			mat-stroked-button
+			type="button"
+			[disabled]="tags().length === 0"
+			(click)="changeTags('remove-tags')"
+		>
+			Remove tags
+		</button>
+		<button
+			mat-flat-button
+			type="button"
+			[disabled]="tags().length === 0"
+			(click)="changeTags('add-tags')"
+		>
+			Add tags
+		</button>
+	</mat-dialog-actions>
+</ng-template>

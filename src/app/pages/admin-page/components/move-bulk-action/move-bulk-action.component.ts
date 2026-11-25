@@ -1,8 +1,7 @@
-import { Component, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, inject } from '@angular/core';
 import { MatButton } from '@angular/material/button';
-import { MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatOption, MatSelect } from '@angular/material/select';
+import { MatIcon } from '@angular/material/icon';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { CollectionContentType } from 'src/app/services/editor-content/editor-content-types';
 import { CollectionsStore } from '../../services/collections-store.service';
 import { BULK_ACTION_HOST } from '../editor-list/bulk-action-host';
@@ -11,15 +10,7 @@ import { BULK_ACTION_HOST } from '../editor-list/bulk-action-host';
 @Component({
 	selector: 'app-move-bulk-action',
 	templateUrl: './move-bulk-action.component.html',
-	styleUrl: './move-bulk-action.component.scss',
-	imports: [
-		FormsModule,
-		MatButton,
-		MatFormField,
-		MatLabel,
-		MatOption,
-		MatSelect
-	]
+	imports: [MatButton, MatIcon, MatMenu, MatMenuItem, MatMenuTrigger]
 })
 export class MoveBulkActionComponent {
 	private host = inject(BULK_ACTION_HOST);
@@ -27,12 +18,8 @@ export class MoveBulkActionComponent {
 	protected readonly collections = inject(CollectionsStore).collections(
 		this.host.type() as CollectionContentType
 	);
-	protected readonly targetCollection = signal('');
 
-	protected move(): void {
-		this.host.runBulkAction({
-			action: 'move',
-			collection: this.targetCollection()
-		});
+	protected move(collection: string): void {
+		this.host.runBulkAction({ action: 'move', collection });
 	}
 }

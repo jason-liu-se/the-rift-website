@@ -1,8 +1,8 @@
 @use "../../../../../../theme-colours" as *;
 @use "../../../../../../font-sizes" as *;
 
-// Mobile: a compact card (select, name, status, menu); the editor shows on
-// desktop only.
+// Mobile: a compact card (select, name, status, menu); when it was updated
+// shows on desktop only.
 :host {
 	display: grid;
 	grid-template-columns: auto 1fr auto;
@@ -44,8 +44,15 @@ td {
 	grid-column: 2;
 }
 
-.editor {
+.updated {
 	display: none;
+	white-space: nowrap;
+	font-size: $font-size-x-small;
+
+	app-editor-avatar {
+		margin-right: 8px;
+		vertical-align: middle;
+	}
 }
 
 .actions {
@@ -68,10 +75,12 @@ td {
 	object-fit: cover;
 }
 
-.details {
-	display: block;
-	font-size: $font-size-x-small;
-	font-weight: 400;
+.danger {
+	color: $colour-error;
+
+	mat-icon {
+		color: inherit;
+	}
 }
 
 @media (min-width: 60rem) {
@@ -85,8 +94,19 @@ td {
 		vertical-align: middle;
 	}
 
-	.editor {
+	.updated {
 		display: table-cell;
+	}
+
+	// The menu shows it's there on hover, without hiding it from touch.
+	.actions button {
+		opacity: 0.6;
+	}
+
+	:host(:hover) .actions button,
+	:host(:focus-within) .actions button,
+	.actions button[aria-expanded="true"] {
+		opacity: 1;
 	}
 
 	.actions {

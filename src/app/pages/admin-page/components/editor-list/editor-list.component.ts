@@ -1,7 +1,10 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { Component, computed, inject } from '@angular/core';
+import { MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatProgressBar } from '@angular/material/progress-bar';
+import { RouterLink } from '@angular/router';
 import { EDITOR_PAGE_SIZE } from 'src/app/config/admin';
 import { FallbackPanelComponent } from 'src/app/components/fallback-panel/fallback-panel.component';
 import { CollectionsStore } from '../../services/collections-store.service';
@@ -9,13 +12,16 @@ import { toCollectionType } from '../../editor-types';
 import { BulkActionBarComponent } from './bulk-action-bar/bulk-action-bar.component';
 import { countItems } from './bulk-results';
 import { EditorListStore } from './editor-list.store';
-import { ListFiltersComponent } from './list-filters/list-filters.component';
+import {
+	ListFiltersComponent,
+	NO_FILTERS
+} from './list-filters/list-filters.component';
 import { RowGroupComponent } from './row-group/row-group.component';
 
 /**
  * A tool's list: filters (or, while rows are selected, bulk actions in their
- * place), the editor's drafts and the published items as two groups of one
- * table, and pages. Ctrl+A previews selecting the page; Enter or Space
+ * place), the editor's unpublished changes and every item as two groups of
+ * one table, and pages. Ctrl+A previews selecting the page; Enter or Space
  * confirms, Escape cancels (or clears a selection).
  */
 @Component({
@@ -26,8 +32,11 @@ import { RowGroupComponent } from './row-group/row-group.component';
 		BulkActionBarComponent,
 		FallbackPanelComponent,
 		ListFiltersComponent,
+		MatButton,
+		MatIcon,
 		MatPaginator,
 		MatProgressBar,
+		RouterLink,
 		RowGroupComponent
 	],
 	host: { '(keydown)': 'handleSelectionKeys($event)' }
@@ -57,6 +66,19 @@ export class EditorListComponent {
 			.filter((part) => !part.startsWith('0 '))
 			.join(' and ');
 	});
+
+	/** Anything but the sort is set, so an empty list means "no matches". */
+	protected readonly hasFilters = computed(() => {
+		const filters = this.store.filters();
+		return (
+			JSON.stringify(filters) !==
+			JSON.stringify({ ...NO_FILTERS, sort: filters.sort })
+		);
+	});
+
+	protected clearFilters(): void {
+		this.store.setFilters({ ...NO_FILTERS, sort: this.store.filters().sort });
+	}
 
 	protected changePage({ pageIndex }: PageEvent): void {
 		this.store.setPage(pageIndex);

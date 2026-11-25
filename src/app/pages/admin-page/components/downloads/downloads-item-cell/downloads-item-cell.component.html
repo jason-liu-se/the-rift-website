@@ -1,7 +1,7 @@
-{{ item().title }}
-<span class="details"
-	>{{ item().collection
-	}}{{
-		item().sortOrder !== undefined ? " · #" + item().sortOrder : ""
-	}}</span
->
+@if (item().imageUrl; as imageUrl) {
+	<img class="thumbnail" [src]="imageUrl" alt="" loading="lazy" />
+}
+<span>
+	{{ item().title }}
+	<span class="details">{{ collectionTitle() }}</span>
+</span>

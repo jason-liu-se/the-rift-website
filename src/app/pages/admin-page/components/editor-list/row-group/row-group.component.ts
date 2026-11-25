@@ -6,7 +6,7 @@ import { EditorRowComponent } from '../editor-row/editor-row.component';
 import { ListRow } from '../list-rows';
 
 /**
- * A collapsible group of an admin list's rows (Drafts, Published): its name
+ * A collapsible group of an admin list's rows (Unpublished changes, All): its name
  * and count, a checkbox for its rows on this page, and the rows.
  */
 @Component({

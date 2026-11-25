@@ -31,6 +31,15 @@ export class CollectionsStore {
 		return this.collectionsByType[type].asReadonly();
 	}
 
+	/** A collection's title, or its slug until the collections load. */
+	public titleOf(type: CollectionContentType, slug: string): string {
+		return (
+			this.collections(type)()?.find(
+				(collection) => collection.slug === slug
+			)?.title ?? slug
+		);
+	}
+
 	public reload(type: CollectionContentType): void {
 		this.requests.get(type)?.unsubscribe();
 		this.requests.set(

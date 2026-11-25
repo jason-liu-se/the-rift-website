@@ -6,7 +6,7 @@ import { provideFakeBulkActionHost } from '../editor-list/bulk-action-host.testi
 import { MoveBulkActionComponent } from './move-bulk-action.component';
 
 describe('MoveBulkActionComponent', () => {
-	it('moves to the chosen collection, once one is chosen', () => {
+	it('moves to the collection picked from its menu', () => {
 		const host = provideFakeBulkActionHost('gallery');
 		TestBed.configureTestingModule({
 			imports: [MoveBulkActionComponent],
@@ -22,13 +22,12 @@ describe('MoveBulkActionComponent', () => {
 		});
 		const fixture = TestBed.createComponent(MoveBulkActionComponent);
 		fixture.detectChanges();
-		const button: HTMLButtonElement =
-			fixture.nativeElement.querySelector('button');
-		expect(button.disabled).toBe(true);
 
-		fixture.componentInstance['targetCollection'].set('season6');
+		fixture.nativeElement.querySelector('button').click();
 		fixture.detectChanges();
-		button.click();
+		[...document.querySelectorAll<HTMLButtonElement>('[mat-menu-item]')]
+			.find((item) => item.textContent?.trim() === 'Season 6')!
+			.click();
 
 		expect(host.actions).toEqual([
 			{ action: 'move', collection: 'season6' }

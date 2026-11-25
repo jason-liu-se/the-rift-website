@@ -1,7 +1,14 @@
 <div class="bar">
-	<p class="count">
-		{{ store.selectedCount() }} of {{ store.selectableCount() }} selected
-	</p>
+	<button
+		mat-icon-button
+		type="button"
+		matTooltip="Clear selection (Esc)"
+		aria-label="Clear selection"
+		(click)="store.selection.clear()"
+	>
+		<mat-icon>close</mat-icon>
+	</button>
+	<p class="count">{{ store.selectedCount() }} selected</p>
 	@if (canSelectAllMatching()) {
 		<button
 			mat-button
@@ -11,39 +18,41 @@
 			{{ allMatchingLabel() }}
 		</button>
 	}
-	<button mat-button type="button" (click)="store.selection.clear()">
-		Clear selection
-	</button>
 	<div class="actions" role="group" aria-label="Bulk actions">
+		@if (showCount(); as count) {
+			<button
+				mat-button
+				type="button"
+				[disabled]="store.isBusy()"
+				(click)="actions.runBulkAction({ action: 'show' })"
+			>
+				<mat-icon>visibility</mat-icon>
+				Show {{ count }}
+			</button>
+		}
+		@if (hideCount(); as count) {
+			<button
+				mat-button
+				type="button"
+				[disabled]="store.isBusy()"
+				(click)="actions.runBulkAction({ action: 'hide' })"
+			>
+				<mat-icon>visibility_off</mat-icon>
+				Hide {{ count }}
+			</button>
+		}
+		@if (hasItems() && store.config().bulkActions; as typeActions) {
+			<ng-container *ngComponentOutlet="typeActions" />
+		}
 		<button
-			mat-stroked-button
+			mat-button
 			type="button"
-			[disabled]="store.isBusy() || !hasItems()"
-			(click)="actions.runBulkAction({ action: 'show' })"
-		>
-			Show {{ selectedItems() }}
-		</button>
-		<button
-			mat-stroked-button
-			type="button"
-			[disabled]="store.isBusy() || !hasItems()"
-			(click)="actions.runBulkAction({ action: 'hide' })"
-		>
-			Hide {{ selectedItems() }}
-		</button>
-		<button
-			mat-flat-button
-			color="warn"
-			type="button"
+			class="danger"
 			[disabled]="store.isBusy()"
 			(click)="actions.runBulkAction({ action: 'delete' })"
 		>
+			<mat-icon>delete</mat-icon>
 			Delete
 		</button>
 	</div>
-	@if (hasItems() && store.config().bulkActions; as typeActions) {
-		<div class="type-actions">
-			<ng-container *ngComponentOutlet="typeActions" />
-		</div>
-	}
 </div>

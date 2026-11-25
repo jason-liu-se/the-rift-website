@@ -1,20 +1,23 @@
 import { NgComponentOutlet } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
-import { MatButton } from '@angular/material/button';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
 import { countItems } from '../bulk-results';
 import { EditorListActions } from '../editor-list.actions';
 import { EditorListStore } from '../editor-list.store';
 
 /**
- * In the filters' place while rows are selected: "N of M selected", the
- * actions every type has, and the type's own. Show and Hide count only the
- * published items selected (drafts have no visibility).
+ * In the toolbar's place while rows are selected: "N selected", the actions
+ * every type has, and the type's own, with Delete last. Show and Hide appear
+ * only when they'd change something, counting the items they'd change
+ * (drafts have no visibility; with every match selected, counts are unknown).
  */
 @Component({
 	selector: 'app-bulk-action-bar',
 	templateUrl: './bulk-action-bar.component.html',
 	styleUrl: './bulk-action-bar.component.scss',
-	imports: [MatButton, NgComponentOutlet]
+	imports: [MatButton, MatIcon, MatIconButton, MatTooltip, NgComponentOutlet]
 })
 export class BulkActionBarComponent {
 	protected readonly store = inject(EditorListStore);
@@ -24,14 +27,18 @@ export class BulkActionBarComponent {
 	protected readonly hasItems = computed(
 		() => this.store.selectedItemCount() > 0
 	);
-	/** "3 posts": the published items an action other than Delete acts on. */
-	protected readonly selectedItems = computed(() =>
-		this.hasItems()
-			? countItems(
-					this.store.selectedItemCount(),
-					this.store.config().noun
-				)
-			: ''
+	/** The selected items on this page; every match is selected beyond it. */
+	private readonly selectedRows = computed(() =>
+		this.store
+			.itemRows()
+			.filter(({ id }) => this.store.selection.isSelected(id))
+	);
+	/** How many Show would change: '' for none, all for every match. */
+	protected readonly showCount = computed(() =>
+		this.countChanging((visible) => !visible)
+	);
+	protected readonly hideCount = computed(() =>
+		this.countChanging((visible) => visible)
 	);
 	/** The whole page is selected, but not every match. */
 	protected readonly canSelectAllMatching = computed(
@@ -44,4 +51,17 @@ export class BulkActionBarComponent {
 		() =>
 			`Select all ${countItems(this.store.total(), this.store.config().noun)} matching`
 	);
+
+	private countChanging(wouldChange: (visible: boolean) => boolean): string {
+		if (!this.hasItems()) {
+			return '';
+		}
+		if (this.store.selection.isAllMatching()) {
+			return 'all';
+		}
+		const count = this.selectedRows().filter(({ item }) =>
+			wouldChange(item.visible)
+		).length;
+		return count > 0 ? String(count) : '';
+	}
 }
