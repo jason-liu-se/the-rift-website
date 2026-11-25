@@ -12,10 +12,13 @@ import {
 	DOWNLOAD_COLLECTIONS,
 	EDITOR_DOWNLOAD_COLLECTIONS,
 	EDITOR_DOWNLOAD_ITEMS,
+	EDITOR_DOWNLOAD_ITEM_ITEMS,
 	EDITOR_GALLERY_COLLECTIONS,
 	EDITOR_GALLERY_IMAGES,
 	EDITOR_MAP_SEASONS,
+	EDITOR_MAP_SEASON_ITEMS,
 	EDITOR_NEWS_POSTS,
+	EDITOR_NEWS_POST_ITEMS,
 	GALLERY_COLLECTIONS,
 	MAP_SEASONS,
 	NEWS_DETAIL_VERSION,
@@ -41,6 +44,13 @@ const EDITOR_LISTS: Record<string, unknown[]> = {
 	'/editor/gallery/images': EDITOR_GALLERY_IMAGES,
 	'/editor/downloads/items': EDITOR_DOWNLOAD_ITEMS,
 	'/editor/maps/seasons': EDITOR_MAP_SEASONS
+};
+/** Each list's items in full, as `/:id` answers. */
+const EDITOR_ITEMS: Record<string, unknown[]> = {
+	'/editor/news': EDITOR_NEWS_POST_ITEMS,
+	'/editor/gallery/images': EDITOR_GALLERY_IMAGES,
+	'/editor/downloads/items': EDITOR_DOWNLOAD_ITEM_ITEMS,
+	'/editor/maps/seasons': EDITOR_MAP_SEASON_ITEMS
 };
 /** One item of an editor list, e.g. /editor/news/news-1. */
 const EDITOR_ITEM_PATH = /^(\/editor\/.+)\/([^/]+)$/;
@@ -94,6 +104,46 @@ function paginateByQuery<T>(
 		: ok(paginate(items, startIndex, limit));
 }
 
+type Row = Record<string, unknown>;
+
+/** A field's sort value: editors by username, text ignoring case. */
+function sortValue(row: Row, field: string): string | number | undefined {
+	const value = row[field];
+	if (value && typeof value === 'object' && 'username' in value) {
+		return String(value.username).toLowerCase();
+	}
+	if (typeof value === 'string') {
+		return value.toLowerCase();
+	}
+	return typeof value === 'number' ? value : undefined;
+}
+
+/**
+ * The list in `sort`/`order` order, as the server sorts: a missing value
+ * first, ties by `id`. Without `sort`, the fixture's order.
+ */
+function sortByQuery<T>(items: T[], params: URLSearchParams): T[] {
+	const fields = params.get('sort')?.split(',') ?? [];
+	const orders = params.get('order')?.split(',') ?? [];
+	const compare = (a: Row, b: Row) => {
+		for (const [index, field] of fields.entries()) {
+			const [left, right] = [sortValue(a, field), sortValue(b, field)];
+			const sign = orders[index] === 'desc' ? -1 : 1;
+			if (left === right) {
+				continue;
+			}
+			if (left === undefined || right === undefined) {
+				return (left === undefined ? -1 : 1) * sign;
+			}
+			return (left < right ? -1 : 1) * sign;
+		}
+		return String(a['id']).localeCompare(String(b['id']));
+	};
+	return fields.length > 0
+		? [...items].sort((a, b) => compare(a as Row, b as Row))
+		: items;
+}
+
 function galleryCollection(
 	encodedSlug: string
 ): GalleryCollectionFixture | undefined {
@@ -137,16 +187,21 @@ export function respondTo(url: URL): IMockResponse {
 		return ok(MAP_SEASONS);
 	}
 	if (url.pathname in EDITOR_LISTS) {
-		return paginateByQuery(EDITOR_LISTS[url.pathname], url.searchParams);
+		return paginateByQuery(
+			sortByQuery(EDITOR_LISTS[url.pathname], url.searchParams),
+			url.searchParams
+		);
+	}
+	if (url.pathname === '/editor/gallery/tags') {
+		const tags = EDITOR_GALLERY_IMAGES.flatMap((image) => image.tags ?? []);
+		return ok([...new Set(tags)].sort());
 	}
 	const editorItem = EDITOR_ITEM_PATH.exec(url.pathname);
-	if (editorItem && editorItem[1] in EDITOR_LISTS) {
-		const item = EDITOR_LISTS[editorItem[1]].find(
+	if (editorItem && editorItem[1] in EDITOR_ITEMS) {
+		const item = EDITOR_ITEMS[editorItem[1]].find(
 			(candidate) => (candidate as { id: string }).id === editorItem[2]
 		);
-		return item
-			? ok({ content: '', desc: '', dimensions: [], ...item })
-			: notFound;
+		return item ? ok(item) : notFound;
 	}
 	if (url.pathname in EDITOR_COLLECTIONS) {
 		return ok(EDITOR_COLLECTIONS[url.pathname]);

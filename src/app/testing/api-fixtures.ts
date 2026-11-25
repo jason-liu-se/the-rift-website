@@ -7,9 +7,12 @@ import {
 	DetailVersion,
 	DownloadCollection,
 	EditorCollection,
+	EditorDownloadItem,
 	EditorDownloadItemSummary,
 	EditorGalleryImage,
+	EditorMapSeason,
 	EditorMapSeasonSummary,
+	EditorNewsPost,
 	EditorNewsPostSummary,
 	GalleryCollection,
 	GalleryImage,
@@ -123,7 +126,8 @@ export function paginate<T>(
 }
 
 // The editor tools' reads (`/editor/*`): the public content above, with the
-// audit fields the editor sees, plus a hidden item each.
+// audit fields the editor sees. Lists answer summaries; `/:id` the full item.
+// Index 0 is the most recently updated, so the default sort keeps this order.
 
 const EDITOR = { id: '1', username: 'editor' };
 /** The same editor with an avatar (a local image: e2e blocks other hosts). */
@@ -131,6 +135,8 @@ const EDITOR_WITH_AVATAR = {
 	...EDITOR,
 	avatarUrl: '/assets/home/grass-block.png'
 };
+const LATEST_UPDATE_MS = Date.UTC(2026, 0, 31, 12);
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 /** `item` without `key`, as a list summary leaves out a long field. */
 function omit<T extends object, K extends keyof T>(
@@ -151,17 +157,18 @@ function withAudit<T extends object>(item: T, index: number) {
 		createdBy: EDITOR_WITH_AVATAR,
 		lastUpdatedBy: EDITOR,
 		createdAt: '2026-01-01T12:00:00.000Z',
-		updatedAt: '2026-01-01T12:00:00.000Z'
+		updatedAt: new Date(LATEST_UPDATE_MS - index * DAY_MS).toISOString()
 	};
 }
 
-export const EDITOR_NEWS_POSTS: EditorNewsPostSummary[] = [
-	...NEWS_POSTS.map((post, index) => withAudit(omit(post, 'content'), index)),
+export const EDITOR_NEWS_POST_ITEMS: EditorNewsPost[] = [
+	...NEWS_POSTS.map(withAudit),
 	{
 		...withAudit(
 			{
 				id: 'news-scheduled',
 				title: 'Coming soon',
+				content: 'Something new is on the way.',
 				date: '2027-01-01T12:00:00.000Z'
 			},
 			NEWS_POSTS.length
@@ -169,6 +176,8 @@ export const EDITOR_NEWS_POSTS: EditorNewsPostSummary[] = [
 		status: 'scheduled'
 	}
 ];
+export const EDITOR_NEWS_POSTS: EditorNewsPostSummary[] =
+	EDITOR_NEWS_POST_ITEMS.map((post) => omit(post, 'content'));
 
 export const EDITOR_GALLERY_IMAGES: EditorGalleryImage[] =
 	GALLERY_COLLECTIONS.flatMap(({ slug, images }) =>
@@ -180,19 +189,22 @@ export const EDITOR_GALLERY_COLLECTIONS: EditorCollection[] =
 		...withAudit({ slug, title, itemCount: images.length }, index)
 	}));
 
-export const EDITOR_DOWNLOAD_ITEMS: EditorDownloadItemSummary[] =
+export const EDITOR_DOWNLOAD_ITEM_ITEMS: EditorDownloadItem[] =
 	DOWNLOAD_COLLECTIONS.flatMap(({ name, items }) =>
-		items.map((item) => ({ ...omit(item, 'desc'), collection: name }))
+		items.map((item, sortOrder) => ({ ...item, collection: name, sortOrder }))
 	).map(withAudit);
+export const EDITOR_DOWNLOAD_ITEMS: EditorDownloadItemSummary[] =
+	EDITOR_DOWNLOAD_ITEM_ITEMS.map((item) => omit(item, 'desc'));
 
 export const EDITOR_DOWNLOAD_COLLECTIONS: EditorCollection[] =
 	DOWNLOAD_COLLECTIONS.map(({ name, title, items }, index) => ({
 		...withAudit({ slug: name, title, itemCount: items.length }, index)
 	}));
 
-export const EDITOR_MAP_SEASONS: EditorMapSeasonSummary[] = MAP_SEASONS.map(
-	({ dimensions, ...season }, index) => ({
-		...withAudit(season, index),
+export const EDITOR_MAP_SEASON_ITEMS: EditorMapSeason[] =
+	MAP_SEASONS.map(withAudit);
+export const EDITOR_MAP_SEASONS: EditorMapSeasonSummary[] =
+	EDITOR_MAP_SEASON_ITEMS.map(({ dimensions, ...season }) => ({
+		...season,
 		dimensionCount: dimensions.length
-	})
-);
+	}));
