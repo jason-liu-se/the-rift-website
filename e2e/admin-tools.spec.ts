@@ -1,7 +1,10 @@
 // The admin tools, logged in with the mock API's editor.
 import { Page } from '@playwright/test';
 import { environment } from '../src/environments/environment.development';
-import { EDITOR_NEWS_POSTS } from '../src/app/testing/api-fixtures';
+import {
+	EDITOR_GALLERY_IMAGES,
+	EDITOR_NEWS_POSTS
+} from '../src/app/testing/api-fixtures';
 import { signIn } from './support/auth';
 import { scanForViolations } from './support/axe';
 import { expect, test } from './support/test';
@@ -275,6 +278,27 @@ test.describe('gallery collections', () => {
 
 test.describe('gallery images', () => {
 	test.beforeEach(({ page }) => openTool(page, 'gallery', 'Spawn walkway'));
+
+	test("copies a card's image link from its right-click menu", async ({
+		page,
+		context
+	}) => {
+		await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+		const image = EDITOR_GALLERY_IMAGES.find(
+			({ caption }) => caption === 'Spawn walkway'
+		)!;
+		await page
+			.getByRole('row')
+			.filter({ hasText: 'Spawn walkway' })
+			.locator('.main')
+			.click({ button: 'right' });
+		await page.getByRole('menuitem', { name: 'Copy image link' }).click();
+
+		await expect(page.getByText('Image link copied')).toBeVisible();
+		expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+			image.imageUrl
+		);
+	});
 
 	test('moves the selection to another collection in one request', async ({
 		page

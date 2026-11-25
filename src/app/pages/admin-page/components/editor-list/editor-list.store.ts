@@ -106,6 +106,10 @@ export class EditorListStore {
 		)
 	);
 	/** The type's column between the name and status, in tables. */
+	/** Images list as a grid of cards; everything else as a table. */
+	public readonly isGrid = computed(
+		() => this.config().listLayout === 'grid'
+	);
 	public readonly extraCell = computed(() => this.config().extraColumn?.cell);
 	public readonly columnCount = computed(() => (this.extraCell() ? 6 : 5));
 	/** In the type's default order: for orderable types, the site's. */

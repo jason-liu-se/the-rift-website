@@ -11,12 +11,12 @@ const STATUS_LABELS: Record<ItemStatus, string> = {
 	live: 'Live',
 	hidden: 'Hidden',
 	scheduled: 'Scheduled',
-	draft: 'New',
+	draft: 'Unpublished',
 	edit: 'Edit'
 };
 
 /**
- * An item's status: Live, Scheduled, or Hidden (or New or Edit for
+ * An item's status: Live, Scheduled, or Hidden (or Unpublished or Edit for
  * unpublished changes), and "Unpublished changes" when the editor has some.
  */
 @Component({

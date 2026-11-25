@@ -170,8 +170,8 @@ td {
 	}
 }
 
-// The gallery: a card, the image on top; select, status, and the menu over
-// it, in the same place on every card.
+// The gallery: a card, the image on top; select and the menu over its top
+// corners, the status its bottom right, in the same place on every card.
 :host-context(.grid) {
 	position: relative;
 	display: block;
@@ -199,16 +199,25 @@ td {
 		font-weight: 400;
 	}
 
-	// Its caption leaves room for the menu beside it.
 	.open {
 		padding-bottom: 8px;
 	}
 
+	// Over the image (the card's width, at the image's 4:3), so it sits on the
+	// image's corner whatever the caption's length; clicks reach the image.
 	.status {
 		position: absolute;
 		z-index: 1;
-		top: 8px;
-		right: 8px;
+		top: 0;
+		right: 0;
+		left: 0;
+		display: flex;
+		align-items: flex-end;
+		justify-content: flex-end;
+		box-sizing: border-box;
+		aspect-ratio: 4 / 3;
+		padding: 8px;
+		pointer-events: none;
 	}
 
 	.extra,
@@ -218,8 +227,23 @@ td {
 
 	.actions {
 		position: absolute;
-		right: 0;
-		bottom: 0;
+		z-index: 1;
+		top: 4px;
+		right: 4px;
+		border-radius: 8px;
+		background-color: rgba($colour-light-background, 0.9);
+
+		// Narrowed to the kebab's shape: the checkbox's height, still above the
+		// 24px minimum target.
+		button {
+			--mat-icon-button-container-shape: 8px;
+			--mat-icon-button-touch-target-display: none;
+			display: grid;
+			place-items: center;
+			width: 28px;
+			height: 40px;
+			padding: 0;
+		}
 	}
 
 	.draft {
@@ -228,7 +252,7 @@ td {
 	}
 
 	.draft > span {
-		padding: 8px 48px 0 8px;
+		padding: 8px 8px 0;
 	}
 
 	.thumbnail {

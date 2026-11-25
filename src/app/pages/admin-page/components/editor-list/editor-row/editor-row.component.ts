@@ -1,3 +1,4 @@
+import { Clipboard } from '@angular/cdk/clipboard';
 import { CdkDragHandle } from '@angular/cdk/drag-drop';
 import { NgComponentOutlet } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
@@ -5,8 +6,14 @@ import { MatIconButton } from '@angular/material/button';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatDivider } from '@angular/material/divider';
 import { MatIcon } from '@angular/material/icon';
-import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
+import {
+	MatContextMenuTrigger,
+	MatMenu,
+	MatMenuItem,
+	MatMenuTrigger
+} from '@angular/material/menu';
 import { MatTooltip } from '@angular/material/tooltip';
+import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { formatRelativeTime } from 'src/app/utilities/relative-time';
 import { formatDateTime } from '../../../utilities/format-date-time';
@@ -19,7 +26,7 @@ import { ListRow } from '../list-rows';
 /**
  * One row of an admin list, a published item or a draft alike: select it,
  * open it (its name's link, or a click anywhere on it), or its menu's
- * actions.
+ * actions (on a gallery card, also from a right-click).
  */
 @Component({
 	// A table's rows must be its own elements.
@@ -31,6 +38,7 @@ import { ListRow } from '../list-rows';
 		CdkDragHandle,
 		EditorAvatarComponent,
 		MatCheckbox,
+		MatContextMenuTrigger,
 		MatDivider,
 		MatIcon,
 		MatIconButton,
@@ -52,6 +60,8 @@ import { ListRow } from '../list-rows';
 export class EditorRowComponent {
 	protected readonly store = inject(EditorListStore);
 	private user = inject(AuthService).user;
+	private clipboard = inject(Clipboard);
+	private notifier = inject(AdminNotifierService);
 
 	public readonly row = input.required<ListRow>();
 
@@ -99,6 +109,14 @@ export class EditorRowComponent {
 				)
 			: undefined;
 	});
+	/** A gallery card's image, for its menu's Copy image link. */
+	protected readonly imageUrl = computed(() => {
+		const row = this.row();
+		const fields = row.kind === 'item' ? row.item : row.draft.fields;
+		return this.store.isGrid() && 'imageUrl' in fields
+			? fields.imageUrl || undefined
+			: undefined;
+	});
 	/** The editor's URL, for the name's link (and opening it in a new tab). */
 	protected readonly href = computed(() => {
 		// The link keeps the list's query, so it changes with it.
@@ -118,6 +136,14 @@ export class EditorRowComponent {
 		const index = this.index();
 		if (index !== undefined) {
 			this.actions.moveItem(index, index + by);
+		}
+	}
+
+	protected copyImageUrl(url: string): void {
+		if (this.clipboard.copy(url)) {
+			this.notifier.notifySuccess('Image link copied');
+		} else {
+			this.notifier.notifyFailure("Couldn't copy the image link");
 		}
 	}
 

@@ -17,7 +17,13 @@
 		(change)="toggleSelected()"
 	/>
 </td>
-<td class="main" role="cell">
+<!-- A gallery card's menu also opens on a right-click anywhere on it. -->
+<td
+	class="main"
+	role="cell"
+	[matContextMenuTriggerFor]="rowMenu"
+	[matContextMenuTriggerDisabled]="!store.isGrid()"
+>
 	<!-- The row opens on a click anywhere; this is its keyboard and
 		new-tab way in. -->
 	<a class="open" [href]="href()" (click)="openFromLink($event)">
@@ -84,6 +90,12 @@
 		<mat-icon>more_vert</mat-icon>
 	</button>
 	<mat-menu #rowMenu="matMenu" xPosition="before">
+		@if (imageUrl(); as url) {
+			<button mat-menu-item (click)="copyImageUrl(url)">
+				<mat-icon>link</mat-icon>
+				Copy image link
+			</button>
+		}
 		@if (row.kind === "item") {
 			<button mat-menu-item (click)="actions.duplicate(row.item)">
 				<mat-icon>content_copy</mat-icon>

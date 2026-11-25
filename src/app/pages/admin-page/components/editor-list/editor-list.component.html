@@ -7,7 +7,7 @@
 		[searchFields]="store.config().searchFields"
 		[sortColumns]="store.sortColumns()"
 		[sort]="store.sort()"
-		[isSortShown]="isGrid()"
+		[isSortShown]="store.isGrid()"
 		[collections]="collections()"
 		(filtersChange)="store.setFilters($event)"
 		(sortChange)="store.setSort($event)"
@@ -59,7 +59,7 @@
 	</div>
 	<!-- Explicit roles: phones and the gallery lay rows out as cards, which
 		some browsers would otherwise stop reading as a table. -->
-	<table class="editor-table" role="table" [class.grid]="isGrid()">
+	<table class="editor-table" role="table" [class.grid]="store.isGrid()">
 		<caption class="cdk-visually-hidden">
 			{{
 				store.config().label

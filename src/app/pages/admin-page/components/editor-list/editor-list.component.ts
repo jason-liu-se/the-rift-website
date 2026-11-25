@@ -62,9 +62,6 @@ export class EditorListComponent {
 		const type = toCollectionType(this.store.type());
 		return type ? this.collectionsStore.collections(type)() : undefined;
 	});
-	protected readonly isGrid = computed(
-		() => this.store.config().listLayout === 'grid'
-	);
 	protected readonly showsPublished = computed(
 		() => this.store.filters().status !== 'draft'
 	);
