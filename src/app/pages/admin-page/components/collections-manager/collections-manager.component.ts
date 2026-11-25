@@ -159,7 +159,10 @@ export class CollectionsManagerComponent {
 	}
 
 	/** Saves a changed title; a blank one goes back to what it was. */
-	protected rename(collection: EditorCollection, input: HTMLInputElement): void {
+	protected rename(
+		collection: EditorCollection,
+		input: HTMLInputElement
+	): void {
 		const title = input.value.trim();
 		if (!title || title === collection.title) {
 			input.value = collection.title;

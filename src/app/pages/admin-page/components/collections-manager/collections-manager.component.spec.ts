@@ -57,7 +57,8 @@ describe('CollectionsManagerComponent', () => {
 				(candidate.getAttribute('aria-label') ??
 					candidate.textContent
 						?.replace(
-							candidate.querySelector('mat-icon')?.textContent ?? '',
+							candidate.querySelector('mat-icon')?.textContent ??
+								'',
 							''
 						)
 						.replace(/\s+/g, ' ')

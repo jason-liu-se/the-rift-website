@@ -87,7 +87,10 @@ export class EditorListComponent {
 	});
 
 	protected clearFilters(): void {
-		this.store.setFilters({ ...NO_FILTERS, sort: this.store.filters().sort });
+		this.store.setFilters({
+			...NO_FILTERS,
+			sort: this.store.filters().sort
+		});
 	}
 
 	protected changePage({ pageIndex }: PageEvent): void {

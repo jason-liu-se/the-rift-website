@@ -122,7 +122,10 @@ export class ListFiltersComponent {
 
 	/** The default sort leaves the URL. */
 	protected setSort(sort: string): void {
-		this.setFilter('sort', sort === this.sortOptions()[0]?.sort ? '' : sort);
+		this.setFilter(
+			'sort',
+			sort === this.sortOptions()[0]?.sort ? '' : sort
+		);
 	}
 
 	/** Clears the search and filters, keeping the sort. */

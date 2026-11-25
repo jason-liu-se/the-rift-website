@@ -46,7 +46,6 @@ export class EditorListPageComponent {
 	private injector = inject(Injector);
 	private heading = viewChild.required<ElementRef<HTMLElement>>('heading');
 
-
 	/** From the URL. */
 	public readonly type = input.required<EditorContentType>();
 

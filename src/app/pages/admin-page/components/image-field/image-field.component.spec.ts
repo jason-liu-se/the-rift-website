@@ -28,7 +28,10 @@ describe('ImageFieldComponent', () => {
 		[...element.querySelectorAll<HTMLButtonElement>('button')].find(
 			(candidate) =>
 				candidate.textContent
-					?.replace(candidate.querySelector('mat-icon')?.textContent ?? '', '')
+					?.replace(
+						candidate.querySelector('mat-icon')?.textContent ?? '',
+						''
+					)
 					.trim() === name
 		)!;
 	function chooseFile(file: File) {
@@ -66,7 +69,8 @@ describe('ImageFieldComponent', () => {
 		fixture.detectChanges();
 		expect(messages()).toBe('');
 
-		const link: HTMLInputElement = element.querySelector('input[type="url"]')!;
+		const link: HTMLInputElement =
+			element.querySelector('input[type="url"]')!;
 		link.value = 'https://example.com/a.png';
 		link.dispatchEvent(new Event('input'));
 		fixture.detectChanges();

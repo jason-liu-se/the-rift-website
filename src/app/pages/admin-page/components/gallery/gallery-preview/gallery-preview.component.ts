@@ -6,7 +6,10 @@ import { DraftSession } from '../../../drafts/draft-session';
 @Component({
 	selector: 'app-gallery-preview',
 	template: `@if (fields().imageUrl; as imageUrl) {
-			<app-caption-card [src]="imageUrl" [caption]="fields().caption ?? ''" />
+			<app-caption-card
+				[src]="imageUrl"
+				[caption]="fields().caption ?? ''"
+			/>
 		} @else {
 			<p class="empty">The image shows here once it's added.</p>
 		}`,

@@ -88,9 +88,7 @@ export class EditorRowComponent {
 	protected readonly canMoveUp = computed(() => (this.index() ?? 0) > 0);
 	protected readonly canMoveDown = computed(() => {
 		const index = this.index();
-		return (
-			index !== undefined && index < this.store.itemRows().length - 1
-		);
+		return index !== undefined && index < this.store.itemRows().length - 1;
 	});
 	/** Where a live item shows on the site. */
 	protected readonly publicPath = computed(() => {

@@ -35,7 +35,9 @@ export class NewsDateFieldComponent {
 	});
 	/** Shown once publishing was tried, so typing a date isn't nagged. */
 	protected readonly problem = computed(() =>
-		this.settings.wasAttempted() ? this.settings.scheduleProblem() : undefined
+		this.settings.wasAttempted()
+			? this.settings.scheduleProblem()
+			: undefined
 	);
 
 	protected minScheduleTime(): string {

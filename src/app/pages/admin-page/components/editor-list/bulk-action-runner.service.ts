@@ -52,17 +52,17 @@ export class BulkActionRunnerService {
 		return from(toChunks(refs, MAX_BULK_ITEMS)).pipe(
 			concatMap((items) =>
 				this.send(type, action, items).pipe(
-					map(({ results }) => results as BulkItemResult<ItemOf<T>>[]),
+					map(
+						({ results }) => results as BulkItemResult<ItemOf<T>>[]
+					),
 					catchError((error: unknown) => {
 						const reason = describeWriteError(error);
 						return of(
-							items.map(
-								({ id }): BulkItemResult<ItemOf<T>> => ({
-									id,
-									outcome: 'invalid',
-									reason
-								})
-							)
+							items.map(({ id }): BulkItemResult<ItemOf<T>> => ({
+								id,
+								outcome: 'invalid',
+								reason
+							}))
 						);
 					})
 				)

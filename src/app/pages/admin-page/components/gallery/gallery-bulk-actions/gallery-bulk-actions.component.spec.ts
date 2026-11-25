@@ -24,7 +24,8 @@ describe('GalleryBulkActionsComponent', () => {
 				(candidate) =>
 					candidate.textContent
 						?.replace(
-							candidate.querySelector('mat-icon')?.textContent ?? '',
+							candidate.querySelector('mat-icon')?.textContent ??
+								'',
 							''
 						)
 						.trim() === name

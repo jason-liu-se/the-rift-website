@@ -96,14 +96,14 @@
 	}
 
 	.modal-tabs {
-	padding: 8px 16px 0;
+		padding: 8px 16px 0;
 
-	&:empty {
-		display: none;
+		&:empty {
+			display: none;
+		}
 	}
-}
 
-.modal-body {
+	.modal-body {
 		padding: 24px;
 	}
 

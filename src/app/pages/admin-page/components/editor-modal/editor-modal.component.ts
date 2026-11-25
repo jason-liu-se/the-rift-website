@@ -122,7 +122,9 @@ export class EditorModalComponent {
 						}),
 				publicPath:
 					item.status === 'live'
-						? (this.config.publicPath as (i: object) => string)(item)
+						? (this.config.publicPath as (i: object) => string)(
+								item
+							)
 						: undefined
 			};
 		}
@@ -244,7 +246,9 @@ export class EditorModalComponent {
 						)
 					)
 				: this.newItemFields().pipe(
-						map((fields) => this.sessions.startNew(this.type, fields))
+						map((fields) =>
+							this.sessions.startNew(this.type, fields)
+						)
 					);
 		return opening.pipe(
 			catchError((error: unknown) => {

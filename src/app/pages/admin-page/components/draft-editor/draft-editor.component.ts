@@ -141,7 +141,10 @@ export class DraftEditorComponent<T extends EditorContentType> {
 			: undefined;
 	});
 	protected readonly publishLabel = computed(() => {
-		if (this.config().hasDate && this.settings.dateChoice() === 'schedule') {
+		if (
+			this.config().hasDate &&
+			this.settings.dateChoice() === 'schedule'
+		) {
 			return 'Schedule';
 		}
 		if (!this.settings.isVisible()) {
@@ -154,7 +157,9 @@ export class DraftEditorComponent<T extends EditorContentType> {
 
 	protected publish(): void {
 		this.runPublish(() =>
-			this.session().publish(this.settings.toRequest(this.config().hasDate))
+			this.session().publish(
+				this.settings.toRequest(this.config().hasDate)
+			)
 		);
 	}
 
@@ -191,7 +196,8 @@ export class DraftEditorComponent<T extends EditorContentType> {
 						}
 					: {
 							title: `Discard this ${noun}?`,
-							message: "It hasn't been published, so it'll be gone.",
+							message:
+								"It hasn't been published, so it'll be gone.",
 							confirmLabel: 'Discard'
 						},
 				request: () => this.session().discard()

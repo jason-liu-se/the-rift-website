@@ -99,7 +99,12 @@ describe('toListQuery', () => {
 		}
 	])('sends $case', ({ filters, search, query }) => {
 		expect(
-			toListQuery({ ...NO_FILTERS, ...filters }, search, 'me', SORT_OPTIONS)
+			toListQuery(
+				{ ...NO_FILTERS, ...filters },
+				search,
+				'me',
+				SORT_OPTIONS
+			)
 		).toEqual(query);
 	});
 });

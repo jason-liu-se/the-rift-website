@@ -191,7 +191,11 @@ export const EDITOR_GALLERY_COLLECTIONS: EditorCollection[] =
 
 export const EDITOR_DOWNLOAD_ITEM_ITEMS: EditorDownloadItem[] =
 	DOWNLOAD_COLLECTIONS.flatMap(({ name, items }) =>
-		items.map((item, sortOrder) => ({ ...item, collection: name, sortOrder }))
+		items.map((item, sortOrder) => ({
+			...item,
+			collection: name,
+			sortOrder
+		}))
 	).map(withAudit);
 export const EDITOR_DOWNLOAD_ITEMS: EditorDownloadItemSummary[] =
 	EDITOR_DOWNLOAD_ITEM_ITEMS.map((item) => omit(item, 'desc'));

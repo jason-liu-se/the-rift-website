@@ -54,7 +54,8 @@ describe('DraftEditorComponent', () => {
 				(candidate.getAttribute('aria-label') ??
 					candidate.textContent
 						?.replace(
-							candidate.querySelector('mat-icon')?.textContent ?? '',
+							candidate.querySelector('mat-icon')?.textContent ??
+								'',
 							''
 						)
 						.trim()) === name

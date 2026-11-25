@@ -38,7 +38,9 @@ export function openModalRoute(
 		dialogRef = dialog.open(content(), {
 			// Under the admin page, so the content gets its providers.
 			injector,
-			panelClass: wide ? ['admin-modal', 'admin-modal-wide'] : 'admin-modal',
+			panelClass: wide
+				? ['admin-modal', 'admin-modal-wide']
+				: 'admin-modal',
 			maxWidth: '100vw',
 			// The content focuses its own heading.
 			autoFocus: false,

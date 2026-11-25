@@ -166,7 +166,8 @@ export class EditorListActions implements BulkActionHost {
 			.run({
 				confirm: {
 					title: `Delete ${name}?`,
-					message: "It's removed from the site. This can't be undone.",
+					message:
+						"It's removed from the site. This can't be undone.",
 					confirmLabel: 'Delete'
 				},
 				request: () => this.editorContent.deleteItem(this.type(), ref),
@@ -186,14 +187,11 @@ export class EditorListActions implements BulkActionHost {
 			return;
 		}
 		this.store.isBusy.set(true);
-		selected
-			.pipe(finalize(() => this.store.isBusy.set(false)))
-			.subscribe({
-				next: (items) =>
-					this.applyUpdate(action as UndoableAction, items),
-				error: (error: unknown) =>
-					this.notifier.notifyFailure(describeWriteError(error))
-			});
+		selected.pipe(finalize(() => this.store.isBusy.set(false))).subscribe({
+			next: (items) => this.applyUpdate(action as UndoableAction, items),
+			error: (error: unknown) =>
+				this.notifier.notifyFailure(describeWriteError(error))
+		});
 	}
 
 	/**
@@ -304,7 +302,11 @@ export class EditorListActions implements BulkActionHost {
 										)
 									),
 									map((results) =>
-										summarizeBulkResults('delete', results, noun)
+										summarizeBulkResults(
+											'delete',
+											results,
+											noun
+										)
 									)
 								)
 							: EMPTY;
@@ -347,6 +349,12 @@ export class EditorListActions implements BulkActionHost {
 	}
 }
 
-function toRef({ id, revision }: { id: string; revision: number }): BulkItemRef {
+function toRef({
+	id,
+	revision
+}: {
+	id: string;
+	revision: number;
+}): BulkItemRef {
 	return { id, startingRevision: revision };
 }
