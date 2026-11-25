@@ -1,25 +1,21 @@
+<app-admin-bar />
 <div class="admin-page">
 	<nav class="tool-nav" aria-label="Admin tools">
-		<div class="tool-nav-content">
-			<p class="tool-nav-label" aria-hidden="true">Admin</p>
-			<ul class="tool-list">
-				@for (tool of tools; track tool.id) {
-					<li>
-						<a
-							class="tool-link"
-							routerLinkActive="active"
-							ariaCurrentWhenActive="page"
-							[routerLink]="['/admin', tool.id]"
-						>
-							<mat-icon aria-hidden="true">{{
-								tool.icon
-							}}</mat-icon>
-							{{ tool.label }}
-						</a>
-					</li>
-				}
-			</ul>
-		</div>
+		<ul class="tool-list">
+			@for (tool of tools; track tool.id) {
+				<li>
+					<a
+						class="tool-link"
+						routerLinkActive="active"
+						ariaCurrentWhenActive="page"
+						[routerLink]="['/admin', tool.id]"
+					>
+						<mat-icon aria-hidden="true">{{ tool.icon }}</mat-icon>
+						<span class="tool-label">{{ tool.label }}</span>
+					</a>
+				</li>
+			}
+		</ul>
 	</nav>
 	<div class="workspace">
 		<router-outlet />

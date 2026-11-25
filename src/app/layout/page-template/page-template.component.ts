@@ -53,6 +53,8 @@ export class PageTemplateComponent implements OnInit {
 	public showContactSection: boolean;
 	public isTransparent!: boolean;
 	public showFooter: boolean;
+	/** Off for pages with their own app bar (the admin tools). */
+	public showNavbar: boolean;
 
 	@ViewChild(PageTemplateDirective, { static: true })
 	appPageTemplateHost!: PageTemplateDirective;
@@ -69,6 +71,7 @@ export class PageTemplateComponent implements OnInit {
 		this.showContactSection =
 			showContactSectionProp == null ? false : showContactSectionProp;
 		this.showFooter = showFooterProp == null ? true : showFooterProp;
+		this.showNavbar = this.route.snapshot.data['showNavbar'] ?? true;
 	}
 
 	// Pages are loaded on demand (their own JS chunks) from data.loadComponent.

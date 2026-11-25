@@ -4,6 +4,7 @@ import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { EDITOR_TYPES, EDITOR_TYPE_ORDER } from './editor-types';
+import { AdminBarComponent } from './components/admin-bar/admin-bar.component';
 import { DraftStore } from './drafts/draft-store.service';
 import { CollectionsStore } from './services/collections-store.service';
 import { originalImageLoader } from 'src/app/utilities/image-loaders';
@@ -16,14 +17,20 @@ export const ADMIN_TOOLS = EDITOR_TYPE_ORDER.map((id) => ({
 }));
 
 /**
- * The admin shell: the tools' sidebar (a tab bar on mobile) beside the open
- * tool (a child route).
+ * The admin shell: its app bar, and the tools' sidebar (a bottom tab bar on
+ * mobile) beside the open tool (a child route).
  */
 @Component({
 	selector: 'app-admin-page',
 	templateUrl: './admin-page.component.html',
 	styleUrls: ['./admin-page.component.scss'],
-	imports: [MatIcon, RouterLink, RouterLinkActive, RouterOutlet],
+	imports: [
+		AdminBarComponent,
+		MatIcon,
+		RouterLink,
+		RouterLinkActive,
+		RouterOutlet
+	],
 	// Previews show whatever URL an editor types: don't spend Cloudflare
 	// transformations on them.
 	providers: [

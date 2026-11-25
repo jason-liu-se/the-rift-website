@@ -173,7 +173,7 @@ export const routes: Routes = [
 				import('./pages/admin-page/admin-page.component').then(
 					(m) => m.AdminPageComponent
 				),
-			isTransparent: false,
+			showNavbar: false,
 			showFooter: false
 		},
 		loadChildren: () => import('./pages/admin-page/admin.routes')
