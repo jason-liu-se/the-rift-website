@@ -1,0 +1,38 @@
+.search-row {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
+
+.search {
+	flex: 1;
+}
+
+// Mobile: the other filters show from the Filters button.
+.more {
+	display: none;
+	grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+	gap: 8px;
+	margin-top: 8px;
+
+	&.shown {
+		display: grid;
+	}
+}
+
+@media (min-width: 60rem) {
+	.more-toggle {
+		display: none;
+	}
+
+	// Desktop: compact selects in one row under the search.
+	.more,
+	.more.shown {
+		display: flex;
+		flex-wrap: wrap;
+	}
+
+	.compact {
+		width: 11rem;
+	}
+}

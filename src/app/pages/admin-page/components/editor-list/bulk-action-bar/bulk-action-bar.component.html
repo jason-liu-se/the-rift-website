@@ -1,0 +1,49 @@
+<div class="bar">
+	<p class="count">
+		{{ store.selectedCount() }} of {{ store.selectableCount() }} selected
+	</p>
+	@if (canSelectAllMatching()) {
+		<button
+			mat-button
+			type="button"
+			(click)="store.selection.selectAllMatching()"
+		>
+			{{ allMatchingLabel() }}
+		</button>
+	}
+	<button mat-button type="button" (click)="store.selection.clear()">
+		Clear selection
+	</button>
+	<div class="actions" role="group" aria-label="Bulk actions">
+		<button
+			mat-stroked-button
+			type="button"
+			[disabled]="store.isBusy() || !hasItems()"
+			(click)="actions.runBulkAction({ action: 'show' })"
+		>
+			Show {{ selectedItems() }}
+		</button>
+		<button
+			mat-stroked-button
+			type="button"
+			[disabled]="store.isBusy() || !hasItems()"
+			(click)="actions.runBulkAction({ action: 'hide' })"
+		>
+			Hide {{ selectedItems() }}
+		</button>
+		<button
+			mat-flat-button
+			color="warn"
+			type="button"
+			[disabled]="store.isBusy()"
+			(click)="actions.runBulkAction({ action: 'delete' })"
+		>
+			Delete
+		</button>
+	</div>
+	@if (hasItems() && store.config().bulkActions; as typeActions) {
+		<div class="type-actions">
+			<ng-container *ngComponentOutlet="typeActions" />
+		</div>
+	}
+</div>

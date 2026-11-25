@@ -1,0 +1,95 @@
+@use "../../../../../../theme-colours" as *;
+@use "../../../../../../font-sizes" as *;
+
+// Mobile: a compact card (select, name, status, menu); the editor shows on
+// desktop only.
+:host {
+	display: grid;
+	grid-template-columns: auto 1fr auto;
+	align-items: center;
+	gap: 4px 8px;
+	padding: 8px 0;
+	border-bottom: 1px solid $colour-light-grey;
+	// Clicking a row opens it.
+	cursor: pointer;
+
+	&:hover {
+		background-color: rgba($colour-primary, 0.03);
+	}
+
+	&:focus-visible {
+		outline: 2px solid $colour-primary;
+		outline-offset: -2px;
+	}
+}
+
+:host(.selected) {
+	background-color: rgba($colour-primary, 0.06);
+}
+
+td {
+	padding: 0 8px;
+}
+
+.select {
+	grid-row: span 2;
+}
+
+.main {
+	overflow-wrap: anywhere;
+	font-weight: 600;
+}
+
+.status {
+	grid-column: 2;
+}
+
+.editor {
+	display: none;
+}
+
+.actions {
+	grid-column: 3;
+	grid-row: 1 / span 2;
+	white-space: nowrap;
+}
+
+.draft {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.thumbnail {
+	flex: none;
+	width: 4rem;
+	aspect-ratio: 16 / 9;
+	border-radius: 4px;
+	object-fit: cover;
+}
+
+.details {
+	display: block;
+	font-size: $font-size-x-small;
+	font-weight: 400;
+}
+
+@media (min-width: 60rem) {
+	:host {
+		display: table-row;
+	}
+
+	td {
+		padding: 8px;
+		border-bottom: 1px solid $colour-light-grey;
+		vertical-align: middle;
+	}
+
+	.editor {
+		display: table-cell;
+	}
+
+	.actions {
+		text-align: right;
+	}
+}

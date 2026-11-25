@@ -1,0 +1,72 @@
+@let row = this.row();
+<td class="select">
+	<mat-checkbox
+		color="primary"
+		[aria-label]="
+			(row.kind === 'draft' ? 'Select draft ' : 'Select ') + row.name
+		"
+		[checked]="isSelected()"
+		(change)="toggleSelected()"
+	/>
+</td>
+<td class="main">
+	@if (row.kind === "item") {
+		<ng-container
+			*ngComponentOutlet="itemCell(); inputs: { item: row.item }"
+		/>
+	} @else {
+		<span class="draft">
+			@if (row.draft.fields.imageUrl) {
+				<img
+					class="thumbnail"
+					[src]="row.draft.fields.imageUrl"
+					alt=""
+					loading="lazy"
+				/>
+			}
+			<span>
+				{{ row.name }}
+				@if (row.isEdit) {
+					<span class="details">Edit of a published item</span>
+				}
+			</span>
+		</span>
+	}
+</td>
+<td class="status">
+	@if (row.kind === "item") {
+		<app-status-badge
+			[status]="row.item.status"
+			[hasDraft]="row.hasDraft"
+		/>
+	} @else {
+		<app-status-badge status="draft" />
+	}
+</td>
+<td class="editor">
+	<app-editor-avatar
+		[editor]="row.kind === 'item' ? row.item.lastUpdatedBy : currentUser()"
+	/>
+</td>
+<td class="actions">
+	<button
+		mat-icon-button
+		type="button"
+		[attr.aria-label]="'More actions for ' + row.name"
+		[matMenuTriggerFor]="rowMenu"
+	>
+		<mat-icon>more_vert</mat-icon>
+	</button>
+	<mat-menu #rowMenu="matMenu" xPosition="before">
+		<button mat-menu-item (click)="open()">Open</button>
+		@if (row.kind === "item") {
+			<button mat-menu-item (click)="actions.duplicate(row.item)">
+				Duplicate as a new draft
+			</button>
+			<button mat-menu-item (click)="actions.toggleVisibility(row)">
+				{{ row.item.visible ? "Hide" : "Show" }}
+			</button>
+		}
+		<button mat-menu-item (click)="actions.delete(row)">Delete</button>
+	</mat-menu>
+</td>

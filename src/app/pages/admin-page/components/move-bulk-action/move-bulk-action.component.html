@@ -1,0 +1,21 @@
+<mat-form-field subscriptSizing="dynamic">
+	<mat-label>Move to</mat-label>
+	<mat-select
+		[ngModel]="targetCollection()"
+		(ngModelChange)="targetCollection.set($event)"
+	>
+		@for (collection of collections() ?? []; track collection.slug) {
+			<mat-option [value]="collection.slug">{{
+				collection.title
+			}}</mat-option>
+		}
+	</mat-select>
+</mat-form-field>
+<button
+	mat-stroked-button
+	type="button"
+	[disabled]="!targetCollection()"
+	(click)="move()"
+>
+	Move
+</button>
