@@ -2,8 +2,8 @@
 	<legend class="legend">Goes live</legend>
 	<mat-radio-group
 		class="choices"
-		[ngModel]="settings.dateChoice()"
-		(ngModelChange)="settings.dateChoice.set($event)"
+		[ngModel]="choice()"
+		(ngModelChange)="choose($event)"
 	>
 		@if (publishedDate(); as date) {
 			<mat-radio-button color="primary" value="keep"
@@ -15,7 +15,7 @@
 			>Later</mat-radio-button
 		>
 	</mat-radio-group>
-	@if (settings.dateChoice() === "schedule") {
+	@if (choice() === "schedule") {
 		<mat-form-field class="when" subscriptSizing="dynamic">
 			<mat-label>Date and time</mat-label>
 			<input
@@ -24,8 +24,8 @@
 				aria-describedby="schedule-problem"
 				[min]="minScheduleTime()"
 				[attr.aria-invalid]="!!problem()"
-				[ngModel]="settings.scheduledAt()"
-				(ngModelChange)="settings.scheduledAt.set($event)"
+				[ngModel]="scheduledAt()"
+				(ngModelChange)="schedule($event)"
 			/>
 		</mat-form-field>
 	}

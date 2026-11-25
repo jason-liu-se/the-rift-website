@@ -1,8 +1,7 @@
+import { EditorContentType } from 'src/app/interfaces/api-requests';
 import {
-	DraftOptions,
-	EditorContentType
-} from 'src/app/interfaces/api-requests';
-import {
+	DRAFT_OPTION_KEYS,
+	DraftOptionsOf,
 	FIELD_KEYS,
 	FieldsOf
 } from 'src/app/services/editor-content/editor-content-types';
@@ -12,9 +11,9 @@ import {
  * the publish options it keeps.
  */
 export type DraftFields<T extends EditorContentType> = Partial<FieldsOf<T>> &
-	DraftOptions;
+	DraftOptionsOf<T>;
 
-const OPTION_KEYS: (keyof DraftOptions)[] = ['visible'];
+const OPTION_KEYS = new Set<string>(Object.values(DRAFT_OPTION_KEYS).flat());
 
 /** Whether a field has nothing in it: missing, null, '', or []. */
 function isBlank(value: unknown): boolean {
@@ -26,20 +25,34 @@ function isBlank(value: unknown): boolean {
 	);
 }
 
+/** The type's own fields and draft options of a draft's `fields`. */
+export function pickDraftFields<T extends EditorContentType>(
+	type: T,
+	fields: object
+): DraftFields<T> {
+	return pickKeys(fields, [...FIELD_KEYS[type], ...DRAFT_OPTION_KEYS[type]]);
+}
+
 /**
- * The type's own fields and the draft options of `item` (an item, or a
- * draft's fields).
+ * A published item's fields as a draft would hold them: its own fields and
+ * visibility. Not its date, which a draft leaves out to keep.
  */
-export function pickFields<T extends EditorContentType>(
+export function pickItemFields<T extends EditorContentType>(
 	type: T,
 	item: object
 ): DraftFields<T> {
-	const source = item as Record<string, unknown>;
-	const keys = [...(FIELD_KEYS[type] as string[]), ...OPTION_KEYS];
+	return pickKeys(item, [...FIELD_KEYS[type], 'visible']);
+}
+
+function pickKeys<T extends EditorContentType>(
+	source: object,
+	keys: readonly PropertyKey[]
+): DraftFields<T> {
+	const values = source as Record<PropertyKey, unknown>;
 	return Object.fromEntries(
 		keys
-			.filter((key) => !isBlank(source[key]))
-			.map((key) => [key, source[key]])
+			.filter((key) => !isBlank(values[key]))
+			.map((key) => [key, values[key]])
 	) as DraftFields<T>;
 }
 
@@ -49,8 +62,7 @@ export function pickFields<T extends EditorContentType>(
  */
 export function isEmptyDraft(fields: object): boolean {
 	return Object.entries(fields).every(
-		([key, value]) =>
-			OPTION_KEYS.includes(key as keyof DraftOptions) || isBlank(value)
+		([key, value]) => OPTION_KEYS.has(key) || isBlank(value)
 	);
 }
 

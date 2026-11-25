@@ -1,6 +1,6 @@
-import { Injectable, Provider, computed, inject, signal } from '@angular/core';
+import { Injectable, Provider, inject, signal } from '@angular/core';
 import { ErrorStateMatcher } from '@angular/material/core';
-import { DraftPublishRequest } from 'src/app/interfaces/api-requests';
+import { NewsDate } from 'src/app/interfaces/api-requests';
 
 /** When a news post goes live: as it was (edits), now, or a date. */
 export type DateChoice = 'keep' | 'now' | 'schedule';
@@ -12,29 +12,16 @@ export interface PublishedState {
 }
 
 /**
- * When the open item will publish (news) and whether publishing was tried
- * (its visibility is the draft's own `visible`), shared by the editor's footer and the projected
- * form's fields. Provided per editor modal (`providePublishSettings`).
+ * The published item's state (for the defaults the draft leaves out) and
+ * whether publishing was tried, shared by the editor's footer and the
+ * projected form's fields. The draft holds the choices themselves (`visible`,
+ * news's `date`). Provided per editor modal (`providePublishSettings`).
  */
 @Injectable()
 export class PublishSettings {
 	public readonly published = signal<PublishedState | undefined>(undefined);
-	public readonly dateChoice = signal<DateChoice>('now');
-	/** A `datetime-local` value, in the editor's time zone. */
-	public readonly scheduledAt = signal('');
 	/** Publishing was tried: required fields left blank show as errors. */
 	public readonly wasAttempted = signal(false);
-
-	public readonly scheduleProblem = computed(() => {
-		if (this.dateChoice() !== 'schedule') {
-			return undefined;
-		}
-		const time = new Date(this.scheduledAt()).getTime();
-		if (Number.isNaN(time)) {
-			return 'Choose a date and time.';
-		}
-		return time > Date.now() ? undefined : 'Choose a time in the future.';
-	});
 
 	/** Field errors show once a field is touched, or publishing was tried. */
 	public readonly errorStateMatcher: ErrorStateMatcher = {
@@ -42,27 +29,36 @@ export class PublishSettings {
 			!!control?.invalid && (control.touched || this.wasAttempted())
 	};
 
-	/** Starts from the published item's date, if any. */
 	public reset(published: PublishedState | undefined): void {
 		this.published.set(published);
-		this.dateChoice.set(published ? 'keep' : 'now');
-		this.scheduledAt.set('');
 		this.wasAttempted.set(false);
 	}
+}
 
-	public toRequest(hasDate: boolean): DraftPublishRequest {
-		if (!hasDate) {
-			return {};
-		}
-		switch (this.dateChoice()) {
-			case 'now':
-				return { date: 'now' };
-			case 'schedule':
-				return { date: new Date(this.scheduledAt()).toISOString() };
-			default:
-				return {};
-		}
+/**
+ * A news draft's `date` as a choice: none keeps an edit's date (or is now,
+ * for a new post), and any date but `now` is scheduled.
+ */
+export function toDateChoice(
+	date: NewsDate | undefined,
+	isEdit: boolean
+): DateChoice {
+	if (!date) {
+		return isEdit ? 'keep' : 'now';
 	}
+	return date === 'now' ? 'now' : 'schedule';
+}
+
+/** Why a scheduled date can't be published, or undefined if it can. */
+export function findScheduleProblem(
+	date: NewsDate | undefined
+): string | undefined {
+	if (!date || date === 'now') {
+		return undefined;
+	}
+	return new Date(date).getTime() > Date.now()
+		? undefined
+		: 'Choose a time in the future.';
 }
 
 /** For the editor modal: the settings, and its fields' error matcher. */

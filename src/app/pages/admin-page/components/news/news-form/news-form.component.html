@@ -41,4 +41,4 @@
 	[url]="fields().imageUrl ?? ''"
 	(urlChange)="setImageUrl($event)"
 />
-<app-news-date-field />
+<app-news-date-field [session]="session()" />

@@ -29,7 +29,7 @@ import {
 	SummaryOf
 } from 'src/app/services/editor-content/editor-content-types';
 import { EditorContentService } from 'src/app/services/editor-content/editor-content.service';
-import { pickFields } from '../../drafts/draft-fields';
+import { pickItemFields } from '../../drafts/draft-fields';
 import { EditorWriteService } from '../../services/editor-write.service';
 import { describeWriteError } from '../../utilities/write-errors';
 import { BulkActionHost } from './bulk-action-host';
@@ -83,7 +83,7 @@ export class EditorListActions implements BulkActionHost {
 						switchMap((published) =>
 							this.drafts.saveDraft(draftId, {
 								type,
-								fields: pickFields(type, published)
+								fields: pickItemFields(type, published)
 							} as DraftSaveRequest)
 						)
 					),

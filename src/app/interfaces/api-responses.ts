@@ -45,6 +45,8 @@
 
 import type {
 	DownloadItemFields,
+	CollectionDraftType,
+	CollectionFields,
 	DraftContent,
 	DraftTarget,
 	GalleryImageFields,
@@ -328,7 +330,8 @@ export interface BulkResponse<T> {
 //                                     404 for a save of a draft that's gone
 //   DELETE /editor/drafts/:id         204
 //   POST   /editor/drafts/:id/publish DraftPublishRequest → the published
-//                                     Editor* item; repeating it returns the
+//                                     Editor* item (EditorCollection for a
+//                                     collection); repeating it returns the
 //                                     same item. 409 ConflictResponse with the
 //                                     item as it is now when it changed since
 //                                     the draft started; 404 when it was
@@ -361,16 +364,25 @@ export type DraftSummary = (
 			type: "gallery";
 			fields: Pick<
 				Partial<GalleryImageFields>,
-				"caption" | "imageUrl" | "tags"
+				"collection" | "caption" | "imageUrl" | "tags"
 			>;
 	  }
 	| {
 			type: "downloads";
-			fields: Pick<Partial<DownloadItemFields>, "title" | "imageUrl">;
+			fields: Pick<
+				Partial<DownloadItemFields>,
+				"collection" | "title" | "imageUrl"
+			>;
 	  }
 	| {
 			type: "maps";
 			fields: Pick<Partial<MapSeasonFields>, "season" | "imageUrl">;
+			/** How many dimensions it has so far, not the dimensions. */
+			dimensionCount: number;
+	  }
+	| {
+			type: CollectionDraftType;
+			fields: Pick<Partial<CollectionFields>, "slug" | "title">;
 			/** How many dimensions it has so far, not the dimensions. */
 			dimensionCount: number;
 	  }

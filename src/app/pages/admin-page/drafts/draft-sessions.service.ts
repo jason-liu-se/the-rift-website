@@ -5,7 +5,12 @@ import { ApiStatusService } from 'src/app/services/api-status/api-status.service
 import { DraftsService } from 'src/app/services/drafts/drafts.service';
 import { LocalDraft } from 'src/app/services/drafts/local-drafts.service';
 import { ItemOf } from 'src/app/services/editor-content/editor-content-types';
-import { DraftFields, pickFields, withVisibility } from './draft-fields';
+import {
+	DraftFields,
+	pickDraftFields,
+	pickItemFields,
+	withVisibility
+} from './draft-fields';
 import { DraftSession, DraftSessionStart } from './draft-session';
 import { DraftStore } from './draft-store.service';
 
@@ -33,7 +38,7 @@ export class DraftSessionsService {
 		type: T,
 		item: ItemOf<T>
 	): Observable<DraftSession<T>> {
-		const published = pickFields(type, item);
+		const published = pickItemFields(type, item);
 		const waiting = this.store
 			.pendingCopies(type)
 			.find(({ target }) => target?.id === item.id);
@@ -70,7 +75,7 @@ export class DraftSessionsService {
 		return this.drafts.fetchDraft(id).pipe(
 			map((draft) => {
 				this.store.noteRevision(draft.id, draft.revision);
-				const saved = pickFields(type, draft.fields);
+				const saved = pickDraftFields(type, draft.fields);
 				return waiting
 					? this.fromCopy(type, waiting, saved, saved)
 					: this.create({
@@ -99,7 +104,7 @@ export class DraftSessionsService {
 		return this.create({
 			type,
 			id: copy.id,
-			fields: pickFields(type, copy.fields),
+			fields: pickDraftFields(type, copy.fields),
 			baseline,
 			savedFields,
 			target: copy.target

@@ -255,13 +255,23 @@ export type DownloadItemUpdateRequest = UpdateRequest<DownloadItemFields>;
 export type MapSeasonCreateRequest = CreateRequest<MapSeasonFields>;
 export type MapSeasonUpdateRequest = UpdateRequest<MapSeasonFields>;
 
-/** A gallery or download collection. */
-export interface CollectionCreateRequest extends VisibilityFields {
+/** A gallery or download collection's fields. */
+export interface CollectionFields {
 	/** Kebab-case (`^[a-z0-9]+(-[a-z0-9]+)*$`); fixed once created. */
 	slug: string;
 	title: string;
 	/** Absent: none. */
 	dimensions?: Dimension[];
+}
+
+/**
+ * A collection's create. `createId` works as an item create's (a draft's ID
+ * doubles as it): repeating the create returns the collection already made
+ * (200), or 404 if it was deleted while the repeat ran.
+ */
+export interface CollectionCreateRequest
+	extends CollectionFields, VisibilityFields {
+	createId: string;
 }
 
 export interface CollectionUpdateRequest extends VisibilityFields {
@@ -323,9 +333,18 @@ export interface GalleryImageBulkCreateRequest {
 
 export type EditorContentType = "news" | "gallery" | "downloads" | "maps";
 
-/** The drafts list, of every content type unless `type` names one. */
+/** A content type with collections (`/editor/<type>/collections`). */
+export type EditorCollectionType = "gallery" | "downloads";
+
+/** A draft of a collection, e.g. `gallery-collections`. */
+export type CollectionDraftType = `${EditorCollectionType}-collections`;
+
+/** What a draft can be of: an item, or a collection. */
+export type DraftType = EditorContentType | CollectionDraftType;
+
+/** The drafts list, of every type unless `type` names one. */
 export interface DraftListQuery {
-	type?: EditorContentType;
+	type?: DraftType;
 }
 
 /** Kept with a draft's fields, so a change to only these is saved too. */
@@ -334,15 +353,27 @@ export interface DraftOptions {
 	visible?: boolean;
 }
 
+/** A news draft also keeps its `date`. */
+export interface NewsDraftOptions extends DraftOptions {
+	/** When to publish the post; publish's `date` overrides it. */
+	date?: NewsDate;
+}
+
 /** What a draft holds, by content type. */
 export type DraftContent =
-	| { type: "news"; fields: Partial<NewsPostFields> & DraftOptions }
+	| { type: "news"; fields: Partial<NewsPostFields> & NewsDraftOptions }
 	| { type: "gallery"; fields: Partial<GalleryImageFields> & DraftOptions }
 	| { type: "downloads"; fields: Partial<DownloadItemFields> & DraftOptions }
-	| { type: "maps"; fields: Partial<MapSeasonFields> & DraftOptions };
+	| { type: "maps"; fields: Partial<MapSeasonFields> & DraftOptions }
+	| {
+			type: CollectionDraftType;
+			/** An edit draft's `slug` is ignored: it's its target's. */
+			fields: Partial<CollectionFields> & DraftOptions;
+	  };
 
 /** The published item an edit draft started from. */
 export interface DraftTarget {
+	/** The item's ID, or a collection's slug. */
 	id: string;
 	/** The item's revision when the draft started from it. */
 	startingRevision: number;
@@ -359,11 +390,20 @@ export type DraftSaveRequest = DraftContent & {
 };
 
 export interface DraftPublishRequest {
-	/** Overrides the draft's `visible`; with neither, the item is visible. */
+	/**
+	 * Overrides the draft's `visible`; with neither, a new item is visible and
+	 * an edit keeps its item's visibility.
+	 */
 	visible?: boolean;
-	/** News only. Absent: now for a new post, unchanged for an edit. */
+	/**
+	 * News only. Overrides the draft's `date`; with neither, now for a new
+	 * post, unchanged for an edit.
+	 */
 	date?: NewsDate;
-	/** Publish an edit draft whose item was deleted as a new item. */
+	/**
+	 * Publish an edit draft whose item was deleted as a new item (a
+	 * collection keeps its target's slug).
+	 */
 	asNew?: boolean;
 }
 

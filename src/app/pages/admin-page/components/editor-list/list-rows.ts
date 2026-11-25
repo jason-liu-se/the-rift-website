@@ -1,6 +1,7 @@
 import {
 	BulkItemRef,
-	EditorContentType
+	EditorContentType,
+	NewsDraftOptions
 } from 'src/app/interfaces/api-requests';
 import { DraftSummary } from 'src/app/interfaces/api-responses';
 import {
@@ -63,8 +64,9 @@ export function toDraftRow(draft: DraftSummary, published?: Item): DraftRow {
 
 /**
  * A draft as the type's cells show it: its fields so far, a season's
- * dimension count, and a news post's date: "now" (publishing's default) for
- * a new post, or the post's own for an edit (which keeps it by default).
+ * dimension count, and a news post's date: the draft's own if it has one
+ * (the server's list leaves it out), else "now" for a new post, or the
+ * post's own for an edit (which keeps it).
  */
 function toDraftCellItem(draft: DraftSummary, published?: Item): object {
 	return {
@@ -73,9 +75,11 @@ function toDraftCellItem(draft: DraftSummary, published?: Item): object {
 			dimensionCount: draft.dimensionCount
 		}),
 		...(draft.type === 'news' && {
-			date: draft.target
-				? (published as { date?: string } | undefined)?.date
-				: 'now'
+			date:
+				(draft.fields as NewsDraftOptions).date ??
+				(draft.target
+					? (published as { date?: string } | undefined)?.date
+					: 'now')
 		})
 	};
 }
@@ -83,19 +87,23 @@ function toDraftCellItem(draft: DraftSummary, published?: Item): object {
 /**
  * The drafts the filters keep, filtered here (the API lists them all): none
  * for a published status, and those whose name matches the search. The
- * editor made every one, so "Created by" keeps them all; drafts don't carry
- * a collection, so that filter doesn't apply.
+ * editor made every one, so "Created by" keeps them all. A collection
+ * filter keeps those in it.
  */
 export function filterDrafts(
 	drafts: readonly DraftSummary[],
-	{ status, search }: ListFilters
+	{ status, search, collection }: ListFilters
 ): DraftSummary[] {
 	if (status && status !== 'draft') {
 		return [];
 	}
 	const words = search.trim().toLowerCase();
-	return drafts.filter((draft) =>
-		itemName(draft.fields).toLowerCase().includes(words)
+	return drafts.filter(
+		(draft) =>
+			itemName(draft.fields).toLowerCase().includes(words) &&
+			(!collection ||
+				(draft.fields as { collection?: string }).collection ===
+					collection)
 	);
 }
 
