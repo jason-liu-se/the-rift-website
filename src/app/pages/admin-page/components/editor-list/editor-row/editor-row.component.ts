@@ -26,7 +26,7 @@ import { ListRow } from '../list-rows';
 /**
  * One row of an admin list, a published item or a draft alike: select it,
  * open it (its name's link, or a click anywhere on it), or its menu's
- * actions (on a gallery card, also from a right-click).
+ * actions (from its button, or a right-click anywhere on it).
  */
 @Component({
 	// A table's rows must be its own elements.

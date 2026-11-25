@@ -34,6 +34,21 @@ test.describe('news list', () => {
 		await expect(page.getByText('Live').first()).toBeVisible();
 	});
 
+	test("opens a row's menu on a right-click anywhere on it", async ({
+		page
+	}) => {
+		await page
+			.getByRole('row')
+			.filter({ hasText: EDITOR_NEWS_POSTS[0].title })
+			.getByRole('cell')
+			.last()
+			.click({ button: 'right' });
+
+		await expect(
+			page.getByRole('menuitem', { name: 'Duplicate' })
+		).toBeVisible();
+	});
+
 	test('selects the page by keyboard with Ctrl+A, then Enter', async ({
 		page
 	}) => {

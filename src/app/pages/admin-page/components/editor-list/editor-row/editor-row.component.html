@@ -1,5 +1,6 @@
 @let row = this.row();
-<td class="select" role="cell">
+<!-- Every cell opens the row's menu on a right-click. -->
+<td class="select" role="cell" [matContextMenuTriggerFor]="rowMenu">
 	@if (index() !== undefined) {
 		<span
 			class="drag-handle"
@@ -17,15 +18,10 @@
 		(change)="toggleSelected()"
 	/>
 </td>
-<!-- A gallery card's menu also opens on a right-click anywhere on it. -->
-<td
-	class="main"
-	role="cell"
-	[matContextMenuTriggerFor]="rowMenu"
-	[matContextMenuTriggerDisabled]="!store.isGrid()"
->
+<td class="main" role="cell" [matContextMenuTriggerFor]="rowMenu">
 	<!-- The row opens on a click anywhere; this is its keyboard and
-		new-tab way in. -->
+		new-tab way in (Ctrl or middle click, as right-click opens the
+		row's menu). -->
 	<a class="open" [href]="href()" (click)="openFromLink($event)">
 		@if (row.kind === "item") {
 			<ng-container
@@ -47,7 +43,7 @@
 	</a>
 </td>
 @if (store.extraCell(); as cell) {
-	<td class="extra" role="cell">
+	<td class="extra" role="cell" [matContextMenuTriggerFor]="rowMenu">
 		@if (row.kind === "item") {
 			<ng-container
 				*ngComponentOutlet="cell; inputs: { item: row.item }"
@@ -55,7 +51,7 @@
 		}
 	</td>
 }
-<td class="status" role="cell">
+<td class="status" role="cell" [matContextMenuTriggerFor]="rowMenu">
 	@if (row.kind === "item") {
 		<app-status-badge
 			[status]="row.item.status"
@@ -65,7 +61,7 @@
 		<app-status-badge [status]="row.isEdit ? 'edit' : 'draft'" />
 	}
 </td>
-<td class="updated" role="cell">
+<td class="updated" role="cell" [matContextMenuTriggerFor]="rowMenu">
 	<span class="updated-layout">
 		<app-editor-avatar [editor]="updatedBy()" />
 		<span class="updated-text">
@@ -80,7 +76,7 @@
 		</span>
 	</span>
 </td>
-<td class="actions" role="cell">
+<td class="actions" role="cell" [matContextMenuTriggerFor]="rowMenu">
 	<button
 		mat-icon-button
 		type="button"
