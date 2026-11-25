@@ -15,8 +15,11 @@
 		grid-area: 1 / 1;
 	}
 
-	&.selecting .filters {
-		visibility: hidden;
+	// Desktop: the bar stands in for the filters (on mobile it floats).
+	@media (min-width: 60rem) {
+		&.selecting .filters {
+			visibility: hidden;
+		}
 	}
 }
 
@@ -32,6 +35,14 @@
 // Reserves the bar's height, so it appearing doesn't move the table.
 .progress {
 	height: 4px;
+}
+
+.hint {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 0 0 8px;
+	font-size: $font-size-small;
 }
 
 .placeholder {
@@ -83,4 +94,9 @@ thead {
 	.empty {
 		display: table-cell;
 	}
+}
+
+// The gallery's images as a grid of cards (see EditorRowComponent).
+.grid thead {
+	display: none;
 }

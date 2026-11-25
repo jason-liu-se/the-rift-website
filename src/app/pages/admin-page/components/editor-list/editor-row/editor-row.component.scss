@@ -33,6 +33,26 @@ td {
 
 .select {
 	grid-row: span 2;
+	white-space: nowrap;
+}
+
+.drag-handle {
+	display: inline-flex;
+	vertical-align: middle;
+	padding: 10px 2px;
+	cursor: grab;
+	touch-action: none;
+}
+
+// While dragging: the row lifts, and its place shows where it'll land.
+:host(.cdk-drag-preview) {
+	display: table;
+	background-color: $colour-light-background;
+	box-shadow: 0 8px 24px rgba($colour-dark-text, 0.2);
+}
+
+:host(.cdk-drag-placeholder) {
+	opacity: 0.4;
 }
 
 .main {
@@ -111,5 +131,68 @@ td {
 
 	.actions {
 		text-align: right;
+	}
+}
+
+// The gallery: a card, the image on top, select and the menu over it.
+:host-context(.grid) {
+	position: relative;
+	display: grid;
+	grid-template-columns: 1fr auto;
+	align-content: start;
+	gap: 0;
+	padding: 0;
+	overflow: hidden;
+	border: 1px solid $colour-light-grey;
+	border-radius: 8px;
+
+	td {
+		display: block;
+		padding: 0;
+		border: 0;
+	}
+
+	.select {
+		position: absolute;
+		z-index: 1;
+		top: 4px;
+		left: 4px;
+		border-radius: 8px;
+		background-color: rgba($colour-light-background, 0.9);
+	}
+
+	.main {
+		grid-column: 1 / -1;
+		font-weight: 400;
+	}
+
+	.status {
+		grid-column: 1;
+		align-self: center;
+		padding: 0 8px;
+	}
+
+	.updated {
+		display: none;
+	}
+
+	.actions {
+		grid-column: 2;
+		grid-row: auto;
+	}
+
+	.draft {
+		display: grid;
+		gap: 4px;
+	}
+
+	.draft > span {
+		padding: 8px 8px 0;
+	}
+
+	.thumbnail {
+		width: 100%;
+		aspect-ratio: 4 / 3;
+		border-radius: 0;
 	}
 }

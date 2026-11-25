@@ -10,6 +10,7 @@
 
 .search {
 	flex: 1;
+	min-width: 0;
 }
 
 .more-toggle {
@@ -55,5 +56,9 @@
 
 	.compact {
 		width: 10.5rem;
+	}
+
+	.sort {
+		width: 13rem;
 	}
 }

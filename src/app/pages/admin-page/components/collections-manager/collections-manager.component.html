@@ -33,7 +33,8 @@
 						collection.visible ? 'Hide from site' : 'Show on site'
 					"
 					[attr.aria-label]="
-						(collection.visible ? 'Hide ' : 'Show ') + collection.title
+						(collection.visible ? 'Hide ' : 'Show ') +
+						collection.title
 					"
 					(click)="toggleVisibility(collection)"
 				>
@@ -90,10 +91,10 @@
 		/>
 		<mat-hint>
 			@if (urlPrefix(); as prefix) {
-				URL: {{ prefix }}{{ slug() || "…" }}.
+				{{ prefix }}{{ slug() || "…" }} ·
 			}
-			Can't be changed later.
-		</mat-hint>
+			Can't be changed later</mat-hint
+		>
 	</mat-form-field>
 	<p id="slug-problem" class="problem" aria-live="polite">
 		{{ shownSlugProblem() }}

@@ -3,7 +3,20 @@
 
 // On mobile only: the switch between the fields and the preview.
 .pane-switch {
-	margin-right: 4px;
+	display: flex;
+	--mat-standard-button-toggle-height: 40px;
+
+	mat-button-toggle {
+		flex: 1;
+	}
+
+	mat-icon {
+		margin-right: 4px;
+		font-size: 18px;
+		width: 18px;
+		height: 18px;
+		vertical-align: -3px;
+	}
 }
 
 .panes {
@@ -116,6 +129,32 @@
 
 .publish {
 	min-height: 40px;
+}
+
+// Narrow screens: the footer's actions fit one row, the toggle as icons
+// (its labels stay for screen readers and as tooltips).
+@media (max-width: 39.99rem) {
+	.actions {
+		flex-wrap: nowrap;
+		width: 100%;
+	}
+
+	.publish {
+		margin-left: auto;
+	}
+
+	.toggle-label {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
+
+	.visibility mat-icon {
+		margin-right: 0;
+	}
 }
 
 .danger {

@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import {
 	EMPTY,
 	Observable,
+	catchError,
 	concat,
 	concatMap,
 	filter,
@@ -11,7 +12,8 @@ import {
 	of,
 	reduce,
 	switchMap,
-	tap
+	tap,
+	toArray
 } from 'rxjs';
 import {
 	BulkItemRef,
@@ -45,6 +47,7 @@ import {
 	wouldChange
 } from './bulk-undo';
 import { EditorListStore } from './editor-list.store';
+import { OrderedItem, toOrderUpdates } from './list-order';
 import { ItemRow, ListRow } from './list-rows';
 
 type Item = SummaryOf<EditorContentType>;
@@ -88,6 +91,46 @@ export class EditorListActions implements BulkActionHost {
 			.subscribe(() => {
 				this.store.reload();
 				this.store.openDraft(draftId);
+			});
+	}
+
+	/**
+	 * Moves an item (by drag or its menu) and saves the new order: one update
+	 * per item whose position changed.
+	 */
+	public moveItem(fromIndex: number, toIndex: number): void {
+		if (fromIndex === toIndex) {
+			return;
+		}
+		this.store.moveItem(fromIndex, toIndex);
+		const type = this.type();
+		const updates = toOrderUpdates(
+			this.store.itemRows().map(({ item }) => item as OrderedItem)
+		);
+		this.store.isBusy.set(true);
+		from(updates)
+			.pipe(
+				concatMap(({ id, startingRevision, sortOrder }) =>
+					this.editorContent
+						.updateItem(type, id, { sortOrder, startingRevision })
+						.pipe(
+							map(() => true),
+							catchError(() => of(false))
+						)
+				),
+				toArray(),
+				finalize(() => {
+					this.store.isBusy.set(false);
+					this.store.reload();
+				})
+			)
+			.subscribe((results) => {
+				const failures = results.filter((isSaved) => !isSaved).length;
+				if (failures > 0) {
+					this.notifier.notifyFailure(
+						`Couldn't save the new position of ${countItems(failures, this.store.config().noun)}. Try again.`
+					);
+				}
 			});
 	}
 

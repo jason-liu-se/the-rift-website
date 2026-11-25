@@ -63,7 +63,9 @@
 		}
 	}
 	@if (isOffline()) {
-		<p>Uploads are off until the server can be reached. Links still work.</p>
+		<p>
+			Uploads are off until the server can be reached. Links still work.
+		</p>
 	} @else if (!album() && noAlbumHint()) {
 		<p>{{ noAlbumHint() }}</p>
 	}

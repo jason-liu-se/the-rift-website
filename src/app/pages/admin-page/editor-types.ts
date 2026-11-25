@@ -72,7 +72,10 @@ export interface EditorTypeConfig<T extends EditorContentType> {
 	sortOptions: readonly SortOption[];
 	/** Images list as a grid of cards; everything else as a table. */
 	listLayout: 'table' | 'grid';
-	/** Can be put in order by dragging, within one collection (`sortOrder`). */
+	/**
+	 * Can be put in order (`sortOrder`) within one collection, by dragging or
+	 * from a row's menu; the first sort option is then the site's order.
+	 */
 	isOrderable: boolean;
 	/** Where a live item shows on the site. */
 	publicPath: (item: SummaryOf<T>) => string;
@@ -152,12 +155,12 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 		bulkActions: MoveBulkActionComponent,
 		preview: DownloadsPreviewComponent,
 		sortOptions: [
-			RECENTLY_UPDATED,
 			{
 				label: 'Order on the site',
 				sort: 'collection,sortOrder,title',
 				order: 'asc,asc,asc'
 			},
+			RECENTLY_UPDATED,
 			{ label: 'Title (A–Z)', sort: 'title', order: 'asc' },
 			RECENTLY_CREATED
 		],

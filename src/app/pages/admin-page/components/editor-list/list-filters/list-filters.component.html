@@ -63,7 +63,9 @@
 		>
 			<mat-option value="">Any</mat-option>
 			@for (status of statuses(); track status.value) {
-				<mat-option [value]="status.value">{{ status.label }}</mat-option>
+				<mat-option [value]="status.value">{{
+					status.label
+				}}</mat-option>
 			}
 			<mat-option value="draft">Unpublished changes</mat-option>
 		</mat-select>
@@ -94,14 +96,16 @@
 			<mat-option value="mine">Me</mat-option>
 		</mat-select>
 	</mat-form-field>
-	<mat-form-field class="compact" subscriptSizing="dynamic">
+	<mat-form-field class="compact sort" subscriptSizing="dynamic">
 		<mat-label>Sort by</mat-label>
 		<mat-select
 			[ngModel]="selectedSort()"
 			(ngModelChange)="setSort($event)"
 		>
 			@for (option of sortOptions(); track option.sort) {
-				<mat-option [value]="option.sort">{{ option.label }}</mat-option>
+				<mat-option [value]="option.sort">{{
+					option.label
+				}}</mat-option>
 			}
 		</mat-select>
 	</mat-form-field>

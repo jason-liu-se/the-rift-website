@@ -16,6 +16,7 @@
 		@if (config().hasBulkCreate) {
 			<a
 				mat-flat-button
+				color="primary"
 				routerLink="bulk"
 				queryParamsHandling="preserve"
 			>
@@ -23,7 +24,12 @@
 				Upload {{ config().noun.many }}
 			</a>
 		} @else {
-			<a mat-flat-button routerLink="new" queryParamsHandling="preserve">
+			<a
+				mat-flat-button
+				color="primary"
+				routerLink="new"
+				queryParamsHandling="preserve"
+			>
 				<mat-icon>add</mat-icon>
 				New {{ config().noun.one }}
 			</a>

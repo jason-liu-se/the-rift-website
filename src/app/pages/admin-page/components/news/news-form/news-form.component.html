@@ -10,7 +10,8 @@
 	<mat-hint>Markdown works: *italic*, **bold**, [link](https://…)</mat-hint>
 	@if (isNearLimit(fields().title, maxTitleLength)) {
 		<mat-hint align="end"
-			>{{ (fields().title ?? "").length }} / {{ maxTitleLength }}</mat-hint
+			>{{ (fields().title ?? "").length }} /
+			{{ maxTitleLength }}</mat-hint
 		>
 	}
 </mat-form-field>

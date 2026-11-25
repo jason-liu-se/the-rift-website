@@ -1,17 +1,24 @@
 <app-modal-shell [heading]="title()" (closed)="close()">
+	@if (preview()) {
+		<mat-button-toggle-group
+			modalTabs
+			class="pane-switch"
+			hideSingleSelectionIndicator
+			aria-label="Show"
+			[ngModel]="pane()"
+			(ngModelChange)="pane.set($event)"
+		>
+			<mat-button-toggle value="fields">
+				<mat-icon aria-hidden="true">edit</mat-icon>
+				Edit
+			</mat-button-toggle>
+			<mat-button-toggle value="preview">
+				<mat-icon aria-hidden="true">visibility</mat-icon>
+				Preview
+			</mat-button-toggle>
+		</mat-button-toggle-group>
+	}
 	<ng-container modalTools>
-		@if (preview()) {
-			<mat-button-toggle-group
-				class="pane-switch"
-				hideSingleSelectionIndicator
-				aria-label="Show"
-				[ngModel]="pane()"
-				(ngModelChange)="pane.set($event)"
-			>
-				<mat-button-toggle value="fields">Edit</mat-button-toggle>
-				<mat-button-toggle value="preview">Preview</mat-button-toggle>
-			</mat-button-toggle-group>
-		}
 		<button
 			mat-icon-button
 			type="button"
@@ -43,7 +50,11 @@
 				<mat-icon>more_vert</mat-icon>
 			</button>
 			<mat-menu #itemMenu="matMenu" xPosition="before">
-				<button mat-menu-item type="button" (click)="actions.duplicate()">
+				<button
+					mat-menu-item
+					type="button"
+					(click)="actions.duplicate()"
+				>
 					<mat-icon aria-hidden="true">content_copy</mat-icon>
 					Duplicate
 				</button>
@@ -147,14 +158,14 @@
 					matTooltip="Everyone can see it"
 				>
 					<mat-icon aria-hidden="true">visibility</mat-icon>
-					Visible
+					<span class="toggle-label">Visible</span>
 				</mat-button-toggle>
 				<mat-button-toggle
 					[value]="false"
 					matTooltip="Only editors can see it"
 				>
 					<mat-icon aria-hidden="true">visibility_off</mat-icon>
-					Hidden
+					<span class="toggle-label">Hidden</span>
 				</mat-button-toggle>
 			</mat-button-toggle-group>
 			<button

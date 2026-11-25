@@ -19,3 +19,20 @@
 	font-size: $font-size-x-small;
 	font-weight: 400;
 }
+
+// In the gallery's grid: the image fills the card's top.
+:host-context(.grid) {
+	display: grid;
+	gap: 4px;
+
+	.thumbnail {
+		width: 100%;
+		aspect-ratio: 4 / 3;
+		border-radius: 0;
+	}
+
+	> span {
+		padding: 8px 8px 0;
+		overflow-wrap: anywhere;
+	}
+}

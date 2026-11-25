@@ -15,7 +15,9 @@ let nextId = 0;
 /**
  * The admin modals' frame: a header (title, the modal's own tools, Close)
  * and a footer that stay in view, with the content scrolling between them.
- * Project tools with `modalTools` and the footer with `modalFooter`. It
+ * Project tools with `modalTools`, tabs under the header (mobile only) with
+ * `modalTabs`,
+ * and the footer with `modalFooter`. It
  * focuses its heading on opening, so screen readers start there.
  */
 @Component({

@@ -67,6 +67,16 @@ export class EditorListComponent {
 			.join(' and ');
 	});
 
+	/** In the site's order, but across collections: say how to reorder. */
+	protected readonly isOrderHintShown = computed(() => {
+		const config = this.store.config();
+		const { sort, collection } = this.store.filters();
+		return (
+			config.isOrderable &&
+			!collection &&
+			(!sort || sort === config.sortOptions[0]?.sort)
+		);
+	});
 	/** Anything but the sort is set, so an empty list means "no matches". */
 	protected readonly hasFilters = computed(() => {
 		const filters = this.store.filters();

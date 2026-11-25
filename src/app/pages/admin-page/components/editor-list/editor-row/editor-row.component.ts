@@ -1,3 +1,4 @@
+import { CdkDragHandle } from '@angular/cdk/drag-drop';
 import { NgComponentOutlet } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
 import { MatIconButton } from '@angular/material/button';
@@ -5,6 +6,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
 import { MatDivider } from '@angular/material/divider';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
+import { MatTooltip } from '@angular/material/tooltip';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { formatRelativeTime } from 'src/app/utilities/relative-time';
 import { formatDateTime } from '../../../utilities/format-date-time';
@@ -25,6 +27,7 @@ import { ListRow } from '../list-rows';
 	templateUrl: './editor-row.component.html',
 	styleUrl: './editor-row.component.scss',
 	imports: [
+		CdkDragHandle,
 		EditorAvatarComponent,
 		MatCheckbox,
 		MatDivider,
@@ -33,6 +36,7 @@ import { ListRow } from '../list-rows';
 		MatMenu,
 		MatMenuItem,
 		MatMenuTrigger,
+		MatTooltip,
 		NgComponentOutlet,
 		StatusBadgeComponent
 	],
@@ -73,6 +77,21 @@ export class EditorRowComponent {
 		const updatedAt = this.updatedAt();
 		return updatedAt ? formatDateTime(updatedAt) : '';
 	});
+	/** Its position, while the list can be put in order; else undefined. */
+	protected readonly index = computed(() => {
+		const row = this.row();
+		if (!this.store.isReorderable() || row.kind !== 'item') {
+			return undefined;
+		}
+		return this.store.itemRows().findIndex(({ id }) => id === row.id);
+	});
+	protected readonly canMoveUp = computed(() => (this.index() ?? 0) > 0);
+	protected readonly canMoveDown = computed(() => {
+		const index = this.index();
+		return (
+			index !== undefined && index < this.store.itemRows().length - 1
+		);
+	});
 	/** Where a live item shows on the site. */
 	protected readonly publicPath = computed(() => {
 		const row = this.row();
@@ -88,6 +107,14 @@ export class EditorRowComponent {
 			? this.store.selection.isDraftSelected(row.id)
 			: this.store.selection.isSelected(row.id);
 	});
+
+	/** Moves it one place up (-1) or down (1): dragging without a pointer. */
+	protected move(by: -1 | 1): void {
+		const index = this.index();
+		if (index !== undefined) {
+			this.actions.moveItem(index, index + by);
+		}
+	}
 
 	protected toggleSelected(): void {
 		const row = this.row();

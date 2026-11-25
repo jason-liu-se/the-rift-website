@@ -1,3 +1,4 @@
+import { moveItemInArray } from '@angular/cdk/drag-drop';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -129,6 +130,24 @@ export class EditorListStore {
 	public readonly selectedItemCount = computed(
 		() => this.selectedCount() - this.selection.selectedDraftIds().length
 	);
+	/**
+	 * The rows can be put in order: the type has an order, it's sorted by it,
+	 * one collection is chosen and nothing else filtered, and every item is
+	 * on this page.
+	 */
+	public readonly isReorderable = computed(() => {
+		const config = this.config();
+		const { collection, search, status, scope, sort } = this.filters();
+		return (
+			config.isOrderable &&
+			!!collection &&
+			!search &&
+			!status &&
+			scope === 'all' &&
+			(!sort || sort === config.sortOptions[0]?.sort) &&
+			this.total() <= EDITOR_PAGE_SIZE
+		);
+	});
 	/** Every item matching the filters, and the drafts listed with them. */
 	public readonly selectableCount = computed(
 		() => this.total() + this.draftRows().length
@@ -166,6 +185,18 @@ export class EditorListStore {
 
 	public reload(): void {
 		this.reloads.next();
+	}
+
+	/** Moves a loaded item, until the order is saved and the list reloads. */
+	public moveItem(fromIndex: number, toIndex: number): void {
+		this.loaded.update((loaded) => {
+			if (!loaded) {
+				return loaded;
+			}
+			const items = [...loaded.page.items];
+			moveItemInArray(items, fromIndex, toIndex);
+			return { ...loaded, page: { ...loaded.page, items } };
+		});
 	}
 
 	public setFilters(filters: ListFilters): void {

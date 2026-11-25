@@ -23,6 +23,9 @@
 			<mat-icon>close</mat-icon>
 		</button>
 	</header>
+	<div class="modal-tabs">
+		<ng-content select="[modalTabs]" />
+	</div>
 	<div class="modal-body" #body>
 		<ng-content />
 	</div>

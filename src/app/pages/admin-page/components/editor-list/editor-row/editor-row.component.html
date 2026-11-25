@@ -1,5 +1,15 @@
 @let row = this.row();
 <td class="select">
+	@if (index() !== undefined) {
+		<span
+			class="drag-handle"
+			cdkDragHandle
+			matTooltip="Drag to reorder"
+			aria-hidden="true"
+		>
+			<mat-icon>drag_indicator</mat-icon>
+		</span>
+	}
 	<mat-checkbox
 		color="primary"
 		[aria-label]="'Select ' + row.name"
@@ -63,6 +73,18 @@
 				}}</mat-icon>
 				{{ row.item.visible ? "Hide from site" : "Show on site" }}
 			</button>
+			@if (canMoveUp()) {
+				<button mat-menu-item (click)="move(-1)">
+					<mat-icon>arrow_upward</mat-icon>
+					Move up
+				</button>
+			}
+			@if (canMoveDown()) {
+				<button mat-menu-item (click)="move(1)">
+					<mat-icon>arrow_downward</mat-icon>
+					Move down
+				</button>
+			}
 			@if (publicPath(); as path) {
 				<a mat-menu-item target="_blank" [href]="path">
 					<mat-icon>open_in_new</mat-icon>

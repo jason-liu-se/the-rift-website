@@ -26,6 +26,12 @@
 </tr>
 @if (isExpanded()) {
 	@for (row of rows(); track row.kind + row.id) {
-		<tr app-editor-row [row]="row"></tr>
+		<tr
+			app-editor-row
+			cdkDrag
+			cdkDragLockAxis="y"
+			[cdkDragDisabled]="!isReorderable()"
+			[row]="row"
+		></tr>
 	}
 }
