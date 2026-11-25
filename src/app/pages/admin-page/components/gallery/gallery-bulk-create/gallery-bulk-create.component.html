@@ -1,0 +1,167 @@
+<section class="bulk-create" aria-labelledby="bulk-create-heading">
+	<h2 id="bulk-create-heading" class="heading" tabindex="-1">
+		Add many images
+	</h2>
+
+	<div class="sources">
+		<button
+			mat-flat-button
+			color="primary"
+			type="button"
+			[disabled]="!canUpload()"
+			(click)="fileInput.click()"
+		>
+			Pick files
+		</button>
+		<input
+			#fileInput
+			type="file"
+			multiple
+			hidden
+			[accept]="acceptedTypes"
+			(change)="addFiles($event)"
+		/>
+		@if (!canUpload()) {
+			<p>
+				Uploads are off until the server can be reached. Links still
+				work.
+			</p>
+		}
+		<mat-form-field class="links" subscriptSizing="dynamic">
+			<mat-label>Or paste links, one per line</mat-label>
+			<textarea
+				matInput
+				rows="2"
+				[ngModel]="pastedLinks()"
+				(ngModelChange)="pastedLinks.set($event)"
+			></textarea>
+		</mat-form-field>
+		<button
+			mat-stroked-button
+			type="button"
+			[disabled]="!pastedLinks().trim()"
+			(click)="addLinks()"
+		>
+			Add links
+		</button>
+	</div>
+
+	<fieldset class="set-all">
+		<legend>For every image</legend>
+		<div class="set-all-field">
+			<mat-form-field subscriptSizing="dynamic">
+				<mat-label>Collection</mat-label>
+				<mat-select
+					[ngModel]="allCollection()"
+					(ngModelChange)="
+						allCollection.set($event); setAll('collection')
+					"
+				>
+					@for (collection of collections(); track collection.slug) {
+						<mat-option [value]="collection.slug">{{
+							collection.title
+						}}</mat-option>
+					}
+				</mat-select>
+			</mat-form-field>
+		</div>
+		<div class="set-all-field">
+			<app-tag-input
+				label="Tags"
+				[tags]="allTags()"
+				(tagsChange)="allTags.set($event)"
+			/>
+			<button mat-stroked-button type="button" (click)="setAll('tags')">
+				Set all tags
+			</button>
+		</div>
+		<mat-checkbox
+			color="primary"
+			[ngModel]="isAllVisible()"
+			(ngModelChange)="isAllVisible.set($event); setAll('visibility')"
+			>Visible to everyone</mat-checkbox
+		>
+	</fieldset>
+
+	<ol class="rows" aria-label="Images to add">
+		@for (row of rows(); track row.id; let index = $index) {
+			<li class="row" [class.has-problem]="row.problem">
+				<img class="thumbnail" [src]="row.previewUrl" alt="" />
+				<div class="row-fields">
+					<mat-form-field subscriptSizing="dynamic">
+						<mat-label>Caption for image {{ index + 1 }}</mat-label>
+						<input
+							matInput
+							[maxlength]="maxCaptionLength"
+							[ngModel]="row.caption"
+							(ngModelChange)="
+								updateRow(row.id, { caption: $event })
+							"
+						/>
+					</mat-form-field>
+					<mat-form-field subscriptSizing="dynamic">
+						<mat-label
+							>Collection for image {{ index + 1 }}</mat-label
+						>
+						<mat-select
+							[ngModel]="row.collection"
+							(ngModelChange)="
+								updateRow(row.id, { collection: $event })
+							"
+						>
+							@for (
+								collection of collections();
+								track collection.slug
+							) {
+								<mat-option [value]="collection.slug">{{
+									collection.title
+								}}</mat-option>
+							}
+						</mat-select>
+					</mat-form-field>
+					<app-tag-input
+						[label]="'Tags for image ' + (index + 1)"
+						[tags]="row.tags"
+						(tagsChange)="updateRow(row.id, { tags: $event })"
+					/>
+					<mat-checkbox
+						color="primary"
+						[ngModel]="row.isVisible"
+						(ngModelChange)="
+							updateRow(row.id, { isVisible: $event })
+						"
+						>Visible</mat-checkbox
+					>
+					@if (row.problem) {
+						<p class="problem">{{ row.problem }}</p>
+					}
+				</div>
+				<button
+					mat-icon-button
+					type="button"
+					[attr.aria-label]="'Remove image ' + (index + 1)"
+					(click)="removeRow(row.id)"
+				>
+					<mat-icon>close</mat-icon>
+				</button>
+			</li>
+		} @empty {
+			<li class="empty">Pick files or paste links to start.</li>
+		}
+	</ol>
+
+	<div class="actions">
+		<button
+			mat-flat-button
+			color="primary"
+			type="button"
+			[disabled]="rows().length === 0 || isPublishing()"
+			(click)="uploadAndPublish()"
+		>
+			{{ isPublishing() ? "Publishing…" : publishLabel() }}
+		</button>
+		<button mat-stroked-button type="button" (click)="closed.emit()">
+			Close
+		</button>
+	</div>
+</section>

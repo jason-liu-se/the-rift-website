@@ -1,0 +1,42 @@
+@use "../../../../../../theme-colours" as *;
+
+:host {
+	display: grid;
+	gap: 12px;
+	justify-items: start;
+}
+
+.dimensions {
+	display: grid;
+	gap: 12px;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+fieldset {
+	display: grid;
+	gap: 12px;
+	margin: 0;
+	padding: 16px;
+	border: 1px solid $colour-light-grey;
+	border-radius: 8px;
+}
+
+legend {
+	padding: 0 4px;
+	font-weight: 600;
+}
+
+.fields {
+	display: grid;
+	// Fields keep a readable width instead of stretching across the modal.
+	grid-template-columns: repeat(auto-fill, minmax(14rem, 20rem));
+	gap: 12px;
+}
+
+.dimension-actions {
+	display: flex;
+	justify-content: flex-end;
+}

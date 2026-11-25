@@ -1,0 +1,8 @@
+<img class="thumbnail" [src]="item().imageUrl" alt="" loading="lazy" />
+<span>
+	{{ item().caption }}
+	<span class="details"
+		>{{ item().collection
+		}}{{ item().tags.length ? " · " + item().tags.join(", ") : "" }}</span
+	>
+</span>

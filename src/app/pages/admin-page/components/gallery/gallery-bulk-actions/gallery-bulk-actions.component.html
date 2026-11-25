@@ -1,0 +1,24 @@
+<app-move-bulk-action />
+<div class="bulk-tags">
+	<app-tag-input
+		label="Tags to add or remove"
+		[tags]="tags()"
+		(tagsChange)="tags.set($event)"
+	/>
+	<button
+		mat-stroked-button
+		type="button"
+		[disabled]="tags().length === 0"
+		(click)="changeTags('add-tags')"
+	>
+		Add tags
+	</button>
+	<button
+		mat-stroked-button
+		type="button"
+		[disabled]="tags().length === 0"
+		(click)="changeTags('remove-tags')"
+	>
+		Remove tags
+	</button>
+</div>

@@ -1,0 +1,102 @@
+<ol class="dimensions">
+	@for (
+		dimension of dimensions();
+		track $index;
+		let index = $index;
+		let isFirst = $first;
+		let isLast = $last
+	) {
+		<li class="dimension">
+			<fieldset>
+				<legend>{{ index + 1 }}. {{ nameOf(index) }}</legend>
+				<div class="fields">
+					<mat-form-field subscriptSizing="dynamic">
+						<mat-label>Name</mat-label>
+						<input
+							matInput
+							required
+							[maxlength]="maxNameLength"
+							[ngModel]="dimension.name"
+							(ngModelChange)="
+								updateDimension(index, { name: $event })
+							"
+						/>
+					</mat-form-field>
+					<mat-form-field subscriptSizing="dynamic">
+						<mat-label>BlueMap map ID</mat-label>
+						<input
+							matInput
+							required
+							spellcheck="false"
+							[maxlength]="maxWorldFieldLength"
+							[ngModel]="dimension.worldId"
+							(ngModelChange)="
+								updateDimension(index, { worldId: $event })
+							"
+						/>
+					</mat-form-field>
+					<mat-form-field subscriptSizing="dynamic">
+						<mat-label>BlueMap camera position</mat-label>
+						<input
+							matInput
+							spellcheck="false"
+							[maxlength]="maxWorldFieldLength"
+							[ngModel]="dimension.perspective"
+							(ngModelChange)="
+								updateDimension(index, { perspective: $event })
+							"
+						/>
+						<mat-hint
+							>Where the map opens, from BlueMap's URL.</mat-hint
+						>
+					</mat-form-field>
+				</div>
+				<app-image-field
+					[label]="nameOf(index) + ' image'"
+					[album]="{ album: 'maps' }"
+					[url]="dimension.imageUrl"
+					(urlChange)="updateDimension(index, { imageUrl: $event })"
+				/>
+				<div class="dimension-actions">
+					<button
+						mat-icon-button
+						type="button"
+						class="move-up"
+						[attr.aria-label]="'Move up ' + nameOf(index)"
+						[disabled]="isFirst"
+						(click)="moveDimension(index, -1)"
+					>
+						<mat-icon>arrow_upward</mat-icon>
+					</button>
+					<button
+						mat-icon-button
+						type="button"
+						class="move-down"
+						[attr.aria-label]="'Move down ' + nameOf(index)"
+						[disabled]="isLast"
+						(click)="moveDimension(index, 1)"
+					>
+						<mat-icon>arrow_downward</mat-icon>
+					</button>
+					<button
+						mat-icon-button
+						type="button"
+						[attr.aria-label]="'Remove ' + nameOf(index)"
+						(click)="removeDimension(index)"
+					>
+						<mat-icon>delete</mat-icon>
+					</button>
+				</div>
+			</fieldset>
+		</li>
+	}
+</ol>
+<button
+	mat-stroked-button
+	type="button"
+	class="add-dimension"
+	[disabled]="dimensions().length >= maxDimensions"
+	(click)="addDimension()"
+>
+	Add a dimension
+</button>

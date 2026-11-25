@@ -1,0 +1,72 @@
+<div class="image-field">
+	<mat-form-field class="link" subscriptSizing="dynamic">
+		<mat-label>{{ label() }} link</mat-label>
+		<input
+			matInput
+			type="url"
+			[maxlength]="maxUrlLength"
+			[attr.aria-invalid]="!!linkProblem()"
+			[ngModel]="url()"
+			(ngModelChange)="url.set($event)"
+		/>
+		<mat-hint>Paste an imgbb or imgur link, or upload a file.</mat-hint>
+	</mat-form-field>
+	<div class="upload">
+		<button
+			mat-stroked-button
+			type="button"
+			[disabled]="!canUpload()"
+			(click)="chooseFile()"
+		>
+			Upload {{ label().toLowerCase() }}
+		</button>
+		<input
+			#fileInput
+			type="file"
+			hidden
+			[accept]="acceptedTypes"
+			(change)="uploadChosenFile($event)"
+		/>
+		@if (upload(); as state) {
+			@if (state.kind === "uploading") {
+				<progress
+					max="1"
+					[value]="state.fraction"
+					[attr.aria-label]="'Uploading ' + label().toLowerCase()"
+				></progress>
+			}
+		}
+	</div>
+	<!-- Always in the DOM, so screen readers announce each new message. -->
+	<div class="messages" aria-live="polite">
+		@if (linkProblem(); as problem) {
+			<p class="error">{{ problem }}</p>
+		}
+		@if (upload(); as state) {
+			@if (state.kind === "failed") {
+				<p class="error">
+					{{ state.message }}
+					@if (state.file) {
+						<button
+							mat-button
+							type="button"
+							[disabled]="!canUpload()"
+							(click)="retryUpload()"
+						>
+							Retry
+						</button>
+					}
+				</p>
+			}
+		}
+		@if (isOffline()) {
+			<p>
+				Uploads are off until the server can be reached. Links still
+				work.
+			</p>
+		}
+	</div>
+	@if (hasPreview()) {
+		<img class="preview" [src]="url()" alt="" />
+	}
+</div>
