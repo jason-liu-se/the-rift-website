@@ -78,7 +78,7 @@ test("the map page links each season's dimensions", async ({ page }) => {
 	await page.goto('/map');
 
 	for (const { dimensions } of MAP_SEASONS) {
-		for (const { name } of dimensions) {
+		for (const { name } of dimensions ?? []) {
 			await expect(
 				page.getByRole('link', { name, exact: true })
 			).toBeVisible();
