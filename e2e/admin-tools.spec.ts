@@ -256,7 +256,9 @@ test.describe('gallery collections', () => {
 			body = route.request().postDataJSON();
 			return route.fulfill({ status: 201, json: {} });
 		});
-		await page.getByRole('textbox', { name: 'Title' }).fill('Season 7');
+		await page
+			.getByRole('textbox', { name: 'Title', exact: true })
+			.fill('Season 7');
 		await expect(page.getByRole('textbox', { name: 'Slug' })).toHaveValue(
 			'season-7'
 		);

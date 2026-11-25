@@ -98,6 +98,11 @@ function recordApiRequests(page: Page): string[] {
 }
 
 async function openDownloadsInApp(page: Page): Promise<void> {
+	// On phones, the navbar's links are behind its Menu button.
+	const menu = page.getByRole('button', { name: 'Menu' });
+	if (await menu.isVisible()) {
+		await menu.click();
+	}
 	await page.getByRole('link', { name: 'Downloads' }).first().click();
 	await expect(
 		page.getByText(DOWNLOAD_COLLECTIONS[0].items[0].title)
