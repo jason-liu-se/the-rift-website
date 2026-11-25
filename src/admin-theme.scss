@@ -45,6 +45,12 @@
 	}
 }
 
+// The list's search shares a row with the Filters button on phones, so it
+// shrinks below Material's fixed 180px input.
+.mat-mdc-form-field.search .mat-mdc-form-field-infix {
+	width: auto;
+}
+
 // Admin list filters other than search: compact fields.
 .mat-mdc-form-field.compact {
 	@include mat.form-field-density(-3);

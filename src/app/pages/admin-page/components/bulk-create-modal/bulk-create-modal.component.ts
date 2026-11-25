@@ -24,7 +24,9 @@ export class BulkCreateModalComponent {
 	private content = viewChild.required<TemplateRef<unknown>>('content');
 	private bulkCreate = viewChild(GalleryBulkCreateComponent);
 
-	protected readonly close = openModalRoute(() => this.content());
+	protected readonly close = openModalRoute(() => this.content(), {
+		wide: true
+	});
 
 	constructor() {
 		// Whatever was published shows in the list.

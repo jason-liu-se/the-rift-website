@@ -1,4 +1,10 @@
 import {
+	CdkDrag,
+	CdkDragHandle,
+	CdkDropList,
+	moveItemInArray
+} from '@angular/cdk/drag-drop';
+import {
 	Component,
 	DestroyRef,
 	computed,
@@ -13,6 +19,7 @@ import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
 import { MatOption, MatSelect } from '@angular/material/select';
+import { MatTooltip } from '@angular/material/tooltip';
 import {
 	EMPTY,
 	Observable,
@@ -42,6 +49,7 @@ import {
 	summarizeBulkResults,
 	toChunks
 } from '../../editor-list/bulk-results';
+import { ModalShellComponent } from '../../modal-shell/modal-shell.component';
 import { TagInputComponent } from '../../tag-input/tag-input.component';
 import {
 	BulkImageRow,
@@ -56,15 +64,19 @@ const IMAGES = { one: 'image', many: 'images' };
 const NOT_ALLOWED_LINK = "This link isn't from imgbb or imgur.";
 
 /**
- * Adds many gallery images at once: pick files or paste links, set the
- * collection, tags, and visibility for all, adjust each row, then upload and
- * publish with one button. Done rows leave; failed rows stay, marked, to retry.
+ * Adds many gallery images at once: drop, paste, or choose files (or add
+ * links), apply a collection, tags, and visibility to all, adjust and order
+ * each row, then upload and publish with one button. Done rows leave; failed
+ * rows stay, marked, to retry.
  */
 @Component({
 	selector: 'app-gallery-bulk-create',
 	templateUrl: './gallery-bulk-create.component.html',
 	styleUrl: './gallery-bulk-create.component.scss',
 	imports: [
+		CdkDrag,
+		CdkDragHandle,
+		CdkDropList,
 		FormsModule,
 		MatButton,
 		MatCheckbox,
@@ -75,8 +87,11 @@ const NOT_ALLOWED_LINK = "This link isn't from imgbb or imgur.";
 		MatLabel,
 		MatOption,
 		MatSelect,
+		MatTooltip,
+		ModalShellComponent,
 		TagInputComponent
-	]
+	],
+	host: { '(paste)': 'addPasted($event)' }
 })
 export class GalleryBulkCreateComponent {
 	private uploads = inject(ImageUploadService);
@@ -103,7 +118,26 @@ export class GalleryBulkCreateComponent {
 	protected readonly allTags = signal<string[]>([]);
 	protected readonly isAllVisible = signal(true);
 	protected readonly isPublishing = signal(false);
+	protected readonly isDragging = signal(false);
 	protected readonly canUpload = computed(() => this.apiStatus() === 'up');
+	/** "3 images · 1 needs a caption": what's left before publishing. */
+	protected readonly summary = computed(() => {
+		const rows = this.rows();
+		if (rows.length === 0) {
+			return 'No images yet.';
+		}
+		const missing = (field: 'caption' | 'collection') =>
+			rows.filter((row) => !row[field].trim()).length;
+		const needs = (count: number, what: string) =>
+			count === 0
+				? []
+				: [`${count} ${count === 1 ? 'needs' : 'need'} ${what}`];
+		return [
+			`${rows.length} ${rows.length === 1 ? IMAGES.one : IMAGES.many}`,
+			...needs(missing('caption'), 'a caption'),
+			...needs(missing('collection'), 'a collection')
+		].join(' · ');
+	});
 	protected readonly publishLabel = computed(() => {
 		const count = this.rows().length;
 		return `Upload and publish ${count} ${count === 1 ? IMAGES.one : IMAGES.many}`;
@@ -117,10 +151,46 @@ export class GalleryBulkCreateComponent {
 		);
 	}
 
-	protected addFiles(event: Event): void {
+	protected addChosenFiles(event: Event): void {
 		const input = event.target as HTMLInputElement;
 		const files = [...(input.files ?? [])];
 		input.value = '';
+		this.addFiles(files);
+	}
+
+	protected allowDrop(event: DragEvent): void {
+		if (this.canUpload() && event.dataTransfer?.types.includes('Files')) {
+			event.preventDefault();
+			this.isDragging.set(true);
+		}
+	}
+
+	protected addDropped(event: DragEvent): void {
+		this.isDragging.set(false);
+		if (this.canUpload() && event.dataTransfer?.files.length) {
+			event.preventDefault();
+			this.addFiles([...event.dataTransfer.files]);
+		}
+	}
+
+	/** Pasted image files become rows; pasted text goes where it's typed. */
+	protected addPasted(event: ClipboardEvent): void {
+		const files = [...(event.clipboardData?.files ?? [])];
+		if (this.canUpload() && files.length > 0) {
+			event.preventDefault();
+			this.addFiles(files);
+		}
+	}
+
+	protected moveRow(fromIndex: number, toIndex: number): void {
+		this.rows.update((rows) => {
+			const reordered = [...rows];
+			moveItemInArray(reordered, fromIndex, toIndex);
+			return reordered;
+		});
+	}
+
+	private addFiles(files: File[]): void {
 		this.rows.update((rows) => [
 			...rows,
 			...files.map((file) => ({

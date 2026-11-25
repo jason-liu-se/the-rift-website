@@ -1,156 +1,221 @@
-<section class="bulk-create" aria-labelledby="bulk-create-heading">
-	<h2 id="bulk-create-heading" class="heading" tabindex="-1">
-		Add many images
-	</h2>
-
-	<div class="sources">
-		<button
-			mat-flat-button
-			color="primary"
-			type="button"
-			[disabled]="!canUpload()"
-			(click)="fileInput.click()"
+<app-modal-shell heading="Upload images" (closed)="closed.emit()">
+	<div class="body">
+		<div
+			class="drop-zone"
+			[class.dragging]="isDragging()"
+			(dragover)="allowDrop($event)"
+			(dragleave)="isDragging.set(false)"
+			(drop)="addDropped($event)"
 		>
-			Pick files
-		</button>
-		<input
-			#fileInput
-			type="file"
-			multiple
-			hidden
-			[accept]="acceptedTypes"
-			(change)="addFiles($event)"
-		/>
-		@if (!canUpload()) {
-			<p>
-				Uploads are off until the server can be reached. Links still
-				work.
-			</p>
-		}
-		<mat-form-field class="links" subscriptSizing="dynamic">
-			<mat-label>Or paste links, one per line</mat-label>
-			<textarea
-				matInput
-				rows="2"
-				[ngModel]="pastedLinks()"
-				(ngModelChange)="pastedLinks.set($event)"
-			></textarea>
-		</mat-form-field>
-		<button
-			mat-stroked-button
-			type="button"
-			[disabled]="!pastedLinks().trim()"
-			(click)="addLinks()"
-		>
-			Add links
-		</button>
-	</div>
-
-	<fieldset class="set-all">
-		<legend>For every image</legend>
-		<div class="set-all-field">
-			<mat-form-field subscriptSizing="dynamic">
-				<mat-label>Collection</mat-label>
-				<mat-select
-					[ngModel]="allCollection()"
-					(ngModelChange)="
-						allCollection.set($event); setAll('collection')
-					"
+			<mat-icon class="drop-icon" aria-hidden="true"
+				>add_photo_alternate</mat-icon
+			>
+			<p class="drop-text">
+				Drop images here or paste them, or
+				<button
+					mat-flat-button
+					color="primary"
+					type="button"
+					[disabled]="!canUpload()"
+					(click)="fileInput.click()"
 				>
-					@for (collection of collections(); track collection.slug) {
-						<mat-option [value]="collection.slug">{{
-							collection.title
-						}}</mat-option>
-					}
-				</mat-select>
-			</mat-form-field>
-		</div>
-		<div class="set-all-field">
-			<app-tag-input
-				label="Tags"
-				[tags]="allTags()"
-				(tagsChange)="allTags.set($event)"
+					<mat-icon>upload</mat-icon>
+					Choose files
+				</button>
+			</p>
+			<input
+				#fileInput
+				type="file"
+				multiple
+				hidden
+				[accept]="acceptedTypes"
+				(change)="addChosenFiles($event)"
 			/>
-			<button mat-stroked-button type="button" (click)="setAll('tags')">
-				Set all tags
-			</button>
-		</div>
-		<mat-checkbox
-			color="primary"
-			[ngModel]="isAllVisible()"
-			(ngModelChange)="isAllVisible.set($event); setAll('visibility')"
-			>Visible to everyone</mat-checkbox
-		>
-	</fieldset>
-
-	<ol class="rows" aria-label="Images to add">
-		@for (row of rows(); track row.id; let index = $index) {
-			<li class="row" [class.has-problem]="row.problem">
-				<img class="thumbnail" [src]="row.previewUrl" alt="" />
-				<div class="row-fields">
-					<mat-form-field subscriptSizing="dynamic">
-						<mat-label>Caption for image {{ index + 1 }}</mat-label>
-						<input
-							matInput
-							[maxlength]="maxCaptionLength"
-							[ngModel]="row.caption"
-							(ngModelChange)="
-								updateRow(row.id, { caption: $event })
-							"
-						/>
-					</mat-form-field>
+			@if (!canUpload()) {
+				<p class="note">
+					Uploads are off until the server can be reached. Links still
+					work.
+				</p>
+			}
+			<details class="links">
+				<summary>Add by link instead</summary>
+				<div class="links-form">
 					<mat-form-field subscriptSizing="dynamic">
 						<mat-label
-							>Collection for image {{ index + 1 }}</mat-label
+							>imgur or imgbb links, one per line</mat-label
 						>
-						<mat-select
-							[ngModel]="row.collection"
-							(ngModelChange)="
-								updateRow(row.id, { collection: $event })
-							"
-						>
-							@for (
-								collection of collections();
-								track collection.slug
-							) {
-								<mat-option [value]="collection.slug">{{
-									collection.title
-								}}</mat-option>
-							}
-						</mat-select>
+						<textarea
+							matInput
+							rows="3"
+							[ngModel]="pastedLinks()"
+							(ngModelChange)="pastedLinks.set($event)"
+						></textarea>
 					</mat-form-field>
-					<app-tag-input
-						[label]="'Tags for image ' + (index + 1)"
-						[tags]="row.tags"
-						(tagsChange)="updateRow(row.id, { tags: $event })"
-					/>
-					<mat-checkbox
-						color="primary"
-						[ngModel]="row.isVisible"
-						(ngModelChange)="
-							updateRow(row.id, { isVisible: $event })
-						"
-						>Visible</mat-checkbox
+					<button
+						mat-stroked-button
+						type="button"
+						[disabled]="!pastedLinks().trim()"
+						(click)="addLinks()"
 					>
-					@if (row.problem) {
-						<p class="problem">{{ row.problem }}</p>
-					}
+						<mat-icon>add_link</mat-icon>
+						Add links
+					</button>
 				</div>
-				<button
-					mat-icon-button
-					type="button"
-					[attr.aria-label]="'Remove image ' + (index + 1)"
-					(click)="removeRow(row.id)"
-				>
-					<mat-icon>close</mat-icon>
-				</button>
-			</li>
-		} @empty {
-			<li class="empty">Pick files or paste links to start.</li>
-		}
-	</ol>
+			</details>
+		</div>
 
-	<div class="actions">
+		@if (rows().length > 1) {
+			<fieldset class="apply-all">
+				<legend>Apply to all</legend>
+				<mat-form-field subscriptSizing="dynamic">
+					<mat-label>Collection</mat-label>
+					<mat-select
+						[ngModel]="allCollection()"
+						(ngModelChange)="
+							allCollection.set($event); setAll('collection')
+						"
+					>
+						@for (
+							collection of collections();
+							track collection.slug
+						) {
+							<mat-option [value]="collection.slug">{{
+								collection.title
+							}}</mat-option>
+						}
+					</mat-select>
+				</mat-form-field>
+				<div class="apply-tags">
+					<app-tag-input
+						label="Tags"
+						[tags]="allTags()"
+						(tagsChange)="allTags.set($event)"
+					/>
+					<button
+						mat-stroked-button
+						type="button"
+						(click)="setAll('tags')"
+					>
+						Apply tags
+					</button>
+				</div>
+				<mat-checkbox
+					color="primary"
+					[ngModel]="isAllVisible()"
+					(ngModelChange)="
+						isAllVisible.set($event); setAll('visibility')
+					"
+					>Show on the site</mat-checkbox
+				>
+			</fieldset>
+		}
+
+		<ol
+			class="rows"
+			aria-label="Images to upload"
+			cdkDropList
+			(cdkDropListDropped)="
+				moveRow($event.previousIndex, $event.currentIndex)
+			"
+		>
+			@for (row of rows(); track row.id; let index = $index) {
+				<li
+					class="row"
+					cdkDrag
+					cdkDragLockAxis="y"
+					[class.has-problem]="row.problem"
+				>
+					<span class="drag-handle" cdkDragHandle aria-hidden="true">
+						<mat-icon>drag_indicator</mat-icon>
+					</span>
+					<img class="thumbnail" [src]="row.previewUrl" alt="" />
+					<div class="row-fields">
+						<mat-form-field
+							class="caption"
+							subscriptSizing="dynamic"
+						>
+							<mat-label
+								>Caption for image {{ index + 1 }}</mat-label
+							>
+							<input
+								matInput
+								required
+								[maxlength]="maxCaptionLength"
+								[ngModel]="row.caption"
+								(ngModelChange)="
+									updateRow(row.id, { caption: $event })
+								"
+							/>
+						</mat-form-field>
+						<mat-form-field subscriptSizing="dynamic">
+							<mat-label
+								>Collection for image {{ index + 1 }}</mat-label
+							>
+							<mat-select
+								required
+								[ngModel]="row.collection"
+								(ngModelChange)="
+									updateRow(row.id, { collection: $event })
+								"
+							>
+								@for (
+									collection of collections();
+									track collection.slug
+								) {
+									<mat-option [value]="collection.slug">{{
+										collection.title
+									}}</mat-option>
+								}
+							</mat-select>
+						</mat-form-field>
+						<app-tag-input
+							[label]="'Tags for image ' + (index + 1)"
+							[tags]="row.tags"
+							(tagsChange)="updateRow(row.id, { tags: $event })"
+						/>
+						<mat-checkbox
+							color="primary"
+							[ngModel]="row.isVisible"
+							(ngModelChange)="
+								updateRow(row.id, { isVisible: $event })
+							"
+							>Show on the site</mat-checkbox
+						>
+						@if (row.problem) {
+							<p class="problem">{{ row.problem }}</p>
+						}
+					</div>
+					<div class="row-actions">
+						@if (index > 0) {
+							<button
+								mat-icon-button
+								type="button"
+								matTooltip="Move up"
+								[attr.aria-label]="
+									'Move image ' + (index + 1) + ' up'
+								"
+								(click)="moveRow(index, index - 1)"
+							>
+								<mat-icon>arrow_upward</mat-icon>
+							</button>
+						}
+						<button
+							mat-icon-button
+							type="button"
+							matTooltip="Remove"
+							[attr.aria-label]="'Remove image ' + (index + 1)"
+							(click)="removeRow(row.id)"
+						>
+							<mat-icon>close</mat-icon>
+						</button>
+					</div>
+				</li>
+			}
+		</ol>
+	</div>
+
+	<div class="footer" modalFooter>
+		<p class="summary" role="status">{{ summary() }}</p>
 		<button
 			mat-flat-button
 			color="primary"
@@ -158,10 +223,8 @@
 			[disabled]="rows().length === 0 || isPublishing()"
 			(click)="uploadAndPublish()"
 		>
+			<mat-icon>publish</mat-icon>
 			{{ isPublishing() ? "Publishing…" : publishLabel() }}
 		</button>
-		<button mat-stroked-button type="button" (click)="closed.emit()">
-			Close
-		</button>
 	</div>
-</section>
+</app-modal-shell>
