@@ -6,7 +6,10 @@ export interface ItemNoun {
 	many: string;
 }
 
-export const DRAFT_NOUN: ItemNoun = { one: 'draft', many: 'drafts' };
+export const DRAFT_NOUN: ItemNoun = {
+	one: 'unpublished change',
+	many: 'unpublished changes'
+};
 
 /** What a bulk action did, for messages: "Deleted", "Moved". */
 export type BulkActionName =

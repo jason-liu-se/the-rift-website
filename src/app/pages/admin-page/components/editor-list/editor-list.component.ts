@@ -10,7 +10,7 @@ import { FallbackPanelComponent } from 'src/app/components/fallback-panel/fallba
 import { CollectionsStore } from '../../services/collections-store.service';
 import { toCollectionType } from '../../editor-types';
 import { BulkActionBarComponent } from './bulk-action-bar/bulk-action-bar.component';
-import { countItems } from './bulk-results';
+import { DRAFT_NOUN, countItems } from './bulk-results';
 import { EditorListStore } from './editor-list.store';
 import {
 	ListFiltersComponent,
@@ -61,7 +61,7 @@ export class EditorListComponent {
 		const { items, draftIds } = this.store.pageRows();
 		return [
 			countItems(items.length, this.noun()),
-			countItems(draftIds.length, { one: 'draft', many: 'drafts' })
+			countItems(draftIds.length, DRAFT_NOUN)
 		]
 			.filter((part) => !part.startsWith('0 '))
 			.join(' and ');

@@ -122,7 +122,7 @@ describe('EditorListStore and EditorListActions', () => {
 		actions.runBulkAction({ action: 'delete' });
 
 		expect(confirmations).toEqual([
-			`Delete ${EDITOR_NEWS_POSTS.length} posts and 1 draft?`
+			`Delete ${EDITOR_NEWS_POSTS.length} posts and 1 unpublished change?`
 		]);
 		const bulk = http.expectOne(`${EDITOR_URL}/news/bulk`);
 		expect(bulk.request.method).toBe('DELETE');
