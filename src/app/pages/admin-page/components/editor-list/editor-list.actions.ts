@@ -36,6 +36,7 @@ import { BulkActionRunnerService } from './bulk-action-runner.service';
 import {
 	BulkSummary,
 	DRAFT_NOUN,
+	ItemNoun,
 	countItems,
 	summarizeBulkResults
 } from './bulk-results';
@@ -99,7 +100,8 @@ export class EditorListActions implements BulkActionHost {
 	 * per item whose position changed.
 	 */
 	public moveItem(fromIndex: number, toIndex: number): void {
-		if (fromIndex === toIndex) {
+		// A move waits for the last to save: it diffs against saved positions.
+		if (fromIndex === toIndex || this.store.isBusy()) {
 			return;
 		}
 		this.store.moveItem(fromIndex, toIndex);
@@ -137,7 +139,7 @@ export class EditorListActions implements BulkActionHost {
 	public toggleVisibility(row: ItemRow): void {
 		this.applyUpdate({ action: row.item.visible ? 'hide' : 'show' }, [
 			row.item
-		]);
+		]).subscribe();
 	}
 
 	public delete(row: ListRow): void {
@@ -181,76 +183,84 @@ export class EditorListActions implements BulkActionHost {
 	 * selected items and drafts, or an update of the selected items.
 	 */
 	public runBulkAction(action: BulkActionOf<EditorContentType>): void {
-		const selected = this.selectedItems();
 		if (action.action === 'delete') {
 			this.deleteSelection();
 			return;
 		}
-		this.store.isBusy.set(true);
-		selected.pipe(finalize(() => this.store.isBusy.set(false))).subscribe({
-			next: (items) => this.applyUpdate(action as UndoableAction, items),
-			error: (error: unknown) =>
-				this.notifier.notifyFailure(describeWriteError(error))
-		});
+		this.selectedItems()
+			.pipe(
+				switchMap((items) =>
+					this.applyUpdate(action as UndoableAction, items)
+				)
+			)
+			.subscribe({
+				error: (error: unknown) =>
+					this.notifier.notifyFailure(describeWriteError(error))
+			});
 	}
 
 	/**
 	 * Updates the items it would change, then says how it went, with Undo
-	 * when it all went through.
+	 * when it all went through. Busy (so the bar's actions wait) until done.
 	 */
 	private applyUpdate(
 		action: UndoableAction,
 		items: readonly UndoableItem[]
-	): void {
+	): Observable<unknown> {
 		const changing = items.filter((item) => wouldChange(action, item));
 		if (changing.length === 0) {
 			this.notifier.notifySuccess('Nothing to change.');
-			return;
+			return EMPTY;
 		}
 		const before = new Map(changing.map((item) => [item.id, item]));
+		// Undo may come after switching tools, so it keeps this one's.
+		const type = this.type();
 		const noun = this.store.config().noun;
 		this.store.isBusy.set(true);
-		this.bulkRunner
+		return this.bulkRunner
 			.run(
-				this.type(),
+				type,
 				action as BulkActionOf<EditorContentType>,
 				changing.map(toRef)
 			)
 			.pipe(
+				tap((results) => {
+					const summary = summarizeBulkResults(
+						action.action,
+						results,
+						noun
+					);
+					const steps = toUndoSteps(
+						action,
+						before,
+						results as BulkItemResult<UndoableItem>[]
+					);
+					if (summary.hasFailures || steps.length === 0) {
+						this.notifier.notify(summary);
+						return;
+					}
+					this.notifier.notifyWithUndo(summary.message, () =>
+						this.undo(type, noun, steps)
+					);
+				}),
 				finalize(() => {
 					this.store.isBusy.set(false);
 					this.store.reload();
 				})
-			)
-			.subscribe((results) => {
-				const summary = summarizeBulkResults(
-					action.action,
-					results,
-					noun
-				);
-				const steps = toUndoSteps(
-					action,
-					before,
-					results as BulkItemResult<UndoableItem>[]
-				);
-				if (summary.hasFailures || steps.length === 0) {
-					this.notifier.notify(summary);
-					return;
-				}
-				this.notifier.notifyWithUndo(summary.message, () =>
-					this.undo(steps)
-				);
-			});
+			);
 	}
 
-	private undo(steps: readonly UndoStep[]): void {
-		const noun = this.store.config().noun;
+	private undo(
+		type: EditorContentType,
+		noun: ItemNoun,
+		steps: readonly UndoStep[]
+	): void {
 		this.store.isBusy.set(true);
 		from(steps)
 			.pipe(
 				concatMap(({ items, ...action }) =>
 					this.bulkRunner.run(
-						this.type(),
+						type,
 						action as BulkActionOf<EditorContentType>,
 						items
 					)

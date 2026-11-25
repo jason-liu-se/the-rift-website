@@ -132,8 +132,8 @@ export class EditorListStore {
 	);
 	/**
 	 * The rows can be put in order: the type has an order, it's sorted by it,
-	 * one collection is chosen and nothing else filtered, and every item is
-	 * on this page.
+	 * one collection is chosen and nothing else filtered, every item is on
+	 * this page, and nothing is saving.
 	 */
 	public readonly isReorderable = computed(() => {
 		const config = this.config();
@@ -145,7 +145,8 @@ export class EditorListStore {
 			!status &&
 			scope === 'all' &&
 			(!sort || sort === config.sortOptions[0]?.sort) &&
-			this.total() <= EDITOR_PAGE_SIZE
+			this.total() <= EDITOR_PAGE_SIZE &&
+			!this.isBusy()
 		);
 	});
 	/** Every item matching the filters, and the drafts listed with them. */

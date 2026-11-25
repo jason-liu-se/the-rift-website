@@ -7,6 +7,7 @@ import {
 } from '@angular/cdk/drag-drop';
 import {
 	Component,
+	DestroyRef,
 	ElementRef,
 	Injector,
 	afterNextRender,
@@ -62,6 +63,8 @@ export class DimensionsEditorComponent {
 	private injector = inject(Injector);
 	private host = inject<ElementRef<HTMLElement>>(ElementRef);
 	private notifier = inject(AdminNotifierService);
+	/** Undo outlives the editor (its toast stays), so it checks first. */
+	private isDestroyed = false;
 
 	public readonly dimensions = input.required<readonly MapDimension[]>();
 	public readonly dimensionsChange = output<MapDimension[]>();
@@ -69,6 +72,10 @@ export class DimensionsEditorComponent {
 	protected readonly maxDimensions = MAX_MAP_DIMENSIONS;
 	protected readonly maxNameLength = MAX_MAP_DIMENSION_NAME_LENGTH;
 	protected readonly maxWorldFieldLength = MAX_MAP_WORLD_FIELD_LENGTH;
+
+	constructor() {
+		inject(DestroyRef).onDestroy(() => (this.isDestroyed = true));
+	}
 
 	protected updateDimension(
 		index: number,
@@ -111,9 +118,13 @@ export class DimensionsEditorComponent {
 		);
 		this.notifier.notifyWithUndo(`Removed ${name}.`, () => {
 			const dimensions = [...this.dimensions()];
-			dimensions.splice(index, 0, removed);
+			if (this.isDestroyed || dimensions.length >= this.maxDimensions) {
+				return;
+			}
+			const at = Math.min(index, dimensions.length);
+			dimensions.splice(at, 0, removed);
 			this.dimensionsChange.emit(dimensions);
-			this.focusAfterRender(index, 'input');
+			this.focusAfterRender(at, 'input');
 		});
 		this.focusAfterRender(Math.max(0, index - 1), '.add-dimension');
 	}
