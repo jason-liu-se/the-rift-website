@@ -79,6 +79,8 @@ describe('EditorListStore and EditorListActions', () => {
 						notifySuccess: (message: string) =>
 							messages.push(message),
 						notifyFailure: (message: string) =>
+							messages.push(message),
+						notifyWithUndo: (message: string) =>
 							messages.push(message)
 					}
 				}

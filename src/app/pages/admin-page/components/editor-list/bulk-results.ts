@@ -10,7 +10,14 @@ export const DRAFT_NOUN: ItemNoun = { one: 'draft', many: 'drafts' };
 
 /** What a bulk action did, for messages: "Deleted", "Moved". */
 export type BulkActionName =
-	'create' | 'delete' | 'show' | 'hide' | 'move' | 'add-tags' | 'remove-tags';
+	| 'create'
+	| 'delete'
+	| 'show'
+	| 'hide'
+	| 'move'
+	| 'add-tags'
+	| 'remove-tags'
+	| 'undo';
 
 const DONE_VERBS: Record<BulkActionName, string> = {
 	create: 'Published',
@@ -19,7 +26,8 @@ const DONE_VERBS: Record<BulkActionName, string> = {
 	hide: 'Hid',
 	move: 'Moved',
 	'add-tags': 'Tagged',
-	'remove-tags': 'Untagged'
+	'remove-tags': 'Untagged',
+	undo: 'Put back'
 };
 
 /** One message for a bulk response, and whether anything failed. */
@@ -51,6 +59,10 @@ export function summarizeBulkResults(
 	const count = (outcome: BulkItemResult<unknown>['outcome']) =>
 		results.filter((result) => result.outcome === outcome).length;
 	const reasons = [...new Set(results.flatMap(invalidReason))];
+	// Nothing went through, all for one reason (the request failed): say just why.
+	if (count('invalid') === results.length && reasons.length === 1) {
+		return { message: reasons[0], hasFailures: true };
+	}
 	const why = [
 		count('conflict') &&
 			`${count('conflict')} changed since you loaded ${count('conflict') === 1 ? 'it' : 'them'} (reload and try again)`,

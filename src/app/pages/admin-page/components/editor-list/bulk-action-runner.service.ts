@@ -20,7 +20,9 @@ import { BulkItemResult, BulkResponse } from 'src/app/interfaces/api-responses';
 import {
 	BulkActionOf,
 	BulkUpdateRequestOf,
-	ListQueryOf
+	ItemOf,
+	ListQueryOf,
+	SummaryOf
 } from 'src/app/services/editor-content/editor-content-types';
 import { EditorContentService } from 'src/app/services/editor-content/editor-content.service';
 import { DraftStore } from '../../drafts/draft-store.service';
@@ -28,14 +30,14 @@ import { describeWriteError } from '../../utilities/write-errors';
 import {
 	BulkSummary,
 	DRAFT_NOUN,
-	ItemNoun,
 	summarizeBulkResults,
 	toChunks
 } from './bulk-results';
 
 /**
  * Runs a bulk action on a selection: in requests of at most MAX_BULK_ITEMS,
- * one after another, with one summary per request as its response arrives.
+ * one after another, answering every item's result once all are done (a
+ * request that failed as a whole counts its items `invalid`, with why).
  */
 @Injectable({ providedIn: 'root' })
 export class BulkActionRunnerService {
@@ -45,22 +47,29 @@ export class BulkActionRunnerService {
 	public run<T extends EditorContentType>(
 		type: T,
 		action: BulkActionOf<T>,
-		refs: readonly BulkItemRef[],
-		noun: ItemNoun
-	): Observable<BulkSummary> {
+		refs: readonly BulkItemRef[]
+	): Observable<BulkItemResult<ItemOf<T>>[]> {
 		return from(toChunks(refs, MAX_BULK_ITEMS)).pipe(
 			concatMap((items) =>
 				this.send(type, action, items).pipe(
-					map(({ results }) =>
-						summarizeBulkResults(action.action, results, noun)
-					),
-					catchError((error: unknown) =>
-						of({
-							message: describeWriteError(error),
-							hasFailures: true
-						})
-					)
+					map(({ results }) => results as BulkItemResult<ItemOf<T>>[]),
+					catchError((error: unknown) => {
+						const reason = describeWriteError(error);
+						return of(
+							items.map(
+								({ id }): BulkItemResult<ItemOf<T>> => ({
+									id,
+									outcome: 'invalid',
+									reason
+								})
+							)
+						);
+					})
 				)
+			),
+			reduce<BulkItemResult<ItemOf<T>>[], BulkItemResult<ItemOf<T>>[]>(
+				(all, results) => [...all, ...results],
+				[]
 			)
 		);
 	}
@@ -95,7 +104,7 @@ export class BulkActionRunnerService {
 	public fetchAllMatching<T extends EditorContentType>(
 		type: T,
 		query: ListQueryOf<T>
-	): Observable<BulkItemRef[]> {
+	): Observable<SummaryOf<T>[]> {
 		const fetchPage = (startIndex: number) =>
 			this.editorContent
 				.fetchItems(type, {
@@ -111,17 +120,8 @@ export class BulkActionRunnerService {
 					? fetchPage(next)
 					: EMPTY;
 			}),
-			reduce<
-				{ page: { items: { id: string; revision: number }[] } },
-				BulkItemRef[]
-			>(
-				(refs, { page }) => [
-					...refs,
-					...page.items.map(({ id, revision }) => ({
-						id,
-						startingRevision: revision
-					}))
-				],
+			reduce<{ page: { items: SummaryOf<T>[] } }, SummaryOf<T>[]>(
+				(items, { page }) => [...items, ...page.items],
 				[]
 			)
 		);
