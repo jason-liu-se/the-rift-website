@@ -1,13 +1,11 @@
+import { STORAGE_KEYS } from '../../services/browser-storage/browser-storage.service';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { ToastService } from 'src/app/components/toast/toast.service';
 import { SessionUser } from 'src/app/interfaces/api-responses';
-import {
-	AuthService,
-	SAVED_USER_KEY
-} from 'src/app/services/auth/auth.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 import {
 	ANY_URL_ROUTES,
@@ -50,7 +48,7 @@ describe('NavbarComponent', () => {
 
 	beforeEach(async () => {
 		user.set(undefined);
-		localStorage.removeItem(SAVED_USER_KEY);
+		localStorage.removeItem(STORAGE_KEYS.savedUser);
 		checkSession.mockClear();
 		logout.mockClear();
 		show.mockClear();
@@ -66,7 +64,8 @@ describe('NavbarComponent', () => {
 						checkSession,
 						logout,
 						hasSavedUser: () =>
-							localStorage.getItem(SAVED_USER_KEY) !== null
+							localStorage.getItem(STORAGE_KEYS.savedUser) !==
+							null
 					}
 				},
 				{ provide: ToastService, useValue: { show } }
@@ -82,7 +81,7 @@ describe('NavbarComponent', () => {
 		resetViewport();
 		vi.unstubAllGlobals();
 		document.documentElement.style.removeProperty(NAVBAR_HEIGHT_VARIABLE);
-		localStorage.removeItem(SAVED_USER_KEY);
+		localStorage.removeItem(STORAGE_KEYS.savedUser);
 	});
 
 	it('publishes its height for scroll padding', () => {
@@ -228,7 +227,10 @@ describe('NavbarComponent', () => {
 		});
 
 		it('checks the session after rendering when a user is saved', () => {
-			localStorage.setItem(SAVED_USER_KEY, JSON.stringify(EDITOR));
+			localStorage.setItem(
+				STORAGE_KEYS.savedUser,
+				JSON.stringify(EDITOR)
+			);
 
 			renderComponent(NavbarComponent);
 

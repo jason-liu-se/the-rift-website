@@ -10,7 +10,6 @@ import {
 	Observable,
 	Subject,
 	catchError,
-	filter,
 	finalize,
 	fromEvent,
 	map,
@@ -20,17 +19,11 @@ import {
 } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { SessionUser } from '../../interfaces/api-responses';
+import {
+	BrowserStorage,
+	STORAGE_KEYS
+} from '../browser-storage/browser-storage.service';
 import { unversioned } from '../content-version/content-version.service';
-
-/** The `localStorage` key holding the last-known user. */
-export const SAVED_USER_KEY = 'session-user';
-
-/**
- * The `localStorage` key set while the API hasn't confirmed a logout. Only the
- * API can clear the httpOnly session cookies, so until it does, the old user
- * would be logged straight back in.
- */
-export const LOGOUT_PENDING_KEY = 'logout-pending';
 
 /**
  * Why a session ended without a logout in this tab: it expired (or was
@@ -63,6 +56,7 @@ export const isUnauthorized = (error: unknown): boolean =>
 })
 export class AuthService {
 	private http = inject(HttpClient);
+	private storage = inject(BrowserStorage);
 	private isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 	private readonly state = signal<SessionUser | null | undefined>(undefined);
 	private check$?: Observable<unknown>;
@@ -89,12 +83,9 @@ export class AuthService {
 
 	constructor() {
 		if (this.isBrowser) {
-			// Fires for changes made in other tabs only.
-			fromEvent<StorageEvent>(window, 'storage')
-				.pipe(
-					filter(({ key }) => key === SAVED_USER_KEY || key === null),
-					takeUntilDestroyed()
-				)
+			this.storage
+				.changesFromOtherTabs(STORAGE_KEYS.savedUser)
+				.pipe(takeUntilDestroyed())
 				.subscribe(() => {
 					const user = this.readSavedUser();
 					const wasLoggedOut = this.state() === null;
@@ -173,14 +164,7 @@ export class AuthService {
 
 	/** Whether the API still has to be told about a logout. */
 	public isLogoutPending(): boolean {
-		if (!this.isBrowser) {
-			return false;
-		}
-		try {
-			return localStorage.getItem(LOGOUT_PENDING_KEY) !== null;
-		} catch {
-			return false;
-		}
+		return this.storage.get('local', STORAGE_KEYS.logoutPending) !== null;
 	}
 
 	/**
@@ -215,17 +199,11 @@ export class AuthService {
 	}
 
 	private setLogoutPending(pending: boolean): void {
-		if (!this.isBrowser) {
-			return;
-		}
-		try {
-			if (pending) {
-				localStorage.setItem(LOGOUT_PENDING_KEY, 'true');
-			} else {
-				localStorage.removeItem(LOGOUT_PENDING_KEY);
-			}
-		} catch {
-			// Nothing to do: only the retry is lost.
+		// Without storage, only the retry is lost.
+		if (pending) {
+			this.storage.set('local', STORAGE_KEYS.logoutPending, 'true');
+		} else {
+			this.storage.remove('local', STORAGE_KEYS.logoutPending);
 		}
 	}
 
@@ -263,27 +241,20 @@ export class AuthService {
 
 	private setUser(user: SessionUser | null): void {
 		this.state.set(user);
-		if (!this.isBrowser) {
-			return;
-		}
-		// Storage can be blocked or full; the session still works without it.
-		try {
-			if (user) {
-				localStorage.setItem(SAVED_USER_KEY, JSON.stringify(user));
-			} else {
-				localStorage.removeItem(SAVED_USER_KEY);
-			}
-		} catch {
-			// Nothing to do: only the API-down fallback and tab syncing are lost.
+		// Without storage, only the API-down fallback and tab syncing are lost.
+		if (user) {
+			this.storage.setJson('local', STORAGE_KEYS.savedUser, user);
+		} else {
+			this.storage.remove('local', STORAGE_KEYS.savedUser);
 		}
 	}
 
 	private readSavedUser(): SessionUser | null {
-		try {
-			const saved = localStorage.getItem(SAVED_USER_KEY);
-			return saved ? (JSON.parse(saved) as SessionUser) : null;
-		} catch {
-			return null;
-		}
+		return (
+			this.storage.getJson<SessionUser>(
+				'local',
+				STORAGE_KEYS.savedUser
+			) ?? null
+		);
 	}
 }

@@ -1,3 +1,4 @@
+import { STORAGE_KEYS } from '../../services/browser-storage/browser-storage.service';
 import {
 	HttpClient,
 	provideHttpClient,
@@ -16,12 +17,7 @@ import {
 	AUTH_REFRESH_URL,
 	authRefreshInterceptor
 } from './auth-refresh.interceptor';
-import {
-	AuthService,
-	LOGOUT_PENDING_KEY,
-	SAVED_USER_KEY,
-	SessionEndReason
-} from './auth.service';
+import { AuthService, SessionEndReason } from './auth.service';
 
 const ME_URL = `${environment.API_URL}/auth/me`;
 const USER: SessionUser = { id: '1', username: 'editor' };
@@ -50,9 +46,9 @@ describe('AuthService', () => {
 		return result;
 	}
 
-	const savedUser = () => localStorage.getItem(SAVED_USER_KEY);
+	const savedUser = () => localStorage.getItem(STORAGE_KEYS.savedUser);
 	const saveUser = (user: SessionUser) =>
-		localStorage.setItem(SAVED_USER_KEY, JSON.stringify(user));
+		localStorage.setItem(STORAGE_KEYS.savedUser, JSON.stringify(user));
 
 	// Before each test, so a failed test's saved user can't leak into the next.
 	beforeEach(() => localStorage.clear());
@@ -140,9 +136,9 @@ describe('AuthService', () => {
 			const removeItem = Storage.prototype.removeItem;
 			vi.spyOn(Storage.prototype, 'removeItem').mockImplementation(
 				function (this: Storage, key: string) {
-					if (key === SAVED_USER_KEY) {
+					if (key === STORAGE_KEYS.savedUser) {
 						pendingWhenRemoved.push(
-							this.getItem(LOGOUT_PENDING_KEY)
+							this.getItem(STORAGE_KEYS.logoutPending)
 						);
 					}
 					removeItem.call(this, key);
@@ -243,7 +239,8 @@ describe('AuthService', () => {
 	describe('logging out', () => {
 		const LOGOUT_URL = `${environment.API_URL}/auth/logout`;
 		const NO_CONTENT = { status: 204, statusText: 'No Content' };
-		const isPending = () => localStorage.getItem(LOGOUT_PENDING_KEY);
+		const isPending = () =>
+			localStorage.getItem(STORAGE_KEYS.logoutPending);
 
 		function signedIn() {
 			setUp();
@@ -365,7 +362,9 @@ describe('AuthService', () => {
 		});
 
 		describe('while pending', () => {
-			beforeEach(() => localStorage.setItem(LOGOUT_PENDING_KEY, 'true'));
+			beforeEach(() =>
+				localStorage.setItem(STORAGE_KEYS.logoutPending, 'true')
+			);
 
 			it('retries once when the app starts, with the session cookies', async () => {
 				setUp();
@@ -447,12 +446,15 @@ describe('AuthService', () => {
 	describe('in other tabs', () => {
 		const otherTab = (newValue: string | null) => {
 			if (newValue) {
-				localStorage.setItem(SAVED_USER_KEY, newValue);
+				localStorage.setItem(STORAGE_KEYS.savedUser, newValue);
 			} else {
-				localStorage.removeItem(SAVED_USER_KEY);
+				localStorage.removeItem(STORAGE_KEYS.savedUser);
 			}
 			window.dispatchEvent(
-				new StorageEvent('storage', { key: SAVED_USER_KEY, newValue })
+				new StorageEvent('storage', {
+					key: STORAGE_KEYS.savedUser,
+					newValue
+				})
 			);
 		};
 
@@ -486,7 +488,7 @@ describe('AuthService', () => {
 
 			otherTab(JSON.stringify(USER));
 			// logout() there marks the logout pending before removing the user.
-			localStorage.setItem(LOGOUT_PENDING_KEY, 'true');
+			localStorage.setItem(STORAGE_KEYS.logoutPending, 'true');
 			otherTab(null);
 
 			expect(reasons).toEqual(['other-tab']);

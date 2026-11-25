@@ -1,0 +1,55 @@
+// The Material components only the admin tools use. Built as its own
+// stylesheet (`admin-theme.css`, not injected: see angular.json) and loaded by
+// AdminPageComponent, so the public pages don't download it.
+@use "@angular/material" as mat;
+@use "material-theme" as *;
+@use "theme-colours" as colours;
+@use "font-sizes" as *;
+
+@include mat.checkbox-theme($app-theme);
+@include mat.form-field-theme($app-theme);
+@include mat.input-theme($app-theme);
+@include mat.select-theme($app-theme);
+@include mat.menu-theme($app-theme);
+@include mat.dialog-theme($app-theme);
+@include mat.snack-bar-theme($app-theme);
+@include mat.radio-theme($app-theme);
+@include mat.chips-theme($app-theme);
+@include mat.autocomplete-theme($app-theme);
+@include mat.progress-bar-theme($app-theme);
+
+// The admin tools' modals (editor, bulk creation): full screen on mobile,
+// large on desktop.
+.admin-modal {
+	width: 100vw;
+	height: 100dvh;
+
+	.mat-mdc-dialog-surface {
+		padding: 16px;
+		border-radius: 0;
+	}
+
+	@media (min-width: 60rem) {
+		width: min(64rem, 92vw);
+		height: auto;
+
+		.mat-mdc-dialog-surface {
+			max-height: 92dvh;
+			padding: 24px 32px;
+			border-radius: 12px;
+		}
+	}
+}
+
+// Admin list filters other than search: compact fields.
+.mat-mdc-form-field.compact {
+	@include mat.form-field-density(-3);
+	@include mat.select-density(-3);
+}
+
+// Hints under admin fields: quieter than the fields they explain.
+.mat-mdc-form-field-hint-wrapper,
+.mat-mdc-form-field-bottom-align::before {
+	color: rgba(colours.$colour-dark-text, 0.75);
+	font-size: $font-size-x-small;
+}

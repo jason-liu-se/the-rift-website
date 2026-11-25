@@ -1,0 +1,32 @@
+@use "../../../theme-colours" as *;
+@use "../../../font-sizes" as *;
+
+.edit-button {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	min-height: 32px;
+	padding: 2px 10px;
+	border: 1px solid $colour-primary;
+	border-radius: 999px;
+	background-color: $colour-light-background;
+	color: $colour-primary;
+	font-size: $font-size-small;
+	font-weight: 600;
+	text-decoration: none;
+
+	mat-icon {
+		width: 18px;
+		height: 18px;
+		font-size: 18px;
+	}
+
+	&:hover {
+		background-color: rgba($colour-primary, 0.08);
+	}
+
+	&:focus-visible {
+		outline: 2px solid $colour-dark-text;
+		outline-offset: 2px;
+	}
+}

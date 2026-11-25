@@ -5,6 +5,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { ADMIN_LOGIN_PATH } from 'src/app/config/admin';
 import { saveLoginReturnUrl } from 'src/app/guards/login-return-url';
+import { BrowserStorage } from 'src/app/services/browser-storage/browser-storage.service';
 import { isOnProtectedPage } from 'src/app/guards/requires-login';
 import {
 	AuthService,
@@ -51,6 +52,7 @@ export const SESSION_ENDED_DIALOG_CONFIG = {
 export class SessionEndedDialogComponent {
 	private dialogRef = inject(DialogRef);
 	private router = inject(Router);
+	private storage = inject(BrowserStorage);
 	private user = inject(AuthService).user;
 
 	public readonly copy = COPY[inject<SessionEndReason>(DIALOG_DATA)];
@@ -74,7 +76,7 @@ export class SessionEndedDialogComponent {
 	}
 
 	public logInAgain(): void {
-		saveLoginReturnUrl(this.router.url);
+		saveLoginReturnUrl(this.storage, this.router.url);
 		this.leaveFor(ADMIN_LOGIN_PATH);
 	}
 

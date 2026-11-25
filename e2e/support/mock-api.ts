@@ -6,12 +6,19 @@
 import { Page } from '@playwright/test';
 // The suite runs against `npm start`, which serves the development environment.
 import { environment } from '../../src/environments/environment.development';
-import { GalleryImage } from '../../src/app/interfaces/api-responses';
 import {
 	CONTENT_VERSION,
+	GalleryCollectionFixture,
 	DOWNLOAD_COLLECTIONS,
+	EDITOR_DOWNLOAD_COLLECTIONS,
+	EDITOR_DOWNLOAD_ITEMS,
+	EDITOR_GALLERY_COLLECTIONS,
+	EDITOR_GALLERY_IMAGES,
+	EDITOR_MAP_SEASONS,
+	EDITOR_NEWS_POSTS,
 	GALLERY_COLLECTIONS,
 	MAP_SEASONS,
+	NEWS_DETAIL_VERSION,
 	NEWS_POSTS,
 	paginate
 } from '../../src/app/testing/api-fixtures';
@@ -28,6 +35,21 @@ const BLUEMAP_PLACEHOLDER =
 	'<!doctype html><html lang="en"><title>BlueMap</title></html>';
 
 const GALLERY_PAGE_PATH = /^\/gallery\/([^/]+)$/;
+/** The editor tools' lists (unfiltered) and collections. */
+const EDITOR_LISTS: Record<string, unknown[]> = {
+	'/editor/news': EDITOR_NEWS_POSTS,
+	'/editor/gallery/images': EDITOR_GALLERY_IMAGES,
+	'/editor/downloads/items': EDITOR_DOWNLOAD_ITEMS,
+	'/editor/maps/seasons': EDITOR_MAP_SEASONS
+};
+/** One item of an editor list, e.g. /editor/news/news-1. */
+const EDITOR_ITEM_PATH = /^(\/editor\/.+)\/([^/]+)$/;
+const EDITOR_COLLECTIONS: Record<string, unknown[]> = {
+	'/editor/gallery/collections': EDITOR_GALLERY_COLLECTIONS,
+	'/editor/downloads/collections': EDITOR_DOWNLOAD_COLLECTIONS
+};
+
+const GALLERY_TAGS_PATH = /^\/gallery\/([^/]+)\/tags$/;
 
 export interface IMockResponse {
 	status: number;
@@ -72,8 +94,22 @@ function paginateByQuery<T>(
 		: ok(paginate(items, startIndex, limit));
 }
 
-function galleryCollection(encodedName: string): GalleryImage[] | undefined {
-	return GALLERY_COLLECTIONS[decodeURIComponent(encodedName)];
+function galleryCollection(
+	encodedSlug: string
+): GalleryCollectionFixture | undefined {
+	const slug = decodeURIComponent(encodedSlug);
+	return GALLERY_COLLECTIONS.find((collection) => collection.slug === slug);
+}
+
+/** The images with every tag in `tags` (comma-separated), as the server filters. */
+function withTags(
+	collection: GalleryCollectionFixture,
+	params: URLSearchParams
+) {
+	const tags = params.get('tags')?.split(',') ?? [];
+	return collection.images.filter((image) =>
+		tags.every((tag) => image.tags.includes(tag))
+	);
 }
 
 /** The fixture response to an API request; shared with mock-api-server.ts. */
@@ -83,6 +119,9 @@ export function respondTo(url: URL): IMockResponse {
 	if (url.pathname === '/content/version') {
 		return ok(CONTENT_VERSION);
 	}
+	if (url.pathname === '/content/version/news') {
+		return ok(NEWS_DETAIL_VERSION);
+	}
 	if (url.pathname === '/news') {
 		return paginateByQuery(NEWS_POSTS, url.searchParams);
 	}
@@ -90,16 +129,47 @@ export function respondTo(url: URL): IMockResponse {
 		return ok(DOWNLOAD_COLLECTIONS);
 	}
 	if (url.pathname === '/gallery') {
-		return ok(Object.keys(GALLERY_COLLECTIONS));
+		return ok(
+			GALLERY_COLLECTIONS.map(({ slug, title }) => ({ slug, title }))
+		);
 	}
 	if (url.pathname === '/maps/seasons') {
 		return ok(MAP_SEASONS);
 	}
+	if (url.pathname in EDITOR_LISTS) {
+		return paginateByQuery(EDITOR_LISTS[url.pathname], url.searchParams);
+	}
+	const editorItem = EDITOR_ITEM_PATH.exec(url.pathname);
+	if (editorItem && editorItem[1] in EDITOR_LISTS) {
+		const item = EDITOR_LISTS[editorItem[1]].find(
+			(candidate) => (candidate as { id: string }).id === editorItem[2]
+		);
+		return item
+			? ok({ content: '', desc: '', dimensions: [], ...item })
+			: notFound;
+	}
+	if (url.pathname in EDITOR_COLLECTIONS) {
+		return ok(EDITOR_COLLECTIONS[url.pathname]);
+	}
+	if (url.pathname === '/editor/drafts') {
+		return ok([]);
+	}
 
 	const pageMatch = GALLERY_PAGE_PATH.exec(url.pathname);
 	if (pageMatch) {
-		const images = galleryCollection(pageMatch[1]);
-		return images ? paginateByQuery(images, url.searchParams) : notFound;
+		const collection = galleryCollection(pageMatch[1]);
+		return collection
+			? paginateByQuery(
+					withTags(collection, url.searchParams),
+					url.searchParams
+				)
+			: notFound;
+	}
+	const tagsMatch = GALLERY_TAGS_PATH.exec(url.pathname);
+	if (tagsMatch) {
+		const collection = galleryCollection(tagsMatch[1]);
+		const tags = collection?.images.flatMap((image) => image.tags);
+		return tags ? ok([...new Set(tags)].sort()) : notFound;
 	}
 
 	return notFound;
