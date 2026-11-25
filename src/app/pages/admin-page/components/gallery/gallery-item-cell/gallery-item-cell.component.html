@@ -1,8 +1,5 @@
-<img class="thumbnail" [src]="item().imageUrl" alt="" loading="lazy" />
+<app-item-thumbnail class="thumbnail" [src]="item().imageUrl" />
 <span>
-	{{ item().caption }}
-	<span class="details"
-		>{{ collectionTitle()
-		}}{{ item().tags.length ? " · " + item().tags.join(", ") : "" }}</span
-	>
+	{{ item().caption || "Untitled" }}
+	<span class="details">{{ details() }}</span>
 </span>

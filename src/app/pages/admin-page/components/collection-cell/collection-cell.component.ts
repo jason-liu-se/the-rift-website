@@ -14,11 +14,13 @@ export class CollectionCellComponent {
 	private collections = inject(CollectionsStore);
 	private type = inject(EditorListStore).type;
 
-	public readonly item = input.required<{ collection: string }>();
+	public readonly item = input.required<{ collection?: string }>();
 
 	protected readonly title = computed(() => {
 		const type = toCollectionType(this.type());
 		const { collection } = this.item();
-		return type ? this.collections.titleOf(type, collection) : collection;
+		return type && collection
+			? this.collections.titleOf(type, collection)
+			: (collection ?? '');
 	});
 }

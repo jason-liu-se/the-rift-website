@@ -1,4 +1,4 @@
-Season {{ item().season }}
+{{ item().season !== undefined ? "Season " + item().season : "Untitled" }}
 <span class="details">
 	{{ item().dimensionCount }}
 	{{ item().dimensionCount === 1 ? "dimension" : "dimensions" }}

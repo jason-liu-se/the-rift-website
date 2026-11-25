@@ -1,2 +1,6 @@
 <app-item-thumbnail [src]="item().imageUrl" />
-<app-markdown class="title" [markdown]="item().title" [inline]="true" />
+<app-markdown
+	class="title"
+	[markdown]="item().title || 'Untitled'"
+	[inline]="true"
+/>

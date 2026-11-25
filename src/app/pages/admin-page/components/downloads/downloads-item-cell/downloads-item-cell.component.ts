@@ -2,7 +2,7 @@ import { Component, input } from '@angular/core';
 import { SummaryOf } from 'src/app/services/editor-content/editor-content-types';
 import { ItemThumbnailComponent } from '../../item-thumbnail/item-thumbnail.component';
 
-/** A download's row: its image and title (its collection is a column). */
+/** A download's or draft's row: its image and title (its collection is a column). */
 @Component({
 	selector: 'app-downloads-item-cell',
 	imports: [ItemThumbnailComponent],
@@ -10,5 +10,5 @@ import { ItemThumbnailComponent } from '../../item-thumbnail/item-thumbnail.comp
 	styleUrl: './downloads-item-cell.component.scss'
 })
 export class DownloadsItemCellComponent {
-	public readonly item = input.required<SummaryOf<'downloads'>>();
+	public readonly item = input.required<Partial<SummaryOf<'downloads'>>>();
 }
