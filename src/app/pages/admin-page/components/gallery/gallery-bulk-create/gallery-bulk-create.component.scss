@@ -84,11 +84,16 @@
 .apply-tags {
 	display: flex;
 	flex: 1 1 18rem;
+	flex-wrap: wrap;
 	align-items: center;
 	gap: 8px;
 
 	app-tag-input {
-		flex: 1;
+		flex: 1 1 12rem;
+	}
+
+	button {
+		white-space: nowrap;
 	}
 }
 
