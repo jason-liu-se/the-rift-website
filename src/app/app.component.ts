@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { publishScrollbarGap } from './layout/publish-scrollbar-gap';
 import { SessionEndedService } from './layout/session-ended/session-ended.service';
 
 @Component({
@@ -14,5 +15,6 @@ export class AppComponent {
 	constructor() {
 		// Before the first navigation, so a fresh load's expired session is told.
 		inject(SessionEndedService).start();
+		publishScrollbarGap();
 	}
 }

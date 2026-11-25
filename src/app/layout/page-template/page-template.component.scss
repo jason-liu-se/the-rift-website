@@ -1,7 +1,9 @@
+// Keeps the page scrollbar's place (src/scrollbar-gap.scss).
 .page-template {
 	display: flex;
 	flex-direction: column;
 	min-height: 100vh;
+	padding-right: var(--scrollbar-gap, 0px);
 }
 
 .template {

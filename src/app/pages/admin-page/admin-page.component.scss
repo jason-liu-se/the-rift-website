@@ -1,5 +1,6 @@
 @use "../../../theme-colours" as *;
 @use "../../../font-sizes" as *;
+@use "../../../scrollbar-gap" as *;
 
 // The admin bar's height (components/admin-bar).
 $bar-height: 3.5rem;
@@ -18,6 +19,7 @@ $tab-bar-height: 4rem;
 	display: flex;
 	flex-direction: column;
 	flex: 1;
+	@include fill-scrollbar-gap;
 	background-color: rgba($colour-light-grey, 0.4);
 	color: $colour-dark-text;
 }
@@ -29,6 +31,7 @@ $tab-bar-height: 4rem;
 	left: 0;
 	z-index: 10;
 	padding: 4px 4px calc(4px + env(safe-area-inset-bottom));
+	@include fixed-fill-scrollbar-gap(4px);
 	border-top: 1px solid rgba($colour-light-text, 0.12);
 	background-color: $colour-dark-background;
 }

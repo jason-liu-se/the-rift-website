@@ -1,5 +1,6 @@
 @use "../../../../../theme-colours" as *;
 @use "../../../../../font-sizes" as *;
+@use "../../../../../scrollbar-gap" as *;
 
 $bar-height: 3.5rem;
 
@@ -17,6 +18,7 @@ $bar-height: 3.5rem;
 	gap: 16px;
 	height: $bar-height;
 	padding: 0 8px 0 16px;
+	@include fill-scrollbar-gap(8px);
 	border-bottom: 1px solid rgba($colour-light-text, 0.12);
 	background-color: $colour-dark-background;
 	color: $colour-light-text;

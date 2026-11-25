@@ -1,5 +1,6 @@
 @use "../../../theme-colours" as *;
 @use "../../../font-sizes" as *;
+@use "../../../scrollbar-gap" as *;
 
 $edge-padding-x: 10px;
 $edge-padding-y: 5%;
@@ -24,6 +25,7 @@ $inner-padding-y: 20px;
 .section-card-wrapper {
 	display: flex;
 	justify-content: center;
+	@include fill-scrollbar-gap;
 }
 
 .section-card {

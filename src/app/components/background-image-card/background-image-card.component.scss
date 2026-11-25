@@ -1,17 +1,20 @@
 @use "../../../theme-colours" as *;
 @use "../../../font-sizes" as *;
+@use "../../../scrollbar-gap" as *;
 
 .background-image-card {
-	width: 100%;
+	@include fill-scrollbar-gap;
 	height: 350px;
 	max-height: 50vh;
 	position: relative;
 }
 
+// Over the whole image, the scrollbar's place too; its text centred on the
+// content.
 .overlay-content {
-	position: relative;
-	width: 100%;
-	height: 100%;
+	position: absolute;
+	inset: 0;
+	padding-right: var(--scrollbar-gap, 0px);
 	color: $colour-light-text;
 	display: flex;
 	justify-content: center;

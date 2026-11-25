@@ -89,6 +89,11 @@ The whole site works by keyboard alone:
   images and embeds scale to their container.
 - Reflow at 320px and 200% zoom without horizontal scroll; 24×24 CSS px minimum
   targets; nothing hover-only.
+- Every page keeps the page scrollbar's place, so content doesn't shift when the
+  scrollbar appears or disappears. A band whose background spans the page (a
+  bar, a section's colour or image) includes `fill-scrollbar-gap` (or
+  `fixed-fill-scrollbar-gap` if fixed) so its background fills that place
+  (`src/scrollbar-gap.scss`).
 - Check how a change looks on other screen sizes. If it doesn't translate
   smoothly, ask whether mobile and desktop should diverge or share one scalable
   approach.

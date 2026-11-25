@@ -1,5 +1,6 @@
 @use "../../../theme-colours" as *;
 @use "../../../font-sizes" as *;
+@use "../../../scrollbar-gap" as *;
 
 * {
 	text-align: center;
@@ -9,8 +10,8 @@
 .contact-section-wrapper {
 	display: flex;
 	justify-content: center;
-	width: 100%;
 	background-color: $colour-light-background;
+	@include fill-scrollbar-gap;
 }
 
 .contact-section {

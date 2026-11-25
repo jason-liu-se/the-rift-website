@@ -1,5 +1,6 @@
 @use "../../components/feedback-card/feedback-variants" as *;
 @use "../../../theme-colours" as *;
+@use "../../../scrollbar-gap" as *;
 
 // In the page's flow, so content makes room for it, but stuck to the top so
 // it stays above the fixed navbar (which sits below it).
@@ -17,11 +18,13 @@
 	justify-content: space-between;
 	gap: 0.5rem;
 	padding: 0.25rem 0.5rem 0.25rem 1rem;
+	@include fill-scrollbar-gap(0.5rem);
 	border-width: 0 0 1px;
 }
 
 // Nothing to say: no height, but the live region stays in the DOM.
 .banner.empty {
+	margin: 0;
 	padding: 0;
 	border-width: 0;
 }

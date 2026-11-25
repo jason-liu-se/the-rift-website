@@ -1,0 +1,20 @@
+// The page scrollbar's place while it's hidden: `--scrollbar-gap`
+// (publishScrollbarGap) is its width then, and 0 while it shows.
+// PageTemplateComponent pads every page by it, so content never shifts as a
+// page grows or shrinks past the window.
+
+// A band whose background spans the page (a bar, a section's colour or
+// image) reaches into that padding, so its background fills the scrollbar's
+// place. `$padding-right` is the band's own. In the page's flow only, and
+// with an auto width (a set width ignores the negative margin).
+@mixin fill-scrollbar-gap($padding-right: 0px) {
+	margin-right: calc(-1 * var(--scrollbar-gap, 0px));
+	padding-right: calc(#{$padding-right} + var(--scrollbar-gap, 0px));
+}
+
+// The same for a fixed band, which spans the window rather than the page.
+// Border-box, so a `width: 100%` band still spans just the window.
+@mixin fixed-fill-scrollbar-gap($padding-right: 0px) {
+	box-sizing: border-box;
+	padding-right: calc(#{$padding-right} + var(--scrollbar-gap, 0px));
+}
