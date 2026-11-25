@@ -35,6 +35,7 @@
 // on:
 //
 //   GET    /editor/<items>          EditorListQuery<NewsStatus> for news,
+//                                   GalleryImageListQuery for the gallery,
 //                                   EditorListQuery for the others
 //   GET    /editor/<items>/:id      —
 //   POST   /editor/<items>          NewsPostCreateRequest, ...
@@ -51,6 +52,10 @@
 //   POST   /editor/<collections>        CollectionCreateRequest
 //   PATCH  /editor/<collections>/:slug  CollectionUpdateRequest
 //   DELETE /editor/<collections>/:slug  DeleteQuery
+//
+// And the gallery's tags, for its tag filter and suggestions:
+//
+//   GET    /editor/gallery/tags         EditorTagsQuery
 //
 // And for drafts (see the Drafts note in api-responses.ts):
 //
@@ -115,8 +120,8 @@ export interface GalleryTagsQuery {
 }
 
 /**
- * An editor list's filters. Lists are in the public order; `total` counts
- * every match.
+ * An editor list's filters and order. Lists are in the public order unless
+ * `sort` names fields; `total` counts every match.
  */
 export interface EditorListQuery<
 	Status extends NewsStatus = ContentStatus
@@ -137,6 +142,26 @@ export interface EditorListQuery<
 	 * by name).
 	 */
 	in?: string;
+	/**
+	 * The fields to sort by, comma-separated and most significant first: any
+	 * of the list's summary fields but `status` (`createdBy` and
+	 * `lastUpdatedBy` by username). Text ignores the case of ASCII letters, a
+	 * missing value sorts first, and ties are broken by `id`, ascending.
+	 */
+	sort?: string;
+	/**
+	 * `asc` or `desc` for each `sort` field, comma-separated and in the same
+	 * order (missing ones are `asc`); more than `sort` has fields is 400.
+	 */
+	order?: string;
+}
+
+/** The gallery editor list's filters, plus its images with every tag. */
+export type GalleryImageListQuery = EditorListQuery & GalleryTagsQuery;
+
+/** The tags containing `q` (case-insensitive, at most 100 characters). */
+export interface EditorTagsQuery {
+	q?: string;
 }
 
 /** A delete: the item's revision when the editor started (stale is 409). */
@@ -297,12 +322,18 @@ export interface DraftListQuery {
 	type?: EditorContentType;
 }
 
+/** Kept with a draft's fields, so a change to only these is saved too. */
+export interface DraftOptions {
+	/** Whether to publish the item visible; publish's `visible` overrides it. */
+	visible?: boolean;
+}
+
 /** What a draft holds, by content type. */
 export type DraftContent =
-	| { type: "news"; fields: Partial<NewsPostFields> }
-	| { type: "gallery"; fields: Partial<GalleryImageFields> }
-	| { type: "downloads"; fields: Partial<DownloadItemFields> }
-	| { type: "maps"; fields: Partial<MapSeasonFields> };
+	| { type: "news"; fields: Partial<NewsPostFields> & DraftOptions }
+	| { type: "gallery"; fields: Partial<GalleryImageFields> & DraftOptions }
+	| { type: "downloads"; fields: Partial<DownloadItemFields> & DraftOptions }
+	| { type: "maps"; fields: Partial<MapSeasonFields> & DraftOptions };
 
 /** The published item an edit draft started from. */
 export interface DraftTarget {
@@ -322,7 +353,8 @@ export type DraftSaveRequest = DraftContent & {
 };
 
 export interface DraftPublishRequest {
-	visible: boolean;
+	/** Overrides the draft's `visible`; with neither, the item is visible. */
+	visible?: boolean;
 	/** News only. Absent: now for a new post, unchanged for an edit. */
 	date?: NewsDate;
 	/** Publish an edit draft whose item was deleted as a new item. */
