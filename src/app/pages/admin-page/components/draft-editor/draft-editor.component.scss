@@ -1,0 +1,107 @@
+@use "../../../../../theme-colours" as *;
+@use "../../../../../font-sizes" as *;
+
+.draft-editor {
+	display: grid;
+	gap: 20px;
+}
+
+.editor-header {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px 16px;
+}
+
+.heading {
+	// Focused on opening, to start screen readers here; not a control.
+	outline: none;
+
+	flex: 1 1 12rem;
+	margin: 0;
+	font-size: $font-size-medium-plus;
+	overflow-wrap: anywhere;
+}
+
+.save-status {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	margin: 0;
+	font-size: $font-size-small;
+}
+
+.changes-tell {
+	padding: 2px 8px;
+	border-radius: 999px;
+	background-color: rgba($colour-warning, 0.1);
+	color: $colour-warning;
+	font-weight: 600;
+}
+
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+}
+
+.tools {
+	display: flex;
+	margin-left: auto;
+}
+
+// Publishing stays in view while the fields scroll. The offsets cancel the
+// modal's padding (.admin-modal in admin-theme.scss).
+.editor-footer {
+	position: sticky;
+	z-index: 1;
+	bottom: -16px;
+	display: grid;
+	gap: 12px;
+	margin: 0 -16px -16px;
+	padding: 12px 16px 16px;
+	border-top: 1px solid $colour-light-grey;
+	background-color: $colour-light-background;
+}
+
+.needs {
+	margin: 0;
+	color: rgba($colour-dark-text, 0.75);
+	font-size: $font-size-small;
+}
+
+@media (min-width: 60rem) {
+	.editor-footer {
+		bottom: -24px;
+		margin: 0 -32px -24px;
+		padding: 12px 32px 24px;
+	}
+}
+
+.fields {
+	display: grid;
+	gap: 16px;
+}
+
+.options {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 4px 24px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+
+	legend {
+		padding: 0 4px;
+		font-weight: 600;
+	}
+
+	mat-radio-group {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px 16px;
+	}
+}

@@ -1,0 +1,138 @@
+<section class="draft-editor" aria-labelledby="draft-editor-heading">
+	<header class="editor-header">
+		<h2 id="draft-editor-heading" class="heading" tabindex="-1" #heading>
+			{{ title() }}
+		</h2>
+		<div class="save-status">
+			@if (session().hasChanges() && session().status() !== "published") {
+				<span class="changes-tell">Unpublished changes</span>
+			}
+			<span role="status">{{ statusText() }}</span>
+			@if (session().status() === "failed") {
+				<button mat-button type="button" (click)="retrySave()">
+					Retry
+				</button>
+			}
+		</div>
+		<div class="tools">
+			<button
+				mat-icon-button
+				type="button"
+				aria-label="Undo"
+				[disabled]="!session().canUndo()"
+				(click)="session().undo()"
+			>
+				<mat-icon>undo</mat-icon>
+			</button>
+			<button
+				mat-icon-button
+				type="button"
+				aria-label="Redo"
+				[disabled]="!session().canRedo()"
+				(click)="session().redo()"
+			>
+				<mat-icon>redo</mat-icon>
+			</button>
+			<button
+				mat-icon-button
+				type="button"
+				aria-label="Close"
+				(click)="close()"
+			>
+				<mat-icon>close</mat-icon>
+			</button>
+		</div>
+	</header>
+
+	<app-draft-conflict
+		[session]="session()"
+		(overwrite)="overwrite()"
+		(publishAsNew)="publishAsNew()"
+		(discard)="discard()"
+	/>
+
+	<div class="fields">
+		<ng-content />
+	</div>
+
+	<footer class="editor-footer">
+		<fieldset class="options">
+			<legend>Publishing</legend>
+			<mat-radio-group
+				aria-label="Who can see it"
+				[ngModel]="isVisible()"
+				(ngModelChange)="isVisible.set($event)"
+			>
+				<mat-radio-button color="primary" [value]="true"
+					>Visible to everyone</mat-radio-button
+				>
+				<mat-radio-button color="primary" [value]="false"
+					>Hidden (editors only)</mat-radio-button
+				>
+			</mat-radio-group>
+			@if (hasDate()) {
+				<mat-radio-group
+					aria-label="When it goes live"
+					[ngModel]="dateChoice()"
+					(ngModelChange)="dateChoice.set($event)"
+				>
+					@if (published()) {
+						<mat-radio-button color="primary" value="keep"
+							>Keep its date</mat-radio-button
+						>
+					}
+					<mat-radio-button color="primary" value="now"
+						>Now</mat-radio-button
+					>
+					<mat-radio-button color="primary" value="schedule"
+						>Schedule</mat-radio-button
+					>
+				</mat-radio-group>
+				@if (dateChoice() === "schedule") {
+					<mat-form-field subscriptSizing="dynamic">
+						<mat-label>Goes live at</mat-label>
+						<input
+							matInput
+							type="datetime-local"
+							[min]="minScheduleTime()"
+							[ngModel]="scheduledAt()"
+							(ngModelChange)="scheduledAt.set($event)"
+						/>
+					</mat-form-field>
+				}
+			}
+		</fieldset>
+
+		<div class="actions">
+			<button
+				mat-flat-button
+				color="primary"
+				type="button"
+				aria-describedby="publish-needs"
+				[disabled]="
+					isPublishing() ||
+					!!session().conflict() ||
+					!!missingFields()
+				"
+				(click)="publish()"
+			>
+				Publish
+			</button>
+			@if (missingFields(); as missing) {
+				<p id="publish-needs" class="needs">
+					Fill in {{ missing }} to publish.
+				</p>
+			}
+			@if (hasDraft()) {
+				<button
+					mat-button
+					color="warn"
+					type="button"
+					(click)="discard()"
+				>
+					Discard draft
+				</button>
+			}
+		</div>
+	</footer>
+</section>
