@@ -155,6 +155,26 @@ describe('DraftSession', () => {
 		});
 	});
 
+	it("keeps an edit's visibility change, but no new draft with only that", () => {
+		const fresh = start({
+			fields: { visible: true },
+			baseline: { visible: true }
+		});
+		fresh.update({ visible: false });
+		const edit = start({
+			fields: { title: 'Theirs', visible: true },
+			baseline: { title: 'Theirs', visible: true },
+			target: { id: 'post-1', startingRevision: 5 }
+		});
+		edit.update({ visible: false });
+
+		expect(fresh.status()).toBe('unchanged');
+		expect(flushAutosave(draft('id-2', 1, {})).body.fields).toEqual({
+			title: 'Theirs',
+			visible: false
+		});
+	});
+
 	it('keeps editing offline, and the store sends it once the server is back', () => {
 		apiStatus.set('offline');
 		TestBed.tick();
@@ -296,7 +316,8 @@ describe('DraftSession', () => {
 		created.flush(draft('id-1', 1, {}));
 		expect(session.mergeReference()).toEqual({
 			title: 'Theirs',
-			content: 'Their content'
+			content: 'Their content',
+			visible: true
 		});
 		session.close();
 	});

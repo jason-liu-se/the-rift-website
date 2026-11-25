@@ -24,7 +24,11 @@ const THEIRS = {
 function fakeSession() {
 	return {
 		type: 'news' as const,
-		fields: signal({ title: 'Mine', content: 'Body' }),
+		fields: signal<object>({
+			title: 'Mine',
+			content: 'Body',
+			visible: false
+		}),
 		status: signal('saved'),
 		conflict: signal<unknown>(undefined),
 		mergeReference: signal<unknown>(undefined),
@@ -48,17 +52,19 @@ describe('DraftEditorComponent', () => {
 	let session: ReturnType<typeof fakeSession>;
 	let element: HTMLElement;
 
+	/** A button by its accessible name: its label, or its text without icons and hidden text. */
 	const button = (name: string) =>
 		[...element.querySelectorAll<HTMLButtonElement>('button')].find(
-			(candidate) =>
-				(candidate.getAttribute('aria-label') ??
-					candidate.textContent
-						?.replace(
-							candidate.querySelector('mat-icon')?.textContent ??
-								'',
-							''
-						)
-						.trim()) === name
+			(candidate) => {
+				const visible = candidate.cloneNode(true) as HTMLElement;
+				visible
+					.querySelectorAll('mat-icon, [aria-hidden="true"]')
+					.forEach((hidden) => hidden.remove());
+				return (
+					(candidate.getAttribute('aria-label') ??
+						visible.textContent?.trim()) === name
+				);
+			}
 		)!;
 	const text = () => element.textContent?.replace(/\s+/g, ' ') ?? '';
 
@@ -89,10 +95,7 @@ describe('DraftEditorComponent', () => {
 			'session',
 			session as unknown as DraftSession<'news'>
 		);
-		TestBed.inject(PublishSettings).reset({
-			visible: false,
-			date: THEIRS.date
-		});
+		TestBed.inject(PublishSettings).reset({ date: THEIRS.date });
 		element = fixture.nativeElement;
 		fixture.detectChanges();
 		await fixture.whenStable();
@@ -108,14 +111,15 @@ describe('DraftEditorComponent', () => {
 		expect(session.undo).toHaveBeenCalled();
 	});
 
-	it("publishes with the published item's visibility and date by default", () => {
+	it("publishes with the draft's visibility and the published date by default", () => {
 		button('Save as hidden').click();
 
-		expect(session.publish).toHaveBeenCalledWith({ visible: false });
+		// The draft carries `visible`; a request without one uses it.
+		expect(session.publish).toHaveBeenCalledWith({});
 	});
 
 	it("won't publish until the required fields are filled in", () => {
-		session.fields.set({ title: 'Mine', content: '' });
+		session.fields.set({ title: 'Mine', content: '', visible: false });
 		fixture.detectChanges();
 
 		button('Save as hidden').click();
@@ -144,7 +148,7 @@ describe('DraftEditorComponent', () => {
 
 		button('Publish as new').click();
 
-		expect(session.publishAsNew).toHaveBeenCalledWith({ visible: false });
+		expect(session.publishAsNew).toHaveBeenCalledWith({});
 	});
 
 	it('discards the changes once confirmed', () => {

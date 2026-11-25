@@ -117,29 +117,52 @@
 
 .visibility {
 	margin-right: 8px;
-	font-size: $font-size-small;
-
-	span {
-		display: inline-block;
-		// The wider word, so the switch doesn't move when it changes.
-		min-width: 3.5rem;
-		font-size: $font-size-small;
-	}
 }
 
 .publish {
 	min-height: 40px;
 }
 
-// Narrow screens: the footer's actions fit one row.
+// Stacked in one cell, so a label changing moves nothing beside the button.
+.publish-labels {
+	display: inline-grid;
+	white-space: nowrap;
+
+	> span {
+		grid-area: 1 / 1;
+		visibility: hidden;
+	}
+
+	> .current {
+		visibility: visible;
+	}
+}
+
+// Narrow screens: the actions in one row, the switch and Publish pinned
+// right, so Discard (left, wrapping if it must) coming and going moves neither.
 @media (max-width: 39.99rem) {
 	.actions {
-		flex-wrap: nowrap;
+		display: grid;
+		grid-template-columns: minmax(0, auto) 1fr auto auto;
 		width: 100%;
 	}
 
+	.discard {
+		grid-column: 1;
+		white-space: normal;
+	}
+
+	.visibility {
+		grid-column: 3;
+	}
+
 	.publish {
-		margin-left: auto;
+		grid-column: 4;
+
+		// Room for the label, which says it.
+		mat-icon {
+			display: none;
+		}
 	}
 }
 

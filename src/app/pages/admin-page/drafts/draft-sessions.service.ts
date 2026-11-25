@@ -5,7 +5,7 @@ import { ApiStatusService } from 'src/app/services/api-status/api-status.service
 import { DraftsService } from 'src/app/services/drafts/drafts.service';
 import { LocalDraft } from 'src/app/services/drafts/local-drafts.service';
 import { ItemOf } from 'src/app/services/editor-content/editor-content-types';
-import { DraftFields, pickFields } from './draft-fields';
+import { DraftFields, pickFields, withVisibility } from './draft-fields';
 import { DraftSession, DraftSessionStart } from './draft-session';
 import { DraftStore } from './draft-store.service';
 
@@ -109,7 +109,12 @@ export class DraftSessionsService {
 	private create<T extends EditorContentType>(
 		start: DraftSessionStart<T>
 	): DraftSession<T> {
-		return new DraftSession(start, {
+		const session = {
+			...start,
+			fields: withVisibility(start.fields),
+			baseline: withVisibility(start.baseline)
+		};
+		return new DraftSession(session, {
 			drafts: this.drafts,
 			store: this.store,
 			apiStatus: this.apiStatus.status,

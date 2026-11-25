@@ -7,20 +7,18 @@ export type DateChoice = 'keep' | 'now' | 'schedule';
 
 /** What the published item was, for the publish options' defaults. */
 export interface PublishedState {
-	visible: boolean;
 	/** News only (ISO 8601). */
 	date?: string;
 }
 
 /**
- * How the open item will publish (visibility, news's date) and whether
- * publishing was tried, shared by the editor's footer and the projected
+ * When the open item will publish (news) and whether publishing was tried
+ * (its visibility is the draft's own `visible`), shared by the editor's footer and the projected
  * form's fields. Provided per editor modal (`providePublishSettings`).
  */
 @Injectable()
 export class PublishSettings {
 	public readonly published = signal<PublishedState | undefined>(undefined);
-	public readonly isVisible = signal(true);
 	public readonly dateChoice = signal<DateChoice>('now');
 	/** A `datetime-local` value, in the editor's time zone. */
 	public readonly scheduledAt = signal('');
@@ -44,30 +42,25 @@ export class PublishSettings {
 			!!control?.invalid && (control.touched || this.wasAttempted())
 	};
 
-	/** Starts from the published item's visibility and date, if any. */
+	/** Starts from the published item's date, if any. */
 	public reset(published: PublishedState | undefined): void {
 		this.published.set(published);
-		this.isVisible.set(published?.visible ?? true);
 		this.dateChoice.set(published ? 'keep' : 'now');
 		this.scheduledAt.set('');
 		this.wasAttempted.set(false);
 	}
 
 	public toRequest(hasDate: boolean): DraftPublishRequest {
-		const options: DraftPublishRequest = { visible: this.isVisible() };
 		if (!hasDate) {
-			return options;
+			return {};
 		}
 		switch (this.dateChoice()) {
 			case 'now':
-				return { ...options, date: 'now' };
+				return { date: 'now' };
 			case 'schedule':
-				return {
-					...options,
-					date: new Date(this.scheduledAt()).toISOString()
-				};
+				return { date: new Date(this.scheduledAt()).toISOString() };
 			default:
-				return options;
+				return {};
 		}
 	}
 }

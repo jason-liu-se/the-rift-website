@@ -146,24 +146,11 @@
 					{{ isEdit() ? "Discard changes" : "Discard" }}
 				</button>
 			}
-			<!-- One switch: on (coloured) is visible to everyone. Named for
-				what "on" means; the visible text says the state. -->
-			<mat-slide-toggle
+			<app-visibility-toggle
 				class="visibility"
-				color="primary"
-				aria-label="Visible on the site"
-				[matTooltip]="
-					settings.isVisible()
-						? 'Everyone can see it'
-						: 'Only editors can see it'
-				"
-				[ngModel]="settings.isVisible()"
-				(ngModelChange)="settings.isVisible.set($event)"
-			>
-				<span aria-hidden="true">{{
-					settings.isVisible() ? "Visible" : "Hidden"
-				}}</span>
-			</mat-slide-toggle>
+				[visible]="isVisible()"
+				(visibleChange)="setVisible($event)"
+			/>
 			<button
 				mat-flat-button
 				color="primary"
@@ -175,7 +162,18 @@
 				<mat-icon aria-hidden="true">{{
 					publishLabel() === "Schedule" ? "schedule" : "publish"
 				}}</mat-icon>
-				{{ isPublishing() ? "Publishing…" : publishLabel() }}
+				<!-- Every label in one place, only the current one shown, so the
+					button is always its widest label's width. -->
+				<span class="publish-labels">
+					@for (label of publishLabels; track label) {
+						@let isCurrent = label === currentPublishLabel();
+						<span
+							[class.current]="isCurrent"
+							[attr.aria-hidden]="isCurrent ? null : true"
+							>{{ label }}</span
+						>
+					}
+				</span>
 			</button>
 		</div>
 	</div>

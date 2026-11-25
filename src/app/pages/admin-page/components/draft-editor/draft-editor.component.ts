@@ -20,21 +20,30 @@ import {
 } from '@angular/material/button-toggle';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
-import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { MatTooltip } from '@angular/material/tooltip';
 import { EMPTY, Observable, catchError, filter } from 'rxjs';
 import { EditorContentType } from 'src/app/interfaces/api-requests';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
 import { ItemOf } from 'src/app/services/editor-content/editor-content-types';
 import { DraftSession, SaveStage } from '../../drafts/draft-session';
-import { findMissingFields } from '../../drafts/draft-fields';
+import { DraftFields, findMissingFields } from '../../drafts/draft-fields';
 import { EDITOR_TYPES } from '../../editor-types';
 import { EditorWriteService } from '../../services/editor-write.service';
 import { describeWriteError } from '../../utilities/write-errors';
 import { itemName } from '../editor-list/item-name';
 import { ModalShellComponent } from '../modal-shell/modal-shell.component';
+import { VisibilityToggleComponent } from '../visibility-toggle/visibility-toggle.component';
 import { DraftConflictComponent } from './draft-conflict/draft-conflict.component';
 import { PublishSettings } from './publish-settings';
+
+/** The publish button's labels (see `publishLabel`), widest included. */
+const PUBLISH_LABELS = [
+	'Publish',
+	'Publish changes',
+	'Save as hidden',
+	'Schedule',
+	'Publishing…'
+] as const;
 
 const STATUS_TEXT: Record<SaveStage, string> = {
 	unchanged: '',
@@ -70,7 +79,6 @@ export interface PublishedItemActions {
 		MatButton,
 		MatButtonToggle,
 		MatButtonToggleGroup,
-		MatSlideToggle,
 		MatIcon,
 		MatIconButton,
 		MatMenu,
@@ -78,7 +86,8 @@ export interface PublishedItemActions {
 		MatMenuTrigger,
 		MatTooltip,
 		ModalShellComponent,
-		NgComponentOutlet
+		NgComponentOutlet,
+		VisibilityToggleComponent
 	],
 	host: {
 		'(keydown)': 'handleShortcuts($event)'
@@ -124,6 +133,9 @@ export class DraftEditorComponent<T extends EditorContentType> {
 		() => this.session().hasChanges() && this.status() !== 'published'
 	);
 	protected readonly isPublishing = signal(false);
+	protected readonly isVisible = computed(
+		() => this.session().fields().visible ?? true
+	);
 	private readonly missingFields = computed(() =>
 		findMissingFields(
 			this.session().fields() as Record<string, unknown>,
@@ -142,6 +154,7 @@ export class DraftEditorComponent<T extends EditorContentType> {
 			? this.settings.scheduleProblem()
 			: undefined;
 	});
+	protected readonly publishLabels = PUBLISH_LABELS;
 	protected readonly publishLabel = computed(() => {
 		if (
 			this.config().hasDate &&
@@ -149,13 +162,21 @@ export class DraftEditorComponent<T extends EditorContentType> {
 		) {
 			return 'Schedule';
 		}
-		if (!this.settings.isVisible()) {
+		if (!this.isVisible()) {
 			return 'Save as hidden';
 		}
 		return this.isEdit() ? 'Publish changes' : 'Publish';
 	});
+	protected readonly currentPublishLabel = computed(() =>
+		this.isPublishing() ? 'Publishing…' : this.publishLabel()
+	);
 	/** There's a draft to discard (anything saved here or on the server). */
 	protected readonly hasDraft = computed(() => this.status() !== 'unchanged');
+
+	/** Kept in the draft, like its fields (and undone like them). */
+	protected setVisible(visible: boolean): void {
+		this.session().update({ visible } as DraftFields<T>);
+	}
 
 	protected publish(): void {
 		this.runPublish(() =>
