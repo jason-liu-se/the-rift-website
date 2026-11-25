@@ -1,0 +1,16 @@
+<div class="tag-filter" role="group" aria-labelledby="tag-filter-label">
+	<span class="label" id="tag-filter-label">Filter by tag</span>
+	@for (tag of tags(); track tag) {
+		<button
+			type="button"
+			class="tag"
+			[attr.aria-pressed]="isSelected(tag)"
+			(click)="toggleTag(tag)"
+		>
+			{{ tag }}
+		</button>
+	}
+	@if (selected().length > 0) {
+		<button type="button" class="clear" (click)="clearTags()">Clear</button>
+	}
+</div>

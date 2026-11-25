@@ -1,0 +1,44 @@
+@use "../../../../../theme-colours" as *;
+@use "../../../../../font-sizes" as *;
+
+.tag-filter {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	margin: 12px 0;
+	color: $colour-dark-text;
+	font-size: $font-size-small;
+}
+
+.label {
+	font-weight: 600;
+}
+
+.tag,
+.clear {
+	min-height: 32px;
+	padding: 4px 12px;
+	border: 1px solid $colour-primary;
+	border-radius: 999px;
+	background-color: $colour-light-background;
+	color: $colour-primary;
+	font: inherit;
+	cursor: pointer;
+
+	&:focus-visible {
+		outline: 2px solid $colour-dark-text;
+		outline-offset: 2px;
+	}
+}
+
+.tag[aria-pressed="true"] {
+	background-color: $colour-primary;
+	color: $colour-light-text;
+}
+
+.clear {
+	border-color: transparent;
+	color: $colour-dark-text;
+	text-decoration: underline;
+}

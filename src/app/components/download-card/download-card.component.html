@@ -5,10 +5,10 @@
 	<div class="download-card">
 		<div class="containers">
 			<div class="text-container">
-				@if (showTitle) {
+				@if (title) {
 					<h2 class="title">{{ title }}</h2>
 				}
-				@if (showDesc) {
+				@if (desc) {
 					<p class="description">{{ desc }}</p>
 				}
 			</div>
@@ -25,6 +25,13 @@
 				Download
 				<span class="cdk-visually-hidden">(opens in new tab)</span>
 			</a>
+			@if (editId) {
+				<app-edit-button
+					type="downloads"
+					[itemId]="editId"
+					[itemName]="title"
+				/>
+			}
 		</div>
 	</div>
 </div>

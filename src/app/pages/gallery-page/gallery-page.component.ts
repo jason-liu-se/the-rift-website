@@ -1,8 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { forkJoin, map, Observable, of, switchMap } from 'rxjs';
 import { GALLERY_FALLBACK_IMAGE } from 'src/app/config/gallery';
+import { GalleryCollection } from 'src/app/interfaces/api-responses';
 import { ICardSelection } from 'src/app/interfaces/card-selection.interface';
-import { galleryCollectionTitle } from 'src/app/services/gallery-provider/gallery-collection-title';
 import { GalleryProviderService } from 'src/app/services/gallery-provider/gallery-provider.service';
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
 import { CardSelectionSectionComponent } from '../../components/card-selection-section/card-selection-section.component';
@@ -38,12 +38,14 @@ export class GalleryPageComponent {
 	public setGalleryCollections(): void {
 		this.loadState.start();
 		this.galleryProvider
-			.getCollectionNamesObservable()
+			.fetchCollections()
 			.pipe(
-				switchMap((names) =>
+				switchMap((collections) =>
 					// forkJoin([]) completes without emitting.
-					names.length
-						? forkJoin([...names].sort(bySeason).map(this.toCard))
+					collections.length
+						? forkJoin(
+								[...collections].sort(bySeason).map(this.toCard)
+							)
 						: of<ICardSelection[]>([])
 				)
 			)
@@ -57,18 +59,21 @@ export class GalleryPageComponent {
 	}
 
 	/** A collection's card, using its first photo and photo count. */
-	private toCard = (name: string): Observable<ICardSelection> =>
-		this.galleryProvider.getCollectionImagesObservable(name, 0, 1).pipe(
+	private toCard = ({
+		slug,
+		title
+	}: GalleryCollection): Observable<ICardSelection> =>
+		this.galleryProvider.fetchCollectionImages(slug, 0, 1).pipe(
 			map(({ items, total }) => ({
 				imageUrl: items[0]?.imageUrl ?? GALLERY_FALLBACK_IMAGE,
-				routerLink: `/gallery/${encodeURIComponent(name)}`,
-				title: galleryCollectionTitle(name),
+				routerLink: `/gallery/${encodeURIComponent(slug)}`,
+				title,
 				desc: `${total} photos`
 			}))
 		);
 }
 
-/** `season5` before `season10`, which a plain string sort gets wrong. */
-function bySeason(a: string, b: string): number {
-	return a.localeCompare(b, undefined, { numeric: true });
+/** `season5` before `season10`, which the API's plain slug sort gets wrong. */
+function bySeason(a: GalleryCollection, b: GalleryCollection): number {
+	return a.slug.localeCompare(b.slug, undefined, { numeric: true });
 }

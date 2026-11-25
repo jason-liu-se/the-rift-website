@@ -81,3 +81,10 @@
 		);
 	}
 }
+
+// Editors' Edit link, beside the download button.
+app-edit-button {
+	display: inline-block;
+	margin-left: 8px;
+	vertical-align: middle;
+}
