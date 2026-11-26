@@ -1,65 +1,133 @@
 import {
 	Component,
+	ElementRef,
+	afterNextRender,
 	computed,
 	inject,
 	input,
 	output,
-	signal
+	viewChild,
+	Injector
 } from '@angular/core';
-import { MatIconButton } from '@angular/material/button';
+import { Observable } from 'rxjs';
+import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
-import { Observable, tap } from 'rxjs';
 import { MAX_COLLECTION_TITLE_LENGTH } from 'src/app/config/content-limits';
 import { EditorCollection } from 'src/app/interfaces/api-responses';
 import { CollectionContentType } from 'src/app/services/editor-content/editor-content-types';
 import { EditorContentService } from 'src/app/services/editor-content/editor-content.service';
 import { CollectionsStore } from '../../services/collections-store.service';
-import {
-	EditorWrite,
-	EditorWriteService
-} from '../../services/editor-write.service';
+import { EditorWriteService } from '../../services/editor-write.service';
 import { CollectionFormComponent } from '../collection-form/collection-form.component';
+import { CollectionsEditor } from '../collections-modal/collections-editor';
 import { ItemNoun, countItems } from '../editor-list/bulk-results';
+import { StatusBadgeComponent } from '../status-badge/status-badge.component';
+
+/** A published collection as the list shows it, with the editor's draft on top. */
+interface CollectionRow {
+	collection: EditorCollection;
+	title: string;
+	isVisible: boolean;
+	hasDraft: boolean;
+	isOpen: boolean;
+}
+
+/** A new collection's draft in the list. */
+interface NewDraftRow {
+	id: string;
+	title: string;
+	slug?: string;
+	isOpen: boolean;
+}
 
 /**
- * A gallery's or downloads' collections: rename one in place, show or hide
- * it, delete it with everything in it, or edit it (title and dimensions)
- * beside the list, where new ones are created.
+ * A gallery's or downloads' collections, and the editor's drafts of new
+ * ones, beside the form editing one. Renaming one in place or showing or
+ * hiding it changes its draft (opening it in the form); deleting one deletes
+ * it with everything in it, at once.
  */
 @Component({
 	selector: 'app-collections-manager',
 	templateUrl: './collections-manager.component.html',
 	styleUrl: './collections-manager.component.scss',
-	imports: [CollectionFormComponent, MatIcon, MatIconButton, MatTooltip]
+	imports: [
+		CollectionFormComponent,
+		MatButton,
+		MatIcon,
+		MatIconButton,
+		MatTooltip,
+		StatusBadgeComponent
+	]
 })
 export class CollectionsManagerComponent {
 	private editorContent = inject(EditorContentService);
 	private writer = inject(EditorWriteService);
 	private store = inject(CollectionsStore);
+	private injector = inject(Injector);
+	protected readonly editor = inject(CollectionsEditor);
+	private form = viewChild<CollectionFormComponent, ElementRef<HTMLElement>>(
+		CollectionFormComponent,
+		{ read: ElementRef }
+	);
 
 	public readonly type = input.required<CollectionContentType>();
 	/** How the collection's items are named: "image", "images". */
 	public readonly itemNoun = input.required<ItemNoun>();
-	/** A collection was created, changed, or deleted. */
+	/** A collection was deleted. */
 	public readonly changed = output<void>();
 
 	protected readonly maxTitleLength = MAX_COLLECTION_TITLE_LENGTH;
-	/** The slug of the collection open in the form; none for a new one. */
-	protected readonly editingSlug = signal<string | undefined>(undefined);
 
-	protected readonly collections = computed(
-		() => this.store.collections(this.type())() ?? []
-	);
+	protected readonly session = this.editor.session;
 	protected readonly urlPrefix = computed(() =>
 		this.type() === 'gallery' ? '/gallery/' : undefined
 	);
-	protected readonly editing = computed(() =>
-		this.collections().find(({ slug }) => slug === this.editingSlug())
-	);
+	protected readonly rows = computed<CollectionRow[]>(() => {
+		const session = this.session();
+		const drafts = this.editor.editDrafts();
+		return (this.store.collections(this.type())() ?? []).map(
+			(collection) => {
+				const isOpen = session?.targetId() === collection.slug;
+				const draft = drafts.get(collection.slug);
+				const fields = isOpen ? session!.fields() : draft?.fields;
+				return {
+					collection,
+					title:
+						(fields as { title?: string } | undefined)?.title ||
+						collection.title,
+					isVisible: isOpen
+						? (session!.fields().visible ?? collection.visible)
+						: collection.visible,
+					hasDraft: isOpen
+						? session!.hasUnpublishedChanges()
+						: !!draft,
+					isOpen
+				};
+			}
+		);
+	});
+	protected readonly newDraftRows = computed<NewDraftRow[]>(() => {
+		const session = this.session();
+		return this.editor.newDrafts().map(({ id, fields }) => {
+			const isOpen = session?.id() === id;
+			const { title, slug } = (isOpen ? session!.fields() : fields) as {
+				title?: string;
+				slug?: string;
+			};
+			return { id, title: title || 'Untitled', slug, isOpen };
+		});
+	});
+	/** The form holds something other than a fresh new collection. */
+	protected readonly canStartNew = computed(() => {
+		const session = this.session();
+		return (
+			!!session && (session.isEdit() || session.status() !== 'unchanged')
+		);
+	});
 
-	protected pathOf(collection: EditorCollection): string {
-		return `${this.urlPrefix() ?? ''}${collection.slug}`;
+	protected pathOf(slug: string | undefined): string {
+		return `${this.urlPrefix() ?? ''}${slug || '…'}`;
 	}
 
 	protected countOf(collection: EditorCollection): string {
@@ -67,75 +135,66 @@ export class CollectionsManagerComponent {
 	}
 
 	protected edit(collection: EditorCollection): void {
-		this.editingSlug.set(collection.slug);
+		this.openInForm(this.editor.edit(collection));
 	}
 
-	/** Back to a new collection, the form's other use. */
-	protected stopEditing(): void {
-		this.editingSlug.set(undefined);
+	protected openDraft(id: string): void {
+		this.openInForm(this.editor.openDraft(id));
 	}
 
-	/** Saves a changed title; a blank one goes back to what it was. */
-	protected rename(
-		collection: EditorCollection,
-		input: HTMLInputElement
-	): void {
+	protected startNew(): void {
+		this.editor.startNew();
+		this.focusForm();
+	}
+
+	/** Renames it in its draft; a blank title goes back to what it was. */
+	protected rename(row: CollectionRow, input: HTMLInputElement): void {
 		const title = input.value.trim();
-		if (!title || title === collection.title) {
-			input.value = collection.title;
+		if (!title || title === row.title) {
+			input.value = row.title;
 			return;
 		}
-		this.write({
-			request: () =>
-				this.editorContent.updateCollection(
-					this.type(),
-					collection.slug,
-					{ title, startingRevision: collection.revision }
-				),
-			success: `Renamed ${collection.title} to ${title}.`
-		}).subscribe();
+		this.editor.rename(row.collection, title);
 	}
 
-	protected toggleVisibility(collection: EditorCollection): void {
-		this.write({
-			request: () =>
-				this.editorContent.updateCollection(
-					this.type(),
-					collection.slug,
-					{
-						visible: !collection.visible,
-						startingRevision: collection.revision
-					}
-				),
-			success: `${collection.visible ? 'Hid' : 'Showed'} ${collection.title}.`
-		}).subscribe();
+	/** Once open, moves to the form (below the list on phones). */
+	private openInForm(opening: Observable<unknown>): void {
+		opening.subscribe(() => this.focusForm());
+	}
+
+	private focusForm(): void {
+		afterNextRender(
+			() =>
+				this.form()
+					?.nativeElement.querySelector<HTMLElement>('h3')
+					?.focus(),
+			{ injector: this.injector }
+		);
 	}
 
 	protected deleteCollection(collection: EditorCollection): void {
 		const items = countItems(collection.itemCount, this.itemNoun());
-		this.write({
-			confirm: {
-				title: `Delete ${collection.title}?`,
-				message: `This deletes the collection and the ${items} in it. It can't be undone.`,
-				confirmLabel: `Delete it and ${items}`
-			},
-			request: () =>
-				this.editorContent.deleteCollection(
-					this.type(),
-					collection.slug,
-					collection.revision
-				),
-			success: `Deleted ${collection.title} and ${items}.`
-		}).subscribe();
-	}
-
-	/** Runs the write, then reloads the collections and tells the list. */
-	private write(write: EditorWrite): Observable<boolean> {
-		return this.writer.run(write).pipe(
-			tap(() => {
-				this.store.reload(this.type());
-				this.changed.emit();
+		this.writer
+			.run({
+				confirm: {
+					title: `Delete ${collection.title}?`,
+					message: `This deletes the collection and the ${items} in it. It can't be undone.`,
+					confirmLabel: `Delete it and ${items}`
+				},
+				request: () =>
+					this.editorContent.deleteCollection(
+						this.type(),
+						collection.slug,
+						collection.revision
+					),
+				success: `Deleted ${collection.title} and ${items}.`
 			})
-		);
+			.subscribe((isDeleted) => {
+				this.store.reload(this.type());
+				if (isDeleted) {
+					this.editor.noteDeleted(collection.slug);
+					this.changed.emit();
+				}
+			});
 	}
 }

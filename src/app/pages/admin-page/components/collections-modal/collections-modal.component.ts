@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { EDITOR_TYPES, toCollectionType } from '../../editor-types';
 import { openModalRoute } from '../../utilities/modal-route';
+import { CollectionsEditor } from './collections-editor';
 import { CollectionsManagerComponent } from '../collections-manager/collections-manager.component';
 import { EditorListStore } from '../editor-list/editor-list.store';
 import { ModalFooterSlot } from '../modal-shell/modal-footer-slot';
@@ -39,11 +40,12 @@ import { ModalShellComponent } from '../modal-shell/modal-shell.component';
 		ModalShellComponent,
 		NgTemplateOutlet
 	],
-	providers: [ModalFooterSlot]
+	providers: [CollectionsEditor, ModalFooterSlot]
 })
 export class CollectionsModalComponent {
 	private content = viewChild.required<TemplateRef<unknown>>('content');
 	private listStore = inject(EditorListStore);
+	private editor = inject(CollectionsEditor);
 
 	protected readonly config = computed(
 		() => EDITOR_TYPES[this.listStore.type()]
@@ -55,14 +57,18 @@ export class CollectionsModalComponent {
 	protected readonly close = openModalRoute(() => this.content(), {
 		wide: true
 	});
-	/** The form's save button, kept in view below the list and form. */
+	/** The form's footer, kept in view below the list and form. */
 	protected readonly footer = inject(ModalFooterSlot);
 	protected isChanged = false;
 
 	constructor() {
-		// A renamed, hidden, or deleted collection changes the list.
+		const type = this.collectionType();
+		if (type) {
+			this.editor.start(type);
+		}
+		// A published or deleted collection changes the list.
 		inject(DestroyRef).onDestroy(() => {
-			if (this.isChanged) {
+			if (this.isChanged || this.editor.hasPublished()) {
 				this.listStore.reload();
 			}
 		});
