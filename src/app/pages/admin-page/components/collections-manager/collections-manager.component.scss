@@ -134,10 +134,36 @@
 	color: $colour-error;
 }
 
-// The list beside the form (which may hold dimension cards).
+// The list beside the form (which may hold dimension cards), each scrolling
+// on its own within the modal's height.
 @media (min-width: 60rem) {
 	:host {
 		grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-		align-items: start;
+		height: 100%;
+	}
+
+	.existing {
+		display: flex;
+		flex-direction: column;
+		min-height: 0;
+	}
+
+	// Padding inside each scroll area keeps focus rings and the open card's
+	// outline from being clipped; the negative margin keeps them aligned.
+	.collection-list,
+	app-collection-form {
+		min-height: 0;
+		margin: -4px;
+		padding: 4px;
+		overflow-y: auto;
+		overscroll-behavior: contain;
+	}
+
+	.collection-list {
+		align-content: start;
+	}
+
+	app-collection-form {
+		display: block;
 	}
 }
