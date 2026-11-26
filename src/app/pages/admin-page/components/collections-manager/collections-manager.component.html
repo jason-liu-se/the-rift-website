@@ -33,7 +33,10 @@
 							· Hidden
 						}
 						@if (card.status; as status) {
-							· <span class="unpublished">{{ status }}</span>
+							<span class="unpublished">
+								<span class="dot" aria-hidden="true"></span>
+								{{ status }}
+							</span>
 						}
 					</span>
 				</span>
