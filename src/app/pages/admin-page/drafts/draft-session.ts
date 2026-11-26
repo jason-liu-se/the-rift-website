@@ -20,12 +20,15 @@ import {
 	DraftContent,
 	DraftPublishRequest,
 	DraftTarget,
-	EditorContentType
+	DraftType
 } from 'src/app/interfaces/api-requests';
 import { ConflictResponse, Draft } from 'src/app/interfaces/api-responses';
 import { ApiStatus } from 'src/app/services/api-status/api-status.service';
 import { DraftsService } from 'src/app/services/drafts/drafts.service';
-import { ItemOf } from 'src/app/services/editor-content/editor-content-types';
+import {
+	DraftItemOf,
+	toTargetId
+} from 'src/app/services/editor-content/editor-content-types';
 import {
 	DraftFields,
 	isEmptyDraft,
@@ -43,13 +46,13 @@ import { DraftStore } from './draft-store.service';
  *   overwrite
  * - `deleted`: the item was deleted; publish as new or discard
  */
-export type DraftConflict<T extends EditorContentType> =
+export type DraftConflict<T extends DraftType> =
 	| { kind: 'draft'; theirs: Draft }
-	| { kind: 'item'; theirs: ItemOf<T> }
+	| { kind: 'item'; theirs: DraftItemOf<T> }
 	| { kind: 'deleted' };
 
 /** Where the draft's changes are. */
-export type SaveState<T extends EditorContentType> =
+export type SaveState<T extends DraftType> =
 	/** Nothing to save: nothing changed, or it would be empty. */
 	| { stage: 'unchanged' }
 	/** In this browser, waiting for the server (offline, or for a pause). */
@@ -61,10 +64,10 @@ export type SaveState<T extends EditorContentType> =
 	| { stage: 'conflict'; conflict: DraftConflict<T> }
 	| { stage: 'published' };
 
-export type SaveStage = SaveState<EditorContentType>['stage'];
+export type SaveStage = SaveState<DraftType>['stage'];
 
 /** How an editing session starts. */
-export interface DraftSessionStart<T extends EditorContentType> {
+export interface DraftSessionStart<T extends DraftType> {
 	type: T;
 	/** An existing draft's ID; a new draft gets one. */
 	id?: string;
@@ -91,7 +94,7 @@ export interface DraftSessionDeps {
  * an empty draft, or one of an item before something changed), undo and redo
  * within the session, conflicts, and publishing. Call `close()` when done.
  */
-export class DraftSession<T extends EditorContentType> {
+export class DraftSession<T extends DraftType> {
 	private readonly baseline = signal<DraftFields<T>>({});
 	private readonly savedFields = signal<DraftFields<T>>({});
 	private readonly draftId: ReturnType<typeof signal<string>>;
@@ -130,6 +133,10 @@ export class DraftSession<T extends EditorContentType> {
 	/** Something differs from the published item (or the draft as opened). */
 	public readonly hasChanges = computed(
 		() => !isSameFields(this.fields(), this.baseline())
+	);
+	/** Changes the published item doesn't have yet. */
+	public readonly hasUnpublishedChanges = computed(
+		() => this.hasChanges() && this.status() !== 'published'
 	);
 	public readonly canUndo = computed(() => this.historySize().undo > 0);
 	public readonly canRedo = computed(() => this.historySize().redo > 0);
@@ -240,7 +247,10 @@ export class DraftSession<T extends EditorContentType> {
 			this.mergeReference.set(pickItemFields(this.type, theirs));
 		}
 		this.baseline.set(pickItemFields(this.type, theirs));
-		this.target = { id: theirs.id, startingRevision: theirs.revision };
+		this.target = {
+			id: toTargetId(theirs),
+			startingRevision: theirs.revision
+		};
 		return this.moveToNewDraft();
 	}
 
@@ -249,7 +259,7 @@ export class DraftSession<T extends EditorContentType> {
 	 * with nothing changed). A refusal sets `conflict` (and still errors, so
 	 * the caller can stop).
 	 */
-	public publish(options: DraftPublishRequest): Observable<ItemOf<T>> {
+	public publish(options: DraftPublishRequest): Observable<DraftItemOf<T>> {
 		return defer(() => {
 			if (this.deps.apiStatus() !== 'up') {
 				return throwError(
@@ -282,7 +292,9 @@ export class DraftSession<T extends EditorContentType> {
 	}
 
 	/** The item was deleted: publishes the edit as a new item instead. */
-	public publishAsNew(options: DraftPublishRequest): Observable<ItemOf<T>> {
+	public publishAsNew(
+		options: DraftPublishRequest
+	): Observable<DraftItemOf<T>> {
 		this.state.set({ stage: 'local' });
 		return this.publish({ ...options, asNew: true });
 	}
@@ -431,8 +443,9 @@ export class DraftSession<T extends EditorContentType> {
 
 	private toPublishConflict(error: unknown): Observable<never> {
 		if (error instanceof HttpErrorResponse) {
-			const theirs = (error.error as ConflictResponse<ItemOf<T>> | null)
-				?.current;
+			const theirs = (
+				error.error as ConflictResponse<DraftItemOf<T>> | null
+			)?.current;
 			if (error.status === HttpStatusCode.Conflict && theirs) {
 				this.state.set({
 					stage: 'conflict',

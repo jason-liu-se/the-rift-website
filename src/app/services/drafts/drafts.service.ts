@@ -5,10 +5,10 @@ import { environment } from '../../../environments/environment';
 import {
 	DraftPublishRequest,
 	DraftSaveRequest,
-	EditorContentType
+	DraftType
 } from '../../interfaces/api-requests';
 import { Draft, DraftSummary } from '../../interfaces/api-responses';
-import { ItemOf } from '../editor-content/editor-content-types';
+import { DraftItemOf } from '../editor-content/editor-content-types';
 import { EDITOR_REQUEST_OPTIONS } from '../editor-content/editor-request-options';
 
 /** The editor's own drafts (`/editor/drafts`, logged in, private to them). */
@@ -20,7 +20,7 @@ export class DraftsService {
 	private draftsUrl = `${environment.API_URL}/editor/drafts`;
 
 	/** The editor's drafts (of one type, or all), most recently saved first. */
-	public fetchDrafts(type?: EditorContentType): Observable<DraftSummary[]> {
+	public fetchDrafts(type?: DraftType): Observable<DraftSummary[]> {
 		return this.http.get<DraftSummary[]>(this.draftsUrl, {
 			...EDITOR_REQUEST_OPTIONS,
 			params: type ? { type } : {}
@@ -48,11 +48,11 @@ export class DraftsService {
 	 * Publishes the draft as its item. 409 with the item as it is when it
 	 * changed since the draft started; 404 when it was deleted.
 	 */
-	public publishDraft<T extends EditorContentType>(
+	public publishDraft<T extends DraftType>(
 		id: string,
 		request: DraftPublishRequest
-	): Observable<ItemOf<T>> {
-		return this.http.post<ItemOf<T>>(
+	): Observable<DraftItemOf<T>> {
+		return this.http.post<DraftItemOf<T>>(
 			`${this.draftUrl(id)}/publish`,
 			request,
 			EDITOR_REQUEST_OPTIONS

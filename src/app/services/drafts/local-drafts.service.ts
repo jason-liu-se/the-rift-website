@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import {
 	DraftContent,
 	DraftTarget,
-	EditorContentType
+	DraftType
 } from '../../interfaces/api-requests';
 import {
 	BrowserStorage,
@@ -47,7 +47,7 @@ export class LocalDraftsService {
 	}
 
 	/** The owner's drafts in this browser, optionally of one type. */
-	public list(owner: string, type?: EditorContentType): LocalDraft[] {
+	public list(owner: string, type?: DraftType): LocalDraft[] {
 		return this.storage
 			.keys('local', STORAGE_KEYS.draftPrefix)
 			.flatMap(

@@ -17,10 +17,7 @@ import {
 	tap,
 	throwError
 } from 'rxjs';
-import {
-	DraftSaveRequest,
-	EditorContentType
-} from 'src/app/interfaces/api-requests';
+import { DraftSaveRequest, DraftType } from 'src/app/interfaces/api-requests';
 import { Draft, DraftSummary } from 'src/app/interfaces/api-responses';
 import { ApiStatusService } from 'src/app/services/api-status/api-status.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -93,7 +90,7 @@ export class DraftStore {
 	}
 
 	/** The editor's drafts waiting for the server, optionally of one type. */
-	public pendingCopies(type?: EditorContentType): LocalDraft[] {
+	public pendingCopies(type?: DraftType): LocalDraft[] {
 		// Read in a `computed`, this updates as copies are kept or dropped.
 		this.pending();
 		return this.pendingCopiesNow(type);
@@ -107,7 +104,7 @@ export class DraftStore {
 	/** The server's drafts, with this browser's waiting changes on top. */
 	public withPending(
 		serverDrafts: readonly DraftSummary[],
-		type: EditorContentType
+		type: DraftType
 	): DraftSummary[] {
 		const copies = new Map(
 			this.pendingCopies(type).map((copy) => [copy.id, copy])
@@ -293,7 +290,7 @@ export class DraftStore {
 		this.pending.set(pending);
 	}
 
-	private pendingCopiesNow(type?: EditorContentType): LocalDraft[] {
+	private pendingCopiesNow(type?: DraftType): LocalDraft[] {
 		return this.local
 			.list(this.owner(), type)
 			.filter(({ isPending }) => isPending);

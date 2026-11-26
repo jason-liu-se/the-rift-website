@@ -33,6 +33,7 @@ function fakeSession() {
 		conflict: signal<unknown>(undefined),
 		mergeReference: signal<unknown>(undefined),
 		hasChanges: signal(true),
+		hasUnpublishedChanges: signal(true),
 		canUndo: signal(true),
 		canRedo: signal(false),
 		undo: vi.fn(),

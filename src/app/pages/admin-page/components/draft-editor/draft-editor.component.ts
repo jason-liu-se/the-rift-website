@@ -13,7 +13,7 @@ import {
 } from '@angular/core';
 import { NgComponentOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatIconButton } from '@angular/material/button';
 import {
 	MatButtonToggle,
 	MatButtonToggleGroup
@@ -21,46 +21,32 @@ import {
 import { MatIcon } from '@angular/material/icon';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { MatTooltip } from '@angular/material/tooltip';
-import { EMPTY, Observable, catchError, filter } from 'rxjs';
+import { Observable, filter } from 'rxjs';
 import {
 	EditorContentType,
 	NewsDraftOptions
 } from 'src/app/interfaces/api-requests';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
 import { ItemOf } from 'src/app/services/editor-content/editor-content-types';
-import { DraftSession, SaveStage } from '../../drafts/draft-session';
-import { DraftFields, findMissingFields } from '../../drafts/draft-fields';
+import { DraftSession } from '../../drafts/draft-session';
+import { findMissingFields } from '../../drafts/draft-fields';
+import { discardDraft } from '../../drafts/discard-draft';
 import { EDITOR_TYPES } from '../../editor-types';
 import { EditorWriteService } from '../../services/editor-write.service';
 import { describeWriteError } from '../../utilities/write-errors';
 import { itemName } from '../editor-list/item-name';
 import { ModalShellComponent } from '../modal-shell/modal-shell.component';
-import { VisibilityToggleComponent } from '../visibility-toggle/visibility-toggle.component';
+import { DraftFooterComponent } from '../draft-footer/draft-footer.component';
+import {
+	DraftHistoryComponent,
+	handleHistoryShortcut
+} from '../draft-history/draft-history.component';
 import { DraftConflictComponent } from './draft-conflict/draft-conflict.component';
 import {
 	PublishSettings,
 	findScheduleProblem,
 	toDateChoice
 } from './publish-settings';
-
-/** The publish button's labels (see `publishLabel`), widest included. */
-const PUBLISH_LABELS = [
-	'Publish',
-	'Publish changes',
-	'Save as hidden',
-	'Schedule',
-	'Publishing…'
-] as const;
-
-const STATUS_TEXT: Record<SaveStage, string> = {
-	unchanged: '',
-	local: 'Saved in this browser',
-	saving: 'Saving…',
-	saved: 'Saved',
-	failed: "Couldn't save",
-	conflict: 'Resolve the conflict above to publish',
-	published: 'Published'
-};
 
 /** What the editor's ⋮ menu can do with the published item. */
 export interface PublishedItemActions {
@@ -83,7 +69,6 @@ export interface PublishedItemActions {
 	imports: [
 		DraftConflictComponent,
 		FormsModule,
-		MatButton,
 		MatButtonToggle,
 		MatButtonToggleGroup,
 		MatIcon,
@@ -94,7 +79,8 @@ export interface PublishedItemActions {
 		MatTooltip,
 		ModalShellComponent,
 		NgComponentOutlet,
-		VisibilityToggleComponent
+		DraftFooterComponent,
+		DraftHistoryComponent
 	],
 	host: {
 		'(keydown)': 'handleShortcuts($event)'
@@ -117,6 +103,9 @@ export class DraftEditorComponent<T extends EditorContentType> {
 	protected readonly settings = inject(PublishSettings);
 	private readonly config = computed(() => EDITOR_TYPES[this.session().type]);
 	protected readonly noun = computed(() => this.config().noun);
+	protected readonly fieldLabels = computed(
+		() => this.config().fieldLabels as Record<string, string>
+	);
 	protected readonly preview = computed(
 		() => this.config().preview as Type<unknown> | undefined
 	);
@@ -128,21 +117,7 @@ export class DraftEditorComponent<T extends EditorContentType> {
 			? itemName(this.session().fields() as object)
 			: `New ${this.noun().one}`
 	);
-	protected readonly status = computed(() => this.session().status());
-	protected readonly statusText = computed(() => {
-		const status = this.status();
-		if (status === 'unchanged') {
-			return this.isEdit() ? 'No changes yet' : '';
-		}
-		return STATUS_TEXT[status];
-	});
-	protected readonly hasUnpublishedChanges = computed(
-		() => this.session().hasChanges() && this.status() !== 'published'
-	);
 	protected readonly isPublishing = signal(false);
-	protected readonly isVisible = computed(
-		() => this.session().fields().visible ?? true
-	);
 	/** News only: when it'll go live, as the draft says. */
 	private readonly date = computed(() =>
 		this.config().hasDate
@@ -165,26 +140,10 @@ export class DraftEditorComponent<T extends EditorContentType> {
 		}
 		return findScheduleProblem(this.date());
 	});
-	protected readonly publishLabels = PUBLISH_LABELS;
-	protected readonly publishLabel = computed(() => {
-		if (toDateChoice(this.date(), this.isEdit()) === 'schedule') {
-			return 'Schedule';
-		}
-		if (!this.isVisible()) {
-			return 'Save as hidden';
-		}
-		return this.isEdit() ? 'Publish changes' : 'Publish';
-	});
-	protected readonly currentPublishLabel = computed(() =>
-		this.isPublishing() ? 'Publishing…' : this.publishLabel()
+	/** News only: it'll go live later. */
+	protected readonly isScheduled = computed(
+		() => toDateChoice(this.date(), this.isEdit()) === 'schedule'
 	);
-	/** There's a draft to discard (anything saved here or on the server). */
-	protected readonly hasDraft = computed(() => this.status() !== 'unchanged');
-
-	/** Kept in the draft, like its fields (and undone like them). */
-	protected setVisible(visible: boolean): void {
-		this.session().update({ visible } as DraftFields<T>);
-	}
 
 	protected publish(): void {
 		this.runPublish(() =>
@@ -203,37 +162,20 @@ export class DraftEditorComponent<T extends EditorContentType> {
 			.subscribe({ complete: () => this.publish() });
 	}
 
-	protected retrySave(): void {
-		this.session()
-			.saveNow()
-			.pipe(catchError(() => EMPTY))
-			.subscribe();
-	}
-
+	/** The conflict's way out when the item was deleted. */
 	protected discard(): void {
-		const noun = this.noun().one;
-		this.writer
-			.run({
-				confirm: this.isEdit()
-					? {
-							title: 'Discard your changes?',
-							message: `The published ${noun} stays as it is.`,
-							confirmLabel: 'Discard changes'
-						}
-					: {
-							title: `Discard this ${noun}?`,
-							message:
-								"It hasn't been published, so it'll be gone.",
-							confirmLabel: 'Discard'
-						},
-				request: () => this.session().discard()
-			})
+		discardDraft(
+			this.writer,
+			this.session(),
+			this.noun().one,
+			this.isEdit()
+		)
 			.pipe(filter(Boolean))
 			.subscribe(() => this.closed.emit());
 	}
 
 	protected close(): void {
-		if (this.hasUnpublishedChanges()) {
+		if (this.session().hasUnpublishedChanges()) {
 			this.notifier.notifySuccess(
 				'Your changes are kept. Find them under Unpublished changes.'
 			);
@@ -242,25 +184,8 @@ export class DraftEditorComponent<T extends EditorContentType> {
 		this.closed.emit();
 	}
 
-	/** Ctrl+Z and Ctrl+Shift+Z (or Ctrl+Y) outside a text field's own undo. */
 	protected handleShortcuts(event: KeyboardEvent): void {
-		const isTyping = !!(event.target as HTMLElement).closest?.(
-			'input, textarea'
-		);
-		if (isTyping || !(event.ctrlKey || event.metaKey)) {
-			return;
-		}
-		const key = event.key.toLowerCase();
-		if (key === 'z' && !event.shiftKey && this.session().canUndo()) {
-			event.preventDefault();
-			this.session().undo();
-		} else if (
-			(key === 'y' || (key === 'z' && event.shiftKey)) &&
-			this.session().canRedo()
-		) {
-			event.preventDefault();
-			this.session().redo();
-		}
+		handleHistoryShortcut(event, this.session());
 	}
 
 	private runPublish(publish: () => Observable<ItemOf<T>>): void {

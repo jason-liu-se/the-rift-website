@@ -1,8 +1,8 @@
 import { Component, computed, input, output } from '@angular/core';
 import { MatButton } from '@angular/material/button';
-import { EditorContentType } from 'src/app/interfaces/api-requests';
+import { DraftType } from 'src/app/interfaces/api-requests';
 import { DraftSession } from '../../../drafts/draft-session';
-import { EDITOR_TYPES } from '../../../editor-types';
+import { ItemNoun } from '../../editor-list/bulk-results';
 import { toFieldRows } from '../field-values';
 
 /**
@@ -16,18 +16,20 @@ import { toFieldRows } from '../field-values';
 	imports: [MatButton]
 })
 export class DraftConflictComponent {
-	public readonly session = input.required<DraftSession<EditorContentType>>();
+	public readonly session = input.required<DraftSession<DraftType>>();
+	/** How the draft's item is named: "post". */
+	public readonly noun = input.required<ItemNoun>();
+	/** Each field's label, in the order their versions are listed. */
+	public readonly fieldLabels = input.required<Record<string, string>>();
 
 	/** Overwrite the changed item with this draft (publish again). */
 	public readonly overwrite = output<void>();
 	public readonly publishAsNew = output<void>();
 	public readonly discard = output<void>();
 
-	private readonly config = computed(() => EDITOR_TYPES[this.session().type]);
-	protected readonly noun = computed(() => this.config().noun);
 	protected readonly conflictRows = computed(() => {
 		const conflict = this.session().conflict();
-		const labels = this.config().fieldLabels;
+		const labels = this.fieldLabels();
 		if (conflict?.kind === 'draft') {
 			return toFieldRows(conflict.theirs.fields, labels);
 		}
@@ -37,9 +39,7 @@ export class DraftConflictComponent {
 	});
 	protected readonly mergeRows = computed(() => {
 		const reference = this.session().mergeReference();
-		return reference
-			? toFieldRows(reference, this.config().fieldLabels)
-			: [];
+		return reference ? toFieldRows(reference, this.fieldLabels()) : [];
 	});
 
 	protected keepDraft(keep: 'mine' | 'theirs'): void {

@@ -19,26 +19,7 @@
 		</mat-button-toggle-group>
 	}
 	<ng-container modalTools>
-		<button
-			mat-icon-button
-			type="button"
-			aria-label="Undo"
-			matTooltip="Undo (Ctrl+Z)"
-			[disabled]="!session().canUndo()"
-			(click)="session().undo()"
-		>
-			<mat-icon>undo</mat-icon>
-		</button>
-		<button
-			mat-icon-button
-			type="button"
-			aria-label="Redo"
-			matTooltip="Redo (Ctrl+Shift+Z)"
-			[disabled]="!session().canRedo()"
-			(click)="session().redo()"
-		>
-			<mat-icon>redo</mat-icon>
-		</button>
+		<app-draft-history [session]="session()" />
 		@if (itemActions(); as actions) {
 			<button
 				mat-icon-button
@@ -79,6 +60,8 @@
 
 	<app-draft-conflict
 		[session]="session()"
+		[noun]="noun()"
+		[fieldLabels]="fieldLabels()"
 		(overwrite)="overwrite()"
 		(publishAsNew)="publishAsNew()"
 		(discard)="discard()"
@@ -108,73 +91,15 @@
 		}
 	</div>
 
-	<div class="footer" modalFooter>
-		<div class="state">
-			@if (publishProblem(); as problem) {
-				<p class="problem" role="alert">
-					<mat-icon aria-hidden="true">error</mat-icon>
-					{{ problem }}
-				</p>
-			} @else {
-				@if (hasUnpublishedChanges()) {
-					<span class="changes">
-						<span class="dot" aria-hidden="true"></span>
-						Unpublished changes
-					</span>
-				}
-				<span
-					class="save-status"
-					role="status"
-					[class.failed]="status() === 'failed'"
-					>{{ statusText() }}</span
-				>
-				@if (status() === "failed") {
-					<button mat-button type="button" (click)="retrySave()">
-						Retry
-					</button>
-				}
-			}
-		</div>
-		<div class="actions">
-			@if (hasDraft()) {
-				<button
-					mat-button
-					type="button"
-					class="discard"
-					(click)="discard()"
-				>
-					{{ isEdit() ? "Discard changes" : "Discard" }}
-				</button>
-			}
-			<app-visibility-toggle
-				class="visibility"
-				[visible]="isVisible()"
-				(visibleChange)="setVisible($event)"
-			/>
-			<button
-				mat-flat-button
-				color="primary"
-				type="button"
-				class="publish"
-				[disabled]="isPublishing() || !!session().conflict()"
-				(click)="publish()"
-			>
-				<mat-icon aria-hidden="true">{{
-					publishLabel() === "Schedule" ? "schedule" : "publish"
-				}}</mat-icon>
-				<!-- Every label in one place, only the current one shown, so the
-					button is always its widest label's width. -->
-				<span class="publish-labels">
-					@for (label of publishLabels; track label) {
-						@let isCurrent = label === currentPublishLabel();
-						<span
-							[class.current]="isCurrent"
-							[attr.aria-hidden]="isCurrent ? null : true"
-							>{{ label }}</span
-						>
-					}
-				</span>
-			</button>
-		</div>
-	</div>
+	<app-draft-footer
+		modalFooter
+		[session]="session()"
+		[isEdit]="isEdit()"
+		[noun]="noun().one"
+		[problem]="publishProblem()"
+		[isScheduled]="isScheduled()"
+		[isPublishing]="isPublishing()"
+		(publish)="publish()"
+		(discarded)="closed.emit()"
+	/>
 </app-modal-shell>
