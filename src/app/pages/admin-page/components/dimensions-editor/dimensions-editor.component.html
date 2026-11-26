@@ -103,14 +103,21 @@
 						</mat-form-field>
 					}
 				</div>
-				<app-image-field
-					required
-					[label]="nameOf(index) + ' image'"
-					[album]="album()"
-					[noAlbumHint]="noAlbumHint()"
-					[url]="dimension.imageUrl"
-					(urlChange)="updateDimension(index, { imageUrl: $event })"
-				/>
+				<div class="image">
+					@if (withThumbnails()) {
+						<app-item-thumbnail [src]="dimension.imageUrl" />
+					}
+					<app-image-field
+						required
+						[label]="nameOf(index) + ' image'"
+						[album]="album()"
+						[noAlbumHint]="noAlbumHint()"
+						[url]="dimension.imageUrl"
+						(urlChange)="
+							updateDimension(index, { imageUrl: $event })
+						"
+					/>
+				</div>
 			</fieldset>
 		</li>
 	}

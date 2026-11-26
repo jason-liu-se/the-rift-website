@@ -32,6 +32,7 @@ import { ImageUploadForm } from 'src/app/interfaces/api-requests';
 import { Dimension, MapDimension } from 'src/app/interfaces/api-responses';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
 import { ImageFieldComponent } from '../image-field/image-field.component';
+import { ItemThumbnailComponent } from '../item-thumbnail/item-thumbnail.component';
 import { parseBlueMapLink } from './bluemap-link';
 
 /** A dimension being edited: a map's also has its BlueMap fields. */
@@ -55,6 +56,7 @@ export type EditableDimension = Dimension &
 		CdkDropList,
 		FormsModule,
 		ImageFieldComponent,
+		ItemThumbnailComponent,
 		MatButton,
 		MatIcon,
 		MatIconButton,
@@ -76,6 +78,10 @@ export class DimensionsEditorComponent {
 	public readonly dimensions = input.required<readonly EditableDimension[]>();
 	public readonly dimensionsChange = output<EditableDimension[]>();
 	public readonly withMapFields = input(false, {
+		transform: booleanAttribute
+	});
+	/** For a form without a preview beside it, which would show the images. */
+	public readonly withThumbnails = input(false, {
 		transform: booleanAttribute
 	});
 	/** Where image uploads go; without one, uploads are off. */

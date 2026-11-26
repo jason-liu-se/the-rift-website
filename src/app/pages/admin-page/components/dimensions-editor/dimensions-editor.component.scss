@@ -75,6 +75,20 @@ fieldset {
 	opacity: 0.4;
 }
 
-app-image-field {
+.image {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 12px;
 	padding: 0 16px 16px;
+
+	app-item-thumbnail {
+		width: 6rem;
+	}
+
+	// Below the thumbnail when there isn't room beside it.
+	app-image-field {
+		flex: 1 1 16rem;
+		min-width: 0;
+	}
 }
