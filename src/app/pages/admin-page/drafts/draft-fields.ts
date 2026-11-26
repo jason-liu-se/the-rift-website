@@ -1,16 +1,16 @@
-import { EditorContentType } from 'src/app/interfaces/api-requests';
+import { DraftType } from 'src/app/interfaces/api-requests';
 import {
 	DRAFT_OPTION_KEYS,
 	DraftOptionsOf,
-	FIELD_KEYS,
-	FieldsOf
+	DraftOwnFieldsOf,
+	FIELD_KEYS
 } from 'src/app/services/editor-content/editor-content-types';
 
 /**
  * A content type's fields as a draft holds them (any may be missing), with
  * the publish options it keeps.
  */
-export type DraftFields<T extends EditorContentType> = Partial<FieldsOf<T>> &
+export type DraftFields<T extends DraftType> = Partial<DraftOwnFieldsOf<T>> &
 	DraftOptionsOf<T>;
 
 const OPTION_KEYS = new Set<string>(Object.values(DRAFT_OPTION_KEYS).flat());
@@ -26,7 +26,7 @@ function isBlank(value: unknown): boolean {
 }
 
 /** The type's own fields and draft options of a draft's `fields`. */
-export function pickDraftFields<T extends EditorContentType>(
+export function pickDraftFields<T extends DraftType>(
 	type: T,
 	fields: object
 ): DraftFields<T> {
@@ -37,14 +37,14 @@ export function pickDraftFields<T extends EditorContentType>(
  * A published item's fields as a draft would hold them: its own fields and
  * visibility. Not its date, which a draft leaves out to keep.
  */
-export function pickItemFields<T extends EditorContentType>(
+export function pickItemFields<T extends DraftType>(
 	type: T,
 	item: object
 ): DraftFields<T> {
 	return pickKeys(item, [...FIELD_KEYS[type], 'visible']);
 }
 
-function pickKeys<T extends EditorContentType>(
+function pickKeys<T extends DraftType>(
 	source: object,
 	keys: readonly PropertyKey[]
 ): DraftFields<T> {
@@ -67,7 +67,7 @@ export function isEmptyDraft(fields: object): boolean {
 }
 
 /** With `visible` set: a draft without it publishes visible. */
-export function withVisibility<T extends EditorContentType>(
+export function withVisibility<T extends DraftType>(
 	fields: DraftFields<T>
 ): DraftFields<T> {
 	return { visible: true, ...fields };

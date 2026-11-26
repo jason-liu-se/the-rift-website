@@ -1,10 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of, switchMap, throwError } from 'rxjs';
-import { EditorContentType } from 'src/app/interfaces/api-requests';
+import { DraftType } from 'src/app/interfaces/api-requests';
 import { ApiStatusService } from 'src/app/services/api-status/api-status.service';
 import { DraftsService } from 'src/app/services/drafts/drafts.service';
 import { LocalDraft } from 'src/app/services/drafts/local-drafts.service';
-import { ItemOf } from 'src/app/services/editor-content/editor-content-types';
+import {
+	DraftItemOf,
+	toTargetId
+} from 'src/app/services/editor-content/editor-content-types';
 import {
 	DraftFields,
 	pickDraftFields,
@@ -26,7 +29,7 @@ export class DraftSessionsService {
 	private apiStatus = inject(ApiStatusService);
 
 	/** A new item, starting from `fields` (defaults, which aren't changes). */
-	public startNew<T extends EditorContentType>(
+	public startNew<T extends DraftType>(
 		type: T,
 		fields: DraftFields<T> = {}
 	): DraftSession<T> {
@@ -34,14 +37,15 @@ export class DraftSessionsService {
 	}
 
 	/** Edits a published item, carrying on with the editor's draft of it. */
-	public startEdit<T extends EditorContentType>(
+	public startEdit<T extends DraftType>(
 		type: T,
-		item: ItemOf<T>
+		item: DraftItemOf<T>
 	): Observable<DraftSession<T>> {
 		const published = pickItemFields(type, item);
+		const targetId = toTargetId(item);
 		const waiting = this.store
 			.pendingCopies(type)
-			.find(({ target }) => target?.id === item.id);
+			.find(({ target }) => target?.id === targetId);
 		if (waiting) {
 			return of(this.fromCopy(type, waiting, published));
 		}
@@ -50,11 +54,11 @@ export class DraftSessionsService {
 				type,
 				fields: published,
 				baseline: published,
-				target: { id: item.id, startingRevision: item.revision }
+				target: { id: targetId, startingRevision: item.revision }
 			});
 		return this.drafts.fetchDrafts(type).pipe(
 			map((drafts) =>
-				drafts.find(({ target }) => target?.id === item.id)
+				drafts.find(({ target }) => target?.id === targetId)
 			),
 			switchMap((existing) =>
 				existing ? this.openDraft(type, existing.id) : of(fresh())
@@ -67,7 +71,7 @@ export class DraftSessionsService {
 	 * Opens a draft by ID: the server's, with this browser's waiting change
 	 * on top (sending it may then find a conflict for the editor to resolve).
 	 */
-	public openDraft<T extends EditorContentType>(
+	public openDraft<T extends DraftType>(
 		type: T,
 		id: string
 	): Observable<DraftSession<T>> {
@@ -95,7 +99,7 @@ export class DraftSessionsService {
 		);
 	}
 
-	private fromCopy<T extends EditorContentType>(
+	private fromCopy<T extends DraftType>(
 		type: T,
 		copy: LocalDraft,
 		baseline: DraftFields<T>,
@@ -111,7 +115,7 @@ export class DraftSessionsService {
 		});
 	}
 
-	private create<T extends EditorContentType>(
+	private create<T extends DraftType>(
 		start: DraftSessionStart<T>
 	): DraftSession<T> {
 		const session = {
