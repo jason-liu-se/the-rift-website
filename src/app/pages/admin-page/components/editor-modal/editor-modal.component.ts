@@ -35,6 +35,7 @@ import { CollectionsStore } from '../../services/collections-store.service';
 import { DraftFields } from '../../drafts/draft-fields';
 import { DraftSession } from '../../drafts/draft-session';
 import { DraftSessionsService } from '../../drafts/draft-sessions.service';
+import { DraftStore } from '../../drafts/draft-store.service';
 import { EDITOR_TYPES, toCollectionType } from '../../editor-types';
 import { openModalRoute } from '../../utilities/modal-route';
 import { describeWriteError } from '../../utilities/write-errors';
@@ -78,6 +79,7 @@ export class EditorModalComponent {
 	private listActions = inject(EditorListActions);
 	private settings = inject(PublishSettings);
 	private storage = inject(BrowserStorage);
+	private draftStore = inject(DraftStore);
 	private collectionsStore = inject(CollectionsStore);
 	private content = viewChild.required<TemplateRef<unknown>>('content');
 
@@ -166,12 +168,15 @@ export class EditorModalComponent {
 				})
 			);
 		inject(DestroyRef).onDestroy(() => {
-			// Saved, changed, or discarded drafts change the list's drafts.
+			// Saved, changed, or discarded drafts change the list's drafts:
+			// reload once closing has sent the waiting change.
 			const status = this.session()?.status();
-			if (status && status !== 'unchanged' && status !== 'published') {
-				this.listStore.reload();
-			}
 			this.setSession(undefined);
+			if (status && status !== 'unchanged' && status !== 'published') {
+				this.draftStore
+					.afterWrites()
+					.subscribe(() => this.listStore.reload());
+			}
 		});
 	}
 
