@@ -102,16 +102,32 @@
 	}
 }
 
+// Wraps the status under the details, unindented, when they don't fit.
 .details {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	column-gap: 12px;
 	font-size: $font-size-x-small;
 	overflow-wrap: anywhere;
 }
 
 .unpublished {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
 	// The site sets every element's size; this one matches its line.
 	font-size: inherit;
 	color: $colour-warning;
 	font-weight: 600;
+	white-space: nowrap;
+}
+
+.dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background-color: currentColor;
 }
 
 .danger {
