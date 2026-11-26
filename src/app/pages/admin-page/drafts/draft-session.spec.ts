@@ -169,6 +169,8 @@ describe('DraftSession', () => {
 		edit.update({ visible: false });
 
 		expect(fresh.status()).toBe('unchanged');
+		expect(fresh.hasUnpublishedChanges()).toBe(false);
+		expect(edit.hasUnpublishedChanges()).toBe(true);
 		expect(flushAutosave(draft('id-2', 1, {})).body.fields).toEqual({
 			title: 'Theirs',
 			visible: false
