@@ -107,20 +107,11 @@
 	overflow-wrap: anywhere;
 }
 
-.status {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
+.unpublished {
+	// The site sets every element's size; this one matches its line.
+	font-size: inherit;
 	color: $colour-warning;
-	font-size: $font-size-x-small;
 	font-weight: 600;
-}
-
-.dot {
-	width: 8px;
-	height: 8px;
-	border-radius: 50%;
-	background-color: currentColor;
 }
 
 .danger {
