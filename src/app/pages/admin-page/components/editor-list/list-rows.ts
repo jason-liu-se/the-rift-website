@@ -64,9 +64,8 @@ export function toDraftRow(draft: DraftSummary, published?: Item): DraftRow {
 
 /**
  * A draft as the type's cells show it: its fields so far, a season's
- * dimension count, and a news post's date: the draft's own if it has one
- * (the server's list leaves it out), else "now" for a new post, or the
- * post's own for an edit (which keeps it).
+ * dimension count, and a news post's date: the draft's own if it has one,
+ * else "now" for a new post, or the post's own for an edit (which keeps it).
  */
 function toDraftCellItem(draft: DraftSummary, published?: Item): object {
 	return {
