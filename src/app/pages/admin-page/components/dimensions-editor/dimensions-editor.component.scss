@@ -15,6 +15,11 @@
 	list-style: none;
 }
 
+// The thumbnail goes beside the fields only when the card has room.
+.dimension {
+	container-type: inline-size;
+}
+
 // Each dimension a card of its own: a tinted header band over its fields.
 fieldset {
 	display: grid;
@@ -56,14 +61,46 @@ fieldset {
 	color: $colour-error;
 }
 
+.card-body {
+	display: grid;
+	gap: 12px;
+	padding: 16px;
+}
+
 .fields {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
 	gap: 12px;
-	padding: 16px 16px 12px;
 
 	.wide {
 		grid-column: 1 / -1;
+	}
+}
+
+app-item-thumbnail {
+	width: 10rem;
+}
+
+// The thumbnail as tall as the name and image link fields beside it.
+@container (min-width: 32rem) {
+	.with-thumbnail {
+		grid-template-columns: auto minmax(0, 1fr);
+
+		app-item-thumbnail {
+			grid-row: span 2;
+			width: auto;
+			height: calc(2 * 56px + 12px);
+		}
+
+		.fields,
+		app-image-field {
+			grid-column: 2;
+		}
+
+		// The name as wide as the image link below it.
+		.fields {
+			grid-template-columns: minmax(0, 1fr);
+		}
 	}
 }
 
@@ -73,22 +110,4 @@ fieldset {
 
 .cdk-drag-placeholder {
 	opacity: 0.4;
-}
-
-.image {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: flex-start;
-	gap: 12px;
-	padding: 0 16px 16px;
-
-	app-item-thumbnail {
-		width: 6rem;
-	}
-
-	// Below the thumbnail when there isn't room beside it.
-	app-image-field {
-		flex: 1 1 16rem;
-		min-width: 0;
-	}
 }
