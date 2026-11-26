@@ -32,13 +32,10 @@
 						@if (!card.isVisible) {
 							· Hidden
 						}
+						@if (card.status; as status) {
+							· <span class="unpublished">{{ status }}</span>
+						}
 					</span>
-					@if (card.status; as status) {
-						<span class="status">
-							<span class="dot" aria-hidden="true"></span>
-							{{ status }}
-						</span>
-					}
 				</span>
 				<button
 					mat-icon-button
