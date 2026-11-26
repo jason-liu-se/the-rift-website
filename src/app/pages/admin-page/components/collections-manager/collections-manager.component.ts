@@ -96,9 +96,9 @@ export class CollectionsManagerComponent {
 					title:
 						(fields as { title?: string } | undefined)?.title ||
 						collection.title,
-					isVisible: isOpen
-						? (session!.fields().visible ?? collection.visible)
-						: collection.visible,
+					isVisible:
+						(fields as { visible?: boolean } | undefined)
+							?.visible ?? collection.visible,
 					hasDraft: isOpen
 						? session!.hasUnpublishedChanges()
 						: !!draft,
