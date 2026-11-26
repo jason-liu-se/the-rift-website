@@ -5,12 +5,13 @@ import {
 	inject,
 	signal
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import {
 	EMPTY,
 	Observable,
 	Subject,
 	catchError,
+	filter,
 	map,
 	of,
 	switchMap
@@ -33,6 +34,12 @@ import { CollectionsStore } from '../../services/collections-store.service';
 import { describeWriteError } from '../../utilities/write-errors';
 
 export type CollectionSession = DraftSession<CollectionDraftType>;
+
+/** A draft of a new collection, as the list names it. */
+export interface NewCollectionDraft {
+	id: string;
+	fields: { title?: string; slug?: string };
+}
 
 /**
  * The Collections modal's editing: the one collection draft open in its form
@@ -63,10 +70,24 @@ export class CollectionsEditor {
 	private readonly allDrafts = computed(() =>
 		this.draftStore.withPending(this.serverDrafts(), this.draftType())
 	);
-	/** Drafts of new collections, most recently saved first. */
-	public readonly newDrafts = computed(() =>
-		this.allDrafts().filter(({ target }) => !target)
-	);
+	/**
+	 * Drafts of new collections, most recently saved first, with the open one
+	 * until the server lists it.
+	 */
+	public readonly newDrafts = computed<NewCollectionDraft[]>(() => {
+		const listed = this.allDrafts().filter(
+			({ target }) => !target
+		) as NewCollectionDraft[];
+		const session = this.session();
+		const isUnlisted =
+			!!session &&
+			!session.isEdit() &&
+			session.hasUnpublishedChanges() &&
+			!listed.some(({ id }) => id === session.id());
+		return isUnlisted
+			? [{ id: session.id(), fields: session.fields() }, ...listed]
+			: listed;
+	});
 	/** Each collection's edit draft, by its slug. */
 	public readonly editDrafts = computed(
 		() =>
@@ -88,6 +109,19 @@ export class CollectionsEditor {
 				takeUntilDestroyed()
 			)
 			.subscribe((drafts) => this.serverDrafts.set(drafts));
+		// Once a new draft is first saved, list it from the server.
+		toObservable(
+			computed(() => {
+				const session = this.session();
+				return (
+					session?.status() === 'saved' &&
+					!session.isEdit() &&
+					!this.serverDrafts().some(({ id }) => id === session.id())
+				);
+			})
+		)
+			.pipe(filter(Boolean), takeUntilDestroyed())
+			.subscribe(() => this.reloadDrafts());
 		inject(DestroyRef).onDestroy(() => this.close());
 	}
 

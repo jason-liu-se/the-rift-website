@@ -8,6 +8,7 @@ import { Component, inject, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { of } from 'rxjs';
+import { AUTOSAVE_DELAY_MS } from 'src/app/config/admin';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
 import { ApiStatusService } from 'src/app/services/api-status/api-status.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -232,6 +233,26 @@ describe('CollectionsManagerComponent', () => {
 
 		expect(element.textContent).toContain('Unpublished changes');
 		httpTesting.expectNone({ method: 'PATCH' });
+	});
+
+	it('keeps listing a new collection once its draft is saved', () => {
+		vi.useFakeTimers();
+		type('title', 'Season 7');
+		vi.advanceTimersByTime(AUTOSAVE_DELAY_MS);
+		vi.useRealTimers();
+		const save = httpTesting.expectOne({ method: 'PUT' });
+		const draft = {
+			...save.request.body,
+			id: save.request.url.split('/').pop(),
+			revision: 1
+		};
+		save.flush(draft);
+		fixture.detectChanges();
+
+		expect(button('Season 7')).toBeDefined();
+		httpTesting.expectOne(LIST_DRAFTS).flush([draft]);
+		fixture.detectChanges();
+		expect(button('Season 7')).toBeDefined();
 	});
 
 	it('says when the slug is taken', () => {
