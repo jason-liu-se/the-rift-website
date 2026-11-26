@@ -54,6 +54,25 @@ describe('GalleryProviderService', () => {
 			vi.useRealTimers();
 		});
 
+		it('returns one collection by slug, or nothing when the API does not list it', () => {
+			const collectionsBySlug: Record<string, unknown> = {};
+			for (const slug of ['season5', 'season1']) {
+				service
+					.fetchCollection(slug)
+					.subscribe(
+						(collection) => (collectionsBySlug[slug] = collection)
+					);
+			}
+			TestBed.inject(HttpTestingController)
+				.expectOne(galleryUrl)
+				.flush(collections);
+
+			expect(collectionsBySlug).toEqual({
+				season5: collections[0],
+				season1: undefined
+			});
+		});
+
 		it('finds no title for a collection the API does not list', () => {
 			let title: string | undefined = 'unset';
 			service

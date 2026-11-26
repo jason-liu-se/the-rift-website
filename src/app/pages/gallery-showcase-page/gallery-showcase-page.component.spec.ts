@@ -14,7 +14,11 @@ import {
 import { BehaviorSubject } from 'rxjs';
 
 import { GALLERY_FALLBACK_IMAGE } from 'src/app/config/gallery';
-import { GalleryImage } from 'src/app/interfaces/api-responses';
+import {
+	GalleryCollection,
+	GalleryImage
+} from 'src/app/interfaces/api-responses';
+import { GALLERY_COLLECTIONS } from 'src/app/testing/api-fixtures';
 import { ANY_URL_ROUTES } from 'src/app/testing/render-component';
 import { environment } from 'src/environments/environment';
 import { GalleryShowcasePageComponent } from './gallery-showcase-page.component';
@@ -28,6 +32,11 @@ const FIRST_PAGE: GalleryImage[] = [
 const SECOND_PAGE: GalleryImage[] = [
 	{ id: '3', imageUrl: 'three.png', caption: 'Three', tags: [] }
 ];
+// Season 5 has dimensions; season 6 has none.
+const COLLECTIONS: GalleryCollection[] = GALLERY_COLLECTIONS.map(
+	({ slug, title, dimensions }) => ({ slug, title, dimensions })
+);
+const SEASON_5_HEADER_IMAGE = COLLECTIONS[0].dimensions![0].imageUrl;
 
 describe('GalleryShowcasePageComponent', () => {
 	let fixture: ComponentFixture<GalleryShowcasePageComponent>;
@@ -60,12 +69,20 @@ describe('GalleryShowcasePageComponent', () => {
 		fixture.detectChanges();
 	};
 
-	/** Opens the page, answering its tags request with `tags`. */
+	const headerImage = () =>
+		element
+			.querySelector('.background-image-card img')
+			?.getAttribute('src');
+
+	/** Opens the page, answering its collections and tags requests. */
 	function render(collection: string, tags = ['night', 'spawn']): void {
 		routeParams['collection'] = collection;
 		fixture = TestBed.createComponent(GalleryShowcasePageComponent);
 		element = fixture.nativeElement;
 		fixture.detectChanges();
+		httpTesting
+			.expectOne(`${environment.API_URL}/gallery`)
+			.flush(COLLECTIONS);
 		httpTesting.expectOne(tagsUrl(collection)).flush(tags);
 	}
 
@@ -131,13 +148,11 @@ describe('GalleryShowcasePageComponent', () => {
 			fixture.detectChanges();
 		});
 
-		it("shows the collection's name and first photo as the page header", () => {
-			const header = element.querySelector('.background-image-card img');
-
+		it("shows the collection's name and first dimension's image as the page header", () => {
 			expect(element.querySelector('h1')?.textContent).toBe(
 				'Gallery: Season 5'
 			);
-			expect(header?.getAttribute('src')).toBe(FIRST_PAGE[0].imageUrl);
+			expect(headerImage()).toBe(SEASON_5_HEADER_IMAGE);
 		});
 
 		it('shows the first page of the collection and its total', () => {
@@ -233,12 +248,8 @@ describe('GalleryShowcasePageComponent', () => {
 				element.querySelector('.page-caption')?.textContent?.trim()
 			).toBe('Results: 0');
 			expect(rangeLabels()).toEqual(['Page 1 of 1', 'Page 1 of 1']);
-			// The header keeps the whole collection's first photo.
-			expect(
-				element
-					.querySelector('.background-image-card img')
-					?.getAttribute('src')
-			).toBe(FIRST_PAGE[0].imageUrl);
+			// The header doesn't depend on the filter.
+			expect(headerImage()).toBe(SEASON_5_HEADER_IMAGE);
 		});
 
 		it('shows every photo again once the filter is cleared', () => {
@@ -318,17 +329,13 @@ describe('GalleryShowcasePageComponent', () => {
 		expect(captions()).toEqual(['One', 'Two']);
 	});
 
-	it('uses the fallback header image for a collection with no photos', () => {
-		render('season5');
+	it('uses the fallback header image for a collection without dimensions', () => {
+		render('season6');
 		httpTesting
-			.expectOne(pageUrl('season5', 0))
-			.flush({ items: [], total: 0 });
+			.expectOne(pageUrl('season6', 0))
+			.flush({ items: SECOND_PAGE, total: 1 });
 		fixture.detectChanges();
 
-		expect(
-			element
-				.querySelector('.background-image-card img')
-				?.getAttribute('src')
-		).toBe(GALLERY_FALLBACK_IMAGE);
+		expect(headerImage()).toBe(GALLERY_FALLBACK_IMAGE);
 	});
 });

@@ -71,6 +71,17 @@ export class GalleryShowcasePageComponent {
 		const { params, data } = this.route.snapshot;
 		this.collectionName = params['collection'];
 		this.title = `Gallery: ${data['collectionTitle']}`;
+
+		// The header shows the first image associated with the collection
+		this.galleryProvider
+			.fetchCollection(this.collectionName)
+			.subscribe(
+				(collection) =>
+					(this.imageUrl =
+						collection?.dimensions?.[0]?.imageUrl ??
+						GALLERY_FALLBACK_IMAGE)
+			);
+
 		// The selected tags are in the URL, so a filtered view can be shared,
 		// and Back restores the previous filter.
 		this.route.queryParamMap
@@ -145,15 +156,6 @@ export class GalleryShowcasePageComponent {
 			)
 			.subscribe({
 				next: ({ items, total }) => {
-					// The header shows the whole collection's first photo.
-					// (or, opened filtered, its first match).
-					if (
-						requestedPageIndex === 0 &&
-						(requestedTags.length === 0 || !this.imageUrl)
-					) {
-						this.imageUrl =
-							items[0]?.imageUrl ?? GALLERY_FALLBACK_IMAGE;
-					}
 					// The cache holds pages of the current filter only.
 					if (requestedTags !== this.selectedTags()) {
 						return;

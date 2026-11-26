@@ -38,6 +38,17 @@ export class GalleryProviderService {
 		return this.latestCollections.response$;
 	}
 
+	/* Fetches the specified collection by its slug */
+	public fetchCollection(
+		slug: string
+	): Observable<GalleryCollection | undefined> {
+		return this.fetchCollections().pipe(
+			map((collections) =>
+				collections.find((collection) => collection.slug === slug)
+			)
+		);
+	}
+
 	/** A gallery's title, or undefined when there's no such public gallery. */
 	public findCollectionTitle(slug: string): Observable<string | undefined> {
 		return this.fetchCollections().pipe(
