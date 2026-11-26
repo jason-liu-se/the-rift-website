@@ -205,8 +205,8 @@ describe('CollectionsManagerComponent', () => {
 		);
 	});
 
-	it("edits a collection's dimensions in its draft, from its Edit button", () => {
-		button('Edit Season 5').click();
+	it("edits a collection's dimensions in its draft, opening it from its card", () => {
+		button('Season 5').click();
 		httpTesting.expectOne(LIST_DRAFTS).flush([]);
 		fixture.detectChanges();
 		button('Remove Nether').click();
@@ -224,13 +224,12 @@ describe('CollectionsManagerComponent', () => {
 		httpTesting.match({ method: 'POST' });
 	});
 
-	it('renames a collection in its draft, publishing nothing', () => {
-		const title = element.querySelector<HTMLInputElement>('input.title')!;
-		title.value = 'Season Five';
-		title.dispatchEvent(new Event('blur'));
+	it('hides a collection in its draft, publishing nothing', () => {
+		button('Hide Season 5').click();
 		httpTesting.expectOne(LIST_DRAFTS).flush([]);
 		fixture.detectChanges();
 
+		expect(button('Show Season 5')).toBeDefined();
 		expect(element.textContent).toContain('Unpublished changes');
 		httpTesting.expectNone({ method: 'PATCH' });
 	});
@@ -253,6 +252,26 @@ describe('CollectionsManagerComponent', () => {
 		httpTesting.expectOne(LIST_DRAFTS).flush([draft]);
 		fixture.detectChanges();
 		expect(button('Season 7')).toBeDefined();
+	});
+
+	it('deletes an unpublished collection after asking', () => {
+		vi.useFakeTimers();
+		type('title', 'Season 7');
+		vi.advanceTimersByTime(AUTOSAVE_DELAY_MS);
+		vi.useRealTimers();
+		const save = httpTesting.expectOne({ method: 'PUT' });
+		save.flush({ ...save.request.body, id: 'draft-1', revision: 1 });
+		httpTesting.match(LIST_DRAFTS);
+		fixture.detectChanges();
+		button('Delete Season 7').click();
+
+		expect(dialogMessages).toEqual([
+			"It hasn't been published, so it'll be gone."
+		]);
+		httpTesting
+			.expectOne({ method: 'DELETE', url: save.request.url })
+			.flush(null);
+		httpTesting.match(LIST_DRAFTS);
 	});
 
 	it('says when the slug is taken', () => {

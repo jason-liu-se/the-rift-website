@@ -12,9 +12,9 @@ import {
 	Subject,
 	catchError,
 	filter,
-	map,
 	of,
-	switchMap
+	switchMap,
+	tap
 } from 'rxjs';
 import { CollectionDraftType } from 'src/app/interfaces/api-requests';
 import {
@@ -35,17 +35,21 @@ import { describeWriteError } from '../../utilities/write-errors';
 
 export type CollectionSession = DraftSession<CollectionDraftType>;
 
+/** A published collection, or a new collection's draft by its ID. */
+export type CollectionTarget = EditorCollection | string;
+
 /** A draft of a new collection, as the list names it. */
 export interface NewCollectionDraft {
 	id: string;
-	fields: { title?: string; slug?: string };
+	fields: { title?: string; slug?: string; visible?: boolean };
+	dimensionCount?: number;
 }
 
 /**
  * The Collections modal's editing: the one collection draft open in its form
  * (a new collection, or an edit of one), and the editor's collection drafts
- * to list. Renaming or showing a collection from the list changes its draft,
- * opening it. Provided by the modal (`start` with its type).
+ * to list. Showing or hiding one from the list changes its draft, opening
+ * it. Provided by the modal (`start` with its type).
  */
 @Injectable()
 export class CollectionsEditor {
@@ -137,33 +141,27 @@ export class CollectionsEditor {
 	}
 
 	/**
-	 * Opens the collection, carrying on with its draft if there is one.
-	 * Emits once it's open.
+	 * Opens a published collection (carrying on with its draft if there is
+	 * one) or a new one's draft, by ID. Emits once it's open.
 	 */
-	public edit(collection: EditorCollection): Observable<unknown> {
-		return this.sessionOf(collection);
-	}
-
-	/** Opens a draft of a new collection. Emits once it's open. */
-	public openDraft(id: string): Observable<unknown> {
-		return this.sessions.openDraft(this.draftType(), id).pipe(
-			map((session) => this.setSession(session)),
-			catchError((error: unknown) => this.notifyOpenFailure(error))
-		);
-	}
-
-	/** Renames the collection in its draft, opening it. */
-	public rename(collection: EditorCollection, title: string): void {
-		this.sessionOf(collection).subscribe((session) =>
-			session.update({ title })
-		);
+	public open(target: CollectionTarget): Observable<unknown> {
+		return this.sessionOf(target);
 	}
 
 	/** Shows or hides the collection in its draft, opening it. */
-	public toggleVisibility(collection: EditorCollection): void {
-		this.sessionOf(collection).subscribe((session) =>
+	public toggleVisibility(target: CollectionTarget): void {
+		this.sessionOf(target).subscribe((session) =>
 			session.update({ visible: !(session.fields().visible ?? true) })
 		);
+	}
+
+	/** Deletes a new collection's draft. */
+	public discardNewDraft(id: string): Observable<unknown> {
+		const session = this.session();
+		if (session?.id() === id) {
+			return session.discard().pipe(tap(() => this.startNew()));
+		}
+		return this.draftStore.delete(id).pipe(tap(() => this.reloadDrafts()));
 	}
 
 	/** The open draft was published: back to a new collection. */
@@ -192,19 +190,21 @@ export class CollectionsEditor {
 		}
 	}
 
-	/** The collection's open draft, opening it first if another is open. */
-	private sessionOf(
-		collection: EditorCollection
-	): Observable<CollectionSession> {
+	/** The open draft of the target, opening it first if another is open. */
+	private sessionOf(target: CollectionTarget): Observable<CollectionSession> {
 		const open = this.session();
-		if (open?.targetId() === collection.slug) {
+		const isDraftId = typeof target === 'string';
+		if (
+			open &&
+			(isDraftId ? open.id() === target : open.targetId() === target.slug)
+		) {
 			return of(open);
 		}
-		return this.sessions.startEdit(this.draftType(), collection).pipe(
-			map((session) => {
-				this.setSession(session);
-				return session;
-			}),
+		const opening = isDraftId
+			? this.sessions.openDraft(this.draftType(), target)
+			: this.sessions.startEdit(this.draftType(), target);
+		return opening.pipe(
+			tap((session) => this.setSession(session)),
 			catchError((error: unknown) => this.notifyOpenFailure(error))
 		);
 	}

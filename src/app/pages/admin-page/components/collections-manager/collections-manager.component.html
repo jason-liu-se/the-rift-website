@@ -1,8 +1,8 @@
 <section class="existing" aria-labelledby="existing-heading">
 	<div class="list-heading">
 		<h3 id="existing-heading" class="subheading">
-			{{ rows().length }}
-			{{ rows().length === 1 ? "collection" : "collections" }}
+			{{ cards().length }}
+			{{ cards().length === 1 ? "collection" : "collections" }}
 		</h3>
 		@if (canStartNew()) {
 			<button mat-button type="button" (click)="startNew()">
@@ -12,81 +12,47 @@
 		}
 	</div>
 	<ul class="collection-list">
-		@for (draft of newDraftRows(); track draft.id) {
-			<li class="new-draft" [class.editing]="draft.isOpen">
-				<span class="name">
-					<button
-						type="button"
-						class="title draft-title"
-						[attr.aria-pressed]="draft.isOpen"
-						(click)="openDraft(draft.id)"
-					>
-						{{ draft.title }}
-					</button>
-					<span class="details">{{ pathOf(draft.slug) }}</span>
-				</span>
-				<app-status-badge status="draft" />
-			</li>
-		}
-		@for (row of rows(); track row.collection.slug) {
+		@for (card of cards(); track card.target) {
 			<li
-				[class.hidden-collection]="!row.isVisible"
-				[class.editing]="row.isOpen"
+				[class.hidden-collection]="!card.isVisible"
+				[class.editing]="card.isOpen"
 			>
 				<span class="name">
-					<input
-						class="title"
-						[attr.aria-label]="'Title of ' + row.title"
-						[maxLength]="maxTitleLength"
-						[value]="row.title"
-						(keydown.enter)="$any($event.target).blur()"
-						(keydown.escape)="
-							$any($event.target).value = row.title;
-							$event.stopPropagation()
-						"
-						(blur)="rename(row, $any($event.target))"
-					/>
+					<!-- Opens on a click anywhere on the card. -->
+					<button
+						type="button"
+						class="open"
+						[attr.aria-current]="card.isOpen || null"
+						(click)="open(card)"
+					>
+						{{ card.title }}
+					</button>
 					<span class="details">
-						{{ pathOf(row.collection.slug) }} ·
-						{{ countOf(row.collection) }}
-						@if (row.collection.dimensions?.length; as count) {
-							· {{ count }}
-							{{ count === 1 ? "dimension" : "dimensions" }}
-						}
-						@if (!row.isVisible) {
+						{{ card.details }}
+						@if (!card.isVisible) {
 							· Hidden
 						}
 					</span>
-					@if (row.hasDraft) {
-						<span class="changes">
+					@if (card.status; as status) {
+						<span class="status">
 							<span class="dot" aria-hidden="true"></span>
-							Unpublished changes
+							{{ status }}
 						</span>
 					}
 				</span>
 				<button
 					mat-icon-button
 					type="button"
-					matTooltip="Edit title and dimensions"
-					[attr.aria-label]="'Edit ' + row.title"
-					[attr.aria-pressed]="row.isOpen"
-					(click)="edit(row.collection)"
-				>
-					<mat-icon>edit</mat-icon>
-				</button>
-				<button
-					mat-icon-button
-					type="button"
 					[matTooltip]="
-						row.isVisible ? 'Hide from site' : 'Show on site'
+						card.isVisible ? 'Hide from site' : 'Show on site'
 					"
 					[attr.aria-label]="
-						(row.isVisible ? 'Hide ' : 'Show ') + row.title
+						(card.isVisible ? 'Hide ' : 'Show ') + card.title
 					"
-					(click)="editor.toggleVisibility(row.collection)"
+					(click)="editor.toggleVisibility(card.target)"
 				>
 					<mat-icon>{{
-						row.isVisible ? "visibility" : "visibility_off"
+						card.isVisible ? "visibility" : "visibility_off"
 					}}</mat-icon>
 				</button>
 				<button
@@ -94,16 +60,14 @@
 					type="button"
 					class="danger"
 					matTooltip="Delete"
-					[attr.aria-label]="'Delete ' + row.collection.title"
-					(click)="deleteCollection(row.collection)"
+					[attr.aria-label]="'Delete ' + card.title"
+					(click)="delete(card)"
 				>
 					<mat-icon>delete</mat-icon>
 				</button>
 			</li>
 		} @empty {
-			@if (newDraftRows().length === 0) {
-				<li class="empty">No collections yet. Create the first one.</li>
-			}
+			<li class="empty">No collections yet. Create the first one.</li>
 		}
 	</ul>
 </section>

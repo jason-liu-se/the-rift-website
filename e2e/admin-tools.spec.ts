@@ -256,7 +256,7 @@ test.describe('gallery collections', () => {
 			page.getByRole('heading', { name: 'Gallery collections' })
 		).toBeFocused();
 		await expect(
-			page.getByRole('textbox', { name: 'Title of Season 5' })
+			page.getByRole('button', { name: 'Season 5', exact: true })
 		).toBeVisible();
 	});
 
