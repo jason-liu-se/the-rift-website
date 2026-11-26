@@ -146,7 +146,7 @@ test.describe('news editor', () => {
 		await expect(page).toHaveURL(/\/admin\/news\/drafts\/[\w-]+$/);
 		expect(saves.at(-1)).toEqual({
 			type: 'news',
-			fields: { title: 'Fresh', content: 'Hello **all**' }
+			fields: { title: 'Fresh', content: 'Hello **all**', visible: true }
 		});
 		expect(await scanForViolations(page)).toEqual([]);
 
@@ -154,7 +154,8 @@ test.describe('news editor', () => {
 			.getByRole('button', { name: 'Publish', exact: true })
 			.click();
 		await expect(page.getByText('Published Fresh.')).toBeVisible();
-		expect(publishRequest).toEqual({ visible: true, date: 'now' });
+		// The draft holds the publish choices.
+		expect(publishRequest).toEqual({});
 		await expect(page).toHaveURL(/\/admin\/news$/);
 	});
 
@@ -215,7 +216,7 @@ test('keeps editing offline, and saves the draft once the API is back', async ({
 		page.getByRole('status').filter({ hasText: /^Saved$/ })
 	).toBeVisible();
 	expect(saves).toEqual([
-		{ type: 'news', fields: { title: 'Written offline' } }
+		{ type: 'news', fields: { title: 'Written offline', visible: true } }
 	]);
 });
 
@@ -263,27 +264,37 @@ test.describe('gallery collections', () => {
 		expect(await scanForViolations(page)).toEqual([]);
 	});
 
-	test('creates a collection, its slug following the title', async ({
+	test('drafts a new collection, its slug following the title, and publishes it', async ({
 		page
 	}) => {
-		let body: unknown;
-		await page.route(`${API_URL}/editor/gallery/collections`, (route) => {
-			if (route.request().method() !== 'POST') {
-				return route.fallback();
-			}
-			body = route.request().postDataJSON();
-			return route.fulfill({ status: 201, json: {} });
+		const saves: { fields: object }[] = [];
+		await page.route(`${API_URL}/editor/drafts/*`, (route) => {
+			const save = route.request().postDataJSON();
+			saves.push(save);
+			return route.fulfill({
+				status: 201,
+				json: {
+					...save,
+					id: route.request().url().split('/').pop(),
+					revision: saves.length,
+					createdAt: '2026-01-01T00:00:00.000Z',
+					updatedAt: '2026-01-01T00:00:00.000Z'
+				}
+			});
 		});
+		await page.route(`${API_URL}/editor/drafts/*/publish`, (route) =>
+			route.fulfill({ json: { slug: 'season-7', title: 'Season 7' } })
+		);
 		await page
 			.getByRole('textbox', { name: 'Title', exact: true })
 			.fill('Season 7');
 		await expect(page.getByRole('textbox', { name: 'Slug' })).toHaveValue(
 			'season-7'
 		);
-		await page.getByRole('button', { name: 'Create collection' }).click();
+		await page.getByRole('button', { name: 'Publish' }).click();
 
-		await expect(page.getByText('Created Season 7.')).toBeVisible();
-		expect(body).toEqual({
+		await expect(page.getByText('Published Season 7.')).toBeVisible();
+		expect(saves.at(-1)?.fields).toEqual({
 			slug: 'season-7',
 			title: 'Season 7',
 			visible: true

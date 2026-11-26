@@ -4,15 +4,18 @@ import {
 	provideHttpClientTesting
 } from '@angular/common/http/testing';
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { of } from 'rxjs';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
+import { ApiStatusService } from 'src/app/services/api-status/api-status.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { EDITOR_GALLERY_COLLECTIONS } from 'src/app/testing/api-fixtures';
 import { environment } from 'src/environments/environment';
 import { CollectionsStore } from '../../services/collections-store.service';
 import { findSlugProblem, toSlug } from '../collection-form/collection-slug';
+import { CollectionsEditor } from '../collections-modal/collections-editor';
 import { ModalFooterSlot } from '../modal-shell/modal-footer-slot';
 import { CollectionsManagerComponent } from './collections-manager.component';
 
@@ -21,18 +24,25 @@ import { CollectionsManagerComponent } from './collections-manager.component';
 	template: `<app-collections-manager
 			type="gallery"
 			[itemNoun]="{ one: 'image', many: 'images' }"
-			(changed)="changed()"
 		/>
 		<ng-container *ngTemplateOutlet="footer.template() ?? null" />`,
 	imports: [CollectionsManagerComponent, NgTemplateOutlet],
-	providers: [ModalFooterSlot]
+	providers: [CollectionsEditor, ModalFooterSlot]
 })
 class ModalHostComponent {
 	protected readonly footer = inject(ModalFooterSlot);
-	public changed = (): void => undefined;
+
+	constructor() {
+		inject(CollectionsEditor).start('gallery');
+	}
 }
 
 const COLLECTIONS_URL = `${environment.API_URL}/editor/gallery/collections`;
+const DRAFTS_URL = `${environment.API_URL}/editor/drafts`;
+const LIST_DRAFTS = {
+	method: 'GET',
+	url: `${DRAFTS_URL}?type=gallery-collections`
+};
 
 describe('findSlugProblem', () => {
 	it.each(['season5', 'season-5', 'a1-b2-c3'])('accepts %s', (slug) => {
@@ -65,20 +75,21 @@ describe('CollectionsManagerComponent', () => {
 	let httpTesting: HttpTestingController;
 	let dialogMessages: string[];
 	let notifyFailure: ReturnType<typeof vi.fn>;
-	let changed: ReturnType<typeof vi.fn<() => void>>;
 
+	/** A button by its accessible name: its label, or its text without icons and hidden text. */
 	const button = (name: string) =>
 		[...element.querySelectorAll<HTMLButtonElement>('button')].find(
-			(candidate) =>
-				(candidate.getAttribute('aria-label') ??
-					candidate.textContent
-						?.replace(
-							candidate.querySelector('mat-icon')?.textContent ??
-								'',
-							''
-						)
-						.replace(/\s+/g, ' ')
-						.trim()) === name
+			(candidate) => {
+				const visible = candidate.cloneNode(true) as HTMLElement;
+				visible
+					.querySelectorAll('mat-icon, [aria-hidden="true"]')
+					.forEach((hidden) => hidden.remove());
+				return (
+					(candidate.getAttribute('aria-label') ??
+						visible.textContent?.replace(/\s+/g, ' ').trim()) ===
+					name
+				);
+			}
 		)!;
 	const type = (name: string, value: string) => {
 		const input = element.querySelector<HTMLInputElement>(
@@ -88,17 +99,39 @@ describe('CollectionsManagerComponent', () => {
 		input.dispatchEvent(new Event('input'));
 		fixture.detectChanges();
 	};
+	/** Answers the draft's save, then expects its publish. */
+	const expectPublish = () => {
+		const save = httpTesting.expectOne({ method: 'PUT' });
+		const { body } = save.request;
+		save.flush({
+			...body,
+			id: save.request.url.split('/').pop(),
+			revision: 1
+		});
+		return {
+			save: body,
+			publish: httpTesting.expectOne({ method: 'POST' })
+		};
+	};
 
 	beforeEach(() => {
+		localStorage.clear();
 		dialogMessages = [];
 		notifyFailure = vi.fn();
-		changed = vi.fn<() => void>();
 		TestBed.configureTestingModule({
 			imports: [ModalHostComponent],
 			providers: [
 				CollectionsStore,
 				provideHttpClient(),
 				provideHttpClientTesting(),
+				{
+					provide: ApiStatusService,
+					useValue: { status: signal('up') }
+				},
+				{
+					provide: AuthService,
+					useValue: { user: signal({ id: 'me' }) }
+				},
 				{
 					provide: AdminNotifierService,
 					useValue: {
@@ -123,9 +156,9 @@ describe('CollectionsManagerComponent', () => {
 		});
 		httpTesting = TestBed.inject(HttpTestingController);
 		fixture = TestBed.createComponent(ModalHostComponent);
-		fixture.componentInstance.changed = () => changed();
 		element = fixture.nativeElement;
 		fixture.detectChanges();
+		httpTesting.expectOne(LIST_DRAFTS).flush([]);
 		httpTesting
 			.expectOne(COLLECTIONS_URL)
 			.flush(EDITOR_GALLERY_COLLECTIONS);
@@ -140,121 +173,75 @@ describe('CollectionsManagerComponent', () => {
 		).toContain('/gallery/season5 · 3 images');
 	});
 
-	it('fills the slug in from the title, and creates the collection', () => {
+	it('fills the slug in from the title, and publishes the new collection', () => {
 		type('title', 'Season 7');
-		button('Create collection').click();
-		const create = httpTesting.expectOne({
-			method: 'POST',
-			url: COLLECTIONS_URL
+		button('Publish').click();
+
+		const { save, publish } = expectPublish();
+		expect(save).toEqual({
+			type: 'gallery-collections',
+			fields: { slug: 'season-7', title: 'Season 7', visible: true }
 		});
-		expect(create.request.body).toEqual({
-			createId: expect.any(String),
-			slug: 'season-7',
-			title: 'Season 7',
-			visible: true
-		});
-		create.flush({});
+		publish.flush({ slug: 'season-7', title: 'Season 7' });
 		httpTesting
 			.expectOne(COLLECTIONS_URL)
 			.flush(EDITOR_GALLERY_COLLECTIONS);
-
-		expect(changed).toHaveBeenCalled();
+		httpTesting.expectOne(LIST_DRAFTS).flush([]);
 	});
 
-	it('checks an edited slug when creating', () => {
+	it("won't publish a bad slug, or a dimension without a name and image", () => {
 		type('title', 'Season 7');
 		type('slug', 'Season 7');
-		button('Create collection').click();
-		fixture.detectChanges();
-
-		httpTesting.expectNone({ method: 'POST', url: COLLECTIONS_URL });
-		expect(element.querySelector('.problem')?.textContent).toContain(
-			'lowercase letters'
-		);
-	});
-
-	it('adds a dimension when creating, and asks for its name and image', () => {
-		type('title', 'Season 7');
 		button('Add a dimension').click();
 		fixture.detectChanges();
-		button('Create collection').click();
+		button('Publish').click();
 		fixture.detectChanges();
 
-		httpTesting.expectNone({ method: 'POST', url: COLLECTIONS_URL });
+		httpTesting.expectNone({ method: 'PUT' });
+		expect(element.textContent).toContain('lowercase letters');
 		expect(element.textContent).toContain(
 			'Give every dimension a name and an image.'
 		);
-
-		type('dimension-name', ' Overworld ');
-		const image = element.querySelector<HTMLInputElement>(
-			'app-dimensions-editor app-image-field input'
-		)!;
-		image.value = 'https://i.imgur.com/a.png';
-		image.dispatchEvent(new Event('input'));
-		fixture.detectChanges();
-		button('Create collection').click();
-
-		const create = httpTesting.expectOne({
-			method: 'POST',
-			url: COLLECTIONS_URL
-		});
-		expect(create.request.body.dimensions).toEqual([
-			{ name: 'Overworld', imageUrl: 'https://i.imgur.com/a.png' }
-		]);
-		create.flush({});
-		httpTesting
-			.expectOne(COLLECTIONS_URL)
-			.flush(EDITOR_GALLERY_COLLECTIONS);
 	});
 
-	it("edits a collection's dimensions, from its Edit button", () => {
+	it("edits a collection's dimensions in its draft, from its Edit button", () => {
 		button('Edit Season 5').click();
+		httpTesting.expectOne(LIST_DRAFTS).flush([]);
 		fixture.detectChanges();
 		button('Remove Nether').click();
 		fixture.detectChanges();
-		button('Save changes').click();
+		button('Publish changes').click();
 
-		const update = httpTesting.expectOne(`${COLLECTIONS_URL}/season5`);
-		expect(update.request.body).toEqual({
-			title: 'Season 5',
-			dimensions: [
-				{
-					name: 'Overworld',
-					imageUrl:
-						'/assets/general-background-images/fancy-tree-1.webp'
-				}
-			],
-			startingRevision: 1
-		});
-		update.flush({});
-		httpTesting.expectOne(COLLECTIONS_URL).flush([]);
-		expect(changed).toHaveBeenCalled();
+		const { save } = expectPublish();
+		expect(save.target).toEqual({ id: 'season5', startingRevision: 1 });
+		expect(save.fields.dimensions).toEqual([
+			{
+				name: 'Overworld',
+				imageUrl: '/assets/general-background-images/fancy-tree-1.webp'
+			}
+		]);
+		httpTesting.match({ method: 'POST' });
 	});
 
-	it('renames a collection when its title is changed', () => {
+	it('renames a collection in its draft, publishing nothing', () => {
 		const title = element.querySelector<HTMLInputElement>('input.title')!;
 		title.value = 'Season Five';
 		title.dispatchEvent(new Event('blur'));
+		httpTesting.expectOne(LIST_DRAFTS).flush([]);
+		fixture.detectChanges();
 
-		const update = httpTesting.expectOne(`${COLLECTIONS_URL}/season5`);
-		expect(update.request.body).toEqual({
-			title: 'Season Five',
-			startingRevision: 1
-		});
-		update.flush({});
-		httpTesting.expectOne(COLLECTIONS_URL).flush([]);
+		expect(element.textContent).toContain('Unpublished changes');
+		httpTesting.expectNone({ method: 'PATCH' });
 	});
 
 	it('says when the slug is taken', () => {
 		type('title', 'Again');
 		type('slug', 'season5');
-		button('Create collection').click();
-		httpTesting
-			.expectOne({ method: 'POST', url: COLLECTIONS_URL })
-			.flush({ error: 'taken' }, { status: 409, statusText: 'Conflict' });
-		httpTesting
-			.expectOne(COLLECTIONS_URL)
-			.flush(EDITOR_GALLERY_COLLECTIONS);
+		button('Publish').click();
+		expectPublish().publish.flush(
+			{ error: 'taken' },
+			{ status: 409, statusText: 'Conflict' }
+		);
 
 		expect(notifyFailure).toHaveBeenCalledWith(
 			'The slug season5 is taken. Choose another.'
@@ -270,18 +257,6 @@ describe('CollectionsManagerComponent', () => {
 		httpTesting
 			.expectOne(`${COLLECTIONS_URL}/season5?startingRevision=1`)
 			.flush(null);
-		httpTesting.expectOne(COLLECTIONS_URL).flush([]);
-	});
-
-	it('shows and hides a collection', () => {
-		button('Hide Season 5').click();
-
-		const update = httpTesting.expectOne(`${COLLECTIONS_URL}/season5`);
-		expect(update.request.body).toEqual({
-			visible: false,
-			startingRevision: 1
-		});
-		update.flush({});
 		httpTesting.expectOne(COLLECTIONS_URL).flush([]);
 	});
 });

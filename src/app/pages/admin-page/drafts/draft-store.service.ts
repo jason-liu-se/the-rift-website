@@ -218,6 +218,11 @@ export class DraftStore {
 		);
 	}
 
+	/** Emits once every write queued before it is done. */
+	public afterWrites(): Observable<void> {
+		return this.enqueue(() => of(undefined));
+	}
+
 	/**
 	 * Reconciles this browser's copies with the server's drafts, sending each
 	 * one the server can take. A copy of a draft that changed elsewhere stays

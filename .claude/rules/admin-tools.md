@@ -53,26 +53,33 @@ The decisions are in issue #101; the API's side is in the web-server's
   collection, drags into order (`list-order.ts`, one update per moved item).
 - **Collections** come from `CollectionsStore` (provided by the admin page):
   fetched once per type, reloaded after a collection write. The Collections
-  modal lists them beside `collection-form/`, which creates one or edits one's
-  title and dimensions. Dimensions (a name and image each) use the same
-  `dimensions-editor/` as map seasons, which add BlueMap fields
-  (`withMapFields`). The form's save button sits in the modal's footer through
-  `ModalFooterSlot` (`modal-shell/modal-footer-slot.ts`). The `/gallery` card
-  shows the collection's first dimension's image, or none.
+  modal lists them, and the editor's drafts of new ones, beside
+  `collection-form/`, which edits one collection draft at a time
+  (`gallery-collections`, `downloads-collections`): a new one, or an existing
+  one's title and dimensions. `CollectionsEditor` (provided by the modal) owns
+  the open draft and the drafts list; renaming or showing a collection from the
+  list changes its draft, and only deleting one writes at once. The form shares
+  the item editor's footer (`draft-footer/`), undo and redo (`draft-history/`),
+  and conflict panel, with the footer in the modal's through `ModalFooterSlot`
+  (`modal-shell/modal-footer-slot.ts`). Dimensions (a name and image each) use
+  the same `dimensions-editor/` as map seasons, which add BlueMap fields
+  (`withMapFields`). The `/gallery` card shows the collection's first
+  dimension's image, or none.
 - **Writes** (confirm, send, snackbar) go through `EditorWriteService.run()`.
 - **API:** `EditorContentService` (items, bulk actions, collections),
   `DraftsService`, and `ImageUploadService`, typed per content type by
   `EditorContentTypes` (`services/editor-content/editor-content-types.ts`).
   Every `/editor/*` request uses `EDITOR_REQUEST_OPTIONS`.
-- **Drafts** (`pages/admin-page/drafts/`): the server holds them. `DraftStore`
-  owns every draft write (one queue, so autosave, retries, publishing, and
-  syncing never race) and this browser's copies, kept only while a change waits
-  for the server (`AUTOSAVE_DELAY_MS` after typing stops, or offline). Its
-  `sync()` reconciles the copies with the server when the admin page opens and
-  when the API comes back. A `DraftSession` per open item holds editing state:
-  fields, undo/redo, the save stage (`SaveState`, one union), conflicts
-  (`409`/`404`), and publishing, which always makes sure the server has the
-  draft first. `DraftSessionsService` starts sessions.
+- **Drafts** (`pages/admin-page/drafts/`): the server holds them, of items or
+  collections (`DraftTypes` in `editor-content-types.ts`). `DraftStore` owns
+  every draft write (one queue, so autosave, retries, publishing, and syncing
+  never race) and this browser's copies, kept only while a change waits for the
+  server (`AUTOSAVE_DELAY_MS` after typing stops, or offline). Its `sync()`
+  reconciles the copies with the server when the admin page opens and when the
+  API comes back. A `DraftSession` per open item holds editing state: fields,
+  undo/redo, the save stage (`SaveState`, one union), conflicts (`409`/`404`),
+  and publishing, which always makes sure the server has the draft first.
+  `DraftSessionsService` starts sessions.
 - **Bulk actions** go through `BulkActionRunnerService`: at most
   `MAX_BULK_ITEMS` a request, one after another, answering every item's result
   once all are done. Updates send only the items they'd change and offer Undo,

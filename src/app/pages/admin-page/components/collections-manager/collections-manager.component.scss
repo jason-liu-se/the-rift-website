@@ -8,8 +8,17 @@
 	gap: 32px;
 }
 
+.list-heading {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	min-height: 40px;
+	margin-bottom: 8px;
+}
+
 .subheading {
-	margin: 0 0 12px;
+	margin: 0;
 	font-size: $font-size-small;
 	font-weight: 600;
 	letter-spacing: 0.05em;
@@ -81,9 +90,31 @@
 	}
 }
 
+// A new collection's draft: its title opens it.
+.draft-title {
+	text-align: left;
+	cursor: pointer;
+}
+
 .details {
 	font-size: $font-size-x-small;
 	overflow-wrap: anywhere;
+}
+
+.changes {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	color: $colour-warning;
+	font-size: $font-size-x-small;
+	font-weight: 600;
+}
+
+.dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background-color: currentColor;
 }
 
 .danger {

@@ -9,34 +9,46 @@ import {
 	signal
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatButton } from '@angular/material/button';
 import { MatFormField, MatHint, MatLabel } from '@angular/material/form-field';
-import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
+import { Observable, filter } from 'rxjs';
 import {
 	MAX_COLLECTION_SLUG_LENGTH,
 	MAX_COLLECTION_TITLE_LENGTH
 } from 'src/app/config/content-limits';
-import {
-	CollectionCreateRequest,
-	CollectionUpdateRequest,
-	ImageUploadForm
-} from 'src/app/interfaces/api-requests';
+import { ImageUploadForm } from 'src/app/interfaces/api-requests';
 import { Dimension, EditorCollection } from 'src/app/interfaces/api-responses';
+import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
 import { CollectionContentType } from 'src/app/services/editor-content/editor-content-types';
-import { EditorContentService } from 'src/app/services/editor-content/editor-content.service';
-import { CollectionsStore } from '../../services/collections-store.service';
+import { discardDraft } from '../../drafts/discard-draft';
 import { EditorWriteService } from '../../services/editor-write.service';
 import { describeWriteError } from '../../utilities/write-errors';
+import { CollectionSession } from '../collections-modal/collections-editor';
 import { DimensionsEditorComponent } from '../dimensions-editor/dimensions-editor.component';
+import { DraftConflictComponent } from '../draft-editor/draft-conflict/draft-conflict.component';
+import { ItemNoun } from '../editor-list/bulk-results';
+import { DraftFooterComponent } from '../draft-footer/draft-footer.component';
+import {
+	DraftHistoryComponent,
+	handleHistoryShortcut
+} from '../draft-history/draft-history.component';
 import { ModalFooterDirective } from '../modal-shell/modal-footer-slot';
-import { VisibilityToggleComponent } from '../visibility-toggle/visibility-toggle.component';
 import { findSlugProblem, toSlug } from './collection-slug';
 
+const NOUN: ItemNoun = { one: 'collection', many: 'collections' };
+
+/** A collection's fields, as a conflict lists their version beside mine. */
+const FIELD_LABELS = {
+	title: 'Title',
+	slug: 'Slug',
+	dimensions: 'Dimensions'
+};
+
 /**
- * A collection's form: a new one (its slug following the title until edited,
- * fixed once created), or an existing one's title and dimensions. Its save
- * button (and a new one's visibility) go in the modal's footer.
+ * A collection's draft: a new one (its slug following the title until
+ * edited, fixed once created) or an existing one's title and dimensions,
+ * saved as it's typed. Its footer (save status, Discard, visibility,
+ * Publish) goes in the modal's footer.
  */
 @Component({
 	selector: 'app-collection-form',
@@ -44,150 +56,150 @@ import { findSlugProblem, toSlug } from './collection-slug';
 	styleUrl: './collection-form.component.scss',
 	imports: [
 		DimensionsEditorComponent,
+		DraftConflictComponent,
+		DraftFooterComponent,
+		DraftHistoryComponent,
 		FormsModule,
-		MatButton,
 		MatFormField,
 		MatHint,
-		MatIcon,
 		MatInput,
 		MatLabel,
-		ModalFooterDirective,
-		VisibilityToggleComponent
-	]
+		ModalFooterDirective
+	],
+	host: { '(keydown)': 'handleShortcuts($event)' }
 })
 export class CollectionFormComponent {
-	private editorContent = inject(EditorContentService);
+	private notifier = inject(AdminNotifierService);
 	private writer = inject(EditorWriteService);
-	private store = inject(CollectionsStore);
 
 	public readonly type = input.required<CollectionContentType>();
-	/** The collection to edit; none to create one. */
-	public readonly collection = input<EditorCollection>();
-	/** It was created or saved. */
-	public readonly saved = output<void>();
-	public readonly cancelled = output<void>();
+	public readonly session = input.required<CollectionSession>();
+	public readonly published = output<EditorCollection>();
+	public readonly discarded = output<void>();
 
+	protected readonly noun = NOUN;
+	protected readonly fieldLabels = FIELD_LABELS;
 	protected readonly maxSlugLength = MAX_COLLECTION_SLUG_LENGTH;
 	protected readonly maxTitleLength = MAX_COLLECTION_TITLE_LENGTH;
-	protected readonly title = linkedSignal(
-		() => this.collection()?.title ?? ''
-	);
-	protected readonly slug = linkedSignal(() => this.collection()?.slug ?? '');
-	protected readonly dimensions = linkedSignal<Dimension[]>(() => [
-		...(this.collection()?.dimensions ?? [])
-	]);
-	protected readonly isVisible = signal(true);
-	protected readonly isSaving = signal(false);
-	/** The slug was typed, so it no longer follows the title. */
-	private readonly isSlugEdited = linkedSignal(() => !!this.collection());
-	/** Repeating the create (a retry) returns the collection it made. */
-	private createId = crypto.randomUUID();
-	/** Problems show once saving was tried. */
+	protected readonly isPublishing = signal(false);
+	/** Problems show once publishing was tried. */
 	private readonly wasAttempted = linkedSignal({
-		source: this.collection,
+		source: this.session,
 		computation: () => false
 	});
 
+	protected readonly fields = computed(() => this.session().fields());
+	protected readonly isEdit = computed(() => this.session().isEdit());
 	protected readonly urlPrefix = computed(() =>
 		this.type() === 'gallery' ? '/gallery/' : undefined
 	);
+	private readonly slugProblem = computed(() =>
+		this.isEdit() ? undefined : findSlugProblem(this.fields().slug ?? '')
+	);
+	private readonly dimensionsProblem = computed(() =>
+		findDimensionsProblem(this.fields().dimensions ?? [])
+	);
 	protected readonly shownSlugProblem = computed(() =>
-		this.wasAttempted() && !this.collection()
-			? findSlugProblem(this.slug())
-			: undefined
+		this.wasAttempted() ? this.slugProblem() : undefined
 	);
 	protected readonly shownDimensionsProblem = computed(() =>
-		this.wasAttempted()
-			? findDimensionsProblem(this.dimensions())
-			: undefined
+		this.wasAttempted() ? this.dimensionsProblem() : undefined
 	);
+	/** In the footer, once publishing was tried. */
+	protected readonly publishProblem = computed(() => {
+		if (!this.wasAttempted()) {
+			return undefined;
+		}
+		const { title, slug } = this.fields();
+		if (!title?.trim() || (!this.isEdit() && !slug)) {
+			return 'Fields marked * are required.';
+		}
+		return this.slugProblem() || this.dimensionsProblem()
+			? 'Fix the problems marked above.'
+			: undefined;
+	});
 	/** The gallery's uploads go in the collection's album, so need its slug. */
 	protected readonly album = computed<ImageUploadForm | undefined>(() => {
 		if (this.type() === 'downloads') {
 			return { album: 'downloads' };
 		}
-		const slug = this.slug();
+		const slug = this.fields().slug ?? '';
 		return findSlugProblem(slug)
 			? undefined
 			: { album: 'gallery', collection: slug };
 	});
 
+	/** A new collection's slug follows its title until it's typed. */
 	protected setTitle(title: string): void {
-		this.title.set(title);
-		if (!this.isSlugEdited()) {
-			this.slug.set(toSlug(title));
-		}
+		const { title: previous, slug } = this.fields();
+		const isSlugFollowing =
+			!this.isEdit() && (slug ?? '') === toSlug(previous ?? '');
+		this.session().update({
+			title,
+			...(isSlugFollowing && { slug: toSlug(title) })
+		});
 	}
 
 	protected setSlug(slug: string): void {
-		this.isSlugEdited.set(true);
-		this.slug.set(slug);
+		this.session().update({ slug });
 	}
 
-	protected save(): void {
-		const title = this.title().trim();
-		const dimensions = this.dimensions().map(({ name, imageUrl }) => ({
-			name: name.trim(),
-			imageUrl
-		}));
+	protected setDimensions(dimensions: Dimension[]): void {
+		this.session().update({ dimensions });
+	}
+
+	protected publish(): void {
+		this.runPublish(() => this.session().publish({}));
+	}
+
+	protected publishAsNew(): void {
+		this.runPublish(() => this.session().publishAsNew({}));
+	}
+
+	protected overwrite(): void {
+		this.session()
+			.resolveItemConflict('overwrite')
+			.subscribe({ complete: () => this.publish() });
+	}
+
+	/** The conflict's way out when the collection was deleted. */
+	protected discard(): void {
+		discardDraft(this.writer, this.session(), NOUN.one, this.isEdit())
+			.pipe(filter(Boolean))
+			.subscribe(() => this.discarded.emit());
+	}
+
+	protected handleShortcuts(event: KeyboardEvent): void {
+		handleHistoryShortcut(event, this.session());
+	}
+
+	private runPublish(publish: () => Observable<EditorCollection>): void {
 		this.wasAttempted.set(true);
-		const existing = this.collection();
-		if (
-			!title ||
-			(!existing && findSlugProblem(this.slug())) ||
-			findDimensionsProblem(dimensions)
-		) {
+		if (this.publishProblem()) {
 			return;
 		}
-		this.isSaving.set(true);
-		const slug = this.slug();
-		this.writer
-			.run({
-				request: () =>
-					existing
-						? this.editorContent.updateCollection(
-								this.type(),
-								existing.slug,
-								{
-									title,
-									dimensions,
-									startingRevision: existing.revision
-								} satisfies CollectionUpdateRequest
-							)
-						: this.editorContent.createCollection(this.type(), {
-								createId: this.createId,
-								slug,
-								title,
-								...(dimensions.length > 0 && { dimensions }),
-								visible: this.isVisible()
-							} satisfies CollectionCreateRequest),
-				success: existing ? `Saved ${title}.` : `Created ${title}.`,
-				describeFailure: (error) =>
-					!existing && isSlugTaken(error)
-						? `The slug ${slug} is taken. Choose another.`
-						: describeWriteError(error)
-			})
-			.subscribe((isSaved) => {
-				this.isSaving.set(false);
-				// Also after a conflict: it brings the current revision.
-				this.store.reload(this.type());
-				if (!isSaved) {
+		const slug = this.fields().slug;
+		this.isPublishing.set(true);
+		publish().subscribe({
+			next: (collection) => {
+				this.isPublishing.set(false);
+				this.notifier.notifySuccess(`Published ${collection.title}.`);
+				this.published.emit(collection);
+			},
+			error: (error: unknown) => {
+				this.isPublishing.set(false);
+				if (this.session().conflict()) {
 					return;
 				}
-				this.saved.emit();
-				if (!existing) {
-					this.reset();
-				}
-			});
-	}
-
-	private reset(): void {
-		this.createId = crypto.randomUUID();
-		this.title.set('');
-		this.slug.set('');
-		this.dimensions.set([]);
-		this.isSlugEdited.set(false);
-		this.wasAttempted.set(false);
+				this.notifier.notifyFailure(
+					isSlugTaken(error)
+						? `The slug ${slug} is taken. Choose another.`
+						: error instanceof Error && !('status' in error)
+							? error.message
+							: describeWriteError(error)
+				);
+			}
+		});
 	}
 }
 

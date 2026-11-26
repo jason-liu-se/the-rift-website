@@ -1,17 +1,31 @@
-<!-- A native form (Enter submits) without Angular's NgForm, which would
+<!-- A native form (Enter publishes) without Angular's NgForm, which would
 	join the dimension cards' same-named fields into one control. Its own
 	messages replace the browser's validation. -->
 <form
 	ngNoForm
 	novalidate
-	id="collection-form"
 	class="form"
 	[attr.aria-labelledby]="'collection-form-heading'"
-	(submit)="$event.preventDefault(); save()"
+	(submit)="$event.preventDefault(); publish()"
 >
-	<h3 id="collection-form-heading" class="subheading">
-		{{ collection() ? "Edit " + collection()!.title : "New collection" }}
-	</h3>
+	<div class="heading-row">
+		<h3 id="collection-form-heading" class="subheading" tabindex="-1">
+			{{
+				isEdit()
+					? "Edit " + (fields().title || "Untitled")
+					: "New collection"
+			}}
+		</h3>
+		<app-draft-history [session]="session()" />
+	</div>
+	<app-draft-conflict
+		[session]="session()"
+		[noun]="noun"
+		[fieldLabels]="fieldLabels"
+		(overwrite)="overwrite()"
+		(publishAsNew)="publishAsNew()"
+		(discard)="discard()"
+	/>
 	<mat-form-field subscriptSizing="dynamic">
 		<mat-label>Title</mat-label>
 		<input
@@ -19,13 +33,13 @@
 			name="title"
 			required
 			[maxlength]="maxTitleLength"
-			[ngModel]="title()"
+			[ngModel]="fields().title ?? ''"
 			(ngModelChange)="setTitle($event)"
 		/>
 	</mat-form-field>
-	@if (collection()) {
+	@if (isEdit()) {
 		<p class="fixed-slug">
-			{{ urlPrefix() ?? "Slug: " }}{{ slug() }} · Can't be changed
+			{{ urlPrefix() ?? "Slug: " }}{{ fields().slug }} · Can't be changed
 		</p>
 	} @else {
 		<mat-form-field subscriptSizing="dynamic">
@@ -39,12 +53,12 @@
 				[maxlength]="maxSlugLength"
 				[attr.aria-invalid]="shownSlugProblem() ? true : null"
 				aria-describedby="slug-problem"
-				[ngModel]="slug()"
+				[ngModel]="fields().slug ?? ''"
 				(ngModelChange)="setSlug($event)"
 			/>
 			<mat-hint>
 				@if (urlPrefix(); as prefix) {
-					{{ prefix }}{{ slug() || "…" }} ·
+					{{ prefix }}{{ fields().slug || "…" }} ·
 				}
 				Can't be changed later</mat-hint
 			>
@@ -61,32 +75,22 @@
 		<app-dimensions-editor
 			[album]="album()"
 			noAlbumHint="Enter a slug to upload images."
-			[dimensions]="dimensions()"
-			(dimensionsChange)="dimensions.set($event)"
+			[dimensions]="fields().dimensions ?? []"
+			(dimensionsChange)="setDimensions($event)"
 		/>
 		<p class="problem" aria-live="polite">{{ shownDimensionsProblem() }}</p>
 	</section>
 </form>
 
-<!-- The modal's footer (see CollectionsModalComponent), outside the form. -->
+<!-- The modal's footer (see CollectionsModalComponent). -->
 <ng-template appModalFooter>
-	<div class="footer">
-		@if (collection()) {
-			<button mat-button type="button" (click)="cancelled.emit()">
-				Cancel
-			</button>
-		} @else {
-			<app-visibility-toggle [(visible)]="isVisible" />
-		}
-		<button
-			mat-flat-button
-			color="primary"
-			type="submit"
-			form="collection-form"
-			[disabled]="isSaving()"
-		>
-			<mat-icon>{{ collection() ? "save" : "add" }}</mat-icon>
-			{{ collection() ? "Save changes" : "Create collection" }}
-		</button>
-	</div>
+	<app-draft-footer
+		[session]="session()"
+		[isEdit]="isEdit()"
+		[noun]="noun.one"
+		[problem]="publishProblem()"
+		[isPublishing]="isPublishing()"
+		(publish)="publish()"
+		(discarded)="discarded.emit()"
+	/>
 </ng-template>
