@@ -13,39 +13,39 @@ import { Observable } from 'rxjs';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
-import { MAX_COLLECTION_TITLE_LENGTH } from 'src/app/config/content-limits';
 import { EditorCollection } from 'src/app/interfaces/api-responses';
 import { CollectionContentType } from 'src/app/services/editor-content/editor-content-types';
 import { EditorContentService } from 'src/app/services/editor-content/editor-content.service';
 import { CollectionsStore } from '../../services/collections-store.service';
 import { EditorWriteService } from '../../services/editor-write.service';
 import { CollectionFormComponent } from '../collection-form/collection-form.component';
-import { CollectionsEditor } from '../collections-modal/collections-editor';
+import {
+	CollectionTarget,
+	CollectionsEditor
+} from '../collections-modal/collections-editor';
 import { ItemNoun, countItems } from '../editor-list/bulk-results';
-import { StatusBadgeComponent } from '../status-badge/status-badge.component';
 
-/** A published collection as the list shows it, with the editor's draft on top. */
-interface CollectionRow {
-	collection: EditorCollection;
+/**
+ * A collection as the list shows it: a published one with the editor's
+ * draft on top, or a new one's draft.
+ */
+interface CollectionCard {
+	/** The published collection, or a new one's draft ID. */
+	target: CollectionTarget;
 	title: string;
+	/** Its URL, item count, and dimension count. */
+	details: string;
 	isVisible: boolean;
-	hasDraft: boolean;
-	isOpen: boolean;
-}
-
-/** A new collection's draft in the list. */
-interface NewDraftRow {
-	id: string;
-	title: string;
-	slug?: string;
+	/** Why it differs from the site, if it does. */
+	status?: 'Unpublished' | 'Unpublished changes';
 	isOpen: boolean;
 }
 
 /**
  * A gallery's or downloads' collections, and the editor's drafts of new
- * ones, beside the form editing one. Renaming one in place or showing or
- * hiding it changes its draft (opening it in the form); deleting one deletes
- * it with everything in it, at once.
+ * ones, as cards that open in the form beside them. Showing or hiding one
+ * changes its draft (opening it in the form); deleting a published one
+ * deletes it with everything in it, at once.
  */
 @Component({
 	selector: 'app-collections-manager',
@@ -56,8 +56,7 @@ interface NewDraftRow {
 		MatButton,
 		MatIcon,
 		MatIconButton,
-		MatTooltip,
-		StatusBadgeComponent
+		MatTooltip
 	]
 })
 export class CollectionsManagerComponent {
@@ -77,46 +76,58 @@ export class CollectionsManagerComponent {
 	/** A collection was deleted. */
 	public readonly changed = output<void>();
 
-	protected readonly maxTitleLength = MAX_COLLECTION_TITLE_LENGTH;
-
 	protected readonly session = this.editor.session;
 	protected readonly urlPrefix = computed(() =>
 		this.type() === 'gallery' ? '/gallery/' : undefined
 	);
-	protected readonly rows = computed<CollectionRow[]>(() => {
+	protected readonly cards = computed<CollectionCard[]>(() => {
 		const session = this.session();
 		const drafts = this.editor.editDrafts();
-		return (this.store.collections(this.type())() ?? []).map(
-			(collection) => {
-				const isOpen = session?.targetId() === collection.slug;
-				const draft = drafts.get(collection.slug);
-				const fields = isOpen ? session!.fields() : draft?.fields;
+		const newCards = this.editor
+			.newDrafts()
+			.map(({ id, fields, dimensionCount }) => {
+				const isOpen = session?.id() === id;
+				const shown = isOpen ? session!.fields() : fields;
 				return {
-					collection,
-					title:
-						(fields as { title?: string } | undefined)?.title ||
-						collection.title,
-					isVisible:
-						(fields as { visible?: boolean } | undefined)
-							?.visible ?? collection.visible,
-					hasDraft: isOpen
-						? session!.hasUnpublishedChanges()
-						: !!draft,
+					target: id,
+					title: shown.title || 'Untitled',
+					details: [
+						this.pathOf(shown.slug),
+						...toDimensionCount(
+							isOpen
+								? session!.fields().dimensions?.length
+								: dimensionCount
+						)
+					].join(' · '),
+					isVisible: shown.visible ?? true,
+					status: 'Unpublished' as const,
 					isOpen
 				};
-			}
-		);
-	});
-	protected readonly newDraftRows = computed<NewDraftRow[]>(() => {
-		const session = this.session();
-		return this.editor.newDrafts().map(({ id, fields }) => {
-			const isOpen = session?.id() === id;
-			const { title, slug } = (isOpen ? session!.fields() : fields) as {
-				title?: string;
-				slug?: string;
+			});
+		const publishedCards = (
+			this.store.collections(this.type())() ?? []
+		).map((collection) => {
+			const isOpen = session?.targetId() === collection.slug;
+			const draft = drafts.get(collection.slug);
+			const shown = (isOpen ? session!.fields() : draft?.fields) as
+				{ title?: string; visible?: boolean } | undefined;
+			const hasDraft = isOpen
+				? session!.hasUnpublishedChanges()
+				: !!draft;
+			return {
+				target: collection,
+				title: shown?.title || collection.title,
+				details: [
+					this.pathOf(collection.slug),
+					countItems(collection.itemCount, this.itemNoun()),
+					...toDimensionCount(collection.dimensions?.length)
+				].join(' · '),
+				isVisible: shown?.visible ?? collection.visible,
+				status: hasDraft ? ('Unpublished changes' as const) : undefined,
+				isOpen
 			};
-			return { id, title: title || 'Untitled', slug, isOpen };
 		});
+		return [...newCards, ...publishedCards];
 	});
 	/** The form holds something other than a fresh new collection. */
 	protected readonly canStartNew = computed(() => {
@@ -126,20 +137,8 @@ export class CollectionsManagerComponent {
 		);
 	});
 
-	protected pathOf(slug: string | undefined): string {
-		return `${this.urlPrefix() ?? ''}${slug || '…'}`;
-	}
-
-	protected countOf(collection: EditorCollection): string {
-		return countItems(collection.itemCount, this.itemNoun());
-	}
-
-	protected edit(collection: EditorCollection): void {
-		this.openInForm(this.editor.edit(collection));
-	}
-
-	protected openDraft(id: string): void {
-		this.openInForm(this.editor.openDraft(id));
+	protected open(card: CollectionCard): void {
+		this.openInForm(this.editor.open(card.target));
 	}
 
 	protected startNew(): void {
@@ -147,19 +146,31 @@ export class CollectionsManagerComponent {
 		this.focusForm();
 	}
 
-	/** Renames it in its draft; a blank title goes back to what it was. */
-	protected rename(row: CollectionRow, input: HTMLInputElement): void {
-		const title = input.value.trim();
-		if (!title || title === row.title) {
-			input.value = row.title;
+	protected delete(card: CollectionCard): void {
+		const { target, title } = card;
+		if (typeof target !== 'string') {
+			this.deleteCollection(target);
 			return;
 		}
-		this.editor.rename(row.collection, title);
+		this.writer
+			.run({
+				confirm: {
+					title: `Delete ${title}?`,
+					message: "It hasn't been published, so it'll be gone.",
+					confirmLabel: 'Delete'
+				},
+				request: () => this.editor.discardNewDraft(target)
+			})
+			.subscribe();
 	}
 
 	/** Once open, moves to the form (below the list on phones). */
 	private openInForm(opening: Observable<unknown>): void {
 		opening.subscribe(() => this.focusForm());
+	}
+
+	private pathOf(slug: string | undefined): string {
+		return `${this.urlPrefix() ?? ''}${slug || '…'}`;
 	}
 
 	private focusForm(): void {
@@ -172,7 +183,7 @@ export class CollectionsManagerComponent {
 		);
 	}
 
-	protected deleteCollection(collection: EditorCollection): void {
+	private deleteCollection(collection: EditorCollection): void {
 		const items = countItems(collection.itemCount, this.itemNoun());
 		this.writer
 			.run({
@@ -197,4 +208,11 @@ export class CollectionsManagerComponent {
 				}
 			});
 	}
+}
+
+function toDimensionCount(count: number | undefined): string[] {
+	if (!count) {
+		return [];
+	}
+	return [`${count} ${count === 1 ? 'dimension' : 'dimensions'}`];
 }

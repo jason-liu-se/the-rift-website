@@ -57,10 +57,11 @@ The decisions are in issue #101; the API's side is in the web-server's
   `collection-form/`, which edits one collection draft at a time
   (`gallery-collections`, `downloads-collections`): a new one, or an existing
   one's title and dimensions. `CollectionsEditor` (provided by the modal) owns
-  the open draft and the drafts list; renaming or showing a collection from the
-  list changes its draft, and only deleting one writes at once. The form shares
-  the item editor's footer (`draft-footer/`), undo and redo (`draft-history/`),
-  and conflict panel, with the footer in the modal's through `ModalFooterSlot`
+  the open draft and the drafts list. Published and unpublished collections are
+  the same cards: a click opens one in the form, showing or hiding one changes
+  its draft, and deleting a published one writes at once. The form shares the
+  item editor's footer (`draft-footer/`), undo and redo (`draft-history/`), and
+  conflict panel, with the footer in the modal's through `ModalFooterSlot`
   (`modal-shell/modal-footer-slot.ts`). Dimensions (a name and image each) use
   the same `dimensions-editor/` as map seasons, which add BlueMap fields
   (`withMapFields`). The `/gallery` card shows the collection's first

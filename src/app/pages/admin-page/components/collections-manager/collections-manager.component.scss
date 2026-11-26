@@ -33,14 +33,19 @@
 	padding: 0;
 	list-style: none;
 
-	li {
+	li:not(.empty) {
+		position: relative;
 		display: flex;
 		align-items: center;
 		gap: 4px;
-		padding: 6px 6px 6px 16px;
+		padding: 8px 6px 8px 16px;
 		border: 1px solid rgba($colour-dark-text, 0.18);
 		border-radius: 8px;
 		background-color: rgba($colour-light-grey, 0.25);
+
+		&:hover {
+			background-color: rgba($colour-light-grey, 0.5);
+		}
 	}
 
 	li.editing {
@@ -51,6 +56,11 @@
 	li.hidden-collection {
 		border-style: dashed;
 		background-color: transparent;
+	}
+
+	// The card's actions sit above its open button's click area.
+	[mat-icon-button] {
+		position: relative;
 	}
 }
 
@@ -64,36 +74,32 @@
 	min-width: 0;
 }
 
-// Looks like text until hovered or focused, then like the field it is.
-.title {
-	// Fills its card instead of an input's default width.
-	box-sizing: border-box;
-	width: calc(100% + 9px);
-	min-width: 0;
-	min-height: 40px;
-	padding: 0 8px;
-	margin-left: -9px;
-	border: 1px solid transparent;
-	border-radius: 4px;
+.open {
+	padding: 0;
+	border: none;
 	background: none;
 	color: inherit;
 	font: inherit;
 	font-weight: 600;
+	text-align: left;
+	cursor: pointer;
 
-	&:hover {
-		border-color: $colour-light-grey;
+	// Stretched over the whole card, so a click anywhere opens it.
+	&::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		border-radius: 8px;
 	}
 
 	&:focus-visible {
-		border-color: $colour-primary;
-		outline: 2px solid $colour-primary;
-	}
-}
+		outline: none;
 
-// A new collection's draft: its title opens it.
-.draft-title {
-	text-align: left;
-	cursor: pointer;
+		&::after {
+			outline: 2px solid $colour-primary;
+			outline-offset: 2px;
+		}
+	}
 }
 
 .details {
@@ -101,7 +107,7 @@
 	overflow-wrap: anywhere;
 }
 
-.changes {
+.status {
 	display: inline-flex;
 	align-items: center;
 	gap: 6px;
