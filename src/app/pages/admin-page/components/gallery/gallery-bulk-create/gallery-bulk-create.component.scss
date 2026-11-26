@@ -100,7 +100,7 @@
 	}
 }
 
-.apply-all mat-checkbox {
+.apply-all app-visibility-toggle {
 	margin-top: 8px;
 }
 
@@ -150,8 +150,14 @@
 
 .row-fields {
 	display: grid;
+	// Each field keeps its own height, beside a taller one.
+	align-items: start;
 	gap: 12px;
 	min-width: 0;
+}
+
+.row-fields app-visibility-toggle {
+	justify-self: start;
 }
 
 .row-actions {
@@ -208,12 +214,12 @@
 		width: 8rem;
 	}
 
-	// Caption across the top, then collection and tags side by side.
+	// Caption and collection side by side, then tags across.
 	.row-fields {
-		grid-template-columns: 1fr 2fr;
+		grid-template-columns: 2fr 1fr;
 
-		.caption,
-		mat-checkbox,
+		app-tag-input,
+		app-visibility-toggle,
 		.problem {
 			grid-column: 1 / -1;
 		}

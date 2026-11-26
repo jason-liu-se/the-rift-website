@@ -18,7 +18,6 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButton, MatIconButton } from '@angular/material/button';
-import { MatCheckbox } from '@angular/material/checkbox';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
@@ -63,6 +62,7 @@ import {
 	toCreateRequest
 } from './bulk-image-rows';
 import { CollectionsStore } from '../../../services/collections-store.service';
+import { VisibilityToggleComponent } from '../../visibility-toggle/visibility-toggle.component';
 
 const IMAGES = { one: 'image', many: 'images' };
 const NOT_ALLOWED_LINK = "This link isn't from imgbb or imgur.";
@@ -83,7 +83,6 @@ const NOT_ALLOWED_LINK = "This link isn't from imgbb or imgur.";
 		CdkDropList,
 		FormsModule,
 		MatButton,
-		MatCheckbox,
 		MatFormField,
 		MatIcon,
 		MatIconButton,
@@ -93,7 +92,8 @@ const NOT_ALLOWED_LINK = "This link isn't from imgbb or imgur.";
 		MatSelect,
 		MatTooltip,
 		ModalShellComponent,
-		TagInputComponent
+		TagInputComponent,
+		VisibilityToggleComponent
 	],
 	host: { '(paste)': 'addPasted($event)' }
 })

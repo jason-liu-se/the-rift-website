@@ -99,14 +99,12 @@
 						Apply tags
 					</button>
 				</div>
-				<mat-checkbox
-					color="primary"
-					[ngModel]="isAllVisible()"
-					(ngModelChange)="
+				<app-visibility-toggle
+					[visible]="isAllVisible()"
+					(visibleChange)="
 						isAllVisible.set($event); setAll('visibility')
 					"
-					>Show on the site</mat-checkbox
-				>
+				/>
 			</fieldset>
 		}
 
@@ -173,14 +171,12 @@
 							[tags]="row.tags"
 							(tagsChange)="updateRow(row.id, { tags: $event })"
 						/>
-						<mat-checkbox
-							color="primary"
-							[ngModel]="row.isVisible"
-							(ngModelChange)="
+						<app-visibility-toggle
+							[visible]="row.isVisible"
+							(visibleChange)="
 								updateRow(row.id, { isVisible: $event })
 							"
-							>Show on the site</mat-checkbox
-						>
+						/>
 						@if (row.problem) {
 							<p class="problem">{{ row.problem }}</p>
 						}
