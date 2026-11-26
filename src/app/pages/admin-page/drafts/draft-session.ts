@@ -134,9 +134,15 @@ export class DraftSession<T extends DraftType> {
 	public readonly hasChanges = computed(
 		() => !isSameFields(this.fields(), this.baseline())
 	);
-	/** Changes the published item doesn't have yet. */
+	/**
+	 * Changes the published item doesn't have yet, kept in a draft (`unchanged`
+	 * means no draft, e.g. a new item with only its visibility set).
+	 */
 	public readonly hasUnpublishedChanges = computed(
-		() => this.hasChanges() && this.status() !== 'published'
+		() =>
+			this.hasChanges() &&
+			this.status() !== 'published' &&
+			this.status() !== 'unchanged'
 	);
 	public readonly canUndo = computed(() => this.historySize().undo > 0);
 	public readonly canRedo = computed(() => this.historySize().redo > 0);
