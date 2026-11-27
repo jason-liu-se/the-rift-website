@@ -2,6 +2,10 @@
 @use "../../../../font-sizes" as *;
 
 :host {
+	display: block;
+}
+
+.drop-area {
 	display: grid;
 	gap: 8px;
 	border-radius: 8px;
@@ -9,7 +13,7 @@
 	outline-offset: 4px;
 }
 
-:host(.dragging) {
+.drop-area.dragging {
 	outline-color: $colour-primary;
 }
 

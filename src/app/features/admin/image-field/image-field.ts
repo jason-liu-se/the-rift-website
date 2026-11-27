@@ -32,6 +32,7 @@ type UploadState =
 export const LINK_PROBLEM =
 	"That link isn't from imgur or imgbb. Upload the image instead.";
 
+import { FileDrop } from '../image-upload/file-drop';
 /**
  * An image for a tool's item: paste a link (checked against the allowlist), or
  * upload, drop, or paste a file, which goes through the API to imgbb, into
@@ -43,6 +44,7 @@ export const LINK_PROBLEM =
 	templateUrl: './image-field.html',
 	styleUrl: './image-field.scss',
 	imports: [
+		FileDrop,
 		FormsModule,
 		MatButton,
 		MatFormField,
@@ -50,13 +52,7 @@ export const LINK_PROBLEM =
 		MatIcon,
 		MatInput,
 		MatLabel
-	],
-	host: {
-		'[class.dragging]': 'isDragging()',
-		'(dragover)': 'allowDrop($event)',
-		'(dragleave)': 'isDragging.set(false)',
-		'(drop)': 'uploadDropped($event)'
-	}
+	]
 })
 export class ImageField {
 	private uploads = inject(ImageUploader);
@@ -74,7 +70,6 @@ export class ImageField {
 	protected readonly maxUrlLength = MAX_URL_LENGTH;
 	protected readonly acceptedTypes = UPLOAD_IMAGE_TYPES.join(',');
 	protected readonly upload = signal<UploadState>({ kind: 'idle' });
-	protected readonly isDragging = signal(false);
 	/** Only a link typed here is checked: a saved one was checked already. */
 	private readonly isEdited = signal(false);
 
@@ -112,23 +107,6 @@ export class ImageField {
 		}
 	}
 
-	protected allowDrop(event: DragEvent): void {
-		if (!this.canUpload() || !event.dataTransfer?.types.includes('Files')) {
-			return;
-		}
-		event.preventDefault();
-		this.isDragging.set(true);
-	}
-
-	protected uploadDropped(event: DragEvent): void {
-		this.isDragging.set(false);
-		const file = event.dataTransfer?.files[0];
-		if (file && this.canUpload()) {
-			event.preventDefault();
-			this.uploadFile(file);
-		}
-	}
-
 	/** A pasted image file uploads; pasted text goes into the link as usual. */
 	protected uploadPasted(event: ClipboardEvent): void {
 		const file = event.clipboardData?.files[0];
@@ -145,7 +123,7 @@ export class ImageField {
 		}
 	}
 
-	private uploadFile(file: File): void {
+	protected uploadFile(file: File): void {
 		const album = this.album();
 		if (!album) {
 			return;

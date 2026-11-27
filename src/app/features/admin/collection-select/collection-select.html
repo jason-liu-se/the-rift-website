@@ -1,0 +1,14 @@
+<mat-form-field subscriptSizing="dynamic">
+	<mat-label>{{ label() }}</mat-label>
+	<mat-select
+		[required]="required()"
+		[ngModel]="slug()"
+		(ngModelChange)="slug.set($event)"
+	>
+		@for (collection of collections(); track collection.slug) {
+		<mat-option [value]="collection.slug"
+			>{{ collection.title }}</mat-option
+		>
+		}
+	</mat-select>
+</mat-form-field>
