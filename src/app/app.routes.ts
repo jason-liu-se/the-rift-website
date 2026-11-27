@@ -104,7 +104,7 @@ export const routes: Routes = [
 		data: {
 			description: 'Learn what The Rift Minecraft SMP is about.',
 			loadComponent: () =>
-				import('./pages/about-page/about-page.component').then(
+				import('./features/about/about-page/about-page.component').then(
 					(m) => m.AboutPageComponent
 				)
 		}
