@@ -24,13 +24,21 @@
 		</button>
 	</th>
 </tr>
-@if (isExpanded()) { @for (row of rows(); track row.kind + row.id) {
+@if (isExpanded()) { @for (view of rowViews(); track view.row.kind +
+view.row.id) {
 <tr
 	app-editor-row
 	cdkDrag
 	cdkDragLockAxis="y"
 	[cdkDragDisabled]="!isReorderable()"
-	[row]="row"
+	[row]="view.row"
 	[layout]="layout()"
+	[cells]="view.cells"
+	[href]="view.href"
+	[isSelected]="view.isSelected"
+	[isDraggable]="view.index !== undefined"
+	[menu]="view.menu"
+	(opened)="open(view.row)"
+	(selectionToggled)="toggleRowSelected(view.row)"
 ></tr>
 } }
