@@ -48,7 +48,7 @@ import { ApiStatusService } from 'src/app/core/api/api-status/api-status.service
 import { EditorContentService } from 'src/app/services/editor-content/editor-content.service';
 import { ImageUploadService } from 'src/app/services/image-upload/image-upload.service';
 import { findImageFileProblem } from 'src/app/utilities/image-files';
-import { isAllowedImageUrl } from 'src/app/utilities/image-urls';
+import { isAllowedImageUrl } from 'src/app/shared/utils/image-urls';
 import { describeWriteError } from '../../../utilities/write-errors';
 import {
 	BulkSummary,

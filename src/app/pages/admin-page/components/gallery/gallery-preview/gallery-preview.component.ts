@@ -1,5 +1,5 @@
 import { Component, computed, input } from '@angular/core';
-import { CaptionCardComponent } from 'src/app/components/caption-card/caption-card.component';
+import { CaptionCardComponent } from 'src/app/shared/ui/caption-card/caption-card.component';
 import { DraftSession } from '../../../drafts/draft-session';
 
 /** A gallery image's draft as the gallery shows it. */

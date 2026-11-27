@@ -1,5 +1,5 @@
 import { Component, input } from '@angular/core';
-import { MarkdownComponent } from 'src/app/components/markdown/markdown.component';
+import { MarkdownComponent } from 'src/app/shared/ui/markdown/markdown.component';
 import { ItemThumbnailComponent } from '../../../item-thumbnail/item-thumbnail.component';
 
 /**

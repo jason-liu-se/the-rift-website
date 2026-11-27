@@ -1,4 +1,4 @@
-import { toPlainText } from 'src/app/utilities/markdown';
+import { toPlainText } from 'src/app/shared/utils/markdown';
 
 /** The fields that name an item or draft, whichever its type has. */
 interface NamingFields {

@@ -7,7 +7,7 @@ import { EDITOR_TYPES, EDITOR_TYPE_ORDER } from './editor-types';
 import { AdminBarComponent } from './components/admin-bar/admin-bar.component';
 import { DraftStore } from './drafts/draft-store.service';
 import { CollectionsStore } from './services/collections-store.service';
-import { originalImageLoader } from 'src/app/utilities/image-loaders';
+import { originalImageLoader } from 'src/app/shared/utils/image-loaders';
 
 /** The tools, in sidebar order; each at /admin/<type>. */
 export const ADMIN_TOOLS = EDITOR_TYPE_ORDER.map((id) => ({

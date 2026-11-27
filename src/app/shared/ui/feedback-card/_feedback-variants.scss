@@ -1,0 +1,26 @@
+@use "../../../../theme-colours" as *;
+
+$feedback-colours: (
+	error: $colour-error,
+	warning: $colour-warning,
+	success: $colour-success
+);
+
+// A thin full border and a 10% tint of the variant's colour, with the colour
+// itself for headings and icons (contrast checked in theme-colours.scss).
+// Include it in the element that carries the `error`/`warning`/`success` class.
+@mixin feedback-surface {
+	border: 1px solid var(--feedback-colour);
+	background-color: color-mix(
+		in srgb,
+		var(--feedback-colour) 10%,
+		$colour-light-background
+	);
+	color: $colour-dark-text;
+
+	@each $variant, $colour in $feedback-colours {
+		&.#{$variant} {
+			--feedback-colour: #{$colour};
+		}
+	}
+}

@@ -15,7 +15,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { PageTemplateDirective } from 'src/app/core/layout/page-template/page-template.directive';
 import { NavbarComponent } from '../navbar/navbar.component';
-import { ContactComponent } from '../../../components/contact/contact.component';
+import { ContactComponent } from '../../../shared/ui/contact/contact.component';
 import { FooterComponent } from '../footer/footer.component';
 import { StatusBannerComponent } from '../status-banner/status-banner.component';
 import {

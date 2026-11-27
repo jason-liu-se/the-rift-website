@@ -1,0 +1,41 @@
+@use "../../../../theme-colours" as *;
+@use "../../../../font-sizes" as *;
+
+$avatar-size: 36px;
+
+:host {
+	display: flex;
+	// A parent can put the avatar last with `row-reverse`.
+	flex-direction: var(--user-avatar-direction, row);
+	align-items: center;
+	gap: 10px;
+	min-width: 0;
+}
+
+.avatar {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: $avatar-size;
+	height: $avatar-size;
+	overflow: hidden;
+	border-radius: 50%;
+	background-color: $colour-primary;
+	color: $colour-light-text;
+	font-size: $font-size-small;
+	font-weight: 600;
+
+	img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+}
+
+.username {
+	overflow: hidden;
+	font-size: $font-size-small;
+	font-weight: 600;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}

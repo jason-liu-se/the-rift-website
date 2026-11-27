@@ -3,7 +3,7 @@ import { MatButton } from '@angular/material/button';
 import { ActivatedRoute } from '@angular/router';
 import { LoginErrorCode } from 'src/app/core/api/api-responses';
 import { AuthService } from 'src/app/core/auth/auth.service';
-import { FeedbackCardComponent } from 'src/app/components/feedback-card/feedback-card.component';
+import { FeedbackCardComponent } from 'src/app/shared/ui/feedback-card/feedback-card.component';
 
 const LOGIN_ERROR_MESSAGES: Record<LoginErrorCode, string> = {
 	'access-denied': 'Login was cancelled on Discord.',

@@ -4,7 +4,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { MatTooltip } from '@angular/material/tooltip';
 import { Router, RouterLink } from '@angular/router';
-import { UserAvatarComponent } from 'src/app/components/user-avatar/user-avatar.component';
+import { UserAvatarComponent } from 'src/app/shared/ui/user-avatar/user-avatar.component';
 import { ADMIN_LOGIN_PATH, ADMIN_PATH } from 'src/app/core/config/admin';
 import { LOGO_PATH } from 'src/app/core/config/site';
 import { NAVBAR_HEIGHT_VARIABLE } from 'src/app/core/layout/navbar/navbar.component';

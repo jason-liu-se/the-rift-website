@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
-import { SectionCardComponent } from '../../components/section-card/section-card.component';
+import { BackgroundImageCardComponent } from '../../shared/ui/background-image-card/background-image-card.component';
+import { SectionCardComponent } from '../../shared/ui/section-card/section-card.component';
 
 @Component({
 	selector: 'app-page-about',

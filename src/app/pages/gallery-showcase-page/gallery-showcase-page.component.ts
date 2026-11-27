@@ -11,13 +11,13 @@ import { GALLERY_FALLBACK_IMAGE } from 'src/app/core/config/gallery';
 import { GALLERY_PAGE_SIZE } from 'src/app/core/config/pagination';
 import { GalleryImage } from 'src/app/core/api/api-responses';
 import { GalleryProviderService } from 'src/app/services/gallery-provider/gallery-provider.service';
-import { PaginatorIntlService } from 'src/app/services/paginator-intl/paginator-intl.service';
-import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';
-import { BackButtonComponent } from '../../components/back-button/back-button.component';
+import { PaginatorIntlService } from 'src/app/shared/paginator-intl/paginator-intl.service';
+import { BackgroundImageCardComponent } from '../../shared/ui/background-image-card/background-image-card.component';
+import { BackButtonComponent } from '../../shared/ui/back-button/back-button.component';
 import { ImageShowcaseSectionComponent } from './components/image-showcase-section/image-showcase-section.component';
 import { TagFilterComponent } from './components/tag-filter/tag-filter.component';
-import { FallbackPanelComponent } from '../../components/fallback-panel/fallback-panel.component';
-import { LoadState } from '../../utilities/load-state';
+import { FallbackPanelComponent } from '../../shared/ui/fallback-panel/fallback-panel.component';
+import { LoadState } from '../../shared/utils/load-state';
 
 /** The query parameter holding the selected tags, comma-separated. */
 const TAGS_PARAM = 'tags';

@@ -1,6 +1,6 @@
 import { Dialog } from '@angular/cdk/dialog';
 import { Injectable, inject } from '@angular/core';
-import { ToastService } from 'src/app/components/toast/toast.service';
+import { ToastService } from 'src/app/shared/ui/toast/toast.service';
 import { SessionEndReason } from 'src/app/core/auth/auth.service';
 import {
 	SESSION_ENDED_DIALOG_CONFIG,

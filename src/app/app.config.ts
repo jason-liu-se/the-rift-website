@@ -24,7 +24,7 @@ import { routes } from './app.routes';
 import {
 	cloudflareImageLoader,
 	originalImageLoader
-} from './utilities/image-loaders';
+} from './shared/utils/image-loaders';
 import { SeoTitleStrategy } from './core/seo/seo-title-strategy';
 import { apiStatusInterceptor } from './core/api/api-status/api-status.interceptor';
 import { authRefreshInterceptor } from './core/auth/auth-refresh.interceptor';

@@ -32,7 +32,7 @@ import {
 	SummaryOf
 } from 'src/app/services/editor-content/editor-content-types';
 import { EditorContentService } from 'src/app/services/editor-content/editor-content.service';
-import { LoadState } from 'src/app/utilities/load-state';
+import { LoadState } from 'src/app/shared/utils/load-state';
 import { DraftStore } from '../../drafts/draft-store.service';
 import { EDITOR_TYPES, toCollectionType } from '../../editor-types';
 import { CollectionsStore } from '../../services/collections-store.service';

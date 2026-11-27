@@ -1,7 +1,7 @@
 import { Dialog } from '@angular/cdk/dialog';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { ToastService } from 'src/app/components/toast/toast.service';
+import { ToastService } from 'src/app/shared/ui/toast/toast.service';
 import { AuthService } from 'src/app/core/auth/auth.service';
 import { ANY_URL_ROUTES } from 'src/app/testing/render-component';
 import { SessionEndedNotifier } from './session-ended-notifier';
