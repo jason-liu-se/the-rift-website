@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { MapSeason } from 'src/app/core/api/api-responses';
-import { ICardSelection } from 'src/app/shared/ui/card-selection-section/card-selection.interface';
-import { MapProviderService } from 'src/app/features/map/map-provider.service';
+import { CardSelection } from 'src/app/shared/ui/card-selection-section/card-selection';
+import { MapsApi } from 'src/app/features/map/maps-api';
 import { EditButton } from '../../../shared/ui/edit-button/edit-button';
 import { BackgroundImageCard } from '../../../shared/ui/background-image-card/background-image-card';
 import { CardSelectionSection } from '../../../shared/ui/card-selection-section/card-selection-section';
@@ -12,7 +12,7 @@ import { LoadState } from '../../../shared/utils/load-state';
 interface ISeasonCards {
 	id: string;
 	title: string;
-	cards: ICardSelection[];
+	cards: CardSelection[];
 }
 
 const MAP_VIEWER_ROUTE = '/map/viewer';
@@ -53,7 +53,7 @@ function toSeasonCards({
 	]
 })
 export class MapPage {
-	private mapProvider = inject(MapProviderService);
+	private mapsApi = inject(MapsApi);
 
 	public readonly seasons = signal<ISeasonCards[]>([]);
 	protected readonly loadState = new LoadState(() => this.loadSeasons());
@@ -64,7 +64,7 @@ export class MapPage {
 
 	public loadSeasons(): void {
 		this.loadState.start();
-		this.mapProvider.getMapSeasons().subscribe({
+		this.mapsApi.getMapSeasons().subscribe({
 			next: (seasons) => {
 				this.seasons.set(seasons.map(toSeasonCards));
 				this.loadState.succeed();

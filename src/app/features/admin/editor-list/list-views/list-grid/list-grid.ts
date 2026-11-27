@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { EditorListStore } from '../../editor-list.store';
+import { EditorListStore } from '../../editor-list-store';
 import { RowGroup } from '../../row-group/row-group';
 import { ListEmpty } from '../list-empty/list-empty';
 

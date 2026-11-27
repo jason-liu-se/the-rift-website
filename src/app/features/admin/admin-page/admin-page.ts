@@ -3,10 +3,10 @@ import { Component, inject } from '@angular/core';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { EDITOR_TYPES, EDITOR_TYPE_ORDER } from '../editor-types';
+import { EDITOR_TYPES, EDITOR_TYPE_ORDER } from '../editor-type-configs';
 import { AdminBar } from '../admin-bar/admin-bar';
-import { DraftStore } from '../drafts/draft-store.service';
-import { CollectionsStore } from '../collections-store.service';
+import { DraftStore } from '../drafts/draft-store';
+import { CollectionsStore } from '../collections-store';
 import { originalImageLoader } from 'src/app/shared/utils/image-loaders';
 
 /** The tools, in sidebar order; each at /admin/<type>. */

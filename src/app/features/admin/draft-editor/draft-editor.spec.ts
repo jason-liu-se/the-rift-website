@@ -5,7 +5,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { of } from 'rxjs';
 import { EditorNewsPost } from 'src/app/core/api/api-responses';
-import { AdminNotifierService } from 'src/app/features/admin/admin-notifier.service';
+import { AdminNotifier } from 'src/app/features/admin/admin-notifier';
 import { DraftSession } from '../drafts/draft-session';
 import { DraftEditor } from './draft-editor';
 import { PublishSettings, providePublishSettings } from './publish-settings';
@@ -78,7 +78,7 @@ describe('DraftEditor', () => {
 				provideHttpClientTesting(),
 				providePublishSettings(),
 				{
-					provide: AdminNotifierService,
+					provide: AdminNotifier,
 					useValue: {
 						notify: vi.fn(),
 						notifySuccess: vi.fn(),

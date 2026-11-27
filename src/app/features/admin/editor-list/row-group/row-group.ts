@@ -3,9 +3,9 @@ import { Component, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatIcon } from '@angular/material/icon';
-import { EditorListStore } from '../editor-list.store';
+import { EditorListStore } from '../editor-list-store';
 import { EditorRow, RowLayout } from '../editor-row/editor-row';
-import { EditorListActions } from '../editor-list.actions';
+import { EditorListActions } from '../editor-list-actions';
 import { ListRow } from '../list-rows';
 
 /**

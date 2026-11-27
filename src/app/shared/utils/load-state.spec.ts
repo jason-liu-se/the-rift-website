@@ -3,7 +3,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { PLATFORM_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-import { ApiStatusService } from '../../core/api/api-status/api-status.service';
+import { ApiStatusMonitor } from '../../core/api/api-status/api-status-monitor';
 import { LoadState } from './load-state';
 
 describe('LoadState', () => {
@@ -20,7 +20,7 @@ describe('LoadState', () => {
 
 	/** The API goes down and comes back, as health checks would report. */
 	function recoverApi(): void {
-		const apiStatus = TestBed.inject(ApiStatusService);
+		const apiStatus = TestBed.inject(ApiStatusMonitor);
 		apiStatus.reportDown();
 		TestBed.tick();
 		apiStatus.reportUp();

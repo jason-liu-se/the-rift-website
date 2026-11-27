@@ -1,8 +1,8 @@
 import { DOCUMENT } from '@angular/common';
 import { Component, ElementRef, computed, inject } from '@angular/core';
-import { AuthService } from '../../auth/auth.service';
+import { AuthSession } from '../../auth/auth-session';
 import { publishHeight } from 'src/app/shared/utils/publish-height';
-import { StatusBannerKind, StatusBannerService } from './status-banner.service';
+import { StatusBannerKind, StatusBannerState } from './status-banner-state';
 
 /** CSS variable the navbar and `scroll-padding-top` offset themselves by. */
 export const STATUS_BANNER_HEIGHT_VARIABLE = '--status-banner-height';
@@ -24,9 +24,9 @@ const EDITOR_DOWN_MESSAGE =
 	styleUrls: ['./status-banner.scss']
 })
 export class StatusBanner {
-	private readonly banner = inject(StatusBannerService);
+	private readonly banner = inject(StatusBannerState);
 	private readonly document = inject(DOCUMENT);
-	private readonly user = inject(AuthService).user;
+	private readonly user = inject(AuthSession).user;
 
 	public readonly kind = this.banner.kind;
 	public readonly message = computed(() => {

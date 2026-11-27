@@ -7,11 +7,11 @@ import {
 	inject,
 	viewChild
 } from '@angular/core';
-import { EDITOR_TYPES, toCollectionType } from '../editor-types';
+import { EDITOR_TYPES, toCollectionType } from '../editor-type-configs';
 import { openModalRoute } from '../modal-route';
 import { CollectionsEditor } from './collections-editor';
 import { CollectionsManager } from '../collections-manager/collections-manager';
-import { EditorListStore } from '../editor-list/editor-list.store';
+import { EditorListStore } from '../editor-list/editor-list-store';
 import { ModalFooterSlot } from '../modal-shell/modal-footer-slot';
 import { ModalShell } from '../modal-shell/modal-shell';
 

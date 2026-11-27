@@ -7,14 +7,14 @@ import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { AUTOSAVE_DELAY_MS } from 'src/app/core/config/admin';
 import { Draft, EditorNewsPost } from 'src/app/core/api/api-responses';
-import { ApiStatus } from 'src/app/core/api/api-status/api-status.service';
-import { ApiStatusService } from 'src/app/core/api/api-status/api-status.service';
-import { AuthService } from 'src/app/core/auth/auth.service';
-import { DraftsService } from 'src/app/features/admin/drafts/drafts.service';
-import { LocalDraftsService } from 'src/app/features/admin/drafts/local-drafts.service';
+import { ApiStatus } from 'src/app/core/api/api-status/api-status-monitor';
+import { ApiStatusMonitor } from 'src/app/core/api/api-status/api-status-monitor';
+import { AuthSession } from 'src/app/core/auth/auth-session';
+import { DraftsApi } from 'src/app/features/admin/drafts/drafts-api';
+import { LocalDrafts } from 'src/app/features/admin/drafts/local-drafts';
 import { environment } from 'src/environments/environment';
 import { DraftSession, DraftSessionStart } from './draft-session';
-import { DraftStore } from './draft-store.service';
+import { DraftStore } from './draft-store';
 
 const DRAFTS_URL = `${environment.API_URL}/editor/drafts`;
 
@@ -42,7 +42,7 @@ const ITEM: EditorNewsPost = {
 describe('DraftSession', () => {
 	let httpTesting: HttpTestingController;
 	let apiStatus: ReturnType<typeof signal<ApiStatus>>;
-	let localDrafts: LocalDraftsService;
+	let localDrafts: LocalDrafts;
 	let ids: number;
 
 	/** A session; with `revision`, of a draft the server has at it. */
@@ -65,7 +65,7 @@ describe('DraftSession', () => {
 				...overrides
 			},
 			{
-				drafts: TestBed.inject(DraftsService),
+				drafts: TestBed.inject(DraftsApi),
 				store,
 				apiStatus,
 				createId: () => `id-${++ids}`
@@ -91,15 +91,15 @@ describe('DraftSession', () => {
 			providers: [
 				provideHttpClient(),
 				provideHttpClientTesting(),
-				{ provide: ApiStatusService, useValue: { status: apiStatus } },
+				{ provide: ApiStatusMonitor, useValue: { status: apiStatus } },
 				{
-					provide: AuthService,
+					provide: AuthSession,
 					useValue: { user: signal({ id: 'editor-1' }) }
 				}
 			]
 		});
 		httpTesting = TestBed.inject(HttpTestingController);
-		localDrafts = TestBed.inject(LocalDraftsService);
+		localDrafts = TestBed.inject(LocalDrafts);
 	});
 
 	afterEach(() => {

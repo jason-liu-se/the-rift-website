@@ -2,7 +2,7 @@ import { Component, computed, inject, input } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { ADMIN_PATH } from 'src/app/core/config/admin';
 import { EditorContentType } from 'src/app/core/api/api-requests';
-import { AuthService } from 'src/app/core/auth/auth.service';
+import { AuthSession } from 'src/app/core/auth/auth-session';
 
 /**
  * "Edit" on a piece of public content, for logged-in editors only: opens the
@@ -16,7 +16,7 @@ import { AuthService } from 'src/app/core/auth/auth.service';
 	imports: [MatIcon]
 })
 export class EditButton {
-	private user = inject(AuthService).user;
+	private user = inject(AuthSession).user;
 
 	public readonly type = input.required<EditorContentType>();
 	public readonly itemId = input.required<string>();

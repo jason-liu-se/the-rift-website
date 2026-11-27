@@ -1,11 +1,11 @@
-import { STORAGE_KEYS } from '../../browser-storage/browser-storage.service';
+import { STORAGE_KEYS } from '../../browser-storage/browser-storage';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { of } from 'rxjs';
-import { ToastService } from 'src/app/shared/ui/toast/toast.service';
+import { Toaster } from 'src/app/shared/ui/toast/toaster';
 import { SessionUser } from 'src/app/core/api/api-responses';
-import { AuthService } from 'src/app/core/auth/auth.service';
+import { AuthSession } from 'src/app/core/auth/auth-session';
 
 import {
 	ANY_URL_ROUTES,
@@ -59,7 +59,7 @@ describe('Navbar', () => {
 			providers: [
 				provideRouter(ANY_URL_ROUTES),
 				{
-					provide: AuthService,
+					provide: AuthSession,
 					useValue: {
 						user,
 						checkSession,
@@ -69,7 +69,7 @@ describe('Navbar', () => {
 							null
 					}
 				},
-				{ provide: ToastService, useValue: { show } }
+				{ provide: Toaster, useValue: { show } }
 			]
 		});
 		// Resolves the lazily loaded user menu.

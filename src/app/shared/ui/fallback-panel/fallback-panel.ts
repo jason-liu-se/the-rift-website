@@ -11,7 +11,7 @@ import {
 	viewChild
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { FocusRecoveryService } from 'src/app/core/focus-recovery/focus-recovery.service';
+import { FocusRecovery } from 'src/app/core/focus-recovery/focus-recovery';
 
 export const RETRY_FAILED_MESSAGE =
 	"Still couldn't load. Try again in a moment.";
@@ -46,7 +46,7 @@ export class FallbackPanel {
 		viewChild.required<ElementRef<HTMLElement>>('headingElement');
 
 	constructor() {
-		const focusRecovery = inject(FocusRecoveryService);
+		const focusRecovery = inject(FocusRecovery);
 		const announcer = inject(LiveAnnouncer);
 
 		afterNextRender(() => {

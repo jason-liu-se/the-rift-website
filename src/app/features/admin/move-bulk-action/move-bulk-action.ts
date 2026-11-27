@@ -3,7 +3,7 @@ import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { CollectionContentType } from 'src/app/features/admin/editor-content/editor-content-types';
-import { CollectionsStore } from '../collections-store.service';
+import { CollectionsStore } from '../collections-store';
 import { BULK_ACTION_HOST } from '../editor-list/bulk-action-host';
 
 /** A bulk action for types with collections: move to another collection. */

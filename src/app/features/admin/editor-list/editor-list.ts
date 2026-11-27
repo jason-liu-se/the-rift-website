@@ -7,7 +7,7 @@ import { EDITOR_PAGE_SIZE } from 'src/app/core/config/admin';
 import { FallbackPanel } from 'src/app/shared/ui/fallback-panel/fallback-panel';
 import { BulkActionBar } from './bulk-action-bar/bulk-action-bar';
 import { DRAFT_NOUN, countItems } from './bulk-results';
-import { EditorListStore } from './editor-list.store';
+import { EditorListStore } from './editor-list-store';
 import { COLLECTION_FILTER } from './list-filter-fields';
 import { ListFilters } from './list-filters/list-filters';
 import { ListGrid } from './list-views/list-grid/list-grid';

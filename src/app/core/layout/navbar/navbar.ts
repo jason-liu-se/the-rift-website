@@ -10,8 +10,8 @@ import { MatIcon } from '@angular/material/icon';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatButton } from '@angular/material/button';
 import { LOGO_PATH } from 'src/app/core/config/site';
-import { AuthService } from 'src/app/core/auth/auth.service';
-import { isDesktopWidth } from 'src/app/shared/utils/viewport.util';
+import { AuthSession } from 'src/app/core/auth/auth-session';
+import { isDesktopWidth } from 'src/app/shared/utils/viewport';
 import {
 	NAVBAR_HEIGHT_VARIABLE,
 	publishHeight
@@ -35,7 +35,7 @@ export class Navbar {
 	public isHamburgerMenuVisible = false;
 
 	/** The signed-in user; unknown (so no user menu) on the server and until checked. */
-	private auth = inject(AuthService);
+	private auth = inject(AuthSession);
 	public readonly user = this.auth.user;
 
 	private readonly menuButton =

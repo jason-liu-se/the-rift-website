@@ -7,7 +7,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NewsPost } from 'src/app/core/api/api-responses';
 import { environment } from 'src/environments/environment';
-import { ApiStatusService } from 'src/app/core/api/api-status/api-status.service';
+import { ApiStatusMonitor } from 'src/app/core/api/api-status/api-status-monitor';
 import { NewsPage } from './news-page';
 
 const PAGE_SIZE = 10;
@@ -150,7 +150,7 @@ describe('NewsPage', () => {
 		it('reloads the news by itself when the API comes back', () => {
 			failPage(0);
 
-			const apiStatus = TestBed.inject(ApiStatusService);
+			const apiStatus = TestBed.inject(ApiStatusMonitor);
 			apiStatus.reportDown();
 			TestBed.tick();
 			apiStatus.reportUp();

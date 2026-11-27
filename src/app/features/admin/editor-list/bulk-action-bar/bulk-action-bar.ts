@@ -4,8 +4,8 @@ import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import { countItems } from '../bulk-results';
-import { EditorListActions } from '../editor-list.actions';
-import { EditorListStore } from '../editor-list.store';
+import { EditorListActions } from '../editor-list-actions';
+import { EditorListStore } from '../editor-list-store';
 
 /**
  * In the toolbar's place while rows are selected: "N selected", the actions

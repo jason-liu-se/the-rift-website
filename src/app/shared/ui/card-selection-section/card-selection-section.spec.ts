@@ -1,14 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 
-import { ICardSelection } from 'src/app/shared/ui/card-selection-section/card-selection.interface';
+import { CardSelection } from 'src/app/shared/ui/card-selection-section/card-selection';
 import {
 	ANY_URL_ROUTES,
 	renderComponent
 } from 'src/app/testing/render-component';
 import { CardSelectionSection } from './card-selection-section';
 
-const ITEMS: ICardSelection[] = [
+const ITEMS: CardSelection[] = [
 	{
 		imageUrl: 'assets/a.png',
 		routerLink: '/gallery/a',

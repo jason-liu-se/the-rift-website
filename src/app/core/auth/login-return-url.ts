@@ -1,7 +1,7 @@
 import {
 	BrowserStorage,
 	STORAGE_KEYS
-} from '../browser-storage/browser-storage.service';
+} from '../browser-storage/browser-storage';
 
 // The API's login always lands on the admin page, so the app remembers the
 // rest (e.g. the tool and item, `/admin/news/<id>`) itself.

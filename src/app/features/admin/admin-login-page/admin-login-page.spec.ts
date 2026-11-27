@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { Subject } from 'rxjs';
-import { AuthService } from 'src/app/core/auth/auth.service';
+import { AuthSession } from 'src/app/core/auth/auth-session';
 import { renderComponent } from 'src/app/testing/render-component';
 import { AdminLoginPage, NAVIGATE_TO } from './admin-login-page';
 
@@ -16,7 +16,7 @@ function renderPage(error?: string): ComponentFixture<AdminLoginPage> {
 		imports: [AdminLoginPage],
 		providers: [
 			{
-				provide: AuthService,
+				provide: AuthSession,
 				useValue: {
 					loginUrl: LOGIN_URL,
 					isLogoutPending: logoutPending,

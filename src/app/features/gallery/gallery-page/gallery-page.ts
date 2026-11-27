@@ -1,8 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { forkJoin, map, Observable, of, switchMap } from 'rxjs';
 import { GalleryCollection } from 'src/app/core/api/api-responses';
-import { ICardSelection } from 'src/app/shared/ui/card-selection-section/card-selection.interface';
-import { GalleryProviderService } from 'src/app/features/gallery/gallery-provider.service';
+import { CardSelection } from 'src/app/shared/ui/card-selection-section/card-selection';
+import { GalleryApi } from 'src/app/features/gallery/gallery-api';
 import { BackgroundImageCard } from '../../../shared/ui/background-image-card/background-image-card';
 import { CardSelectionSection } from '../../../shared/ui/card-selection-section/card-selection-section';
 import { FallbackPanel } from '../../../shared/ui/fallback-panel/fallback-panel';
@@ -15,10 +15,10 @@ import { LoadState } from '../../../shared/utils/load-state';
 	imports: [BackgroundImageCard, CardSelectionSection, FallbackPanel]
 })
 export class GalleryPage {
-	private galleryProvider = inject(GalleryProviderService);
+	private galleryApi = inject(GalleryApi);
 
 	/** Undefined until loaded, so "no collections" isn't shown while loading. */
-	protected readonly collectionCards = signal<ICardSelection[] | undefined>(
+	protected readonly collectionCards = signal<CardSelection[] | undefined>(
 		undefined
 	);
 	protected readonly loadState = new LoadState(() =>
@@ -32,7 +32,7 @@ export class GalleryPage {
 	/** Loads a card for every collection; one failure fails the page. */
 	public setGalleryCollections(): void {
 		this.loadState.start();
-		this.galleryProvider
+		this.galleryApi
 			.fetchCollections()
 			.pipe(
 				switchMap((collections) =>
@@ -41,7 +41,7 @@ export class GalleryPage {
 						? forkJoin(
 								[...collections].sort(bySeason).map(this.toCard)
 							)
-						: of<ICardSelection[]>([])
+						: of<CardSelection[]>([])
 				)
 			)
 			.subscribe({
@@ -58,8 +58,8 @@ export class GalleryPage {
 		slug,
 		title,
 		dimensions = []
-	}: GalleryCollection): Observable<ICardSelection> =>
-		this.galleryProvider.fetchCollectionImages(slug, 0, 1).pipe(
+	}: GalleryCollection): Observable<CardSelection> =>
+		this.galleryApi.fetchCollectionImages(slug, 0, 1).pipe(
 			map(({ total }) => ({
 				imageUrl: dimensions[0]?.imageUrl ?? '',
 				routerLink: `/gallery/${encodeURIComponent(slug)}`,

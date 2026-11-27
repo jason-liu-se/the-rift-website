@@ -6,9 +6,9 @@ import {
 	viewChild
 } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { EditorWriteService } from '../editor-write.service';
+import { EditorWriter } from '../editor-writer';
 import { openModalRoute } from '../modal-route';
-import { EditorListStore } from '../editor-list/editor-list.store';
+import { EditorListStore } from '../editor-list/editor-list-store';
 import { GalleryBulkCreate } from '../gallery/gallery-bulk-create/gallery-bulk-create';
 
 /** Adding many gallery images, in a modal over the gallery's list. */
@@ -18,7 +18,7 @@ import { GalleryBulkCreate } from '../gallery/gallery-bulk-create/gallery-bulk-c
 	imports: [GalleryBulkCreate]
 })
 export class BulkCreateModal {
-	private writer = inject(EditorWriteService);
+	private writer = inject(EditorWriter);
 	private content = viewChild.required<TemplateRef<unknown>>('content');
 	private bulkCreate = viewChild(GalleryBulkCreate);
 

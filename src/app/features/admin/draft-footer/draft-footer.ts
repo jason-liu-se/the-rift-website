@@ -6,7 +6,7 @@ import { DraftType } from 'src/app/core/api/api-requests';
 import { discardDraft } from '../drafts/discard-draft';
 import { DraftFields } from '../drafts/draft-fields';
 import { DraftSession, SaveStage } from '../drafts/draft-session';
-import { EditorWriteService } from '../editor-write.service';
+import { EditorWriter } from '../editor-writer';
 import { VisibilityToggle } from '../visibility-toggle/visibility-toggle';
 
 /** The publish button's labels (see `publishLabel`), widest included. */
@@ -39,7 +39,7 @@ const STATUS_TEXT: Record<SaveStage, string> = {
 	imports: [MatButton, MatIcon, VisibilityToggle]
 })
 export class DraftFooter {
-	private writer = inject(EditorWriteService);
+	private writer = inject(EditorWriter);
 
 	public readonly session = input.required<DraftSession<DraftType>>();
 	/** Editing a published item (rather than a new one). */

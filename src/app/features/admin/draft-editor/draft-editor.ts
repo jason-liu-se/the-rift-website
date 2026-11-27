@@ -26,13 +26,13 @@ import {
 	EditorContentType,
 	NewsDraftOptions
 } from 'src/app/core/api/api-requests';
-import { AdminNotifierService } from 'src/app/features/admin/admin-notifier.service';
+import { AdminNotifier } from 'src/app/features/admin/admin-notifier';
 import { ItemOf } from 'src/app/features/admin/editor-content/editor-content-types';
 import { DraftSession } from '../drafts/draft-session';
 import { findMissingFields } from '../drafts/draft-fields';
 import { discardDraft } from '../drafts/discard-draft';
-import { EDITOR_TYPES } from '../editor-types';
-import { EditorWriteService } from '../editor-write.service';
+import { EDITOR_TYPES } from '../editor-type-configs';
+import { EditorWriter } from '../editor-writer';
 import { describeWriteError } from '../write-errors';
 import { itemName } from '../editor-list/item-name';
 import { ModalShell } from '../modal-shell/modal-shell';
@@ -87,8 +87,8 @@ export interface PublishedItemActions {
 	}
 })
 export class DraftEditor<T extends EditorContentType> {
-	private notifier = inject(AdminNotifierService);
-	private writer = inject(EditorWriteService);
+	private notifier = inject(AdminNotifier);
+	private writer = inject(EditorWriter);
 	private injector = inject(Injector);
 	private host = inject<ElementRef<HTMLElement>>(ElementRef);
 	private shell = viewChild.required(ModalShell);

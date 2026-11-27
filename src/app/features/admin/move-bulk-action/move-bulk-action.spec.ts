@@ -1,7 +1,7 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { EDITOR_GALLERY_COLLECTIONS } from 'src/app/testing/api-fixtures';
-import { CollectionsStore } from '../collections-store.service';
+import { CollectionsStore } from '../collections-store';
 import { provideFakeBulkActionHost } from '../editor-list/bulk-action-host.testing';
 import { MoveBulkAction } from './move-bulk-action';
 

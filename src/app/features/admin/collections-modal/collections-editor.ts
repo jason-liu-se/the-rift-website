@@ -18,16 +18,16 @@ import {
 } from 'rxjs';
 import { CollectionDraftType } from 'src/app/core/api/api-requests';
 import { DraftSummary, EditorCollection } from 'src/app/core/api/api-responses';
-import { AdminNotifierService } from 'src/app/features/admin/admin-notifier.service';
-import { DraftsService } from 'src/app/features/admin/drafts/drafts.service';
+import { AdminNotifier } from 'src/app/features/admin/admin-notifier';
+import { DraftsApi } from 'src/app/features/admin/drafts/drafts-api';
 import {
 	CollectionContentType,
 	toCollectionDraftType
 } from 'src/app/features/admin/editor-content/editor-content-types';
 import { DraftSession } from '../drafts/draft-session';
-import { DraftSessionsService } from '../drafts/draft-sessions.service';
-import { DraftStore } from '../drafts/draft-store.service';
-import { CollectionsStore } from '../collections-store.service';
+import { DraftSessions } from '../drafts/draft-sessions';
+import { DraftStore } from '../drafts/draft-store';
+import { CollectionsStore } from '../collections-store';
 import { describeWriteError } from '../write-errors';
 
 export type CollectionSession = DraftSession<CollectionDraftType>;
@@ -50,11 +50,11 @@ export interface NewCollectionDraft {
  */
 @Injectable()
 export class CollectionsEditor {
-	private sessions = inject(DraftSessionsService);
-	private drafts = inject(DraftsService);
+	private sessions = inject(DraftSessions);
+	private drafts = inject(DraftsApi);
 	private draftStore = inject(DraftStore);
 	private collectionsStore = inject(CollectionsStore);
-	private notifier = inject(AdminNotifierService);
+	private notifier = inject(AdminNotifier);
 
 	private readonly type = signal<CollectionContentType>('gallery');
 	private readonly draftType = computed<CollectionDraftType>(() =>

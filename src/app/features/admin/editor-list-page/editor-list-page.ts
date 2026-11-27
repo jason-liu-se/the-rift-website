@@ -14,11 +14,11 @@ import { MatIcon } from '@angular/material/icon';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { skip } from 'rxjs';
 import { EditorContentType } from 'src/app/core/api/api-requests';
-import { EDITOR_TYPES } from '../editor-types';
+import { EDITOR_TYPES } from '../editor-type-configs';
 import { EditorList } from '../editor-list/editor-list';
 import { BULK_ACTION_HOST } from '../editor-list/bulk-action-host';
-import { EditorListActions } from '../editor-list/editor-list.actions';
-import { EditorListStore } from '../editor-list/editor-list.store';
+import { EditorListActions } from '../editor-list/editor-list-actions';
+import { EditorListStore } from '../editor-list/editor-list-store';
 
 /**
  * One tool, at /admin/<type>: its heading with Collections and New (Upload

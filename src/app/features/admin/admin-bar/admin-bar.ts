@@ -11,7 +11,7 @@ import {
 	NAVBAR_HEIGHT_VARIABLE,
 	publishHeight
 } from 'src/app/shared/utils/publish-height';
-import { AuthService } from 'src/app/core/auth/auth.service';
+import { AuthSession } from 'src/app/core/auth/auth-session';
 
 /**
  * The admin tools' app bar, in the public navbar's place: where you are, a
@@ -33,7 +33,7 @@ import { AuthService } from 'src/app/core/auth/auth.service';
 	]
 })
 export class AdminBar {
-	private auth = inject(AuthService);
+	private auth = inject(AuthSession);
 	private router = inject(Router);
 
 	protected readonly logoPath = LOGO_PATH;
@@ -46,7 +46,7 @@ export class AdminBar {
 		publishHeight(NAVBAR_HEIGHT_VARIABLE, () => this.bar().nativeElement);
 	}
 
-	/** Logs out at once (see AuthService) and leaves the protected pages. */
+	/** Logs out at once (see AuthSession) and leaves the protected pages. */
 	protected logout(): void {
 		this.auth.logout();
 		void this.router.navigateByUrl(ADMIN_LOGIN_PATH);

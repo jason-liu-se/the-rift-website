@@ -61,7 +61,7 @@ rendered, and Angular sanitises the result again.
   renders without the data and the browser fetches it after hydration. Only a
   failure in the browser shows the page's error state and retry button
   (`LoadState` in `src/app/shared/utils/`), and the page retries by itself once
-  the API is back (see `ApiStatusService`).
+  the API is back (see `ApiStatusMonitor`).
 - Every API `GET` sends the site's content version as `v`
   (`contentVersionInterceptor`, `src/app/core/api/content-version/`), so the API
   and Cloudflare cache public reads until the next edit. The version is fetched
@@ -79,7 +79,7 @@ rendered, and Angular sanitises the result again.
   expired, `authRefreshInterceptor` (`src/app/core/auth/`) calls
   `POST /auth/refresh` once and retries it. If the refresh answers 401 too, the
   session is over and the app logs out.
-- `AuthService.user()` is the logged-in user for the whole app. It's checked
+- `AuthSession.user()` is the logged-in user for the whole app. It's checked
   with `GET /auth/me` once per page load, in the browser only (the server can't
   see the API's cookies, so there it stays unknown). The last-known user is kept
   in `localStorage`: it still shows while the API is down, and a logout in one
@@ -88,7 +88,7 @@ rendered, and Angular sanitises the result again.
   logged out in another tab) shows a toast, or on a protected page a dialog that
   offers to log in again and return to the same page
   (`src/app/core/layout/session-ended/`).
-- `ApiStatusService` (`src/app/core/api/api-status/`) tells the browser whether
+- `ApiStatusMonitor` (`src/app/core/api/api-status/`) tells the browser whether
   the API is `up`, `down` or `offline`, fed by `apiStatusInterceptor` (down
   after a network error, timeout or 5xx) and the `online`/`offline` events. A
   response can't mark it up again: the browser may answer a GET from its HTTP
@@ -104,7 +104,7 @@ rendered, and Angular sanitises the result again.
   only when a user is saved, so anonymous visitors make no `/auth/me` request,
   and loads the user menu (avatar, Admin, Log out) once the user is known, so
   server HTML shows no user UI.
-- Logging out always succeeds for the user at once: `AuthService.logout()`
+- Logging out always succeeds for the user at once: `AuthSession.logout()`
   clears the user and saved user, sets a `logout-pending` flag in
   `localStorage`, and then sends `POST /auth/logout`. Only the API can clear the
   httpOnly cookies, so while the flag is set (the API was down, or the browser

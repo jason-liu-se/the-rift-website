@@ -2,10 +2,10 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
-import { ToastService } from 'src/app/shared/ui/toast/toast.service';
-import { requireLoggedIn } from 'src/app/core/auth/admin-auth.guards';
-import { AuthService } from 'src/app/core/auth/auth.service';
-import { FocusRecoveryService } from 'src/app/core/focus-recovery/focus-recovery.service';
+import { Toaster } from 'src/app/shared/ui/toast/toaster';
+import { requireLoggedIn } from 'src/app/core/auth/admin-auth-guards';
+import { AuthSession } from 'src/app/core/auth/auth-session';
+import { FocusRecovery } from 'src/app/core/focus-recovery/focus-recovery';
 import { ANY_URL_ROUTES } from 'src/app/testing/render-component';
 import { UserMenu } from './user-menu';
 
@@ -57,7 +57,7 @@ describe('UserMenu', () => {
 					...ANY_URL_ROUTES
 				]),
 				{
-					provide: AuthService,
+					provide: AuthSession,
 					useValue: {
 						logout,
 						// The protected page's guard sees a signed-in user.
@@ -65,7 +65,7 @@ describe('UserMenu', () => {
 						user: signal({ id: '1', username: 'editor' })
 					}
 				},
-				{ provide: ToastService, useValue: { show } }
+				{ provide: Toaster, useValue: { show } }
 			]
 		});
 		fixture = TestBed.createComponent(UserMenu);
@@ -150,7 +150,7 @@ describe('UserMenu', () => {
 
 		it('recovers focus once the menu is gone, so it does not fall to <body>', async () => {
 			const recover = vi.spyOn(
-				TestBed.inject(FocusRecoveryService),
+				TestBed.inject(FocusRecovery),
 				'recoverAfterRender'
 			);
 
@@ -161,7 +161,7 @@ describe('UserMenu', () => {
 
 		it('leaves focus to the navigation when going to the login page', async () => {
 			const recover = vi.spyOn(
-				TestBed.inject(FocusRecoveryService),
+				TestBed.inject(FocusRecovery),
 				'recoverAfterRender'
 			);
 

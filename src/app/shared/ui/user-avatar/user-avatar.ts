@@ -1,6 +1,6 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
-import { AuthService } from 'src/app/core/auth/auth.service';
+import { AuthSession } from 'src/app/core/auth/auth-session';
 
 /**
  * The logged-in editor's avatar and username. Falls back to their initial when
@@ -14,7 +14,7 @@ import { AuthService } from 'src/app/core/auth/auth.service';
 	imports: [MatIcon]
 })
 export class UserAvatar {
-	public readonly user = inject(AuthService).user;
+	public readonly user = inject(AuthSession).user;
 	/** Turn off to show the avatar alone. */
 	public readonly showUsername = input(true);
 

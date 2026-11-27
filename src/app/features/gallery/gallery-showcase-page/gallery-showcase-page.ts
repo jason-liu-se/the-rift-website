@@ -10,8 +10,8 @@ import { catchError, distinctUntilChanged, map, of } from 'rxjs';
 import { GALLERY_FALLBACK_IMAGE } from 'src/app/core/config/gallery';
 import { GALLERY_PAGE_SIZE } from 'src/app/core/config/pagination';
 import { GalleryImage } from 'src/app/core/api/api-responses';
-import { GalleryProviderService } from 'src/app/features/gallery/gallery-provider.service';
-import { PaginatorIntlService } from 'src/app/shared/paginator-intl/paginator-intl.service';
+import { GalleryApi } from 'src/app/features/gallery/gallery-api';
+import { PaginatorIntl } from 'src/app/shared/paginator-intl/paginator-intl';
 import { BackgroundImageCard } from '../../../shared/ui/background-image-card/background-image-card';
 import { BackButton } from '../../../shared/ui/back-button/back-button';
 import { ImageShowcaseSection } from './image-showcase-section/image-showcase-section';
@@ -30,7 +30,7 @@ function toTags(param: string | null): string[] {
 	selector: 'app-gallery-showcase-page',
 	templateUrl: './gallery-showcase-page.html',
 	styleUrls: ['./gallery-showcase-page.scss'],
-	providers: [{ provide: MatPaginatorIntl, useClass: PaginatorIntlService }],
+	providers: [{ provide: MatPaginatorIntl, useClass: PaginatorIntl }],
 	imports: [
 		BackgroundImageCard,
 		BackButton,
@@ -43,7 +43,7 @@ function toTags(param: string | null): string[] {
 export class GalleryShowcasePage {
 	private route = inject(ActivatedRoute);
 	private router = inject(Router);
-	private galleryProvider = inject(GalleryProviderService);
+	private galleryApi = inject(GalleryApi);
 
 	public title: string;
 	/** The collection's first photo, once the first page has loaded. */
@@ -73,7 +73,7 @@ export class GalleryShowcasePage {
 		this.title = `Gallery: ${data['collectionTitle']}`;
 
 		// The header shows the first image associated with the collection
-		this.galleryProvider
+		this.galleryApi
 			.fetchCollection(this.collectionName)
 			.subscribe(
 				(collection) =>
@@ -92,7 +92,7 @@ export class GalleryShowcasePage {
 			)
 			.subscribe((tags) => this.showTags(tags));
 		// Without tags, the page still works; it just can't be filtered.
-		this.galleryProvider
+		this.galleryApi
 			.fetchCollectionTags(this.collectionName)
 			.pipe(catchError(() => of([])))
 			.subscribe((tags) => this.tags.set(tags));
@@ -147,7 +147,7 @@ export class GalleryShowcasePage {
 		const isLatestRequest = () => request === this.latestRequest;
 
 		this.loadState.start();
-		this.galleryProvider
+		this.galleryApi
 			.fetchCollectionImages(
 				this.collectionName,
 				requestedPageIndex * this.pageSize,

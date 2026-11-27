@@ -31,8 +31,8 @@ The decisions are in issue #101; the API's side is in the web-server's
   shared by the footer and the form's fields; its `ErrorStateMatcher` marks
   blank required fields only after that.
 - **Per-type differences live in `EDITOR_TYPES`**
-  (`features/admin/editor-types.ts`): noun, search fields, field labels, flags,
-  the list's `filters`, `columns`, `view` and `defaultSort`, public page,
+  (`features/admin/editor-type-configs.ts`): noun, search fields, field labels,
+  flags, the list's `filters`, `columns`, `view` and `defaultSort`, public page,
   new-item fields, and the type's form, preview, and bulk actions
   (`features/admin/<type>/`). Shared code reads it; never check `type === …`. A
   type's bulk actions run through `BULK_ACTION_HOST`.
@@ -71,10 +71,9 @@ The decisions are in issue #101; the API's side is in the web-server's
   (`withMapFields`). The collection form has no preview, so its cards show each
   image as a thumbnail (`withThumbnails`). The `/gallery` card shows the
   collection's first dimension's image, or none.
-- **Writes** (confirm, send, snackbar) go through `EditorWriteService.run()`.
-- **API:** `EditorContentService` (items, bulk actions, collections),
-  `DraftsService`, and `ImageUploadService`, typed per content type by
-  `EditorContentTypes`
+- **Writes** (confirm, send, snackbar) go through `EditorWriter.run()`.
+- **API:** `EditorContentApi` (items, bulk actions, collections), `DraftsApi`,
+  and `ImageUploader`, typed per content type by `EditorContentTypes`
   (`features/admin/editor-content/editor-content-types.ts`). Every `/editor/*`
   request uses `EDITOR_REQUEST_OPTIONS`.
 - **Drafts** (`features/admin/drafts/`): the server holds them, of items or
@@ -86,14 +85,14 @@ The decisions are in issue #101; the API's side is in the web-server's
   API comes back. A `DraftSession` per open item holds editing state: fields,
   undo/redo, the save stage (`SaveState`, one union), conflicts (`409`/`404`),
   and publishing, which always makes sure the server has the draft first.
-  `DraftSessionsService` starts sessions.
-- **Bulk actions** go through `BulkActionRunnerService`: at most
-  `MAX_BULK_ITEMS` a request, one after another, answering every item's result
-  once all are done. Updates send only the items they'd change and offer Undo,
-  which `bulk-undo.ts` turns into the fewest updates that put items back.
-- **Feedback:** `AdminNotifierService` (snackbars; failures stay until
-  dismissed), `confirmAction` before anything destructive (through
-  `EditorWriteService`), and `describeWriteError` for messages.
+  `DraftSessions` starts sessions.
+- **Bulk actions** go through `BulkActionRunner`: at most `MAX_BULK_ITEMS` a
+  request, one after another, answering every item's result once all are done.
+  Updates send only the items they'd change and offer Undo, which `bulk-undo.ts`
+  turns into the fewest updates that put items back.
+- **Feedback:** `AdminNotifier` (snackbars; failures stay until dismissed),
+  `confirmAction` before anything destructive (through `EditorWriter`), and
+  `describeWriteError` for messages.
 - **Material** is allowed here; theme components only these pages use in
   `src/admin-theme.scss`, which `AdminPage` loads. Avoid `DatePipe` and other
   `@angular/common` extras: they'd join every page's initial chunk (use

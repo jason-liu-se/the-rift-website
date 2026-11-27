@@ -1,6 +1,6 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { CollectionsStore } from '../../collections-store.service';
+import { CollectionsStore } from '../../collections-store';
 import { provideFakeBulkActionHost } from '../../editor-list/bulk-action-host.testing';
 import { GalleryBulkActions } from './gallery-bulk-actions';
 

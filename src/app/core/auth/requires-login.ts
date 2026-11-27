@@ -1,5 +1,5 @@
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
-import { requireLoggedIn } from './admin-auth.guards';
+import { requireLoggedIn } from './admin-auth-guards';
 
 /**
  * Whether the route, or any route above it, has `requireLoggedIn` in its

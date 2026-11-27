@@ -23,8 +23,8 @@ import {
 	DraftType
 } from 'src/app/core/api/api-requests';
 import { ConflictResponse, Draft } from 'src/app/core/api/api-responses';
-import { ApiStatus } from 'src/app/core/api/api-status/api-status.service';
-import { DraftsService } from 'src/app/features/admin/drafts/drafts.service';
+import { ApiStatus } from 'src/app/core/api/api-status/api-status-monitor';
+import { DraftsApi } from 'src/app/features/admin/drafts/drafts-api';
 import {
 	DraftItemOf,
 	toTargetId
@@ -36,7 +36,7 @@ import {
 	pickDraftFields,
 	pickItemFields
 } from './draft-fields';
-import { DraftStore } from './draft-store.service';
+import { DraftStore } from './draft-store';
 
 /**
  * Why the server refused:
@@ -82,7 +82,7 @@ export interface DraftSessionStart<T extends DraftType> {
 
 /** What a session needs from outside, passed in so it can be tested alone. */
 export interface DraftSessionDeps {
-	drafts: DraftsService;
+	drafts: DraftsApi;
 	store: DraftStore;
 	apiStatus: Signal<ApiStatus>;
 	createId: () => string;

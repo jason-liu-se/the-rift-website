@@ -2,7 +2,7 @@ import { Component, input, output } from '@angular/core';
 
 /**
  * A short notice at the bottom of the screen with a dismiss button; shown by
- * `ToastService`, which also pauses its timer while `paused`.
+ * `Toaster`, which also pauses its timer while `paused`.
  */
 @Component({
 	selector: 'app-toast',

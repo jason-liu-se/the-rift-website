@@ -1,4 +1,4 @@
-import { DownloadsProviderService } from 'src/app/features/downloads/downloads-provider.service';
+import { DownloadsApi } from 'src/app/features/downloads/downloads-api';
 import { BackgroundImageCard } from '../../../shared/ui/background-image-card/background-image-card';
 import { Component, inject } from '@angular/core';
 import { DownloadCollection } from 'src/app/core/api/api-responses';
@@ -14,7 +14,7 @@ import { LoadState } from '../../../shared/utils/load-state';
 	imports: [BackgroundImageCard, SectionCard, DownloadCard, FallbackPanel]
 })
 export class DownloadsPage {
-	private downloadsProvider = inject(DownloadsProviderService);
+	private downloadsApi = inject(DownloadsApi);
 
 	public downloadCollections: DownloadCollection[] = [];
 	protected readonly loadState = new LoadState(() =>
@@ -27,7 +27,7 @@ export class DownloadsPage {
 
 	public loadDownloadCollections(): void {
 		this.loadState.start();
-		this.downloadsProvider.getDownloadCollections().subscribe({
+		this.downloadsApi.getDownloadCollections().subscribe({
 			next: (collections) => {
 				this.downloadCollections = collections;
 				this.loadState.succeed();

@@ -1,8 +1,8 @@
 import { Dialog } from '@angular/cdk/dialog';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { ToastService } from 'src/app/shared/ui/toast/toast.service';
-import { AuthService } from 'src/app/core/auth/auth.service';
+import { Toaster } from 'src/app/shared/ui/toast/toaster';
+import { AuthSession } from 'src/app/core/auth/auth-session';
 import { ANY_URL_ROUTES } from 'src/app/testing/render-component';
 import { SessionEndedNotifier } from './session-ended-notifier';
 
@@ -19,8 +19,8 @@ describe('SessionEndedNotifier', () => {
 		TestBed.configureTestingModule({
 			providers: [
 				provideRouter(ANY_URL_ROUTES),
-				{ provide: AuthService, useValue: { user: () => null } },
-				{ provide: ToastService, useValue: { show } }
+				{ provide: AuthSession, useValue: { user: () => null } },
+				{ provide: Toaster, useValue: { show } }
 			]
 		});
 		notifier = TestBed.inject(SessionEndedNotifier);

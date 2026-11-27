@@ -1,7 +1,7 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { SessionUser } from 'src/app/core/api/api-responses';
-import { AuthService } from 'src/app/core/auth/auth.service';
+import { AuthSession } from 'src/app/core/auth/auth-session';
 import { EditButton } from './edit-button';
 
 describe('EditButton', () => {
@@ -9,7 +9,7 @@ describe('EditButton', () => {
 		TestBed.configureTestingModule({
 			imports: [EditButton],
 			providers: [
-				{ provide: AuthService, useValue: { user: signal(user) } }
+				{ provide: AuthSession, useValue: { user: signal(user) } }
 			]
 		});
 		const fixture = TestBed.createComponent(EditButton);
