@@ -52,10 +52,17 @@ result, `i` in a short loop); generic is not (`data`, `item`, `value`, `info`,
 
 ## Files
 
-- Use the file names the Angular CLI generates (`npm run ng -- generate ...`):
-  kebab-case with the type suffix, e.g. `news-card.component.ts`,
-  `gallery.service.ts`. A component's `.ts`, `.html`, `.scss`, and `.spec.ts`
-  share one base name.
+- Use the file names the Angular CLI generates (`npm run ng -- generate ...`),
+  which follow the v20 style guide: the file is named for its class, in
+  kebab-case, with no type suffix (`NewsDisplay` in `news-display.ts`). A
+  component's `.ts`, `.html`, `.scss`, and `.spec.ts` share one base name.
+  Guards, interceptors and resolvers end in `-guard`, `-interceptor` and
+  `-resolver` (`auth-refresh-interceptor.ts`).
+- Classes have no type suffix either: name them for what they are or do
+  (`NewsDisplay`, `GalleryApi`, `PageOutlet`). Pages end in `Page` (`HomePage`).
+  When dropping the suffix leaves a vague name, or one that collides with
+  another class or type, pick a more descriptive one (`Toaster` for the service
+  that shows `Toast`s).
 - One concept per file. Put files where the README's project structure and
   `CLAUDE.md`'s file scoping say; types used by only one feature live with that
   feature.
