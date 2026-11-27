@@ -130,7 +130,7 @@ export const routes: Routes = [
 			description:
 				'Get in touch with the team behind The Rift Minecraft SMP.',
 			loadComponent: () =>
-				import('./pages/contact-page/contact-page.component').then(
+				import('./features/contact/contact-page/contact-page.component').then(
 					(m) => m.ContactPageComponent
 				)
 		}
