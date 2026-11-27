@@ -10,19 +10,15 @@ export interface PageRows {
 /**
  * Which rows of an admin list are selected: some items (with the revision
  * each was read at, for the bulk request) or every item matching the filters,
- * across pages, plus any of the editor's drafts. Ctrl+A first previews
- * selecting the page's rows, which the user confirms or cancels.
+ * across pages, plus any of the editor's drafts.
  */
 export class ListSelection {
 	private readonly refs = signal<ReadonlyMap<string, number>>(new Map());
 	private readonly drafts = signal<ReadonlySet<string>>(new Set());
 	private readonly allMatching = signal(false);
-	private readonly previewing = signal(false);
 
 	/** Every item matching the filters is selected, on every page. */
 	public readonly isAllMatching = this.allMatching.asReadonly();
-	/** Ctrl+A is waiting for Enter or Space (confirm) or Escape (cancel). */
-	public readonly isPreviewingPage = this.previewing.asReadonly();
 	public readonly selectedRefs = computed<BulkItemRef[]>(() =>
 		[...this.refs()].map(([id, startingRevision]) => ({
 			id,
@@ -104,18 +100,6 @@ export class ListSelection {
 		this.setRows(new Map(), this.drafts(), true);
 	}
 
-	public previewPage(): void {
-		this.previewing.set(true);
-	}
-
-	/** Ends a Ctrl+A preview: selects the page if confirmed. */
-	public endPreview(page: PageRows, isConfirmed: boolean): void {
-		this.previewing.set(false);
-		if (isConfirmed) {
-			this.selectPage(page);
-		}
-	}
-
 	public clear(): void {
 		this.setRows(new Map(), new Set());
 	}
@@ -128,6 +112,5 @@ export class ListSelection {
 		this.refs.set(refs);
 		this.drafts.set(drafts);
 		this.allMatching.set(isAllMatching);
-		this.previewing.set(false);
 	}
 }

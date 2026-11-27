@@ -46,13 +46,12 @@ export class RowGroup {
 
 	/** Each row with what its view shows. */
 	protected readonly rowViews = computed(() => {
-		const { columns, cellContext, selection, itemRows } = this.store;
+		const { columns, cellContext, itemRows } = this.store;
 		// Links keep the list's query, so they change with it.
 		this.store.filters();
 		this.store.pageIndex();
 		const layout = this.layout();
 		const items = itemRows();
-		const isPreviewing = selection.isPreviewingPage();
 		return this.rows().map((row) => {
 			const index =
 				this.isReorderable() && row.kind === 'item'
@@ -65,7 +64,7 @@ export class RowGroup {
 					inputs: column.inputs(row.data, cellContext)
 				})),
 				href: this.store.hrefOf(row),
-				isSelected: isPreviewing || this.isRowSelected(row),
+				isSelected: this.isRowSelected(row),
 				index,
 				menu: toRowMenu(row, {
 					layout,

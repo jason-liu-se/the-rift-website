@@ -48,18 +48,6 @@ describe('ListSelection', () => {
 		expect(selection.selectedRefs()).toEqual([ITEMS[1]]);
 	});
 
-	it('selects the page only when a preview is confirmed', () => {
-		selection.previewPage();
-		expect(selection.isPreviewingPage()).toBe(true);
-		selection.endPreview(PAGE, false);
-		expect(selection.isPreviewingPage()).toBe(false);
-		expect(selection.count(40)).toBe(0);
-
-		selection.previewPage();
-		selection.endPreview(PAGE, true);
-		expect(selection.selectedRefs()).toEqual(ITEMS);
-	});
-
 	it('clears everything', () => {
 		selection.selectAllMatching();
 		selection.clear();

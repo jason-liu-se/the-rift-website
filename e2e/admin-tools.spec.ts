@@ -49,7 +49,7 @@ test.describe('news list', () => {
 		).toBeVisible();
 	});
 
-	test('selects the page by keyboard with Ctrl+A, then Enter', async ({
+	test('selects the page with Ctrl+A and clears it with Escape', async ({
 		page
 	}) => {
 		await page
@@ -59,13 +59,6 @@ test.describe('news list', () => {
 			})
 			.focus();
 		await page.keyboard.press('Control+a');
-		await expect(
-			page.getByRole('paragraph').filter({
-				hasText: 'Select all 13 posts on this page?'
-			})
-		).toBeVisible();
-
-		await page.keyboard.press('Enter');
 		await expect(page.getByText('13 selected').first()).toBeVisible();
 		// The bulk action bar, too.
 		expect(await scanForViolations(page)).toEqual([]);

@@ -56,7 +56,6 @@ export class EditorRow {
 	public readonly cells = input.required<readonly RowCell[]>();
 	/** The editor's URL, for the name's link (and opening it in a new tab). */
 	public readonly href = input.required<string>();
-	/** Selected, or shown as selected (Ctrl+A's preview). */
 	public readonly isSelected = input.required<boolean>();
 	/** It can be dragged into order. */
 	public readonly isDraggable = input(false);
