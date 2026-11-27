@@ -102,6 +102,20 @@ app-item-thumbnail {
 			grid-template-columns: minmax(0, 1fr);
 		}
 	}
+
+	// A map's fields are taller: the thumbnail spans them all, narrower
+	// than 16:9 (cropped) so the fields keep their width.
+	.with-thumbnail.with-map-fields {
+		app-item-thumbnail {
+			width: 8rem;
+			height: auto;
+			aspect-ratio: auto;
+		}
+
+		.fields {
+			grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+		}
+	}
 }
 
 .cdk-drag-preview fieldset {

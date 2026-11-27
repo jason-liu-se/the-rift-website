@@ -80,7 +80,7 @@ export class DimensionsEditor {
 	public readonly withMapFields = input(false, {
 		transform: booleanAttribute
 	});
-	/** For a form without a preview beside it, which would show the images. */
+	/** Shows each dimension's image (or a placeholder) on its card. */
 	public readonly withThumbnails = input(false, {
 		transform: booleanAttribute
 	});
