@@ -34,7 +34,6 @@ export class NewsPage {
 
 	/** Counts requests, so only the latest one updates the page. */
 	private latestRequest = 0;
-	private newsPostCache: Record<string, NewsPost[]> = {};
 
 	constructor() {
 		this.populateNewsPosts();
@@ -46,22 +45,13 @@ export class NewsPage {
 		this.pageSize = e.pageSize;
 		this.pageIndex = e.pageIndex;
 
-		// updating the displayed news posts
 		this.newsPosts = [];
-		// Any response still on its way is for a page the user has left.
-		this.latestRequest++;
-
-		// grabbing images from cache, if they have been cached
-		if (this.newsPostCache[`${this.pageIndex}`]) {
-			this.newsPosts = this.newsPostCache[`${this.pageIndex}`];
-		} else {
-			this.populateNewsPosts();
-		}
+		this.populateNewsPosts();
 
 		window.scrollTo(0, 0);
 	}
 
-	/** Requests the current page again after a failure. */
+	/** Requests the current page; also the error state's retry. */
 	public populateNewsPosts(): void {
 		const requestedPageIndex = this.pageIndex;
 		// The user may change page (and come back) before this response
@@ -74,11 +64,9 @@ export class NewsPage {
 			.getNewsPosts(requestedPageIndex * this.pageSize, this.pageSize)
 			.subscribe({
 				next: ({ items, total }) => {
-					this.newsPostCache[`${requestedPageIndex}`] = items;
-					this.paginationLength = total;
-
 					if (isLatestRequest()) {
 						this.newsPosts = items;
+						this.paginationLength = total;
 						this.loadState.succeed();
 					}
 				},

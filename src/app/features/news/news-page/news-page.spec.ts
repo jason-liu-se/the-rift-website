@@ -89,28 +89,18 @@ describe('NewsPage', () => {
 		expect(window.scrollTo).toHaveBeenCalledWith(0, 0);
 	});
 
-	it('shows a visited page again from cache without a new request', () => {
-		flushPage(0, FIRST_PAGE);
-		clickPaginator('Next page');
-		flushPage(PAGE_SIZE, SECOND_PAGE);
-
-		clickPaginator('Previous page');
-
-		// afterEach's verify() fails if this made another request.
-		expect(titles()).toEqual(['Launch', 'Patch']);
-	});
-
 	it('ignores a late response for a page the user has already left', () => {
 		flushPage(0, FIRST_PAGE);
 		clickPaginator('Next page');
 		clickPaginator('Previous page');
+		const firstPage = httpTesting.expectOne(pageUrl(0));
 
 		flushPage(PAGE_SIZE, SECOND_PAGE);
-		expect(titles()).toEqual(['Launch', 'Patch']);
+		expect(titles()).toEqual([]);
 
-		// the late response is still cached for when the user returns
-		clickPaginator('Next page');
-		expect(titles()).toEqual(['Update']);
+		firstPage.flush({ items: FIRST_PAGE, total: TOTAL });
+		fixture.detectChanges();
+		expect(titles()).toEqual(['Launch', 'Patch']);
 	});
 
 	describe('when a page fails to load', () => {
@@ -190,6 +180,7 @@ describe('NewsPage', () => {
 			clickPaginator('Next page');
 			clickPaginator('Previous page');
 			clickPaginator('Next page');
+			httpTesting.expectOne(pageUrl(0));
 			const [stale, latest] = httpTesting.match(pageUrl(PAGE_SIZE));
 
 			stale.flush(null, { status: 500, statusText: 'Server Error' });
@@ -207,6 +198,7 @@ describe('NewsPage', () => {
 			clickPaginator('Previous page');
 
 			failPage(PAGE_SIZE);
+			flushPage(0, FIRST_PAGE);
 
 			expect(fallbackPanel()).toBeNull();
 			expect(titles()).toEqual(['Launch', 'Patch']);
