@@ -2,7 +2,7 @@ import { Component, ElementRef, viewChild } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 import { AccountMenu } from 'src/app/shared/ui/account-menu/account-menu';
-import { ADMIN_PATH } from 'src/app/core/config/admin';
+import { ADMIN_PATH, HOME_PATH } from 'src/app/core/config/site-paths';
 import { LOGO_PATH } from 'src/app/core/config/site';
 import {
 	NAVBAR_HEIGHT_VARIABLE,
@@ -20,6 +20,7 @@ import {
 	imports: [AccountMenu, MatIcon, RouterLink]
 })
 export class AdminBar {
+	protected readonly homePath = HOME_PATH;
 	protected readonly logoPath = LOGO_PATH;
 	protected readonly adminPath = ADMIN_PATH;
 	private readonly bar = viewChild.required<ElementRef<HTMLElement>>('bar');

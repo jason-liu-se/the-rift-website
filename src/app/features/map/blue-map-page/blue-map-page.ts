@@ -14,6 +14,7 @@ import { environment } from 'src/environments/environment';
 import { BackButton } from '../../../shared/ui/back-button/back-button';
 import { MessageCard } from './message-card/message-card';
 import { MatIcon } from '@angular/material/icon';
+import { MAP_PATH } from 'src/app/core/config/site-paths';
 
 const BLUEMAP_ORIGIN = new URL(environment.BLUEMAP_URL).origin;
 /** Sent by BlueMap's url-sync.js (bluemap/ in this repo) when its fragment changes. */
@@ -34,6 +35,7 @@ function mapIdOf(fragment: string | null): string | undefined {
 	host: { '(window:message)': 'onWindowMessage($event)' }
 })
 export class BlueMapPage {
+	protected readonly mapPath = MAP_PATH;
 	private route = inject(ActivatedRoute);
 	private router = inject(Router);
 	private iframe = viewChild<ElementRef<HTMLIFrameElement>>('mapIframe');

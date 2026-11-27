@@ -11,7 +11,6 @@ import {
 	CollectionContentType,
 	SummaryOf
 } from 'src/app/features/admin/editor-content/editor-content-types';
-import { COLLECTION_TYPES } from './collection-type-configs';
 import { DownloadsForm } from './downloads/downloads-form/downloads-form';
 import { DownloadsPreview } from './downloads/downloads-preview/downloads-preview';
 import { ItemNoun } from './editor-list/bulk-results';
@@ -41,6 +40,12 @@ import { MoveBulkAction } from './move-bulk-action/move-bulk-action';
 import { NewsForm } from './news/news-form/news-form';
 import { NewsPreview } from './news/news-preview/news-preview';
 import { DraftFields } from './drafts/draft-fields';
+import {
+	DOWNLOADS_PATH,
+	MAP_PATH,
+	NEWS_PATH,
+	galleryCollectionPath
+} from 'src/app/core/config/site-paths';
 
 /** Downloads' collection column; ascending is the site's order. */
 const DOWNLOAD_COLLECTION_COLUMN: ListColumn<'downloads'> = {
@@ -170,7 +175,7 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 					? (published as { date?: string } | undefined)?.date
 					: 'now')
 		}),
-		publicPath: () => '/news'
+		publicPath: () => NEWS_PATH
 	},
 	downloads: {
 		label: 'Downloads',
@@ -212,7 +217,7 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 		defaultSort: columnSort(DOWNLOAD_COLLECTION_COLUMN),
 		view: 'table',
 		isOrderable: true,
-		publicPath: () => '/downloads'
+		publicPath: () => DOWNLOADS_PATH
 	},
 	gallery: {
 		label: 'Gallery',
@@ -269,8 +274,7 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 		defaultSort: RECENTLY_UPDATED,
 		view: 'grid',
 		isOrderable: false,
-		publicPath: (image) =>
-			`${COLLECTION_TYPES.gallery.pathPrefix}${image.collection}`
+		publicPath: (image) => galleryCollectionPath(image.collection)
 	},
 	maps: {
 		label: 'Maps',
@@ -312,7 +316,7 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 			dimensionCount:
 				'dimensionCount' in draft ? draft.dimensionCount : undefined
 		}),
-		publicPath: () => '/map'
+		publicPath: () => MAP_PATH
 	}
 };
 

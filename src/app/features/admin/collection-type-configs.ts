@@ -2,6 +2,7 @@ import { ImageUploadForm } from 'src/app/core/api/api-requests';
 import { CollectionContentType } from './editor-content/editor-content-types';
 import { ItemNoun } from './editor-list/bulk-results';
 import { findSlugProblem } from './collection-form/collection-slug';
+import { GALLERY_PATH } from 'src/app/core/config/site-paths';
 
 /** What differs between the content types' collections. */
 export interface CollectionTypeConfig {
@@ -22,7 +23,7 @@ export const COLLECTION_TYPES: Record<
 > = {
 	// Each gallery collection has its own page and album.
 	gallery: {
-		pathPrefix: '/gallery/',
+		pathPrefix: `${GALLERY_PATH}/`,
 		uploadAlbum: (slug) =>
 			findSlugProblem(slug)
 				? undefined
