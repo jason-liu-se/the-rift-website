@@ -1,0 +1,115 @@
+@use "../../../../theme-colours" as *;
+@use "../../../../font-sizes" as *;
+@use "../../../../scrollbar-gap" as *;
+
+$bar-height: 3.5rem;
+
+:host {
+	position: sticky;
+	top: var(--status-banner-height, 0px);
+	z-index: 10;
+	display: block;
+}
+
+.bar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	height: $bar-height;
+	padding: 0 8px 0 16px;
+	@include fill-scrollbar-gap(8px);
+	border-bottom: 1px solid rgba($colour-light-text, 0.12);
+	background-color: $colour-dark-background;
+	color: $colour-light-text;
+}
+
+.home {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	min-height: 44px;
+	border-radius: 8px;
+	color: inherit;
+	text-decoration: none;
+
+	&:focus-visible {
+		outline: 2px solid $colour-light-text;
+		outline-offset: 2px;
+	}
+}
+
+.logo {
+	display: block;
+	width: auto;
+	height: 22px;
+}
+
+.area {
+	padding-left: 10px;
+	border-left: 1px solid rgba($colour-light-text, 0.3);
+	color: $colour-soft-silver;
+}
+
+.end {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.view-site {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	min-width: 44px;
+	min-height: 44px;
+	padding: 0 10px;
+	border-radius: 8px;
+	color: $colour-soft-silver;
+	font-size: $font-size-small;
+	text-decoration: none;
+
+	&:hover {
+		background-color: rgba($colour-light-text, 0.08);
+		color: $colour-light-text;
+	}
+
+	&:focus-visible {
+		outline: 2px solid $colour-light-text;
+		outline-offset: 2px;
+	}
+}
+
+// Mobile: the icon alone, named for screen readers by the hidden label.
+.view-site-label {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+.account {
+	--mat-icon-button-state-layer-size: 44px;
+	padding: 4px;
+}
+
+.signed-in {
+	margin: 0;
+	padding: 8px 16px 12px;
+	border-bottom: 1px solid $colour-light-grey;
+	color: $colour-dark-text;
+	font-size: $font-size-x-small;
+}
+
+@media (min-width: 40rem) {
+	.view-site-label {
+		position: static;
+		width: auto;
+		height: auto;
+		overflow: visible;
+		clip-path: none;
+	}
+}

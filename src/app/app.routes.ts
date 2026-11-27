@@ -157,7 +157,7 @@ export const routes: Routes = [
 			description: 'Log in to edit The Rift website.',
 			noindex: true,
 			loadComponent: () =>
-				import('./pages/admin-page/admin-login-page/admin-login-page.component').then(
+				import('./features/admin/admin-login-page/admin-login-page.component').then(
 					(m) => m.AdminLoginPageComponent
 				),
 			isTransparent: false,
@@ -173,13 +173,13 @@ export const routes: Routes = [
 			description: 'Tools for editors of The Rift website.',
 			noindex: true,
 			loadComponent: () =>
-				import('./pages/admin-page/admin-page.component').then(
+				import('./features/admin/admin-page/admin-page.component').then(
 					(m) => m.AdminPageComponent
 				),
 			showNavbar: false,
 			showFooter: false
 		},
-		loadChildren: () => import('./pages/admin-page/admin.routes')
+		loadChildren: () => import('./features/admin/admin.routes')
 	},
 	{
 		path: '**',

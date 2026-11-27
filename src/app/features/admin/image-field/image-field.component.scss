@@ -1,0 +1,44 @@
+@use "../../../../theme-colours" as *;
+@use "../../../../font-sizes" as *;
+
+:host {
+	display: grid;
+	gap: 8px;
+	border-radius: 8px;
+	outline: 2px dashed transparent;
+	outline-offset: 4px;
+}
+
+:host(.dragging) {
+	outline-color: $colour-primary;
+}
+
+.row {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+}
+
+.link {
+	flex: 1;
+	min-width: 0;
+}
+
+// Level with the outlined input beside it.
+.upload {
+	flex: none;
+	height: 56px;
+}
+
+progress {
+	width: 100%;
+}
+
+.messages p {
+	margin: 0;
+	font-size: $font-size-small;
+}
+
+.error {
+	color: $colour-error;
+}
