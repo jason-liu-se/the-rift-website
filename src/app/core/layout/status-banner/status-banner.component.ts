@@ -1,7 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { Component, ElementRef, computed, inject } from '@angular/core';
 import { AuthService } from '../../auth/auth.service';
-import { publishHeight } from '../publish-height';
+import { publishHeight } from 'src/app/shared/utils/publish-height';
 import { StatusBannerKind, StatusBannerService } from './status-banner.service';
 
 /** CSS variable the navbar and `scroll-padding-top` offset themselves by. */

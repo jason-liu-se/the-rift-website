@@ -7,8 +7,10 @@ import { Router, RouterLink } from '@angular/router';
 import { UserAvatarComponent } from 'src/app/shared/ui/user-avatar/user-avatar.component';
 import { ADMIN_LOGIN_PATH, ADMIN_PATH } from 'src/app/core/config/admin';
 import { LOGO_PATH } from 'src/app/core/config/site';
-import { NAVBAR_HEIGHT_VARIABLE } from 'src/app/core/layout/navbar/navbar.component';
-import { publishHeight } from 'src/app/core/layout/publish-height';
+import {
+	NAVBAR_HEIGHT_VARIABLE,
+	publishHeight
+} from 'src/app/shared/utils/publish-height';
 import { AuthService } from 'src/app/core/auth/auth.service';
 
 /**
