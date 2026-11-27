@@ -142,7 +142,7 @@ export const routes: Routes = [
 		data: {
 			description: 'Apply to join The Rift Minecraft SMP.',
 			loadComponent: () =>
-				import('./pages/join-page/join-page.component').then(
+				import('./features/join/join-page/join-page.component').then(
 					(m) => m.JoinPageComponent
 				),
 			isTransparent: false
