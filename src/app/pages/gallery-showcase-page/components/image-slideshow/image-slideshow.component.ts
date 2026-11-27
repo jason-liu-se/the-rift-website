@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { GalleryImage } from 'src/app/core/api/api-responses';
 import { MatIcon } from '@angular/material/icon';
-import { OptimizedImageComponent } from 'src/app/components/optimized-image/optimized-image.component';
+import { OptimizedImageComponent } from 'src/app/shared/ui/optimized-image/optimized-image.component';
 
 @Component({
 	selector: 'app-image-slideshow',

@@ -1,0 +1,41 @@
+@use "../../../../theme-colours" as *;
+@use "../../../../font-sizes" as *;
+@use "../../../../scrollbar-gap" as *;
+
+.background-image-card {
+	@include fill-scrollbar-gap;
+	height: 350px;
+	max-height: 50vh;
+	position: relative;
+}
+
+// Over the whole image, the scrollbar's place too; its text centred on the
+// content.
+.overlay-content {
+	position: absolute;
+	inset: 0;
+	padding-right: var(--scrollbar-gap, 0px);
+	color: $colour-light-text;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background: radial-gradient(
+		rgba(0, 0, 0, 0.152),
+		rgba(0, 0, 0, 0.315),
+		rgba(0, 0, 0, 0.56)
+	);
+}
+
+.text-container {
+	text-align: center;
+}
+
+.title {
+	font-weight: 700;
+	font-size: $font-size-xx-large;
+	margin-bottom: 10px;
+}
+
+.description {
+	font-size: $font-size-small;
+}

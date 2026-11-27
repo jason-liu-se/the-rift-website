@@ -2,7 +2,7 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
-import { ToastService } from 'src/app/components/toast/toast.service';
+import { ToastService } from 'src/app/shared/ui/toast/toast.service';
 import { requireLoggedIn } from 'src/app/core/auth/admin-auth.guards';
 import { AuthService } from 'src/app/core/auth/auth.service';
 import { FocusRecoveryService } from 'src/app/core/focus-recovery/focus-recovery.service';

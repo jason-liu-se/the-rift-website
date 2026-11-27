@@ -1,0 +1,60 @@
+@use "../../../../font-sizes" as *;
+@use "../../../../theme-colours" as *;
+
+.caption-card {
+	width: 100%;
+	height: 100%;
+	// The size when the parent sets no height: an optimised image's size must
+	// be known before it loads.
+	aspect-ratio: 16 / 9;
+	position: relative;
+}
+
+.overlay-elements {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+}
+
+.caption-text {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	margin: 10px;
+	color: $colour-light-text;
+	z-index: 2;
+}
+
+.gradient {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 1;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.2);
+}
+
+.visible {
+	filter: opacity(1);
+}
+
+.hidden {
+	filter: opacity(0);
+}
+
+.hover {
+	filter: opacity(0);
+	transition: filter 0.2s ease;
+}
+
+.hover:hover {
+	filter: opacity(1);
+}

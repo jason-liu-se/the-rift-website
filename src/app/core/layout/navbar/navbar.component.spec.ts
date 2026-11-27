@@ -3,7 +3,7 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { of } from 'rxjs';
-import { ToastService } from 'src/app/components/toast/toast.service';
+import { ToastService } from 'src/app/shared/ui/toast/toast.service';
 import { SessionUser } from 'src/app/core/api/api-responses';
 import { AuthService } from 'src/app/core/auth/auth.service';
 

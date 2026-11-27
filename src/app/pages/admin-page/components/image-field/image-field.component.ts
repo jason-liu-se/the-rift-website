@@ -20,7 +20,7 @@ import { ImageUploadForm } from 'src/app/core/api/api-requests';
 import { ApiStatusService } from 'src/app/core/api/api-status/api-status.service';
 import { ImageUploadService } from 'src/app/services/image-upload/image-upload.service';
 import { findImageFileProblem } from 'src/app/utilities/image-files';
-import { isAllowedImageUrl } from 'src/app/utilities/image-urls';
+import { isAllowedImageUrl } from 'src/app/shared/utils/image-urls';
 import { describeWriteError } from '../../utilities/write-errors';
 
 /** Where an upload is: none, sending (0 to 1), or failed (to retry). */

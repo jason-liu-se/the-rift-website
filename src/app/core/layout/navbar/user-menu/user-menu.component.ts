@@ -1,8 +1,8 @@
 import { Menu, MenuItem, MenuTrigger } from '@angular/aria/menu';
 import { Component, inject, output } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { ToastService } from 'src/app/components/toast/toast.service';
-import { UserAvatarComponent } from 'src/app/components/user-avatar/user-avatar.component';
+import { ToastService } from 'src/app/shared/ui/toast/toast.service';
+import { UserAvatarComponent } from 'src/app/shared/ui/user-avatar/user-avatar.component';
 import { ADMIN_LOGIN_PATH, ADMIN_PATH } from 'src/app/core/config/admin';
 import { isOnProtectedPage } from 'src/app/core/auth/requires-login';
 import { AuthService } from 'src/app/core/auth/auth.service';

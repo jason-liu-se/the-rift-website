@@ -11,7 +11,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatButton } from '@angular/material/button';
 import { LOGO_PATH } from 'src/app/core/config/site';
 import { AuthService } from 'src/app/core/auth/auth.service';
-import { isDesktopWidth } from 'src/app/utilities/viewport.util';
+import { isDesktopWidth } from 'src/app/shared/utils/viewport.util';
 import { publishHeight } from '../publish-height';
 import { UserMenuComponent } from './user-menu/user-menu.component';
 

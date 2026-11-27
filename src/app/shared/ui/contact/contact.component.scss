@@ -1,0 +1,47 @@
+@use "../../../../theme-colours" as *;
+@use "../../../../font-sizes" as *;
+@use "../../../../scrollbar-gap" as *;
+
+* {
+	text-align: center;
+	color: #343434;
+}
+
+.contact-section-wrapper {
+	display: flex;
+	justify-content: center;
+	background-color: $colour-light-background;
+	@include fill-scrollbar-gap;
+}
+
+.contact-section {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	margin: 140px 0;
+	max-width: 55rem;
+}
+
+.title {
+	font-weight: 900;
+	font-size: $font-size-xx-large;
+	height: 35px;
+}
+
+.description {
+	padding-top: 5px;
+	font-size: $font-size-medium;
+}
+
+.horizontal-separator {
+	border-color: $colour-blue-grey;
+	border-radius: 5px;
+	width: 25px;
+	margin: 30px 0;
+}
+
+.email {
+	margin: 0;
+	font-size: $font-size-small;
+}

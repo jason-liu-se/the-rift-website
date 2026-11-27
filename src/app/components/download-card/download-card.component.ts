@@ -1,8 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
-import { EditButtonComponent } from 'src/app/components/edit-button/edit-button.component';
-import { OptimizedImageComponent } from 'src/app/components/optimized-image/optimized-image.component';
+import { EditButtonComponent } from 'src/app/shared/ui/edit-button/edit-button.component';
+import { OptimizedImageComponent } from 'src/app/shared/ui/optimized-image/optimized-image.component';
 
 @Component({
 	selector: 'app-download-card',

@@ -1,5 +1,5 @@
 import { Component, RESPONSE_INIT, inject } from '@angular/core';
-import { FallbackPanelComponent } from '../../components/fallback-panel/fallback-panel.component';
+import { FallbackPanelComponent } from '../../shared/ui/fallback-panel/fallback-panel.component';
 
 @Component({
 	selector: 'app-error-page',
