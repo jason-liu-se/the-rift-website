@@ -117,7 +117,7 @@ export const routes: Routes = [
 			description:
 				'Download the worlds from previous seasons of The Rift Minecraft SMP.',
 			loadComponent: () =>
-				import('./pages/downloads-page/downloads-page.component').then(
+				import('./features/downloads/downloads-page/downloads-page.component').then(
 					(m) => m.DownloadsPageComponent
 				)
 		}
