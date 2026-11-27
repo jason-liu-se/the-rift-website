@@ -1,4 +1,5 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { Clipboard } from '@angular/cdk/clipboard';
 import { Injectable, inject } from '@angular/core';
 import {
 	EMPTY,
@@ -69,8 +70,17 @@ export class EditorListActions implements BulkActionHost {
 	private writer = inject(EditorWriter);
 	private notifier = inject(AdminNotifier);
 	private announcer = inject(LiveAnnouncer);
+	private clipboard = inject(Clipboard);
 
 	public readonly type = this.store.type;
+
+	public copyImageUrl(url: string): void {
+		if (this.clipboard.copy(url)) {
+			this.notifier.notifySuccess('Image link copied');
+		} else {
+			this.notifier.notifyFailure("Couldn't copy the image link");
+		}
+	}
 
 	/** Saves a copy of the item as a new draft, then opens it. */
 	public duplicate(item: { id: string }): void {
