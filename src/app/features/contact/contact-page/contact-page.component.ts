@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { BackgroundImageCardComponent } from '../../shared/ui/background-image-card/background-image-card.component';
-import { ContactComponent } from '../../shared/ui/contact/contact.component';
+import { BackgroundImageCardComponent } from '../../../shared/ui/background-image-card/background-image-card.component';
+import { ContactComponent } from '../../../shared/ui/contact/contact.component';
 
 @Component({
 	selector: 'app-contact-page',
