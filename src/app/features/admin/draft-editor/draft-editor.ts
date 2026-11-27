@@ -39,10 +39,7 @@ import { EDITOR_TYPES } from '../editor-type-configs';
 import { itemName } from '../editor-list/item-name';
 import { ModalShell } from '../modal-shell/modal-shell';
 import { DraftFooter } from '../draft-footer/draft-footer';
-import {
-	DraftHistory,
-	handleHistoryShortcut
-} from '../draft-history/draft-history';
+import { DraftHistory } from '../draft-history/draft-history';
 import { DraftConflict } from './draft-conflict/draft-conflict';
 import {
 	PublishSettings,
@@ -83,10 +80,7 @@ export interface PublishedItemActions {
 		NgComponentOutlet,
 		DraftFooter,
 		DraftHistory
-	],
-	host: {
-		'(keydown)': 'handleShortcuts($event)'
-	}
+	]
 })
 export class DraftEditor<T extends EditorContentType> {
 	private notifier = inject(AdminNotifier);
@@ -163,10 +157,6 @@ export class DraftEditor<T extends EditorContentType> {
 		}
 		this.session().close();
 		this.closed.emit();
-	}
-
-	protected handleShortcuts(event: KeyboardEvent): void {
-		handleHistoryShortcut(event, this.session());
 	}
 
 	/** Material leaves `aria-invalid` off empty required inputs: find the field. */

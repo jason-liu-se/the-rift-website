@@ -25,10 +25,7 @@ import { CollectionSession } from '../collections-modal/collections-editor';
 import { DimensionsEditor } from '../dimensions-editor/dimensions-editor';
 import { DraftConflict } from '../draft-editor/draft-conflict/draft-conflict';
 import { DraftFooter } from '../draft-footer/draft-footer';
-import {
-	DraftHistory,
-	handleHistoryShortcut
-} from '../draft-history/draft-history';
+import { DraftHistory } from '../draft-history/draft-history';
 import { ModalFooter } from '../modal-shell/modal-footer-slot';
 import { findSlugProblem, toSlug } from './collection-slug';
 
@@ -53,8 +50,7 @@ import { findSlugProblem, toSlug } from './collection-slug';
 		MatInput,
 		MatLabel,
 		ModalFooter
-	],
-	host: { '(keydown)': 'handleShortcuts($event)' }
+	]
 })
 export class CollectionForm {
 	public readonly type = input.required<CollectionContentType>();
@@ -125,10 +121,6 @@ export class CollectionForm {
 
 	protected setDimensions(dimensions: Dimension[]): void {
 		this.session().update({ dimensions });
-	}
-
-	protected handleShortcuts(event: KeyboardEvent): void {
-		handleHistoryShortcut(event, this.session());
 	}
 
 	private findPublishProblem(): string | undefined {
