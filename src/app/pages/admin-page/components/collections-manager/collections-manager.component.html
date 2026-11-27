@@ -1,76 +1,11 @@
-<section class="existing" aria-labelledby="existing-heading">
-	<div class="list-heading">
-		<h3 id="existing-heading" class="subheading">
-			{{ cards().length }}
-			{{ cards().length === 1 ? "collection" : "collections" }}
-		</h3>
-		@if (canStartNew()) {
-			<button mat-button type="button" (click)="startNew()">
-				<mat-icon>add</mat-icon>
-				New collection
-			</button>
-		}
-	</div>
-	<ul class="collection-list">
-		@for (card of cards(); track card.target) {
-			<li
-				[class.hidden-collection]="!card.isVisible"
-				[class.editing]="card.isOpen"
-			>
-				<span class="name">
-					<!-- Opens on a click anywhere on the card. -->
-					<button
-						type="button"
-						class="open"
-						[attr.aria-current]="card.isOpen || null"
-						(click)="open(card)"
-					>
-						{{ card.title }}
-					</button>
-					<span class="details">
-						{{ card.details }}
-						@if (!card.isVisible) {
-							· Hidden
-						}
-						@if (card.status; as status) {
-							<span class="unpublished">
-								<span class="dot" aria-hidden="true"></span>
-								{{ status }}
-							</span>
-						}
-					</span>
-				</span>
-				<button
-					mat-icon-button
-					type="button"
-					[matTooltip]="
-						card.isVisible ? 'Hide from site' : 'Show on site'
-					"
-					[attr.aria-label]="
-						(card.isVisible ? 'Hide ' : 'Show ') + card.title
-					"
-					(click)="editor.toggleVisibility(card.target)"
-				>
-					<mat-icon>{{
-						card.isVisible ? "visibility" : "visibility_off"
-					}}</mat-icon>
-				</button>
-				<button
-					mat-icon-button
-					type="button"
-					class="danger"
-					matTooltip="Delete"
-					[attr.aria-label]="'Delete ' + card.title"
-					(click)="delete(card)"
-				>
-					<mat-icon>delete</mat-icon>
-				</button>
-			</li>
-		} @empty {
-			<li class="empty">No collections yet. Create the first one.</li>
-		}
-	</ul>
-</section>
+<app-collection-list
+	[cards]="cards()"
+	[canStartNew]="canStartNew()"
+	(opened)="open($event)"
+	(visibilityToggled)="editor.toggleVisibility($event.target)"
+	(deleted)="delete($event)"
+	(newStarted)="startNew()"
+/>
 @if (session(); as session) {
 	<app-collection-form
 		class="form"

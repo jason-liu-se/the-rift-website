@@ -1,0 +1,43 @@
+@let card = this.card();
+<span class="name">
+	<!-- Opens on a click anywhere on the card. -->
+	<button
+		type="button"
+		class="open"
+		[attr.aria-current]="card.isOpen || null"
+		(click)="opened.emit()"
+	>
+		{{ card.title }}
+	</button>
+	<span class="details">
+		{{ card.details }}
+		@if (!card.isVisible) {
+			· Hidden
+		}
+		@if (card.status; as status) {
+			<span class="unpublished">
+				<span class="dot" aria-hidden="true"></span>
+				{{ status }}
+			</span>
+		}
+	</span>
+</span>
+<button
+	mat-icon-button
+	type="button"
+	[matTooltip]="card.isVisible ? 'Hide from site' : 'Show on site'"
+	[attr.aria-label]="(card.isVisible ? 'Hide ' : 'Show ') + card.title"
+	(click)="visibilityToggled.emit()"
+>
+	<mat-icon>{{ card.isVisible ? "visibility" : "visibility_off" }}</mat-icon>
+</button>
+<button
+	mat-icon-button
+	type="button"
+	class="danger"
+	matTooltip="Delete"
+	[attr.aria-label]="'Delete ' + card.title"
+	(click)="deleted.emit()"
+>
+	<mat-icon>delete</mat-icon>
+</button>

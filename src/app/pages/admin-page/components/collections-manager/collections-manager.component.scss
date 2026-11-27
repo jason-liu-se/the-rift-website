@@ -1,137 +1,8 @@
-@use "../../../../../theme-colours" as *;
-@use "../../../../../font-sizes" as *;
-
 :host {
 	display: grid;
 	// minmax(0, …): wide content (dimension cards) can't widen the modal.
 	grid-template-columns: minmax(0, 1fr);
 	gap: 32px;
-}
-
-.list-heading {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 8px;
-	min-height: 40px;
-	margin-bottom: 8px;
-}
-
-.subheading {
-	margin: 0;
-	font-size: $font-size-small;
-	font-weight: 600;
-	letter-spacing: 0.05em;
-	text-transform: uppercase;
-}
-
-// Each collection a card of its own.
-.collection-list {
-	display: grid;
-	gap: 8px;
-	margin: 0;
-	padding: 0;
-	list-style: none;
-
-	li:not(.empty) {
-		position: relative;
-		display: flex;
-		align-items: center;
-		gap: 4px;
-		padding: 8px 6px 8px 16px;
-		border: 1px solid rgba($colour-dark-text, 0.18);
-		border-radius: 8px;
-		background-color: rgba($colour-light-grey, 0.25);
-
-		&:hover {
-			background-color: rgba($colour-light-grey, 0.5);
-		}
-	}
-
-	li.editing {
-		border-color: $colour-primary;
-		box-shadow: 0 0 0 1px $colour-primary;
-	}
-
-	li.hidden-collection {
-		border-style: dashed;
-		background-color: transparent;
-	}
-
-	// The card's actions sit above its open button's click area.
-	[mat-icon-button] {
-		position: relative;
-	}
-}
-
-.empty {
-	padding: 24px 16px;
-}
-
-.name {
-	display: grid;
-	flex: 1;
-	min-width: 0;
-}
-
-.open {
-	padding: 0;
-	border: none;
-	background: none;
-	color: inherit;
-	font: inherit;
-	font-weight: 600;
-	text-align: left;
-	cursor: pointer;
-
-	// Stretched over the whole card, so a click anywhere opens it.
-	&::after {
-		content: "";
-		position: absolute;
-		inset: 0;
-		border-radius: 8px;
-	}
-
-	&:focus-visible {
-		outline: none;
-
-		&::after {
-			outline: 2px solid $colour-primary;
-			outline-offset: 2px;
-		}
-	}
-}
-
-// Wraps the status under the details, unindented, when they don't fit.
-.details {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	column-gap: 12px;
-	font-size: $font-size-x-small;
-	overflow-wrap: anywhere;
-}
-
-.unpublished {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	// The site sets every element's size; this one matches its line.
-	font-size: inherit;
-	color: $colour-warning;
-	font-weight: 600;
-	white-space: nowrap;
-}
-
-.dot {
-	width: 8px;
-	height: 8px;
-	border-radius: 50%;
-	background-color: currentColor;
-}
-
-.danger {
-	color: $colour-error;
 }
 
 // The list beside the form (which may hold dimension cards), each scrolling
@@ -142,28 +13,14 @@
 		height: 100%;
 	}
 
-	.existing {
-		display: flex;
-		flex-direction: column;
-		min-height: 0;
-	}
-
-	// Padding inside each scroll area keeps focus rings and the open card's
-	// outline from being clipped; the negative margin keeps them aligned.
-	.collection-list,
+	// Padding inside the scroll area keeps focus rings from being clipped;
+	// the negative margin keeps it aligned.
 	app-collection-form {
+		display: block;
 		min-height: 0;
 		margin: -4px;
 		padding: 4px;
 		overflow-y: auto;
 		overscroll-behavior: contain;
-	}
-
-	.collection-list {
-		align-content: start;
-	}
-
-	app-collection-form {
-		display: block;
 	}
 }
