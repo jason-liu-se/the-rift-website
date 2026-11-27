@@ -6,7 +6,7 @@
 	novalidate
 	class="form"
 	[attr.aria-labelledby]="'collection-form-heading'"
-	(submit)="$event.preventDefault(); publish()"
+	(submit)="$event.preventDefault(); publisher.publish()"
 >
 	<div class="heading-row">
 		<h3 id="collection-form-heading" class="subheading" tabindex="-1">
@@ -19,9 +19,9 @@
 		[session]="session()"
 		[noun]="noun"
 		[fieldLabels]="fieldLabels"
-		(overwrite)="overwrite()"
-		(publishAsNew)="publishAsNew()"
-		(discard)="discard()"
+		(overwrite)="publisher.overwrite()"
+		(publishAsNew)="publisher.publishAsNew()"
+		(discard)="publisher.discard()"
 	/>
 	<mat-form-field subscriptSizing="dynamic">
 		<mat-label>Title</mat-label>
@@ -84,9 +84,9 @@
 		[session]="session()"
 		[isEdit]="isEdit()"
 		[noun]="noun.one"
-		[problem]="publishProblem()"
-		[isPublishing]="isPublishing()"
-		(publish)="publish()"
+		[problem]="publisher.problem()"
+		[isPublishing]="publisher.isPublishing()"
+		(publish)="publisher.publish()"
 		(discarded)="discarded.emit()"
 	/>
 </ng-template>
