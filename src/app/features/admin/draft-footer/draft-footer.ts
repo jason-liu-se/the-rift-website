@@ -8,6 +8,7 @@ import { DraftFields } from '../drafts/draft-fields';
 import { DraftSession, SaveStage } from '../drafts/draft-session';
 import { EditorWriter } from '../editor-writer';
 import { VisibilityToggle } from '../visibility-toggle/visibility-toggle';
+import { UNPUBLISHED_CHANGES } from '../status-badge/status-badge';
 
 /** The publish button's labels (see `publishLabel`), widest included. */
 const PUBLISH_LABELS = [
@@ -56,6 +57,7 @@ export class DraftFooter {
 	/** The draft was discarded, once confirmed. */
 	public readonly discarded = output<void>();
 
+	protected readonly unpublishedChanges = UNPUBLISHED_CHANGES;
 	protected readonly status = computed(() => this.session().status());
 	protected readonly statusText = computed(() => {
 		const status = this.status();

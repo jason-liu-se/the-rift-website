@@ -16,13 +16,6 @@ export const COLLECTION_NOUN: ItemNoun = {
 	many: 'collections'
 };
 
-/** A collection's fields, as a conflict lists their version beside mine. */
-export const COLLECTION_FIELD_LABELS = {
-	title: 'Title',
-	slug: 'Slug',
-	dimensions: 'Dimensions'
-};
-
 export const COLLECTION_TYPES: Record<
 	CollectionContentType,
 	CollectionTypeConfig

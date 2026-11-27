@@ -4,7 +4,7 @@ import { EditorRef } from 'src/app/core/api/api-responses';
 import { SummaryOf } from 'src/app/features/admin/editor-content/editor-content-types';
 import { ItemStatus, StatusBadge } from '../status-badge/status-badge';
 import { UpdatedCell } from './cells/updated-cell/updated-cell';
-import { SortColumn, SortDirection } from './list-sort';
+import { ListSort, SortColumn, SortDirection } from './list-sort';
 
 /** What a row's cells show, a published item and a draft alike. */
 export interface RowData<T extends EditorContentType = EditorContentType> {
@@ -80,4 +80,12 @@ export function toSortColumn({
 /** The columns a list can be sorted by, in table order. */
 export function toSortColumns(columns: readonly ListColumn[]): SortColumn[] {
 	return columns.flatMap((column) => toSortColumn(column) ?? []);
+}
+
+/** Sorting by a column, in the order it sorts in first unless given. */
+export function columnSort(
+	{ sort }: ListColumn,
+	order: SortDirection = sort!.firstOrder
+): ListSort {
+	return { sort: sort!.by, order };
 }

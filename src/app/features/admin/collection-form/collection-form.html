@@ -24,11 +24,11 @@
 		(discard)="publisher.discard()"
 	/>
 	<mat-form-field subscriptSizing="dynamic">
-		<mat-label>Title</mat-label>
+		<mat-label>{{ spec.title.label }}</mat-label>
 		<input
 			matInput
 			name="title"
-			required
+			[required]="!!spec.title.required"
 			[maxlength]="maxTitleLength"
 			[ngModel]="fields().title ?? ''"
 			(ngModelChange)="setTitle($event)"
@@ -40,11 +40,11 @@
 	</p>
 	} @else {
 	<mat-form-field subscriptSizing="dynamic">
-		<mat-label>Slug</mat-label>
+		<mat-label>{{ spec.slug.label }}</mat-label>
 		<input
 			matInput
 			name="slug"
-			required
+			[required]="!!spec.slug.required"
 			autocapitalize="off"
 			spellcheck="false"
 			[maxlength]="maxSlugLength"
