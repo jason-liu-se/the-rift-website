@@ -92,7 +92,8 @@ The decisions are in issue #101; the API's side is in the web-server's
   undo/redo (`FieldHistory`), the save stage (`SaveState`, one union), conflicts
   (`409`/`404`), and publishing, which always makes sure the server has the
   draft first. `DraftSessions` starts sessions.
-- **Bulk actions** go through `BulkActionRunner`: at most `MAX_BULK_ITEMS` a
+- **Bulk actions** (and bulk gallery creation, which `GalleryBulkPublisher`
+  uploads first) go through `BulkActionRunner`: at most `MAX_BULK_ITEMS` a
   request, one after another, answering every item's result once all are done.
   Updates send only the items they'd change and offer Undo, which `bulk-undo.ts`
   turns into the fewest updates that put items back.
