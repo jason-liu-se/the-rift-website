@@ -65,7 +65,6 @@ export class GalleryShowcasePage {
 
 	/** Counts requests, so only the latest one updates the page. */
 	private latestRequest = 0;
-	private imageCache: Record<string, GalleryImage[]> = {};
 
 	constructor() {
 		const { params, data } = this.route.snapshot;
@@ -110,7 +109,6 @@ export class GalleryShowcasePage {
 	/** Shows the first page of the photos with every one of `tags`. */
 	private showTags(tags: readonly string[]): void {
 		this.selectedTags.set(tags);
-		this.imageCache = {};
 		this.pageIndex = 0;
 		this.captionedImages = [];
 		this.populateCaptionedImages();
@@ -122,17 +120,8 @@ export class GalleryShowcasePage {
 		this.pageSize = e.pageSize;
 		this.pageIndex = e.pageIndex;
 
-		// updating the displayed images
 		this.captionedImages = [];
-		// Any response still on its way is for a page the user has left.
-		this.latestRequest++;
-
-		// grabbing images from cache, if they have been cached
-		if (this.imageCache[`${this.pageIndex}`]) {
-			this.captionedImages = this.imageCache[`${this.pageIndex}`];
-		} else {
-			this.populateCaptionedImages();
-		}
+		this.populateCaptionedImages();
 
 		window.scrollTo(0, 0);
 	}
@@ -141,8 +130,8 @@ export class GalleryShowcasePage {
 	public populateCaptionedImages(): void {
 		const requestedPageIndex = this.pageIndex;
 		const requestedTags = this.selectedTags();
-		// The user may change page (and come back) before this response
-		// arrives, so compare requests, not page indexes.
+		// The user may change page or filter (and come back) before this
+		// response arrives, so compare requests, not page indexes.
 		const request = ++this.latestRequest;
 		const isLatestRequest = () => request === this.latestRequest;
 
@@ -156,14 +145,9 @@ export class GalleryShowcasePage {
 			)
 			.subscribe({
 				next: ({ items, total }) => {
-					// The cache holds pages of the current filter only.
-					if (requestedTags !== this.selectedTags()) {
-						return;
-					}
-					this.imageCache[`${requestedPageIndex}`] = items;
-					this.paginationLength = total;
 					if (isLatestRequest()) {
 						this.captionedImages = items;
+						this.paginationLength = total;
 						this.loadState.succeed();
 					}
 				},

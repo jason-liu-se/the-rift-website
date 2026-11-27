@@ -177,34 +177,21 @@ describe('GalleryShowcasePage', () => {
 			expect(window.scrollTo).toHaveBeenCalledWith(0, 0);
 		});
 
-		it('shows a visited page again from cache without a new request', () => {
-			vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined);
-			clickPaginator('Next page');
-			httpTesting
-				.expectOne(pageUrl('season5', PAGE_SIZE))
-				.flush({ items: SECOND_PAGE, total: TOTAL });
-			fixture.detectChanges();
-
-			clickPaginator('Previous page');
-
-			// afterEach's verify() fails if this made another request.
-			expect(captions()).toEqual(['One', 'Two']);
-		});
-
 		it('ignores a late response for a page the user has already left', () => {
 			vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined);
 			clickPaginator('Next page');
 			clickPaginator('Previous page');
+			const firstPage = httpTesting.expectOne(pageUrl('season5', 0));
 
 			httpTesting
 				.expectOne(pageUrl('season5', PAGE_SIZE))
 				.flush({ items: SECOND_PAGE, total: TOTAL });
 			fixture.detectChanges();
-			expect(captions()).toEqual(['One', 'Two']);
+			expect(captions()).toEqual([]);
 
-			// the late response is still cached for when the user returns
-			clickPaginator('Next page');
-			expect(captions()).toEqual(['Three']);
+			firstPage.flush({ items: FIRST_PAGE, total: TOTAL });
+			fixture.detectChanges();
+			expect(captions()).toEqual(['One', 'Two']);
 		});
 
 		it('shows only the latest request after leaving a page and coming back', () => {
@@ -212,6 +199,7 @@ describe('GalleryShowcasePage', () => {
 			clickPaginator('Next page');
 			clickPaginator('Previous page');
 			clickPaginator('Next page');
+			httpTesting.expectOne(pageUrl('season5', 0));
 			const [stale, latest] = httpTesting.match(
 				pageUrl('season5', PAGE_SIZE)
 			);
