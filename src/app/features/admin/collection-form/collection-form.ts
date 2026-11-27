@@ -14,13 +14,13 @@ import {
 	MAX_COLLECTION_TITLE_LENGTH
 } from 'src/app/core/config/content-limits';
 import { Dimension, EditorCollection } from 'src/app/core/api/api-responses';
-import { CollectionContentType } from 'src/app/features/admin/editor-content/editor-content-types';
-import { DraftPublisher } from '../drafts/draft-publisher';
 import {
-	COLLECTION_FIELD_LABELS,
-	COLLECTION_NOUN,
-	COLLECTION_TYPES
-} from '../collection-type-configs';
+	CollectionContentType,
+	DRAFT_FIELDS,
+	fieldLabelsOf
+} from 'src/app/features/admin/editor-content/editor-content-types';
+import { DraftPublisher } from '../drafts/draft-publisher';
+import { COLLECTION_NOUN, COLLECTION_TYPES } from '../collection-type-configs';
 import { CollectionSession } from '../collections-modal/collections-editor';
 import { DimensionsEditor } from '../dimensions-editor/dimensions-editor';
 import { DraftConflict } from '../draft-editor/draft-conflict/draft-conflict';
@@ -63,7 +63,8 @@ export class CollectionForm {
 	public readonly discarded = output<void>();
 
 	protected readonly noun = COLLECTION_NOUN;
-	protected readonly fieldLabels = COLLECTION_FIELD_LABELS;
+	protected readonly spec = DRAFT_FIELDS['gallery-collections'];
+	protected readonly fieldLabels = fieldLabelsOf('gallery-collections');
 	protected readonly maxSlugLength = MAX_COLLECTION_SLUG_LENGTH;
 	protected readonly maxTitleLength = MAX_COLLECTION_TITLE_LENGTH;
 	/** Problems show once publishing was tried. */

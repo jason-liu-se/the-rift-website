@@ -9,6 +9,7 @@ import {
 	MAX_URL_LENGTH
 } from 'src/app/core/config/content-limits';
 import { CollectionSelect } from '../../collection-select/collection-select';
+import { DRAFT_FIELDS } from '../../editor-content/editor-content-types';
 import { DraftSession } from '../../drafts/draft-session';
 import { isNearLimit } from '../../near-limit';
 import { ImageField } from '../../image-field/image-field';
@@ -35,6 +36,7 @@ import { ImageField } from '../../image-field/image-field';
 export class DownloadsForm {
 	public readonly session = input.required<DraftSession<'downloads'>>();
 
+	protected readonly spec = DRAFT_FIELDS.downloads;
 	protected readonly maxTitleLength = MAX_DOWNLOAD_TITLE_LENGTH;
 	protected readonly maxDescLength = MAX_DOWNLOAD_DESCRIPTION_LENGTH;
 	protected readonly maxUrlLength = MAX_URL_LENGTH;

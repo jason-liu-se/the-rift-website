@@ -3,7 +3,7 @@ import {
 	DRAFT_OPTION_KEYS,
 	DraftOptionsOf,
 	DraftOwnFieldsOf,
-	FIELD_KEYS
+	fieldKeysOf
 } from 'src/app/features/admin/editor-content/editor-content-types';
 
 /**
@@ -30,7 +30,7 @@ export function pickDraftFields<T extends DraftType>(
 	type: T,
 	fields: object
 ): DraftFields<T> {
-	return pickKeys(fields, [...FIELD_KEYS[type], ...DRAFT_OPTION_KEYS[type]]);
+	return pickKeys(fields, [...fieldKeysOf(type), ...DRAFT_OPTION_KEYS[type]]);
 }
 
 /**
@@ -41,7 +41,7 @@ export function pickItemFields<T extends DraftType>(
 	type: T,
 	item: object
 ): DraftFields<T> {
-	return pickKeys(item, [...FIELD_KEYS[type], 'visible']);
+	return pickKeys(item, [...fieldKeysOf(type), 'visible']);
 }
 
 function pickKeys<T extends DraftType>(

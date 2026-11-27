@@ -1,21 +1,23 @@
 <app-collection-select
+	[label]="spec.collection.label"
 	type="gallery"
-	required
+	[required]="!!spec.collection.required"
 	[slug]="fields().collection"
 	(slugChange)="setCollection($event ?? '')"
 />
 <app-image-field
-	required
+	[label]="spec.imageUrl.label"
+	[required]="!!spec.imageUrl.required"
 	[album]="album()"
 	noAlbumHint="Choose a collection to upload images."
 	[url]="fields().imageUrl ?? ''"
 	(urlChange)="setImageUrl($event)"
 />
 <mat-form-field subscriptSizing="dynamic">
-	<mat-label>Caption</mat-label>
+	<mat-label>{{ spec.caption.label }}</mat-label>
 	<textarea
 		matInput
-		required
+		[required]="!!spec.caption.required"
 		rows="1"
 		cdkTextareaAutosize
 		cdkAutosizeMinRows="1"
