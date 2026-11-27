@@ -180,7 +180,7 @@ test.describe('news editor', () => {
 		expect(saves).toEqual([]);
 	});
 
-	test("undoes a text field's edit with Ctrl+Z, in step with the Undo button", async ({
+	test('undoes and redoes with the shortcuts, in step with the buttons', async ({
 		page
 	}) => {
 		await acceptDraftSaves(page);
@@ -198,7 +198,16 @@ test.describe('news editor', () => {
 
 		await expect(title).toHaveValue(EDITOR_NEWS_POSTS[1].title);
 		await expect(undo).toBeDisabled();
-		await expect(page.getByRole('button', { name: 'Redo' })).toBeEnabled();
+		const redo = page.getByRole('button', { name: 'Redo' });
+		await expect(redo).toBeEnabled();
+
+		// The button and the shortcut take turns on one history, even once
+		// a disabled button drops focus to the page.
+		await redo.click();
+		await expect(title).toHaveValue('Retitled');
+		await page.keyboard.press('ControlOrMeta+z');
+		await expect(title).toHaveValue(EDITOR_NEWS_POSTS[1].title);
+		await expect(redo).toBeEnabled();
 	});
 });
 

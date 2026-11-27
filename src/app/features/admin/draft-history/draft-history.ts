@@ -26,9 +26,8 @@ export class DraftHistory {
 	 * the draft as a new edit, a second history the buttons don't follow.
 	 */
 	protected handleShortcut(event: KeyboardEvent): void {
-		const modal = this.host.nativeElement.closest('[role="dialog"]');
 		const isShortcut = (event.ctrlKey || event.metaKey) && !event.altKey;
-		if (!isShortcut || !modal?.contains(event.target as Node)) {
+		if (!isShortcut || !this.isForThisModal(event.target as Element)) {
 			return;
 		}
 		const key = event.key.toLowerCase();
@@ -44,5 +43,23 @@ export class DraftHistory {
 				session.redo();
 			}
 		}
+	}
+
+	/**
+	 * From inside this modal, or from the page's body while it's the top
+	 * dialog: focus falls there when a focused Undo or Redo is disabled.
+	 */
+	private isForThisModal(target: Element): boolean {
+		const modal = this.host.nativeElement.closest('[role="dialog"]');
+		if (!modal) {
+			return false;
+		}
+		if (target !== target.ownerDocument.body) {
+			return modal.contains(target);
+		}
+		const dialogs = target.ownerDocument.querySelectorAll(
+			'.cdk-overlay-container [role="dialog"]'
+		);
+		return dialogs[dialogs.length - 1] === modal;
 	}
 }

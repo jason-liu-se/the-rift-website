@@ -40,7 +40,10 @@ describe('DraftHistory shortcuts', () => {
 		modal.append(fixture.nativeElement, field);
 		otherDialog = document.createElement('div');
 		otherDialog.setAttribute('role', 'dialog');
-		document.body.replaceChildren(modal, otherDialog);
+		const overlays = document.createElement('div');
+		overlays.className = 'cdk-overlay-container';
+		overlays.append(modal, otherDialog);
+		document.body.replaceChildren(overlays);
 	});
 
 	it.each([
@@ -76,5 +79,14 @@ describe('DraftHistory shortcuts', () => {
 
 		expect(session.undo).not.toHaveBeenCalled();
 		expect(event.defaultPrevented).toBe(false);
+	});
+
+	it("takes keys from the page's body only while its modal is on top", () => {
+		press(document.body, { key: 'z', ctrlKey: true });
+		expect(session.undo).not.toHaveBeenCalled();
+
+		otherDialog.remove();
+		press(document.body, { key: 'z', ctrlKey: true });
+		expect(session.undo).toHaveBeenCalledTimes(1);
 	});
 });
