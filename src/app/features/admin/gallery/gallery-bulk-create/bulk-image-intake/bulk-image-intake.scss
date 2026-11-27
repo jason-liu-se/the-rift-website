@@ -1,0 +1,65 @@
+@use "../../../../../../theme-colours" as *;
+@use "../../../../../../font-sizes" as *;
+
+:host {
+	display: block;
+}
+
+.drop-zone {
+	display: grid;
+	justify-items: center;
+	gap: 8px;
+	padding: 24px 16px;
+	border: 2px dashed $colour-light-grey;
+	border-radius: 12px;
+	text-align: center;
+
+	&.dragging {
+		border-color: $colour-primary;
+		background-color: rgba($colour-primary, 0.05);
+	}
+}
+
+.drop-icon {
+	width: 40px;
+	height: 40px;
+	font-size: 40px;
+}
+
+.drop-text {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 8px 12px;
+	margin: 0;
+}
+
+.note {
+	margin: 0;
+	font-size: $font-size-small;
+}
+
+.links {
+	justify-self: stretch;
+	text-align: left;
+
+	summary {
+		width: fit-content;
+		margin: 0 auto;
+		padding: 8px;
+		cursor: pointer;
+		font-size: $font-size-small;
+	}
+}
+
+.links-form {
+	display: grid;
+	justify-items: start;
+	gap: 8px;
+	margin-top: 8px;
+
+	mat-form-field {
+		width: 100%;
+	}
+}
