@@ -2,10 +2,8 @@
 	<div class="body">
 		<div
 			class="drop-zone"
-			[class.dragging]="isDragging()"
-			(dragover)="allowDrop($event)"
-			(dragleave)="isDragging.set(false)"
-			(drop)="addDropped($event)"
+			[appFileDrop]="canUpload()"
+			(filesDropped)="addFiles($event)"
 		>
 			<mat-icon class="drop-icon" aria-hidden="true"
 				>add_photo_alternate</mat-icon
@@ -67,22 +65,11 @@
 		@if (rows().length > 1) {
 		<fieldset class="apply-all">
 			<legend>Apply to all</legend>
-			<mat-form-field subscriptSizing="dynamic">
-				<mat-label>Collection</mat-label>
-				<mat-select
-					[ngModel]="allCollection()"
-					(ngModelChange)="
-							allCollection.set($event); setAll('collection')
-						"
-				>
-					@for ( collection of collections(); track collection.slug )
-					{
-					<mat-option [value]="collection.slug"
-						>{{ collection.title }}</mat-option
-					>
-					}
-				</mat-select>
-			</mat-form-field>
+			<app-collection-select
+				type="gallery"
+				[slug]="allCollection()"
+				(slugChange)="allCollection.set($event ?? ''); setAll('collection')"
+			/>
 			<div class="apply-tags">
 				<app-tag-input
 					label="Tags"
@@ -138,25 +125,13 @@
 								"
 						/>
 					</mat-form-field>
-					<mat-form-field subscriptSizing="dynamic">
-						<mat-label
-							>Collection for image {{ index + 1 }}</mat-label
-						>
-						<mat-select
-							required
-							[ngModel]="row.collection"
-							(ngModelChange)="
-									updateRow(row.id, { collection: $event })
-								"
-						>
-							@for ( collection of collections(); track
-							collection.slug ) {
-							<mat-option [value]="collection.slug"
-								>{{ collection.title }}</mat-option
-							>
-							}
-						</mat-select>
-					</mat-form-field>
+					<app-collection-select
+						type="gallery"
+						required
+						[label]="'Collection for image ' + (index + 1)"
+						[slug]="row.collection"
+						(slugChange)="updateRow(row.id, { collection: $event ?? '' })"
+					/>
 					<app-tag-input
 						[label]="'Tags for image ' + (index + 1)"
 						[tags]="row.tags"

@@ -64,12 +64,13 @@ describe('GalleryBulkCreate', () => {
 			]
 		});
 		httpTesting = TestBed.inject(HttpTestingController);
-		fixture = TestBed.createComponent(GalleryBulkCreate);
-		element = fixture.nativeElement;
-		fixture.detectChanges();
+		// Loaded already, as by the list page behind the modal.
+		TestBed.inject(CollectionsStore).collections('gallery');
 		httpTesting
 			.expectOne(`${EDITOR_URL}/gallery/collections`)
 			.flush(EDITOR_GALLERY_COLLECTIONS);
+		fixture = TestBed.createComponent(GalleryBulkCreate);
+		element = fixture.nativeElement;
 		fixture.detectChanges();
 	});
 
