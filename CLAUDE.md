@@ -40,8 +40,8 @@ frontmatter so it loads only when matching files are read or edited.
   `PageTemplate`). Pages read their own values from route data or parameters, so
   a variant of a page is usually just a new route, or none (new gallery
   collections come from the API through `gallery/:collection`). Every route also
-  needs a `title`, a `data.description`, and a render mode in
-  `src/app/app.routes.server.ts`.
+  needs a `title`, a `data.description`, and a `data.renderMode`
+  (`.claude/docs/rendering.md`).
 - **External services.** The Rift API and BlueMap run separately. Import
   `environment` from `src/environments/` (generated from `.env`); never
   hard-code URLs.

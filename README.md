@@ -94,7 +94,7 @@ src/
 │   │   └── admin/    Admin tools; may import public features to preview them
 │   ├── testing/      Unit test helpers and API fixtures
 │   ├── app.routes.ts          Routes
-│   └── app.routes.server.ts   How each route is rendered
+│   └── app.routes.server.ts   Server routes, from each route's render mode
 ├── environments/     Generated from .env; don't edit
 └── server.ts         Server request handler
 e2e/                  Playwright tests
