@@ -188,7 +188,7 @@ export const routes: Routes = [
 		data: {
 			noindex: true,
 			loadComponent: () =>
-				import('./pages/error-page/error-page.component').then(
+				import('./features/error/error-page/error-page.component').then(
 					(m) => m.ErrorPageComponent
 				),
 			isTransparent: false
