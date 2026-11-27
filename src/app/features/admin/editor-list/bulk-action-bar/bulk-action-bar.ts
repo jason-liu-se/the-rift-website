@@ -52,7 +52,7 @@ export class BulkActionBar {
 	);
 	protected readonly allMatchingLabel = computed(
 		() =>
-			`Select all ${countItems(this.store.total(), this.store.config().noun)} matching`
+			`Select all ${countItems(this.store.total(), this.store.config().noun)}`
 	);
 
 	protected clearSelection(): void {
