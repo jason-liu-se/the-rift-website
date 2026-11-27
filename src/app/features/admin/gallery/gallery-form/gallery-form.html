@@ -1,0 +1,46 @@
+<mat-form-field subscriptSizing="dynamic">
+	<mat-label>Collection</mat-label>
+	<mat-select
+		required
+		[ngModel]="fields().collection"
+		(ngModelChange)="setCollection($event)"
+	>
+		@for (collection of collections(); track collection.slug) {
+		<mat-option [value]="collection.slug"
+			>{{ collection.title }}</mat-option
+		>
+		}
+	</mat-select>
+</mat-form-field>
+<app-image-field
+	required
+	[album]="album()"
+	noAlbumHint="Choose a collection to upload images."
+	[url]="fields().imageUrl ?? ''"
+	(urlChange)="setImageUrl($event)"
+/>
+<mat-form-field subscriptSizing="dynamic">
+	<mat-label>Caption</mat-label>
+	<textarea
+		matInput
+		required
+		rows="1"
+		cdkTextareaAutosize
+		cdkAutosizeMinRows="1"
+		cdkAutosizeMaxRows="6"
+		[maxlength]="maxCaptionLength"
+		[ngModel]="fields().caption ?? ''"
+		(ngModelChange)="setCaption($event)"
+	></textarea>
+	@if (isNearLimit(fields().caption, maxCaptionLength)) {
+	<mat-hint align="end"
+		>{{ (fields().caption ?? "").length }} / {{ maxCaptionLength
+		}}</mat-hint
+	>
+	}
+</mat-form-field>
+<app-tag-input
+	[tags]="fields().tags ?? []"
+	[suggestions]="tagSuggestions()"
+	(tagsChange)="setTags($event)"
+/>

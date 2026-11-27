@@ -30,8 +30,8 @@ body {
 }
 
 // Keeps focused or linked-to content clear of the fixed navbar and the status
-// banner above it (heights published by NavbarComponent and
-// StatusBannerComponent).
+// banner above it (heights published by Navbar and
+// StatusBanner).
 html {
 	scroll-padding-top: calc(
 		var(--status-banner-height, 0px) + var(--navbar-height, 0px)

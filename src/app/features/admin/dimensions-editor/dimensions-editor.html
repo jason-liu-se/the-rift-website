@@ -1,0 +1,133 @@
+<ol
+	class="dimensions"
+	cdkDropList
+	(cdkDropListDropped)="
+		moveDimension($event.previousIndex, $event.currentIndex)
+	"
+>
+	@for ( dimension of dimensions(); track $index; let index = $index; let
+	isFirst = $first; let isLast = $last ) {
+	<li class="dimension" cdkDrag cdkDragLockAxis="y">
+		<fieldset>
+			<legend class="cdk-visually-hidden">{{ nameOf(index) }}</legend>
+			<div class="card-header">
+				<span
+					class="drag-handle"
+					cdkDragHandle
+					matTooltip="Drag to reorder"
+					aria-hidden="true"
+				>
+					<mat-icon>drag_indicator</mat-icon>
+				</span>
+				<span class="title" aria-hidden="true"
+					>{{ nameOf(index) }}</span
+				>
+				<button
+					mat-icon-button
+					type="button"
+					class="move-up"
+					matTooltip="Move up"
+					[attr.aria-label]="'Move up ' + nameOf(index)"
+					[disabled]="isFirst"
+					(click)="moveDimension(index, index - 1)"
+				>
+					<mat-icon>arrow_upward</mat-icon>
+				</button>
+				<button
+					mat-icon-button
+					type="button"
+					class="move-down"
+					matTooltip="Move down"
+					[attr.aria-label]="'Move down ' + nameOf(index)"
+					[disabled]="isLast"
+					(click)="moveDimension(index, index + 1)"
+				>
+					<mat-icon>arrow_downward</mat-icon>
+				</button>
+				<button
+					mat-icon-button
+					type="button"
+					class="danger"
+					matTooltip="Remove"
+					[attr.aria-label]="'Remove ' + nameOf(index)"
+					(click)="removeDimension(index)"
+				>
+					<mat-icon>delete</mat-icon>
+				</button>
+			</div>
+			<div class="card-body" [class.with-thumbnail]="withThumbnails()">
+				@if (withThumbnails()) {
+				<app-item-thumbnail [src]="dimension.imageUrl" />
+				}
+				<div class="fields">
+					<mat-form-field subscriptSizing="dynamic">
+						<mat-label>Name</mat-label>
+						<input
+							matInput
+							name="dimension-name"
+							required
+							[maxlength]="maxNameLength"
+							[ngModel]="dimension.name"
+							(ngModelChange)="
+									updateDimension(index, { name: $event })
+								"
+						/>
+					</mat-form-field>
+					@if (withMapFields()) {
+					<mat-form-field subscriptSizing="dynamic">
+						<mat-label>BlueMap map ID</mat-label>
+						<input
+							matInput
+							required
+							spellcheck="false"
+							[maxlength]="maxWorldFieldLength"
+							[ngModel]="dimension.worldId"
+							(ngModelChange)="
+										updateDimension(index, {
+											worldId: $event
+										})
+									"
+						/>
+					</mat-form-field>
+					<mat-form-field class="wide" subscriptSizing="dynamic">
+						<mat-label>Starting view</mat-label>
+						<input
+							matInput
+							spellcheck="false"
+							[ngModel]="dimension.perspective"
+							(ngModelChange)="
+										setStartingView(index, $event)
+									"
+						/>
+						<mat-hint
+							>Paste a BlueMap link to fill this and the map
+							ID.</mat-hint
+						>
+					</mat-form-field>
+					}
+				</div>
+				<app-image-field
+					required
+					[label]="nameOf(index) + ' image'"
+					[album]="album()"
+					[noAlbumHint]="noAlbumHint()"
+					[url]="dimension.imageUrl"
+					(urlChange)="
+							updateDimension(index, { imageUrl: $event })
+						"
+				/>
+			</div>
+		</fieldset>
+	</li>
+	}
+</ol>
+<button
+	mat-stroked-button
+	type="button"
+	class="add-dimension"
+	[disabled]="dimensions().length >= maxDimensions"
+	(click)="addDimension()"
+>
+	<mat-icon>add</mat-icon>
+	Add a dimension
+</button>

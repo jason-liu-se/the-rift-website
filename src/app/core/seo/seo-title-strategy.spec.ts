@@ -6,7 +6,7 @@ import { environment } from 'src/environments/environment';
 import { SeoTitleStrategy } from './seo-title-strategy';
 
 @Component({ template: '' })
-class StubPageComponent {}
+class StubPage {}
 
 const DEFAULT_DESCRIPTION = 'Site-wide description';
 
@@ -26,14 +26,14 @@ describe('SeoTitleStrategy', () => {
 				provideRouter([
 					{
 						path: 'news',
-						component: StubPageComponent,
+						component: StubPage,
 						title: 'News',
 						data: { description: 'The latest news.' }
 					},
-					{ path: 'plain', component: StubPageComponent },
+					{ path: 'plain', component: StubPage },
 					{
 						path: '**',
-						component: StubPageComponent,
+						component: StubPage,
 						title: 'Page Not Found',
 						data: { noindex: true }
 					}

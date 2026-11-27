@@ -4,7 +4,7 @@ import { ComponentPortal } from '@angular/cdk/portal';
 import { DOCUMENT } from '@angular/common';
 import { Injectable, inject } from '@angular/core';
 import { FocusRecoveryService } from 'src/app/core/focus-recovery/focus-recovery.service';
-import { ToastComponent } from './toast.component';
+import { Toast } from './toast';
 
 /** How long a toast stays before it dismisses itself. */
 export const TOAST_DURATION_MS = 6000;
@@ -31,7 +31,7 @@ export class ToastService {
 				.centerHorizontally()
 				.bottom('1.5rem')
 		});
-		const toast = overlayRef.attach(new ComponentPortal(ToastComponent));
+		const toast = overlayRef.attach(new ComponentPortal(Toast));
 		toast.setInput('message', message);
 		toast.instance.dismissed.subscribe(() => this.dismiss());
 		toast.instance.paused.subscribe(() => clearTimeout(this.timer));

@@ -1,0 +1,7 @@
+@if (icon(); as iconName) {
+<span class="material-icons icon" aria-hidden="true">{{ iconName }}</span>
+}
+<div class="text">
+	<p class="title">{{ title() }}</p>
+	<div class="message"><ng-content /></div>
+</div>

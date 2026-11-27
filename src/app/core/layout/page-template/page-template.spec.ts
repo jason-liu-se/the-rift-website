@@ -1,0 +1,175 @@
+import { STORAGE_KEYS } from '../../browser-storage/browser-storage.service';
+import { ApplicationRef, Component, Type } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute, Router, provideRouter } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
+
+import { stubResizeObserver } from '../testing/resize-observer';
+import { PageTemplate } from './page-template';
+
+@Component({ template: '<p class="stub-page">Stub page</p>' })
+class StubPage {}
+
+describe('PageTemplate', () => {
+	let fixture: ComponentFixture<PageTemplate>;
+	let element: HTMLElement;
+	let routeData: Record<string, unknown>;
+
+	beforeEach(() => {
+		stubResizeObserver();
+		routeData = { loadComponent: () => Promise.resolve(StubPage) };
+		TestBed.configureTestingModule({
+			imports: [PageTemplate],
+			providers: [
+				provideRouter([]),
+				{
+					provide: ActivatedRoute,
+					useFactory: () => ({ snapshot: { data: routeData } })
+				}
+			]
+		});
+	});
+
+	async function render(data: Record<string, unknown> = {}): Promise<void> {
+		Object.assign(routeData, data);
+		fixture = TestBed.createComponent(PageTemplate);
+		element = fixture.nativeElement;
+		// Attached so the <main> element can receive focus.
+		document.body.appendChild(element);
+		fixture.detectChanges();
+		// Waits for the page component to load, then runs afterNextRender hooks.
+		await fixture.whenStable();
+		TestBed.tick();
+	}
+
+	const mainContent = (): HTMLElement => element.querySelector('main')!;
+	const navbarWrapper = () => element.querySelector('.rift-navbar-wrapper');
+
+	afterEach(() => {
+		element.remove();
+		sessionStorage.clear();
+		vi.unstubAllGlobals();
+	});
+
+	it("renders the route's page inside <main>", async () => {
+		await render();
+
+		expect(mainContent().querySelector('.stub-page')).not.toBeNull();
+	});
+
+	it('shows a transparent navbar and the footer, without the contact section, by default', async () => {
+		await render();
+
+		expect(navbarWrapper()?.classList).not.toContain('opaque');
+		expect(element.querySelector('app-footer')).not.toBeNull();
+		expect(element.querySelector('app-contact')).toBeNull();
+	});
+
+	it('shows an opaque navbar when isTransparent is false', async () => {
+		await render({ isTransparent: false });
+
+		expect(navbarWrapper()?.classList).toContain('opaque');
+	});
+
+	it('shows the contact section when showContactSection is true', async () => {
+		await render({ showContactSection: true });
+
+		expect(element.querySelector('app-contact')).not.toBeNull();
+	});
+
+	it('hides the footer when showFooter is false', async () => {
+		await render({ showFooter: false });
+
+		expect(element.querySelector('app-footer')).toBeNull();
+	});
+
+	it('leaves focus alone on the first page load', async () => {
+		await render();
+
+		expect(document.activeElement).not.toBe(mainContent());
+	});
+
+	it('focuses the main content after an in-app navigation', async () => {
+		TestBed.inject(Router).navigated = true;
+
+		await render();
+
+		expect(document.activeElement).toBe(mainContent());
+	});
+
+	it('waits for the page before focusing the main content', async () => {
+		TestBed.inject(Router).navigated = true;
+		let resolvePage!: (page: Type<unknown>) => void;
+		routeData['loadComponent'] = () =>
+			new Promise<Type<unknown>>((resolve) => (resolvePage = resolve));
+		fixture = TestBed.createComponent(PageTemplate);
+		element = fixture.nativeElement;
+		document.body.appendChild(element);
+		fixture.detectChanges();
+		TestBed.tick();
+
+		expect(document.activeElement).not.toBe(mainContent());
+
+		resolvePage(StubPage);
+		await fixture.whenStable();
+		TestBed.tick();
+
+		expect(document.activeElement).toBe(mainContent());
+		expect(mainContent().querySelector('.stub-page')).not.toBeNull();
+	});
+
+	describe('loading the page', () => {
+		const isStable = () =>
+			firstValueFrom(TestBed.inject(ApplicationRef).isStable);
+		const failedLoad = () => Promise.reject(new Error('chunk missing'));
+
+		it('keeps the app unstable until the page has loaded', async () => {
+			let resolvePage!: (page: Type<unknown>) => void;
+			routeData['loadComponent'] = () =>
+				new Promise<Type<unknown>>(
+					(resolve) => (resolvePage = resolve)
+				);
+			fixture = TestBed.createComponent(PageTemplate);
+			element = fixture.nativeElement;
+			fixture.detectChanges();
+
+			expect(await isStable()).toBe(false);
+
+			resolvePage(StubPage);
+			await fixture.whenStable();
+
+			expect(await isStable()).toBe(true);
+			expect(mainContent().querySelector('.stub-page')).not.toBeNull();
+		});
+
+		it('reloads once when the page fails to load', async () => {
+			// jsdom can't navigate or spy on location.reload(), so this checks the
+			// marker set just before reloading and that nothing was rendered.
+			await render({ loadComponent: failedLoad });
+
+			expect(sessionStorage.getItem(STORAGE_KEYS.chunkReload)).toBe(
+				'true'
+			);
+			expect(mainContent().children).toHaveLength(0);
+		});
+
+		it('fails without reloading again when the reload did not help', async () => {
+			sessionStorage.setItem(STORAGE_KEYS.chunkReload, 'true');
+			fixture = TestBed.createComponent(PageTemplate);
+			element = fixture.nativeElement;
+			routeData['loadComponent'] = failedLoad;
+
+			await expect(fixture.componentInstance.ngOnInit()).rejects.toThrow(
+				'chunk missing'
+			);
+		});
+
+		it('clears the reload marker once a page loads', async () => {
+			sessionStorage.setItem(STORAGE_KEYS.chunkReload, 'true');
+
+			await render();
+
+			expect(sessionStorage.getItem(STORAGE_KEYS.chunkReload)).toBeNull();
+		});
+	});
+});

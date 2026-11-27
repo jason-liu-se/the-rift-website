@@ -11,8 +11,8 @@ The decisions are in issue #101; the API's side is in the web-server's
 
 - **Shell:** admin routes hide the site navbar (`data.showNavbar: false`) for
   the slim `admin-bar/`; tools are a sidebar on desktop and a bottom tab bar on
-  mobile. Without the navbar, `PageTemplateComponent` leaves `<main>` to the
-  page, so the admin bar and tools sit outside it.
+  mobile. Without the navbar, `PageTemplate` leaves `<main>` to the page, so the
+  admin bar and tools sit outside it.
 - **Routes** (`features/admin/admin.routes.ts`, under `/admin`): each tool's
   list at `/admin/<type>` (`editor-list-page/`), with routed modals over it:
   `new`, `drafts/<draftId>`, `<id>` (`editor-modal/`, the shared `draft-editor/`
@@ -95,8 +95,8 @@ The decisions are in issue #101; the API's side is in the web-server's
   dismissed), `confirmAction` before anything destructive (through
   `EditorWriteService`), and `describeWriteError` for messages.
 - **Material** is allowed here; theme components only these pages use in
-  `src/admin-theme.scss`, which `AdminPageComponent` loads. Avoid `DatePipe` and
-  other `@angular/common` extras: they'd join every page's initial chunk (use
+  `src/admin-theme.scss`, which `AdminPage` loads. Avoid `DatePipe` and other
+  `@angular/common` extras: they'd join every page's initial chunk (use
   `formatDateTime`).
 - **Mirrored limits** (`core/config/images.ts`, `core/config/uploads.ts`,
   `core/config/admin.ts`) copy the API's to flag problems early; the API's are

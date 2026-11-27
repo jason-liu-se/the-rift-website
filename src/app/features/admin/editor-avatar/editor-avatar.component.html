@@ -1,5 +1,0 @@
-@if (avatarUrl(); as url) {
-	<img class="avatar" [src]="url" alt="" (error)="markFailed(url)" />
-} @else {
-	<span class="avatar placeholder"></span>
-}

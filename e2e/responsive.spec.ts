@@ -4,7 +4,7 @@ import { ROUTES } from './support/routes';
 import { expect, test } from './support/test';
 
 // 320px: WCAG's reflow width. 640px: a 1280px screen at 200% zoom (mobile
-// layout). 960px: the navbar's 60rem desktop breakpoint (navbar.component.scss)
+// layout). 960px: the navbar's 60rem desktop breakpoint (navbar.scss)
 // at the default font size, i.e. a 1920px screen at 200% zoom, where the
 // desktop layout is at its narrowest.
 const REFLOW_WIDTHS = [320, 640, 960];

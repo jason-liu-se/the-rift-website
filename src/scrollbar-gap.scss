@@ -1,6 +1,6 @@
 // The page scrollbar's place while it's hidden: `--scrollbar-gap`
 // (publishScrollbarGap) is its width then, and 0 while it shows.
-// PageTemplateComponent pads every page by it, so content never shifts as a
+// PageTemplate pads every page by it, so content never shifts as a
 // page grows or shrinks past the window.
 
 // A band whose background spans the page (a bar, a section's colour or

@@ -10,7 +10,7 @@
 		return;
 	}
 
-	// Must match BLUEMAP_HASH_MESSAGE in blue-map-page.component.ts.
+	// Must match BLUEMAP_HASH_MESSAGE in blue-map-page.ts.
 	const MESSAGE_TYPE = "bluemap:hash";
 
 	const postHash = () =>

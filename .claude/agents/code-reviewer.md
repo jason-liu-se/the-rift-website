@@ -116,7 +116,7 @@ wide desktop widths, not only the size it was evidently built for:
 **Commonly overlooked changes**
 
 - New route not linked from the navbar (or vice versa), or route data that
-  doesn't match what `PageTemplateComponent` and the page expect.
+  doesn't match what `PageTemplate` and the page expect.
 - Hard-coded URLs instead of `environment`; a new setting missing from the
   README `.env` example, or a URL setting missing from `PROCESSORS` in
   `scripts/environments/config.mjs`.

@@ -2,11 +2,8 @@ import { Type } from '@angular/core';
 import { EditorContentType } from 'src/app/core/api/api-requests';
 import { EditorRef } from 'src/app/core/api/api-responses';
 import { SummaryOf } from 'src/app/features/admin/editor-content/editor-content-types';
-import {
-	ItemStatus,
-	StatusBadgeComponent
-} from '../status-badge/status-badge.component';
-import { UpdatedCellComponent } from './cells/updated-cell/updated-cell.component';
+import { ItemStatus, StatusBadge } from '../status-badge/status-badge';
+import { UpdatedCell } from './cells/updated-cell/updated-cell';
 import { SortColumn, SortDirection } from './list-sort';
 
 /** What a row's cells show, a published item and a draft alike. */
@@ -56,7 +53,7 @@ export interface ListColumn<T extends EditorContentType = EditorContentType> {
 export const STATUS_COLUMN: ListColumn = {
 	id: 'status',
 	label: 'Status',
-	cell: StatusBadgeComponent,
+	cell: StatusBadge,
 	inputs: ({ status, hasDraft }) => ({ status, hasDraft }),
 	width: '11rem',
 	card: 'badge'
@@ -65,7 +62,7 @@ export const STATUS_COLUMN: ListColumn = {
 export const UPDATED_COLUMN: ListColumn = {
 	id: 'updated',
 	label: 'Updated',
-	cell: UpdatedCellComponent,
+	cell: UpdatedCell,
 	inputs: ({ updatedBy, updatedAt }) => ({ editor: updatedBy, updatedAt }),
 	width: '13rem',
 	sort: { by: 'updatedAt', firstOrder: 'desc' },

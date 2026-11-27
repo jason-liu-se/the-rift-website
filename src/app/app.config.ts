@@ -60,7 +60,7 @@ export const appConfig: ApplicationConfig = {
 		// Reuses the server-rendered HTML (and the API responses it fetched)
 		// instead of rendering the page again in the browser.
 		provideClientHydration(withEventReplay()),
-		// Resized images for OptimizedImageComponent. Development servers
+		// Resized images for OptimizedImage. Development servers
 		// have no Cloudflare image transformations, so they get the originals.
 		{
 			provide: IMAGE_LOADER,

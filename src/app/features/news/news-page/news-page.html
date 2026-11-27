@@ -1,0 +1,52 @@
+<div class="news-page">
+	<app-background-image-card
+		class="background-image-card"
+		[src]="'/assets/general-background-images/iron-stand-3.webp'"
+		[isPageTitle]="true"
+		[title]="'News'"
+		[desc]="'Check out what\'s going on with The Rift'"
+	></app-background-image-card>
+	@if (loadState.failed()) {
+	<app-fallback-panel
+		heading="Couldn't load the news"
+		[busy]="loadState.retrying()"
+		(action)="populateNewsPosts()"
+	>
+		The server didn't answer. Check your connection and try again.
+	</app-fallback-panel>
+	} @else {
+	<div class="paginated-news-display-container">
+		<mat-paginator
+			#paginator
+			class="paginator"
+			(page)="handlePageEvent($event)"
+			[length]="paginationLength"
+			[pageSize]="pageSize"
+			[showFirstLastButtons]="true"
+			[pageIndex]="pageIndex"
+			[hidePageSize]="true"
+			aria-label="Select page"
+		>
+		</mat-paginator>
+		@if (newsPosts.length > 0) {
+		<app-news-display
+			class="news-display"
+			[newsPosts]="newsPosts"
+			[canEdit]="true"
+		></app-news-display>
+		}
+		<mat-paginator
+			#paginator
+			class="paginator"
+			(page)="handlePageEvent($event)"
+			[length]="paginationLength"
+			[pageSize]="pageSize"
+			[showFirstLastButtons]="true"
+			[pageIndex]="pageIndex"
+			[hidePageSize]="true"
+			aria-label="Select page"
+		>
+		</mat-paginator>
+	</div>
+	}
+</div>

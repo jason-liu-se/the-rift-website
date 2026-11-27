@@ -1,6 +1,6 @@
 // The Material components only the admin tools use. Built as its own
 // stylesheet (`admin-theme.css`, not injected: see angular.json) and loaded by
-// AdminPageComponent, so the public pages don't download it.
+// AdminPage, so the public pages don't download it.
 @use "@angular/material" as mat;
 @use "material-theme" as *;
 @use "theme-colours" as colours;
@@ -22,7 +22,7 @@
 @include mat.slide-toggle-theme($app-theme);
 
 // The admin tools' modals: full screen on mobile, centred on desktop. Each
-// lays itself out with ModalShellComponent, which scrolls its own body.
+// lays itself out with ModalShell, which scrolls its own body.
 .admin-modal {
 	width: 100vw;
 	height: 100dvh;

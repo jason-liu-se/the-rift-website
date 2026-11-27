@@ -1,0 +1,40 @@
+<header class="bar" #bar>
+	<a class="home" [routerLink]="adminPath">
+		<!-- The wordmark (1200 × 274) at its own proportions. -->
+		<img
+			class="logo"
+			[src]="logoPath"
+			alt="The Rift"
+			width="96"
+			height="22"
+		/>
+		<span class="area">Admin</span>
+	</a>
+	<div class="end">
+		<a class="view-site" routerLink="/">
+			<mat-icon aria-hidden="true">public</mat-icon>
+			<span class="view-site-label">View site</span>
+		</a>
+		<button
+			mat-icon-button
+			type="button"
+			class="account"
+			aria-label="Account menu"
+			matTooltip="Account"
+			[matMenuTriggerFor]="accountMenu"
+		>
+			<app-user-avatar [showUsername]="false" />
+		</button>
+		<mat-menu #accountMenu="matMenu" xPosition="before">
+			@if (user(); as currentUser) {
+			<p class="signed-in" role="presentation">
+				Signed in as <strong>{{ currentUser.username }}</strong>
+			</p>
+			}
+			<button mat-menu-item type="button" (click)="logout()">
+				<mat-icon aria-hidden="true">logout</mat-icon>
+				Log out
+			</button>
+		</mat-menu>
+	</div>
+</header>

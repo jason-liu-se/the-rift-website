@@ -1,0 +1,17 @@
+<div class="background-image-card">
+	<!-- Every use is a page banner, at the top of the page. -->
+	@if (src) {
+	<app-optimized-image [src]="src" priority />
+	}
+	<div class="overlay-content">
+		<div class="text-container">
+			@if (showTitle) { @if (isPageTitle) {
+			<h1 class="title">{{ title }}</h1>
+			} @if (!isPageTitle) {
+			<h2 class="title">{{ title }}</h2>
+			} } @if (showDescription) {
+			<p class="description">{{ desc }}</p>
+			}
+		</div>
+	</div>
+</div>

@@ -1,0 +1,33 @@
+<!-- A sad face, ":(", 8×12 px. -->
+<svg
+	class="face"
+	viewBox="0 0 8 12"
+	shape-rendering="crispEdges"
+	aria-hidden="true"
+	focusable="false"
+>
+	<path
+		d="M0 3h2v2h-2zM0 7h2v2h-2zM6 0h2v1h-2zM5 1h2v1h-2zM4 2h2v8h-2zM5 10h2v1h-2zM6 11h2v1h-2z"
+	/>
+</svg>
+<!-- A failure that replaces content is announced; a 404 page is just a page. -->
+<div class="text" [attr.role]="actionLink() ? null : 'alert'">
+	@if (headingLevel() === 1) {
+	<h1 #headingElement class="heading" tabindex="-1">{{ heading() }}</h1>
+	} @else {
+	<h2 #headingElement class="heading" tabindex="-1">{{ heading() }}</h2>
+	}
+	<p class="message"><ng-content /></p>
+</div>
+@if (actionLink(); as link) {
+<a class="action" [routerLink]="link">{{ actionLabel() }}</a>
+} @else {
+<button
+	type="button"
+	class="action"
+	[attr.aria-disabled]="busy() || null"
+	(click)="onAction()"
+>
+	{{ busy() ? "Trying again…" : actionLabel() }}
+</button>
+}

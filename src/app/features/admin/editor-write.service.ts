@@ -13,7 +13,7 @@ import { AdminNotifierService } from 'src/app/features/admin/admin-notifier.serv
 import {
 	ConfirmDialogData,
 	confirmAction
-} from './confirm-dialog/confirm-dialog.component';
+} from './confirm-dialog/confirm-dialog';
 import { describeWriteError } from './write-errors';
 
 export interface EditorWrite {
