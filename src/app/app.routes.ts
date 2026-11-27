@@ -16,7 +16,7 @@ export const routes: Routes = [
 		title: 'Home',
 		data: {
 			loadComponent: () =>
-				import('./pages/home-page/home-page.component').then(
+				import('./features/home/home-page/home-page.component').then(
 					(m) => m.HomePageComponent
 				),
 			showContactSection: true
