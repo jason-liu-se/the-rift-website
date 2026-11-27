@@ -17,6 +17,9 @@
 
 .tool-title {
 	margin: 0;
+	// Focused by script after navigating to the tool, for screen readers;
+	// not a control, so no focus ring (as with the modals' headings).
+	outline: none;
 	font-size: $font-size-medium-plus;
 	font-weight: 600;
 }
