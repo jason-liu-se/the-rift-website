@@ -18,6 +18,7 @@ import { ImageShowcaseSection } from './image-showcase-section/image-showcase-se
 import { TagFilter } from './tag-filter/tag-filter';
 import { FallbackPanel } from '../../../shared/ui/fallback-panel/fallback-panel';
 import { LoadState } from '../../../shared/utils/load-state';
+import { GALLERY_PATH } from 'src/app/core/config/site-paths';
 
 /** The query parameter holding the selected tags, comma-separated. */
 const TAGS_PARAM = 'tags';
@@ -55,6 +56,7 @@ export class GalleryShowcasePage {
 	public pageIndex = 0;
 	public pageEvent!: PageEvent;
 	/** The collection's tags, for filtering; empty until loaded, or if that fails. */
+	protected readonly galleryPath = GALLERY_PATH;
 	protected readonly tags = signal<readonly string[]>([]);
 	/** Only photos with every one of these tags are shown (the URL's `tags`). */
 	protected readonly selectedTags = signal<readonly string[]>([]);

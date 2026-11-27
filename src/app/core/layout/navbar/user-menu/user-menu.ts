@@ -2,7 +2,7 @@ import { Component, inject, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AccountMenu } from 'src/app/shared/ui/account-menu/account-menu';
 import { UserAvatar } from 'src/app/shared/ui/user-avatar/user-avatar';
-import { ADMIN_PATH } from 'src/app/core/config/admin';
+import { ADMIN_PATH } from 'src/app/core/config/site-paths';
 import { UserLogout } from 'src/app/core/auth/user-logout';
 
 /**

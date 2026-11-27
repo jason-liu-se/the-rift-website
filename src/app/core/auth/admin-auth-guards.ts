@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { map } from 'rxjs';
-import { ADMIN_LOGIN_PATH, ADMIN_PATH } from '../config/admin';
+import { ADMIN_LOGIN_PATH, ADMIN_PATH } from '../config/site-paths';
 import { AuthSession } from './auth-session';
 import { BrowserStorage } from '../browser-storage/browser-storage';
 import { takeLoginReturnUrl } from './login-return-url';

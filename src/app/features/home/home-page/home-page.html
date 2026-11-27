@@ -15,7 +15,7 @@
 			mat-flat-button
 			color="primary"
 			disableRipple
-			routerLink="/join"
+			[routerLink]="joinPath"
 		>
 			<p class="button-text">Join</p>
 		</button>
@@ -24,7 +24,7 @@
 			mat-flat-button
 			color="accent"
 			disableRipple
-			routerLink="/about"
+			[routerLink]="aboutPath"
 		>
 			<p class="button-text">Learn More</p>
 		</button>

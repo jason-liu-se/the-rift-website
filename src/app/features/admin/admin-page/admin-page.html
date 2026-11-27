@@ -8,7 +8,7 @@
 					class="tool-link"
 					routerLinkActive="active"
 					ariaCurrentWhenActive="page"
-					[routerLink]="['/admin', tool.id]"
+					[routerLink]="[adminPath, tool.id]"
 				>
 					<mat-icon aria-hidden="true">{{ tool.icon }}</mat-icon>
 					<span class="tool-label">{{ tool.label }}</span>
