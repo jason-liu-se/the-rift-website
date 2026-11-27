@@ -87,9 +87,9 @@ The decisions are in issue #101; the API's side is in the web-server's
   server (`AUTOSAVE_DELAY_MS` after typing stops, or offline). Its `sync()`
   reconciles the copies with the server when the admin page opens and when the
   API comes back. A `DraftSession` per open item holds editing state: fields,
-  undo/redo, the save stage (`SaveState`, one union), conflicts (`409`/`404`),
-  and publishing, which always makes sure the server has the draft first.
-  `DraftSessions` starts sessions.
+  undo/redo (`FieldHistory`), the save stage (`SaveState`, one union), conflicts
+  (`409`/`404`), and publishing, which always makes sure the server has the
+  draft first. `DraftSessions` starts sessions.
 - **Bulk actions** go through `BulkActionRunner`: at most `MAX_BULK_ITEMS` a
   request, one after another, answering every item's result once all are done.
   Updates send only the items they'd change and offer Undo, which `bulk-undo.ts`
