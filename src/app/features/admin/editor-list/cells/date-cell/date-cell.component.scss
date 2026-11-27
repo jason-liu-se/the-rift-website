@@ -1,0 +1,11 @@
+@use "../../../../../../font-sizes" as *;
+
+// Sized by its column (the site's base style would size it otherwise).
+:host {
+	font-size: inherit;
+}
+
+.details {
+	display: block;
+	font-size: $font-size-x-small;
+}

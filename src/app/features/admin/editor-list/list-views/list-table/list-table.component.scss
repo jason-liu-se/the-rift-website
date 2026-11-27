@@ -1,0 +1,104 @@
+@use "../../../../../../theme-colours" as *;
+@use "../../../../../../font-sizes" as *;
+
+:host {
+	display: block;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: $font-size-small;
+}
+
+// Mobile: rows are cards (see EditorRowComponent), without column headings.
+thead {
+	display: none;
+}
+
+@media (min-width: 60rem) {
+	// Widths from the columns, not their content: collapsing a group or
+	// paging keeps every column where it was.
+	table {
+		table-layout: fixed;
+	}
+
+	col {
+		width: var(--column-width, auto);
+	}
+
+	.col-select {
+		width: 5rem;
+	}
+
+	.col-actions {
+		width: 4rem;
+	}
+
+	thead {
+		display: table-header-group;
+	}
+
+	th {
+		height: 44px;
+		padding: 0 8px;
+		border-bottom: 1px solid $colour-light-grey;
+		text-align: left;
+		font-size: $font-size-x-small;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	// The heading's chevron: the order it's sorted in, or dimmed, the order
+	// it would sort in.
+	.sort-button {
+		display: inline-flex;
+		align-items: center;
+		gap: 2px;
+		min-height: 32px;
+		margin-left: -6px;
+		padding: 0 6px;
+		border: 0;
+		border-radius: 4px;
+		background: none;
+		color: inherit;
+		font: inherit;
+		letter-spacing: inherit;
+		text-transform: inherit;
+		cursor: pointer;
+
+		mat-icon {
+			width: 20px;
+			height: 20px;
+			font-size: 20px;
+			opacity: 0.35;
+			transition: opacity 0.15s ease-out;
+		}
+
+		&:hover {
+			background-color: rgba($colour-dark-text, 0.05);
+
+			mat-icon {
+				opacity: 0.8;
+			}
+		}
+
+		&:focus-visible {
+			outline: 2px solid $colour-primary;
+		}
+
+		&.active {
+			color: $colour-primary;
+
+			mat-icon {
+				opacity: 1;
+			}
+		}
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.sort-button mat-icon {
+		transition: none;
+	}
+}
