@@ -24,6 +24,12 @@ reviewer flags any of them.
 - **Data flows down, events flow up.** Inputs in, outputs out. Never pass a
   component instance to a template or parent to read its state or call its
   methods; move that state up to the parent or into a service.
+- **Containers read stores; views take inputs.** One container component per
+  screen area injects the store or actions service and passes plain data (rows,
+  columns, selection) down. The views under it (rows, cards, cells) take inputs
+  and emit outputs, so they can show other data and be tested alone. A view
+  doesn't run writes, copy to the clipboard, or navigate: it emits, and the
+  container or an action's handler does it.
 - **One owner per piece of shared data.** When two or more components need the
   same API data (a content type's collections), one service fetches it once,
   exposes it as a signal, and reloads it after a write. Components don't each
@@ -53,29 +59,66 @@ once:
 Centralise what callers really share; don't force unrelated cases through one
 path.
 
+## Declare once, derive the rest
+
+A fact about a kind, field, status, action, or route is declared in one place;
+everything else reads or derives it. Adding or changing something minor should
+touch that one declaration, not every file that shows it.
+
+- Lists, labels, and options are derived, never retyped: a filter's options name
+  status keys and look up their labels; a type's field keys, labels, and
+  required fields come from one field list; a default sort names a column's id.
+- Site paths and other strings used in several files are named constants
+  (`src/app/core/config/`), not literals repeated per file.
+- When a fact is needed outside the code that declares it (a script, the
+  server's routes), read it from that code rather than copying it, or add a test
+  that the copies match.
+- Deliberate copies of another system's values (the API contract, mirrored
+  limits) are the exception: say so where they're declared.
+
 ## Variants
 
 - **One config object per variant.** When behaviour varies by kind (each content
   type's noun, statuses, search fields, whether it has collections or a date),
   keep it in one `Record<Kind, Config>` the shared code reads. Not spread across
   several inputs, constants keyed by a subset of kinds, or
-  `kind === 'a' || kind === 'b'` checks in several files.
+  `kind === 'a' || kind === 'b'` checks in several files. Anything edited the
+  same way (items and collections both have drafts, labels, and a publish flow)
+  is a variant of one config, not a separate set of constants.
+- **Repeated controls are data.** Menus, toolbars, and actions are lists of
+  definitions (label, icon, when it applies, what it runs) that one template
+  loops over, like a table's columns. Reordering or adding one is a one-line
+  change, and an action shown in two places (a row's menu and the bulk bar) is
+  declared once.
+- **One flow, configured per variant.** When two components run the same steps
+  (validate, publish, report the result, handle a conflict) with different
+  nouns, fields, or checks, extract the steps once and pass the differences in
+  as config or functions.
 - Use `TemplateRef` inputs only for markup that really differs per variant, and
   pass the template plain data, never a component.
 
 ## Size and responsibility
 
-Split a component (or service) when any of these is true:
+Split a component (or service) when:
 
 - It does more than one of: routing or URL state, loading data, running writes,
   interaction state (selection, keyboard modes), and presentation.
-- Its class is over about 200 lines, or its template over about 150.
-- Its template repeats a block with small differences (two kinds of table row):
-  extract a component with an input for the difference.
-- It injects more than about five services.
+- Its template repeats a block with small differences (two kinds of table row,
+  or two views with the same sections): extract a component with an input for
+  the difference.
+- Two components share markup or logic (the same select, drop zone, or
+  fallback): extract it and switch both, in the same change.
+
+Prefer short files. A class over about 200 lines, a template over about 150, or
+more than about five injected services is a prompt to look for a second
+responsibility, not a rule: keep a long unit that really owns one thing.
 
 A split moves a responsibility into a child component, a service, or a pure
 function, with a name that says what it owns.
+
+When a feature grows in steps, each step checks the earlier ones: the second
+similar component, flow, or constant generalises the first in the same change,
+instead of adding a parallel copy.
 
 ## State with several stages
 
