@@ -18,7 +18,8 @@ import {
 	useRootFontSize
 } from 'src/app/testing/viewport';
 import { stubResizeObserver } from '../testing/resize-observer';
-import { NAVBAR_HEIGHT_VARIABLE, NavbarComponent } from './navbar.component';
+import { NAVBAR_HEIGHT_VARIABLE } from 'src/app/shared/utils/publish-height';
+import { NavbarComponent } from './navbar.component';
 
 describe('NavbarComponent', () => {
 	let fixture: ComponentFixture<NavbarComponent>;

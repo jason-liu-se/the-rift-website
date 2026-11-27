@@ -12,11 +12,11 @@ import { MatButton } from '@angular/material/button';
 import { LOGO_PATH } from 'src/app/core/config/site';
 import { AuthService } from 'src/app/core/auth/auth.service';
 import { isDesktopWidth } from 'src/app/shared/utils/viewport.util';
-import { publishHeight } from '../publish-height';
+import {
+	NAVBAR_HEIGHT_VARIABLE,
+	publishHeight
+} from 'src/app/shared/utils/publish-height';
 import { UserMenuComponent } from './user-menu/user-menu.component';
-
-/** CSS variable for `scroll-padding-top`, so focus isn't hidden under the navbar. */
-export const NAVBAR_HEIGHT_VARIABLE = '--navbar-height';
 
 @Component({
 	selector: 'app-navbar',
