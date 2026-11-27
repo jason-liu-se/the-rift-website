@@ -9,7 +9,7 @@ import {
 	GalleryTags,
 	PaginatedResponse
 } from '../../core/api/api-responses';
-import { toTagsQuery } from '../../utilities/gallery-tags';
+import { toTagsQuery } from './gallery-tags';
 import { TimedRequest, reuseUntilOld } from '../../core/api/reuse-until-old';
 
 @Injectable({

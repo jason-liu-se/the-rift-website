@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { CanMatchFn, ResolveFn } from '@angular/router';
 import { catchError, map, of } from 'rxjs';
-import { GalleryProviderService } from '../services/gallery-provider/gallery-provider.service';
+import { GalleryProviderService } from './gallery-provider.service';
 
 /**
  * Matches `gallery/:collection` only for a collection the API lists, so any

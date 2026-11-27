@@ -6,7 +6,7 @@ import {
 import {
 	requireGalleryCollection,
 	resolveFromGalleryTitle
-} from './guards/gallery-collection.guard';
+} from './features/gallery/gallery-collection.guard';
 import { PageTemplateComponent } from './core/layout/page-template/page-template.component';
 
 export const routes: Routes = [
@@ -44,7 +44,7 @@ export const routes: Routes = [
 			description:
 				'Screenshots of builds from every season of The Rift Minecraft SMP.',
 			loadComponent: () =>
-				import('./pages/gallery-page/gallery-page.component').then(
+				import('./features/gallery/gallery-page/gallery-page.component').then(
 					(m) => m.GalleryPageComponent
 				)
 		}
@@ -64,7 +64,7 @@ export const routes: Routes = [
 		},
 		data: {
 			loadComponent: () =>
-				import('./pages/gallery-showcase-page/gallery-showcase-page.component').then(
+				import('./features/gallery/gallery-showcase-page/gallery-showcase-page.component').then(
 					(m) => m.GalleryShowcasePageComponent
 				)
 		}

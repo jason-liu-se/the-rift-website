@@ -2,11 +2,11 @@ import { Component, inject, signal } from '@angular/core';
 import { forkJoin, map, Observable, of, switchMap } from 'rxjs';
 import { GalleryCollection } from 'src/app/core/api/api-responses';
 import { ICardSelection } from 'src/app/shared/ui/card-selection-section/card-selection.interface';
-import { GalleryProviderService } from 'src/app/services/gallery-provider/gallery-provider.service';
-import { BackgroundImageCardComponent } from '../../shared/ui/background-image-card/background-image-card.component';
-import { CardSelectionSectionComponent } from '../../shared/ui/card-selection-section/card-selection-section.component';
-import { FallbackPanelComponent } from '../../shared/ui/fallback-panel/fallback-panel.component';
-import { LoadState } from '../../shared/utils/load-state';
+import { GalleryProviderService } from 'src/app/features/gallery/gallery-provider.service';
+import { BackgroundImageCardComponent } from '../../../shared/ui/background-image-card/background-image-card.component';
+import { CardSelectionSectionComponent } from '../../../shared/ui/card-selection-section/card-selection-section.component';
+import { FallbackPanelComponent } from '../../../shared/ui/fallback-panel/fallback-panel.component';
+import { LoadState } from '../../../shared/utils/load-state';
 
 @Component({
 	selector: 'app-page-gallery',
