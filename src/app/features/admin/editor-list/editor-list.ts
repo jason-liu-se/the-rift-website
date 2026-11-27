@@ -1,5 +1,6 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { Component, computed, inject } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatProgressBar } from '@angular/material/progress-bar';
@@ -30,10 +31,11 @@ import { ListTable } from './list-views/list-table/list-table';
 		MatPaginator,
 		MatProgressBar
 	],
-	host: { '(keydown)': 'handleSelectionKeys($event)' }
+	host: { '(document:keydown)': 'handleSelectionKeys($event)' }
 })
 export class EditorList {
 	private announcer = inject(LiveAnnouncer);
+	private dialog = inject(MatDialog);
 
 	protected readonly store = inject(EditorListStore);
 	protected readonly pageSize = EDITOR_PAGE_SIZE;
@@ -62,13 +64,17 @@ export class EditorList {
 		this.store.setPage(pageIndex);
 	}
 
-	/** Ctrl+A selects the page; Escape clears the selection. */
+	/**
+	 * Ctrl+A selects the page; Escape clears the selection. Anywhere on the
+	 * page (focus is often on its body), but not in a text field, or in a
+	 * modal or menu over the list.
+	 */
 	protected handleSelectionKeys(event: KeyboardEvent): void {
 		const target = event.target as HTMLElement;
-		const isTyping = !!target.closest?.(
-			'input:not([type="checkbox"]), textarea, [role="combobox"], [role="listbox"]'
+		const isElsewhere = !!target.closest?.(
+			'input:not([type="checkbox"]), textarea, [role="combobox"], [role="listbox"], .cdk-overlay-container'
 		);
-		if (isTyping) {
+		if (isElsewhere || this.dialog.openDialogs.length > 0) {
 			return;
 		}
 		const isSelectAll =

@@ -20,6 +20,26 @@ async function openTool(page: Page, tool: string, firstItem: string) {
 	).toBeVisible();
 }
 
+/** Answers draft saves as the API would, and returns what was sent. */
+async function acceptDraftSaves(page: Page): Promise<unknown[]> {
+	const saves: unknown[] = [];
+	await page.route(`${API_URL}/editor/drafts/*`, (route) => {
+		saves.push(route.request().postDataJSON());
+		route.fulfill({
+			status: 201,
+			json: {
+				id: route.request().url().split('/').pop(),
+				type: 'news',
+				fields: {},
+				revision: saves.length,
+				createdAt: '2026-01-01T00:00:00.000Z',
+				updatedAt: '2026-01-01T00:00:00.000Z'
+			}
+		});
+	});
+	return saves;
+}
+
 test.describe('news list', () => {
 	test.beforeEach(({ page }) =>
 		openTool(page, 'news', EDITOR_NEWS_POSTS[0].title)
@@ -52,12 +72,10 @@ test.describe('news list', () => {
 	test('selects the page with Ctrl+A and clears it with Escape', async ({
 		page
 	}) => {
-		await page
-			.getByRole('checkbox', {
-				name: `Select ${EDITOR_NEWS_POSTS[0].title}`,
-				exact: true
-			})
-			.focus();
+		// Focus on the page itself, as after it loads or a click on nothing.
+		await page.evaluate(() =>
+			(document.activeElement as HTMLElement | null)?.blur()
+		);
 		await page.keyboard.press('Control+a');
 		await expect(page.getByText('13 selected').first()).toBeVisible();
 		// The bulk action bar, too.
@@ -101,21 +119,7 @@ test.describe('news editor', () => {
 	test('writes a new post, autosaves it, and publishes it', async ({
 		page
 	}) => {
-		const saves: unknown[] = [];
-		await page.route(`${API_URL}/editor/drafts/*`, (route) => {
-			saves.push(route.request().postDataJSON());
-			route.fulfill({
-				status: 201,
-				json: {
-					id: route.request().url().split('/').pop(),
-					type: 'news',
-					fields: {},
-					revision: saves.length,
-					createdAt: '2026-01-01T00:00:00.000Z',
-					updatedAt: '2026-01-01T00:00:00.000Z'
-				}
-			});
-		});
+		const saves = await acceptDraftSaves(page);
 		let publishRequest: unknown;
 		await page.route(`${API_URL}/editor/drafts/*/publish`, (route) => {
 			publishRequest = route.request().postDataJSON();
@@ -174,6 +178,36 @@ test.describe('news editor', () => {
 		await expect(page.getByLabel(/^As before/)).toBeChecked();
 		await page.waitForTimeout(500);
 		expect(saves).toEqual([]);
+	});
+
+	test('undoes and redoes with the shortcuts, in step with the buttons', async ({
+		page
+	}) => {
+		await acceptDraftSaves(page);
+		await page
+			.getByRole('row')
+			.filter({ hasText: EDITOR_NEWS_POSTS[1].title })
+			.click();
+		const title = page.getByRole('textbox', { name: 'Title' });
+		const undo = page.getByRole('button', { name: 'Undo' });
+		await expect(title).toHaveValue(EDITOR_NEWS_POSTS[1].title);
+
+		await title.fill('Retitled');
+		await expect(undo).toBeEnabled();
+		await page.keyboard.press('ControlOrMeta+z');
+
+		await expect(title).toHaveValue(EDITOR_NEWS_POSTS[1].title);
+		await expect(undo).toBeDisabled();
+		const redo = page.getByRole('button', { name: 'Redo' });
+		await expect(redo).toBeEnabled();
+
+		// The button and the shortcut take turns on one history, even once
+		// a disabled button drops focus to the page.
+		await redo.click();
+		await expect(title).toHaveValue('Retitled');
+		await page.keyboard.press('ControlOrMeta+z');
+		await expect(title).toHaveValue(EDITOR_NEWS_POSTS[1].title);
+		await expect(redo).toBeEnabled();
 	});
 });
 
