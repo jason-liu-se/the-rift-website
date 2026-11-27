@@ -1,5 +1,5 @@
 import { Component, computed, input } from '@angular/core';
-import { DownloadCardComponent } from 'src/app/components/download-card/download-card.component';
+import { DownloadCardComponent } from 'src/app/features/downloads/download-card/download-card.component';
 import { DraftSession } from '../../../drafts/draft-session';
 
 /** A download's draft as the downloads page shows it. */
