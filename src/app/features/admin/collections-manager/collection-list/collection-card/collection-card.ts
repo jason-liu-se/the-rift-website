@@ -1,3 +1,4 @@
+import { StatusBadge } from '../../../status-badge/status-badge';
 import { Component, input, output } from '@angular/core';
 import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -15,7 +16,7 @@ import { CollectionCardContent } from '../../collection-cards';
 	selector: 'li[app-collection-card]',
 	templateUrl: './collection-card.html',
 	styleUrl: './collection-card.scss',
-	imports: [MatIcon, MatIconButton, MatTooltip],
+	imports: [StatusBadge, MatIcon, MatIconButton, MatTooltip],
 	host: {
 		'[class.hidden-collection]': '!card().isVisible',
 		'[class.editing]': 'card().isOpen'

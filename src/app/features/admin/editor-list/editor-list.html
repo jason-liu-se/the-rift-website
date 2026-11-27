@@ -50,11 +50,8 @@
 	<mat-progress-bar mode="indeterminate" aria-label="Updating" />
 	}
 </div>
-@if (store.view() === "grid") {
-<app-list-grid />
-} @else {
 <app-list-table />
-} @if (store.total() > pageSize) {
+@if (store.total() > pageSize) {
 <mat-paginator
 	[length]="store.total()"
 	[pageSize]="pageSize"

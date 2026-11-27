@@ -1,0 +1,35 @@
+import { ImageUploadForm } from 'src/app/core/api/api-requests';
+import { CollectionContentType } from './editor-content/editor-content-types';
+import { ItemNoun } from './editor-list/bulk-results';
+import { findSlugProblem } from './collection-form/collection-slug';
+import { GALLERY_PATH } from 'src/app/core/config/site-paths';
+
+/** What differs between the content types' collections. */
+export interface CollectionTypeConfig {
+	/** Where a collection's own page is, before its slug; none without one. */
+	pathPrefix?: string;
+	/** Where a collection's images upload to, once its slug is valid. */
+	uploadAlbum: (slug: string) => ImageUploadForm | undefined;
+}
+
+export const COLLECTION_NOUN: ItemNoun = {
+	one: 'collection',
+	many: 'collections'
+};
+
+export const COLLECTION_TYPES: Record<
+	CollectionContentType,
+	CollectionTypeConfig
+> = {
+	// Each gallery collection has its own page and album.
+	gallery: {
+		pathPrefix: `${GALLERY_PATH}/`,
+		uploadAlbum: (slug) =>
+			findSlugProblem(slug)
+				? undefined
+				: { album: 'gallery', collection: slug }
+	},
+	downloads: {
+		uploadAlbum: () => ({ album: 'downloads' })
+	}
+};

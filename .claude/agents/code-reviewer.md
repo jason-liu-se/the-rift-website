@@ -63,8 +63,17 @@ Important, with the split or move that fixes it. In particular:
   that owns that resource.
 - Per-variant behaviour spread across inputs, partial constants, and
   `type === …` checks instead of one config record.
-- A component or service with several responsibilities, over the size limits, or
-  with near-duplicate template blocks.
+- A component or service with several responsibilities, or with near-duplicate
+  template blocks; markup or logic duplicated from another component. (Size
+  alone is a prompt to look, not a finding.)
+- A view (row, card, cell) injecting a store or running writes, instead of
+  taking inputs and emitting outputs to its container.
+- A fact declared twice: a label, status name, path, field list, or sort key
+  retyped in another file instead of derived or read from its declaration.
+- Menus, toolbars, or actions hard-coded per item in a template instead of a
+  list of definitions; the same action declared in two places.
+- Two components running the same flow with small differences instead of one
+  flow configured per variant.
 - Several code paths writing the same resource outside one queue; stages implied
   by combinations of flags.
 

@@ -1,3 +1,4 @@
+import { COLLECTION_TYPES } from '../collection-type-configs';
 import {
 	Component,
 	ElementRef,
@@ -63,7 +64,7 @@ export class CollectionsManager {
 				fields: session.fields(),
 				hasUnpublishedChanges: session.hasUnpublishedChanges()
 			},
-			urlPrefix: this.type() === 'gallery' ? '/gallery/' : undefined,
+			urlPrefix: COLLECTION_TYPES[this.type()].pathPrefix,
 			itemNoun: this.itemNoun()
 		});
 	});

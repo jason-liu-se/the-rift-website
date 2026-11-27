@@ -1,7 +1,6 @@
-import { Clipboard } from '@angular/cdk/clipboard';
 import { CdkDragHandle } from '@angular/cdk/drag-drop';
 import { NgComponentOutlet } from '@angular/common';
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { MatIconButton } from '@angular/material/button';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatDivider } from '@angular/material/divider';
@@ -13,13 +12,9 @@ import {
 	MatMenuTrigger
 } from '@angular/material/menu';
 import { MatTooltip } from '@angular/material/tooltip';
-import { AdminNotifier } from 'src/app/features/admin/admin-notifier';
-import { EditorListActions } from '../editor-list-actions';
-import { EditorListStore } from '../editor-list-store';
+import { ListColumn } from '../list-columns';
+import { RowLayout, RowMenuItem } from '../row-actions';
 import { ListRow } from '../list-rows';
-
-/** A table's row, or a card: a phone's, or the gallery grid's. */
-export type RowLayout = 'row' | 'card';
 
 /**
  * One row of an admin list, a published item or a draft alike: a checkbox,
@@ -48,102 +43,27 @@ export type RowLayout = 'row' | 'card';
 	],
 	host: {
 		role: 'row',
-		// Ctrl+A's preview shows every row on the page as selected.
-		'[class.selected]':
-			'isSelected() || store.selection.isPreviewingPage()',
+		'[class.selected]': 'isSelected()',
 		'[class.card]': "layout() === 'card'",
 		'(click)': 'openFromRow($event)'
 	}
 })
 export class EditorRow {
-	protected readonly store = inject(EditorListStore);
-	private clipboard = inject(Clipboard);
-	private notifier = inject(AdminNotifier);
-
 	public readonly row = input.required<ListRow>();
 	/** Cards on every screen (the gallery's grid), or table rows on desktop. */
 	public readonly layout = input<RowLayout>('row');
-
-	protected readonly actions = inject(EditorListActions);
 	/** Each column's cell, with its inputs for this row. */
-	protected readonly cells = computed(() => {
-		const { data } = this.row();
-		return this.store.columns().map((column) => ({
-			column,
-			inputs: column.inputs(data, this.store.cellContext)
-		}));
-	});
-	/** Its position, while the list can be put in order; else undefined. */
-	protected readonly index = computed(() => {
-		const row = this.row();
-		if (!this.store.isReorderable() || row.kind !== 'item') {
-			return undefined;
-		}
-		return this.store.itemRows().findIndex(({ id }) => id === row.id);
-	});
-	protected readonly canMoveUp = computed(() => (this.index() ?? 0) > 0);
-	protected readonly canMoveDown = computed(() => {
-		const index = this.index();
-		return index !== undefined && index < this.store.itemRows().length - 1;
-	});
-	/** Where a live item shows on the site. */
-	protected readonly publicPath = computed(() => {
-		const row = this.row();
-		return row.kind === 'item' && row.item.status === 'live'
-			? (this.store.config().publicPath as (item: object) => string)(
-					row.item
-				)
-			: undefined;
-	});
-	/** A gallery card's image, for its menu's Copy image link. */
-	protected readonly imageUrl = computed(() => {
-		const { fields } = this.row().data;
-		return this.layout() === 'card' && 'imageUrl' in fields
-			? fields.imageUrl || undefined
-			: undefined;
-	});
+	public readonly cells = input.required<readonly RowCell[]>();
 	/** The editor's URL, for the name's link (and opening it in a new tab). */
-	protected readonly href = computed(() => {
-		// The link keeps the list's query, so it changes with it.
-		this.store.filters();
-		this.store.pageIndex();
-		return this.store.hrefOf(this.row());
-	});
-	protected readonly isSelected = computed(() => {
-		const row = this.row();
-		return row.kind === 'draft'
-			? this.store.selection.isDraftSelected(row.id)
-			: this.store.selection.isSelected(row.id);
-	});
+	public readonly href = input.required<string>();
+	/** Selected, or shown as selected (Ctrl+A's preview). */
+	public readonly isSelected = input.required<boolean>();
+	/** It can be dragged into order. */
+	public readonly isDraggable = input(false);
+	public readonly menu = input.required<readonly RowMenuItem[]>();
 
-	/** Moves it one place up (-1) or down (1): dragging without a pointer. */
-	protected move(by: -1 | 1): void {
-		const index = this.index();
-		if (index !== undefined) {
-			this.actions.moveItem(index, index + by);
-		}
-	}
-
-	protected copyImageUrl(url: string): void {
-		if (this.clipboard.copy(url)) {
-			this.notifier.notifySuccess('Image link copied');
-		} else {
-			this.notifier.notifyFailure("Couldn't copy the image link");
-		}
-	}
-
-	protected toggleSelected(): void {
-		const row = this.row();
-		if (row.kind === 'draft') {
-			this.store.selection.toggleDraft(row.id);
-		} else {
-			this.store.selection.toggle(row.ref, this.store.pageRows());
-		}
-	}
-
-	protected open(): void {
-		this.store.open(this.row());
-	}
+	public readonly opened = output<void>();
+	public readonly selectionToggled = output<void>();
 
 	/** Opens in the modal, unless asked for a new tab or window. */
 	protected openFromLink(event: MouseEvent): void {
@@ -151,14 +71,20 @@ export class EditorRow {
 			return;
 		}
 		event.preventDefault();
-		this.open();
+		this.opened.emit();
 	}
 
 	/** Opens the row unless the click was on one of its own controls. */
 	protected openFromRow(event: Event): void {
 		const target = event.target as HTMLElement;
 		if (!target.closest('a, button, input, label, mat-checkbox')) {
-			this.open();
+			this.opened.emit();
 		}
 	}
+}
+
+/** A column's cell in a row: its component and inputs. */
+export interface RowCell {
+	column: ListColumn;
+	inputs: Record<string, unknown>;
 }

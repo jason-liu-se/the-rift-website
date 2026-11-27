@@ -2,41 +2,22 @@ import { NgComponentOutlet } from '@angular/common';
 import {
 	Component,
 	DestroyRef,
-	Injector,
 	TemplateRef,
 	computed,
 	inject,
 	input,
-	runInInjectionContext,
 	signal,
 	viewChild
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import {
-	EMPTY,
-	Observable,
-	catchError,
-	filter,
-	isObservable,
-	map,
-	of,
-	switchMap
-} from 'rxjs';
+import { EMPTY, Observable, catchError, filter, switchMap } from 'rxjs';
 import { EditorContentType } from 'src/app/core/api/api-requests';
 import { AdminNotifier } from 'src/app/features/admin/admin-notifier';
 import { ItemOf } from 'src/app/features/admin/editor-content/editor-content-types';
-import {
-	BrowserStorage,
-	STORAGE_KEYS
-} from 'src/app/core/browser-storage/browser-storage';
-import { EditorContentApi } from 'src/app/features/admin/editor-content/editor-content-api';
-import { CollectionsStore } from '../collections-store';
-import { DraftFields } from '../drafts/draft-fields';
 import { DraftSession } from '../drafts/draft-session';
-import { DraftSessions } from '../drafts/draft-sessions';
 import { DraftStore } from '../drafts/draft-store';
-import { EDITOR_TYPES, toCollectionType } from '../editor-type-configs';
+import { EDITOR_TYPES } from '../editor-type-configs';
 import { openModalRoute } from '../modal-route';
 import { describeWriteError } from '../write-errors';
 import {
@@ -47,15 +28,14 @@ import {
 	PublishSettings,
 	providePublishSettings
 } from '../draft-editor/publish-settings';
+import {
+	EditorSessionOpener,
+	EditorTarget,
+	OpenedEditor
+} from './editor-session-opener';
 import { EditorListActions } from '../editor-list/editor-list-actions';
 import { EditorListStore } from '../editor-list/editor-list-store';
 import { itemName } from '../editor-list/item-name';
-import { COLLECTION_FILTER } from '../editor-list/list-filter-fields';
-
-interface EditorTarget {
-	id?: string;
-	draftId?: string;
-}
 
 /**
  * The editor modal over a tool's list: a new item (`new`), a draft
@@ -67,21 +47,17 @@ interface EditorTarget {
 	selector: 'app-editor-modal',
 	templateUrl: './editor-modal.html',
 	imports: [DraftEditor, NgComponentOutlet],
-	providers: [providePublishSettings()]
+	providers: [providePublishSettings(), EditorSessionOpener]
 })
 export class EditorModal {
 	private router = inject(Router);
 	private route = inject(ActivatedRoute);
-	private sessions = inject(DraftSessions);
-	private editorContent = inject(EditorContentApi);
-	private injector = inject(Injector);
+	private opener = inject(EditorSessionOpener);
 	private notifier = inject(AdminNotifier);
 	private listStore = inject(EditorListStore);
 	private listActions = inject(EditorListActions);
 	private settings = inject(PublishSettings);
-	private storage = inject(BrowserStorage);
 	private draftStore = inject(DraftStore);
-	private collectionsStore = inject(CollectionsStore);
 	private content = viewChild.required<TemplateRef<unknown>>('content');
 
 	/** From the URL. */
@@ -157,7 +133,7 @@ export class EditorModal {
 				switchMap((target) => this.open(target)),
 				takeUntilDestroyed()
 			)
-			.subscribe((session) => this.setSession(session));
+			.subscribe((opened) => this.show(opened));
 		toObservable(this.unlinkedDraftId)
 			.pipe(filter(Boolean), takeUntilDestroyed())
 			.subscribe((draftId) =>
@@ -182,50 +158,10 @@ export class EditorModal {
 	}
 
 	protected finishPublishing(): void {
-		const collection = (this.session()?.fields() as { collection?: string })
-			.collection;
-		if (collection) {
-			this.storage.set('local', this.lastCollectionKey(), collection);
-		}
+		const fields = this.session()?.fields() ?? {};
+		this.opener.rememberCollection(this.type, fields);
 		this.listStore.reload();
 		this.close();
-	}
-
-	/** What a new item starts with: its type's fields, in a collection. */
-	private newItemFields(): Observable<DraftFields<EditorContentType>> {
-		const fields = runInInjectionContext(this.injector, () =>
-			this.config.newItemFields()
-		);
-		return (isObservable(fields) ? fields : of(fields)).pipe(
-			map((typeFields) => this.withDefaultCollection(typeFields))
-		);
-	}
-
-	/**
-	 * The collection the list shows, else the one last published to, else the
-	 * first.
-	 */
-	private withDefaultCollection(
-		fields: DraftFields<EditorContentType>
-	): DraftFields<EditorContentType> {
-		const collectionType = toCollectionType(this.type);
-		if (!collectionType) {
-			return fields;
-		}
-		const slugs = (
-			this.collectionsStore.collections(collectionType)() ?? []
-		).map(({ slug }) => slug);
-		const candidates = [
-			this.listStore.filters().values[COLLECTION_FILTER.key],
-			this.storage.get('local', this.lastCollectionKey())
-		];
-		const collection =
-			candidates.find((slug) => slug && slugs.includes(slug)) ?? slugs[0];
-		return collection ? { ...fields, collection } : fields;
-	}
-
-	private lastCollectionKey(): string {
-		return STORAGE_KEYS.lastCollectionPrefix + this.type;
 	}
 
 	/** The item is gone: its draft (if any) goes with it, unsaved. */
@@ -241,29 +177,11 @@ export class EditorModal {
 		this.session.set(session);
 	}
 
-	private open({
-		id,
-		draftId
-	}: EditorTarget): Observable<DraftSession<EditorContentType>> {
+	private open(target: EditorTarget): Observable<OpenedEditor> {
 		this.setSession(undefined);
 		this.publishedItem.set(undefined);
 		this.settings.reset(undefined);
-		const opening = draftId
-			? this.sessions
-					.openDraft(this.type, draftId)
-					.pipe(switchMap((session) => this.withPublished(session)))
-			: id
-				? this.fetchPublished(id).pipe(
-						switchMap((item) =>
-							this.sessions.startEdit(this.type, item)
-						)
-					)
-				: this.newItemFields().pipe(
-						map((fields) =>
-							this.sessions.startNew(this.type, fields)
-						)
-					);
-		return opening.pipe(
+		return this.opener.open(this.type, target).pipe(
 			catchError((error: unknown) => {
 				this.notifier.notifyFailure(
 					`Couldn't open it. ${describeWriteError(error)}`
@@ -274,28 +192,13 @@ export class EditorModal {
 		);
 	}
 
-	/** Fetches the published item, keeping its date. */
-	private fetchPublished(id: string): Observable<ItemOf<EditorContentType>> {
-		return this.editorContent.fetchItem(this.type, id).pipe(
-			map((item) => {
-				const { date } = item as { date?: string };
-				this.publishedItem.set(item);
-				this.settings.reset({ date });
-				return item;
-			})
-		);
-	}
-
-	/** An edit draft's item and its date (if it can be fetched). */
-	private withPublished(
-		session: DraftSession<EditorContentType>
-	): Observable<DraftSession<EditorContentType>> {
-		const targetId = session.targetId();
-		return targetId
-			? this.fetchPublished(targetId).pipe(
-					map(() => session),
-					catchError(() => of(session))
-				)
-			: of(session);
+	private show({ session, published }: OpenedEditor): void {
+		if (published) {
+			this.publishedItem.set(published);
+			this.settings.reset({
+				date: (published as { date?: string }).date
+			});
+		}
+		this.setSession(session);
 	}
 }

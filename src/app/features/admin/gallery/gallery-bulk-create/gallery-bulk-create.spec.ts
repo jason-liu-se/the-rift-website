@@ -24,8 +24,7 @@ describe('GalleryBulkCreate', () => {
 		fixture.componentInstance as unknown as {
 			allCollection: { set(value: string): void };
 			setAll(field: string): void;
-			pastedLinks: { set(value: string): void };
-			addLinks(): void;
+			addLinks(links: string[]): void;
 		};
 	const rows = () => [...element.querySelectorAll('li.row')];
 	const button = (text: RegExp) =>
@@ -64,12 +63,13 @@ describe('GalleryBulkCreate', () => {
 			]
 		});
 		httpTesting = TestBed.inject(HttpTestingController);
-		fixture = TestBed.createComponent(GalleryBulkCreate);
-		element = fixture.nativeElement;
-		fixture.detectChanges();
+		// Loaded already, as by the list page behind the modal.
+		TestBed.inject(CollectionsStore).collections('gallery');
 		httpTesting
 			.expectOne(`${EDITOR_URL}/gallery/collections`)
 			.flush(EDITOR_GALLERY_COLLECTIONS);
+		fixture = TestBed.createComponent(GalleryBulkCreate);
+		element = fixture.nativeElement;
 		fixture.detectChanges();
 	});
 
@@ -176,10 +176,10 @@ describe('GalleryBulkCreate', () => {
 	});
 
 	it('flags rows that are not ready, without sending them', () => {
-		component().pastedLinks.set(
-			'https://example.com/x.png\nhttps://i.ibb.co/a/y.png'
-		);
-		component().addLinks();
+		component().addLinks([
+			'https://example.com/x.png',
+			'https://i.ibb.co/a/y.png'
+		]);
 		fixture.detectChanges();
 
 		button(/Upload and publish 2 images/).click();

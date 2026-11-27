@@ -1,0 +1,58 @@
+<div
+	class="drop-zone"
+	[appFileDrop]="canUpload()"
+	(filesDropped)="filesAdded.emit($event)"
+>
+	<mat-icon class="drop-icon" aria-hidden="true"
+		>add_photo_alternate</mat-icon
+	>
+	<p class="drop-text">
+		Drop images here or paste them, or
+		<button
+			mat-flat-button
+			color="primary"
+			type="button"
+			[disabled]="!canUpload()"
+			(click)="fileInput.click()"
+		>
+			<mat-icon>upload</mat-icon>
+			Choose files
+		</button>
+	</p>
+	<input
+		#fileInput
+		type="file"
+		multiple
+		hidden
+		[accept]="acceptedTypes"
+		(change)="addChosenFiles($event)"
+	/>
+	@if (!canUpload()) {
+	<p class="note">
+		Uploads are off until the server can be reached. Links still work.
+	</p>
+	}
+	<details class="links">
+		<summary>Add by link instead</summary>
+		<div class="links-form">
+			<mat-form-field subscriptSizing="dynamic">
+				<mat-label>imgur or imgbb links, one per line</mat-label>
+				<textarea
+					matInput
+					rows="3"
+					[ngModel]="pastedLinks()"
+					(ngModelChange)="pastedLinks.set($event)"
+				></textarea>
+			</mat-form-field>
+			<button
+				mat-stroked-button
+				type="button"
+				[disabled]="!pastedLinks().trim()"
+				(click)="addLinks()"
+			>
+				<mat-icon>add_link</mat-icon>
+				Add links
+			</button>
+		</div>
+	</details>
+</div>

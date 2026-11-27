@@ -2,6 +2,8 @@ import { MAX_GALLERY_CAPTION_LENGTH } from 'src/app/core/config/content-limits';
 import { GalleryImageCreateRequest } from 'src/app/core/api/api-requests';
 import { isAllowedImageUrl } from 'src/app/shared/utils/image-urls';
 
+export const IMAGE_NOUN = { one: 'image', many: 'images' };
+
 /** One image in a bulk creation, edited before it's published. */
 export interface BulkImageRow {
 	/** The create's createId, kept across retries so a repeat makes no copy. */

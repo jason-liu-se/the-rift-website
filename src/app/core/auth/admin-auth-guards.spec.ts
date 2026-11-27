@@ -10,7 +10,7 @@ import {
 } from '@angular/router';
 import { Observable, firstValueFrom, of } from 'rxjs';
 import { routes } from '../../app.routes';
-import { ADMIN_LOGIN_PATH, ADMIN_PATH } from '../config/admin';
+import { ADMIN_LOGIN_PATH, ADMIN_PATH } from '../config/site-paths';
 import { AuthSession } from './auth-session';
 import { requireLoggedIn, requireLoggedOut } from './admin-auth-guards';
 

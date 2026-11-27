@@ -1,32 +1,25 @@
+<app-collection-select
+	[label]="spec.collection.label"
+	type="downloads"
+	[required]="!!spec.collection.required"
+	[slug]="fields().collection"
+	(slugChange)="update({ collection: $event })"
+/>
 <mat-form-field subscriptSizing="dynamic">
-	<mat-label>Collection</mat-label>
-	<mat-select
-		required
-		[ngModel]="fields().collection"
-		(ngModelChange)="update({ collection: $event })"
-	>
-		@for (collection of collections(); track collection.slug) {
-		<mat-option [value]="collection.slug"
-			>{{ collection.title }}</mat-option
-		>
-		}
-	</mat-select>
-</mat-form-field>
-<mat-form-field subscriptSizing="dynamic">
-	<mat-label>Title</mat-label>
+	<mat-label>{{ spec.title.label }}</mat-label>
 	<input
 		matInput
-		required
+		[required]="!!spec.title.required"
 		[maxlength]="maxTitleLength"
 		[ngModel]="fields().title ?? ''"
 		(ngModelChange)="update({ title: $event })"
 	/>
 </mat-form-field>
 <mat-form-field subscriptSizing="dynamic">
-	<mat-label>Description</mat-label>
+	<mat-label>{{ spec.desc.label }}</mat-label>
 	<textarea
 		matInput
-		required
+		[required]="!!spec.desc.required"
 		rows="3"
 		cdkTextareaAutosize
 		cdkAutosizeMinRows="3"
@@ -42,10 +35,10 @@
 	}
 </mat-form-field>
 <mat-form-field subscriptSizing="dynamic">
-	<mat-label>Download link</mat-label>
+	<mat-label>{{ spec.downloadUrl.label }}</mat-label>
 	<input
 		matInput
-		required
+		[required]="!!spec.downloadUrl.required"
 		type="url"
 		[maxlength]="maxUrlLength"
 		[ngModel]="fields().downloadUrl ?? ''"
@@ -53,7 +46,8 @@
 	/>
 </mat-form-field>
 <app-image-field
-	required
+	[label]="spec.imageUrl.label"
+	[required]="!!spec.imageUrl.required"
 	[album]="{ album: 'downloads' }"
 	[url]="fields().imageUrl ?? ''"
 	(urlChange)="update({ imageUrl: $event })"

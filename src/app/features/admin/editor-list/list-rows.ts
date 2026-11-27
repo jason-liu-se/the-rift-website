@@ -1,13 +1,10 @@
-import {
-	BulkItemRef,
-	EditorContentType,
-	NewsDraftOptions
-} from 'src/app/core/api/api-requests';
+import { BulkItemRef, EditorContentType } from 'src/app/core/api/api-requests';
 import { DraftSummary, EditorRef } from 'src/app/core/api/api-responses';
 import {
 	ListQueryOf,
 	SummaryOf
 } from 'src/app/features/admin/editor-content/editor-content-types';
+import { EDITOR_TYPES } from '../editor-type-configs';
 import { itemName } from './item-name';
 import { RowData } from './list-columns';
 import { ListFilterField, ListFilterSettings } from './list-filter-fields';
@@ -80,9 +77,7 @@ export function toDraftRow(
 
 /**
  * A draft's fields as the cells show them: its fields so far (a cleared one,
- * null, as unset), a season's
- * dimension count, and a news post's date: the draft's own if it has one,
- * else "now" for a new post, or the post's own for an edit (which keeps it).
+ * null, as unset), and what its type adds (`draftRowFields`).
  */
 function toDraftFields(
 	draft: DraftSummary,
@@ -93,16 +88,10 @@ function toDraftFields(
 	);
 	return {
 		...Object.fromEntries(fields),
-		...(draft.type === 'maps' && {
-			dimensionCount: draft.dimensionCount
-		}),
-		...(draft.type === 'news' && {
-			date:
-				(draft.fields as NewsDraftOptions).date ??
-				(draft.target
-					? (published as { date?: string } | undefined)?.date
-					: 'now')
-		})
+		...EDITOR_TYPES[draft.type as EditorContentType].draftRowFields?.(
+			draft,
+			published
+		)
 	};
 }
 

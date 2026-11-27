@@ -3,7 +3,7 @@ import { Component, effect, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
-import { ADMIN_LOGIN_PATH } from 'src/app/core/config/admin';
+import { ADMIN_LOGIN_PATH } from 'src/app/core/config/site-paths';
 import { saveLoginReturnUrl } from 'src/app/core/auth/login-return-url';
 import { BrowserStorage } from 'src/app/core/browser-storage/browser-storage';
 import { isOnProtectedPage } from 'src/app/core/auth/requires-login';

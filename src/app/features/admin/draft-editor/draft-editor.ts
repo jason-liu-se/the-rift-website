@@ -21,19 +21,21 @@ import {
 import { MatIcon } from '@angular/material/icon';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { MatTooltip } from '@angular/material/tooltip';
-import { Observable, filter } from 'rxjs';
 import {
 	EditorContentType,
 	NewsDraftOptions
 } from 'src/app/core/api/api-requests';
 import { AdminNotifier } from 'src/app/features/admin/admin-notifier';
-import { ItemOf } from 'src/app/features/admin/editor-content/editor-content-types';
+import {
+	ItemOf,
+	fieldLabelsOf,
+	requiredFieldsOf
+} from 'src/app/features/admin/editor-content/editor-content-types';
 import { DraftSession } from '../drafts/draft-session';
 import { findMissingFields } from '../drafts/draft-fields';
-import { discardDraft } from '../drafts/discard-draft';
+import { UNPUBLISHED_CHANGES } from '../status-badge/status-badge';
+import { DraftPublisher } from '../drafts/draft-publisher';
 import { EDITOR_TYPES } from '../editor-type-configs';
-import { EditorWriter } from '../editor-writer';
-import { describeWriteError } from '../write-errors';
 import { itemName } from '../editor-list/item-name';
 import { ModalShell } from '../modal-shell/modal-shell';
 import { DraftFooter } from '../draft-footer/draft-footer';
@@ -88,7 +90,6 @@ export interface PublishedItemActions {
 })
 export class DraftEditor<T extends EditorContentType> {
 	private notifier = inject(AdminNotifier);
-	private writer = inject(EditorWriter);
 	private injector = inject(Injector);
 	private host = inject<ElementRef<HTMLElement>>(ElementRef);
 	private shell = viewChild.required(ModalShell);
@@ -103,8 +104,8 @@ export class DraftEditor<T extends EditorContentType> {
 	protected readonly settings = inject(PublishSettings);
 	private readonly config = computed(() => EDITOR_TYPES[this.session().type]);
 	protected readonly noun = computed(() => this.config().noun);
-	protected readonly fieldLabels = computed(
-		() => this.config().fieldLabels as Record<string, string>
+	protected readonly fieldLabels = computed(() =>
+		fieldLabelsOf(this.session().type)
 	);
 	protected readonly preview = computed(
 		() => this.config().preview as Type<unknown> | undefined
@@ -117,7 +118,6 @@ export class DraftEditor<T extends EditorContentType> {
 			? itemName(this.session().fields() as object)
 			: `New ${this.noun().one}`
 	);
-	protected readonly isPublishing = signal(false);
 	/** News only: when it'll go live, as the draft says. */
 	private readonly date = computed(() =>
 		this.config().hasDate
@@ -127,57 +127,38 @@ export class DraftEditor<T extends EditorContentType> {
 	private readonly missingFields = computed(() =>
 		findMissingFields(
 			this.session().fields() as Record<string, unknown>,
-			this.config().requiredFields as readonly string[]
+			requiredFieldsOf(this.session().type)
 		)
 	);
-	/** Shown after a publish attempt, until every required field is filled. */
-	protected readonly publishProblem = computed(() => {
-		if (!this.settings.wasAttempted()) {
-			return undefined;
-		}
-		if (this.missingFields().length > 0) {
-			return 'Fields marked * are required.';
-		}
-		return findScheduleProblem(this.date());
+	protected readonly publisher = new DraftPublisher<T>({
+		session: this.session,
+		noun: () => this.noun().one,
+		isEdit: this.isEdit,
+		wasAttempted: this.settings.wasAttempted,
+		findProblem: () =>
+			this.missingFields().length > 0
+				? 'Fields marked * are required.'
+				: findScheduleProblem(this.date()),
+		nameOf: (item) => itemName(item as object),
+		onProblem: () => {
+			this.pane.set('fields');
+			afterNextRender(() => this.focusFirstError(), {
+				injector: this.injector
+			});
+		},
+		onConflict: () => this.shell().scrollToTop(),
+		onPublished: (item) => this.publishedItem.emit(item as ItemOf<T>),
+		onDiscarded: () => this.closed.emit()
 	});
 	/** News only: it'll go live later. */
 	protected readonly isScheduled = computed(
 		() => toDateChoice(this.date(), this.isEdit()) === 'schedule'
 	);
 
-	protected publish(): void {
-		this.runPublish(() =>
-			// The draft holds the choices (visibility, a news date).
-			this.session().publish({})
-		);
-	}
-
-	protected publishAsNew(): void {
-		this.runPublish(() => this.session().publishAsNew({}));
-	}
-
-	protected overwrite(): void {
-		this.session()
-			.resolveItemConflict('overwrite')
-			.subscribe({ complete: () => this.publish() });
-	}
-
-	/** The conflict's way out when the item was deleted. */
-	protected discard(): void {
-		discardDraft(
-			this.writer,
-			this.session(),
-			this.noun().one,
-			this.isEdit()
-		)
-			.pipe(filter(Boolean))
-			.subscribe(() => this.closed.emit());
-	}
-
 	protected close(): void {
 		if (this.session().hasUnpublishedChanges()) {
 			this.notifier.notifySuccess(
-				'Your changes are kept. Find them under Unpublished changes.'
+				`Your changes are kept. Find them under ${UNPUBLISHED_CHANGES}.`
 			);
 		}
 		this.session().close();
@@ -186,39 +167,6 @@ export class DraftEditor<T extends EditorContentType> {
 
 	protected handleShortcuts(event: KeyboardEvent): void {
 		handleHistoryShortcut(event, this.session());
-	}
-
-	private runPublish(publish: () => Observable<ItemOf<T>>): void {
-		this.settings.wasAttempted.set(true);
-		if (this.publishProblem()) {
-			this.pane.set('fields');
-			afterNextRender(() => this.focusFirstError(), {
-				injector: this.injector
-			});
-			return;
-		}
-		this.isPublishing.set(true);
-		publish().subscribe({
-			next: (item) => {
-				this.isPublishing.set(false);
-				this.notifier.notifySuccess(
-					`Published ${itemName(item as object)}.`
-				);
-				this.publishedItem.emit(item);
-			},
-			error: (error: unknown) => {
-				this.isPublishing.set(false);
-				if (this.session().conflict()) {
-					this.shell().scrollToTop();
-					return;
-				}
-				this.notifier.notifyFailure(
-					error instanceof Error && !('status' in error)
-						? error.message
-						: describeWriteError(error)
-				);
-			}
-		});
 	}
 
 	/** Material leaves `aria-invalid` off empty required inputs: find the field. */

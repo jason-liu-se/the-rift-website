@@ -16,13 +16,19 @@ describe('toCollectionCards', () => {
 		});
 
 		expect(
-			cards.map(({ title, details, status }) => [title, details, status])
+			cards.map(({ title, details, status, hasDraft }) => [
+				title,
+				details,
+				status,
+				hasDraft
+			])
 		).toEqual([
-			['Season 7', '/gallery/…', 'Unpublished'],
+			['Season 7', '/gallery/…', 'draft', false],
 			[
 				SEASON_5.title,
 				`/gallery/${SEASON_5.slug} · ${SEASON_5.itemCount} images · ${SEASON_5.dimensions?.length} dimensions`,
-				undefined
+				undefined,
+				false
 			]
 		]);
 	});
@@ -56,13 +62,13 @@ describe('toCollectionCards', () => {
 		expect(closed).toMatchObject({
 			title: 'Renamed',
 			isVisible: false,
-			status: 'Unpublished changes',
+			hasDraft: true,
 			isOpen: false
 		});
 		expect(open).toMatchObject({
 			title: 'Typing…',
 			isVisible: true,
-			status: undefined,
+			hasDraft: false,
 			isOpen: true
 		});
 	});

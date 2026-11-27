@@ -64,8 +64,8 @@ Before launching, settle each of these that isn't already decided:
   and selector, a service method, a route's data flags). Write it down exactly;
   one task owns it.
 - **Ownership**: which task owns each file or folder. Hot files shared by many
-  features (`app.routes.ts`, `app.routes.server.ts`, `e2e/support/routes.ts`,
-  `src/styles.scss`, `README.md`) get one owner, or are marked append-only.
+  features (`app.routes.ts`, `e2e/support/routes.ts`, `src/styles.scss`,
+  `README.md`) get one owner, or are marked append-only.
 - **Order**: tasks that depend on another's output run after it, or after its
   contract is merged. Parallelize only independent tasks.
 - **Design direction and scope cuts**, when the issue leaves them open.

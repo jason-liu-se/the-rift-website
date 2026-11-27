@@ -8,6 +8,7 @@ import { AdminBar } from '../admin-bar/admin-bar';
 import { DraftStore } from '../drafts/draft-store';
 import { CollectionsStore } from '../collections-store';
 import { originalImageLoader } from 'src/app/shared/utils/image-loaders';
+import { ADMIN_PATH } from 'src/app/core/config/site-paths';
 
 /** The tools, in sidebar order; each at /admin/<type>. */
 export const ADMIN_TOOLS = EDITOR_TYPE_ORDER.map((id) => ({
@@ -40,6 +41,7 @@ export const ADMIN_TOOLS = EDITOR_TYPE_ORDER.map((id) => ({
 })
 export class AdminPage {
 	protected readonly tools = ADMIN_TOOLS;
+	protected readonly adminPath = ADMIN_PATH;
 
 	constructor() {
 		loadAdminTheme(inject(DOCUMENT));

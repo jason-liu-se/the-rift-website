@@ -21,53 +21,26 @@ import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
-import { MatOption, MatSelect } from '@angular/material/select';
 import { MatTooltip } from '@angular/material/tooltip';
-import {
-	EMPTY,
-	Observable,
-	catchError,
-	concat,
-	concatMap,
-	defer,
-	filter,
-	finalize,
-	from,
-	map,
-	of,
-	tap
-} from 'rxjs';
-import { MAX_BULK_ITEMS } from 'src/app/core/config/admin';
+import { finalize } from 'rxjs';
 import { MAX_GALLERY_CAPTION_LENGTH } from 'src/app/core/config/content-limits';
-import {
-	MAX_UPLOAD_FILES,
-	UPLOAD_IMAGE_TYPES
-} from 'src/app/core/config/uploads';
 import { AdminNotifier } from 'src/app/features/admin/admin-notifier';
 import { ApiStatusMonitor } from 'src/app/core/api/api-status/api-status-monitor';
-import { EditorContentApi } from 'src/app/features/admin/editor-content/editor-content-api';
-import { ImageUploader } from 'src/app/features/admin/image-upload/image-uploader';
 import { findImageFileProblem } from 'src/app/features/admin/image-upload/image-files';
 import { isAllowedImageUrl } from 'src/app/shared/utils/image-urls';
-import { describeWriteError } from '../../write-errors';
-import {
-	BulkSummary,
-	summarizeBulkResults,
-	toChunks
-} from '../../editor-list/bulk-results';
+import { CollectionSelect } from '../../collection-select/collection-select';
 import { ModalShell } from '../../modal-shell/modal-shell';
 import { TagInput } from '../../tag-input/tag-input';
+import { BulkImageIntake } from './bulk-image-intake/bulk-image-intake';
+import { GalleryBulkPublisher } from './gallery-bulk-publisher';
 import {
 	BulkImageRow,
+	IMAGE_NOUN,
 	captionFromFileName,
-	findRowProblem,
-	parsePastedLinks,
-	toCreateRequest
+	findRowProblem
 } from './bulk-image-rows';
-import { CollectionsStore } from '../../collections-store';
 import { VisibilityToggle } from '../../visibility-toggle/visibility-toggle';
 
-const IMAGES = { one: 'image', many: 'images' };
 const NOT_ALLOWED_LINK = "This link isn't from imgbb or imgur.";
 
 /**
@@ -81,6 +54,8 @@ const NOT_ALLOWED_LINK = "This link isn't from imgbb or imgur.";
 	templateUrl: './gallery-bulk-create.html',
 	styleUrl: './gallery-bulk-create.scss',
 	imports: [
+		BulkImageIntake,
+		CollectionSelect,
 		CdkDrag,
 		CdkDragHandle,
 		CdkDropList,
@@ -91,8 +66,6 @@ const NOT_ALLOWED_LINK = "This link isn't from imgbb or imgur.";
 		MatIconButton,
 		MatInput,
 		MatLabel,
-		MatOption,
-		MatSelect,
 		MatTooltip,
 		ModalShell,
 		TagInput,
@@ -101,8 +74,7 @@ const NOT_ALLOWED_LINK = "This link isn't from imgbb or imgur.";
 	host: { '(paste)': 'addPasted($event)' }
 })
 export class GalleryBulkCreate {
-	private uploads = inject(ImageUploader);
-	private editorContent = inject(EditorContentApi);
+	private publisher = inject(GalleryBulkPublisher);
 	private notifier = inject(AdminNotifier);
 	private apiStatus = inject(ApiStatusMonitor).status;
 	private announcer = inject(LiveAnnouncer);
@@ -112,23 +84,15 @@ export class GalleryBulkCreate {
 	/** Done: back to the list (after publishing anything, it reloads). */
 	public readonly closed = output<void>();
 
-	protected readonly acceptedTypes = UPLOAD_IMAGE_TYPES.join(',');
 	protected readonly maxCaptionLength = MAX_GALLERY_CAPTION_LENGTH;
-	private readonly allCollections =
-		inject(CollectionsStore).collections('gallery');
-	protected readonly collections = computed(
-		() => this.allCollections() ?? []
-	);
 	protected readonly rows = signal<BulkImageRow[]>([]);
 	/** Rows not yet published (published ones leave the list). */
 	public readonly rowCount = computed(() => this.rows().length);
-	protected readonly pastedLinks = signal('');
 	/** "Set all": also the defaults for rows added later. */
 	protected readonly allCollection = signal('');
 	protected readonly allTags = signal<string[]>([]);
 	protected readonly isAllVisible = signal(true);
 	protected readonly isPublishing = signal(false);
-	protected readonly isDragging = signal(false);
 	protected readonly canUpload = computed(() => this.apiStatus() === 'up');
 	/** "3 images · 1 needs a caption": what's left before publishing. */
 	protected readonly summary = computed(() => {
@@ -143,14 +107,14 @@ export class GalleryBulkCreate {
 				? []
 				: [`${count} ${count === 1 ? 'needs' : 'need'} ${what}`];
 		return [
-			`${rows.length} ${rows.length === 1 ? IMAGES.one : IMAGES.many}`,
+			`${rows.length} ${rows.length === 1 ? IMAGE_NOUN.one : IMAGE_NOUN.many}`,
 			...needs(missing('caption'), 'a caption'),
 			...needs(missing('collection'), 'a collection')
 		].join(' · ');
 	});
 	protected readonly publishLabel = computed(() => {
 		const count = this.rows().length;
-		return `Upload and publish ${count} ${count === 1 ? IMAGES.one : IMAGES.many}`;
+		return `Upload and publish ${count} ${count === 1 ? IMAGE_NOUN.one : IMAGE_NOUN.many}`;
 	});
 
 	constructor() {
@@ -159,28 +123,6 @@ export class GalleryBulkCreate {
 				(row) => row.file && URL.revokeObjectURL(row.previewUrl)
 			)
 		);
-	}
-
-	protected addChosenFiles(event: Event): void {
-		const input = event.target as HTMLInputElement;
-		const files = [...(input.files ?? [])];
-		input.value = '';
-		this.addFiles(files);
-	}
-
-	protected allowDrop(event: DragEvent): void {
-		if (this.canUpload() && event.dataTransfer?.types.includes('Files')) {
-			event.preventDefault();
-			this.isDragging.set(true);
-		}
-	}
-
-	protected addDropped(event: DragEvent): void {
-		this.isDragging.set(false);
-		if (this.canUpload() && event.dataTransfer?.files.length) {
-			event.preventDefault();
-			this.addFiles([...event.dataTransfer.files]);
-		}
 	}
 
 	/** Pasted image files become rows; pasted text goes where it's typed. */
@@ -228,7 +170,7 @@ export class GalleryBulkCreate {
 		);
 	}
 
-	private addFiles(files: File[]): void {
+	protected addFiles(files: File[]): void {
 		this.rows.update((rows) => [
 			...rows,
 			...files.map((file) => ({
@@ -240,9 +182,7 @@ export class GalleryBulkCreate {
 		]);
 	}
 
-	protected addLinks(): void {
-		const links = parsePastedLinks(this.pastedLinks());
-		this.pastedLinks.set('');
+	protected addLinks(links: string[]): void {
 		this.rows.update((rows) => [
 			...rows,
 			...links.map((link) => ({
@@ -290,12 +230,23 @@ export class GalleryBulkCreate {
 	protected uploadAndPublish(): void {
 		this.markRowProblems();
 		this.isPublishing.set(true);
-		concat(
-			this.uploadFiles(),
-			defer(() => this.createRows())
-		)
+		this.publisher
+			.publish(this.rows().filter((row) => !row.problem))
 			.pipe(finalize(() => this.isPublishing.set(false)))
-			.subscribe((summary) => this.notifier.notify(summary));
+			.subscribe((event) => {
+				switch (event.kind) {
+					case 'uploaded':
+						return this.updateRow(event.id, {
+							imageUrl: event.imageUrl
+						});
+					case 'problem':
+						return this.markProblem(event.id, event.problem);
+					case 'published':
+						return this.removeRow(event.id);
+					default:
+						return this.notifier.notify(event.summary);
+				}
+			});
 	}
 
 	private newRow(previewUrl: string): BulkImageRow {
@@ -319,114 +270,6 @@ export class GalleryBulkCreate {
 						findImageFileProblem(row.file)) ||
 					findRowProblem(row)
 			}))
-		);
-	}
-
-	private isReady(row: BulkImageRow): boolean {
-		return !row.problem;
-	}
-
-	/**
-	 * Uploads the ready rows' files, by collection (each its own album), at
-	 * most MAX_UPLOAD_FILES a request. Summarises only failed requests.
-	 */
-	private uploadFiles(): Observable<BulkSummary> {
-		const pending = this.rows().filter(
-			(row) => row.file && !row.imageUrl && this.isReady(row)
-		);
-		const collections = [...new Set(pending.map((row) => row.collection))];
-		const batches = collections.flatMap((collection) =>
-			toChunks(
-				pending.filter((row) => row.collection === collection),
-				MAX_UPLOAD_FILES
-			).map((chunk) => ({ collection, chunk }))
-		);
-		return from(batches).pipe(
-			concatMap(({ collection, chunk }) =>
-				this.uploads
-					.uploadImages(
-						chunk.map((row) => row.file!),
-						{ album: 'gallery', collection }
-					)
-					.pipe(
-						filter((event) => event.type === 'done'),
-						concatMap((event) => {
-							event.response.results.forEach((result, index) => {
-								const { id } = chunk[index];
-								if ('url' in result) {
-									this.updateRow(id, {
-										imageUrl: result.url
-									});
-								} else {
-									this.markProblem(
-										id,
-										`Upload failed: ${result.error}`
-									);
-								}
-							});
-							return EMPTY;
-						}),
-						catchError((error: unknown) => {
-							chunk.forEach((row) =>
-								this.markProblem(row.id, 'Upload failed.')
-							);
-							return of({
-								message: `Couldn't upload ${chunk.length} images. ${describeWriteError(error)}`,
-								hasFailures: true
-							});
-						})
-					)
-			)
-		);
-	}
-
-	/** Creates the ready, uploaded rows, MAX_BULK_ITEMS a request. */
-	private createRows(): Observable<BulkSummary> {
-		const ready = this.rows().filter(
-			(row) => row.imageUrl !== undefined && this.isReady(row)
-		);
-		return from(toChunks(ready, MAX_BULK_ITEMS)).pipe(
-			concatMap((chunk) =>
-				this.editorContent
-					.bulkCreateGalleryImages({
-						items: chunk.map(toCreateRequest)
-					})
-					.pipe(
-						tap(({ results }) => {
-							const done = new Set(
-								results
-									.filter(({ outcome }) => outcome === 'ok')
-									.map(({ id }) => id)
-							);
-							for (const result of results) {
-								if (result.outcome === 'invalid') {
-									this.markProblem(result.id, result.reason);
-								} else if (result.outcome !== 'ok') {
-									this.markProblem(
-										result.id,
-										'Not published; try again.'
-									);
-								}
-							}
-							done.forEach((id) => this.removeRow(id));
-						}),
-						map(({ results }) =>
-							summarizeBulkResults('create', results, IMAGES)
-						),
-						catchError((error: unknown) => {
-							chunk.forEach((row) =>
-								this.markProblem(
-									row.id,
-									'Not published; try again.'
-								)
-							);
-							return of({
-								message: describeWriteError(error),
-								hasFailures: true
-							});
-						})
-					)
-			)
 		);
 	}
 

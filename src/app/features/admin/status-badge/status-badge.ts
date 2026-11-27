@@ -7,13 +7,16 @@ import { NewsStatus } from 'src/app/core/api/api-responses';
  */
 export type ItemStatus = NewsStatus | 'draft' | 'edit';
 
-const STATUS_LABELS: Record<ItemStatus, string> = {
+export const STATUS_LABELS: Record<ItemStatus, string> = {
 	live: 'Live',
 	hidden: 'Hidden',
 	scheduled: 'Scheduled',
 	draft: 'Unpublished',
 	edit: 'Edit'
 };
+
+/** The editor has changes it hasn't published (a list's group, a badge). */
+export const UNPUBLISHED_CHANGES = 'Unpublished changes';
 
 /**
  * An item's status: Live, Scheduled, or Hidden (or Unpublished or Edit for
@@ -25,8 +28,10 @@ const STATUS_LABELS: Record<ItemStatus, string> = {
 	styleUrl: './status-badge.scss'
 })
 export class StatusBadge {
-	public readonly status = input.required<ItemStatus>();
+	/** None shows only whether it has unpublished changes. */
+	public readonly status = input<ItemStatus>();
 	public readonly hasDraft = input(false);
 
 	protected readonly labels = STATUS_LABELS;
+	protected readonly unpublishedChanges = UNPUBLISHED_CHANGES;
 }

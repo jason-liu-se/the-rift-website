@@ -1,8 +1,8 @@
 <mat-form-field class="season" subscriptSizing="dynamic">
-	<mat-label>Season</mat-label>
+	<mat-label>{{ spec.season.label }}</mat-label>
 	<input
 		matInput
-		required
+		[required]="!!spec.season.required"
 		type="number"
 		min="0"
 		step="1"

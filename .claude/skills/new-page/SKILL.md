@@ -51,10 +51,11 @@ Add the route to `src/app/app.routes.ts` before the `**` wildcard:
   plus any shell flags it needs. Check `PageTemplate` for the flags and their
   defaults, and only set flags that differ from the defaults.
 
-Then give it a render mode in `src/app/app.routes.server.ts`
-(`.claude/docs/rendering.md`): `RenderMode.Server` if it shows API data,
-otherwise `RenderMode.Prerender`. Keep the page server-safe: read `window` only
-in event handlers, `afterNextRender`, or behind `isPlatformBrowser`.
+If code links to it, add its path to `src/app/core/config/site-paths.ts` (a test
+checks each one is a route) and link with that. Give it a `data.renderMode`
+(`.claude/docs/rendering.md`): `'server'` if it shows API data, otherwise
+`'prerender'`. Keep the page server-safe: read `window` only in event handlers,
+`afterNextRender`, or behind `isPlatformBrowser`.
 
 ## 4. Navigation
 
