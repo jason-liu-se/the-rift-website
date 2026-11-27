@@ -15,7 +15,7 @@ import {
 	tap,
 	throwError
 } from 'rxjs';
-import { AUTOSAVE_DELAY_MS, UNDO_GROUP_MS } from 'src/app/core/config/admin';
+import { AUTOSAVE_DELAY_MS } from 'src/app/core/config/admin';
 import {
 	DraftContent,
 	DraftPublishRequest,
@@ -37,6 +37,7 @@ import {
 	pickItemFields
 } from './draft-fields';
 import { DraftStore } from './draft-store';
+import { FieldHistory } from './field-history';
 
 /**
  * Why the server refused:
@@ -100,13 +101,10 @@ export class DraftSession<T extends DraftType> {
 	private readonly draftId: ReturnType<typeof signal<string>>;
 	private readonly isEditSignal = signal(false);
 	private readonly state = signal<SaveState<T>>({ stage: 'unchanged' });
-	private readonly historySize = signal({ undo: 0, redo: 0 });
+	private readonly history = new FieldHistory<DraftFields<T>>();
 	private readonly saveRequests = new Subject<void>();
 	private readonly autosave: Subscription;
 	private target?: DraftTarget;
-	private undoStack: DraftFields<T>[] = [];
-	private redoStack: DraftFields<T>[] = [];
-	private lastChange = { keys: '', at: 0 };
 
 	public readonly type: T;
 	public readonly fields: ReturnType<typeof signal<DraftFields<T>>>;
@@ -144,8 +142,8 @@ export class DraftSession<T extends DraftType> {
 			this.status() !== 'published' &&
 			this.status() !== 'unchanged'
 	);
-	public readonly canUndo = computed(() => this.historySize().undo > 0);
-	public readonly canRedo = computed(() => this.historySize().redo > 0);
+	public readonly canUndo = this.history.canUndo;
+	public readonly canRedo = this.history.canRedo;
 
 	constructor(
 		start: DraftSessionStart<T>,
@@ -175,33 +173,20 @@ export class DraftSession<T extends DraftType> {
 
 	/** Changes some fields: kept here at once, saved to the server on a pause. */
 	public update(changes: DraftFields<T>): void {
-		const keys = Object.keys(changes).sort().join();
-		const now = Date.now();
-		const isSameStep =
-			keys === this.lastChange.keys &&
-			now - this.lastChange.at < UNDO_GROUP_MS;
-		if (!isSameStep) {
-			this.undoStack.push(this.fields());
-			this.redoStack = [];
-		}
-		this.lastChange = { keys, at: now };
+		this.history.record(this.fields(), Object.keys(changes));
 		this.setFields({ ...this.fields(), ...changes });
 	}
 
 	public undo(): void {
-		const previous = this.undoStack.pop();
+		const previous = this.history.undo(this.fields());
 		if (previous) {
-			this.redoStack.push(this.fields());
-			this.lastChange = { keys: '', at: 0 };
 			this.setFields(previous);
 		}
 	}
 
 	public redo(): void {
-		const next = this.redoStack.pop();
+		const next = this.history.redo(this.fields());
 		if (next) {
-			this.undoStack.push(this.fields());
-			this.lastChange = { keys: '', at: 0 };
 			this.setFields(next);
 		}
 	}
@@ -339,10 +324,6 @@ export class DraftSession<T extends DraftType> {
 
 	private setFields(fields: DraftFields<T>): void {
 		this.fields.set(fields);
-		this.historySize.set({
-			undo: this.undoStack.length,
-			redo: this.redoStack.length
-		});
 		if (!this.isWorthKeeping()) {
 			this.deps.store.dropCopy(this.id());
 			this.state.set({ stage: 'unchanged' });
