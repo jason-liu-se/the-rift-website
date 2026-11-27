@@ -110,7 +110,8 @@ frontmatter so it loads only when matching files are read or edited.
   responsibility (one section or concern each), even with a single caller, so a
   page mainly composes components. Single responsibility, low coupling, pure
   functions, side effects isolated. The concrete rules (state, data flow,
-  variants, when to split) are in `.claude/rules/component-design.md`.
+  declaring facts once, variants, when to split) are in
+  `.claude/rules/component-design.md`.
 - **Clarity.** Descriptive names (`.claude/rules/naming.md`), small functions,
   guard clauses, named constants (in `src/app/core/config/` if shared or likely
   to be tweaked, like page sizes, links, or seasons, so editors can find them;
