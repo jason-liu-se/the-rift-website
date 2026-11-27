@@ -6,12 +6,12 @@ import {
 } from '@angular/material/paginator';
 import { NEWS_PAGE_SIZE } from 'src/app/core/config/pagination';
 import { NewsPost } from 'src/app/core/api/api-responses';
-import { NewsPostProviderService } from 'src/app/services/news-post-provider/news-post-provider.service';
+import { NewsPostProviderService } from 'src/app/features/news/news-post-provider.service';
 import { PaginatorIntlService } from 'src/app/shared/paginator-intl/paginator-intl.service';
-import { BackgroundImageCardComponent } from '../../shared/ui/background-image-card/background-image-card.component';
-import { NewsDisplayComponent } from '../../components/news/news-display/news-display.component';
-import { FallbackPanelComponent } from '../../shared/ui/fallback-panel/fallback-panel.component';
-import { LoadState } from '../../shared/utils/load-state';
+import { BackgroundImageCardComponent } from '../../../shared/ui/background-image-card/background-image-card.component';
+import { NewsDisplayComponent } from '../news-display/news-display.component';
+import { FallbackPanelComponent } from '../../../shared/ui/fallback-panel/fallback-panel.component';
+import { LoadState } from '../../../shared/utils/load-state';
 
 @Component({
 	selector: 'app-page-news',

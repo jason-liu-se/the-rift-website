@@ -1,5 +1,5 @@
 import { Component, computed, inject, input } from '@angular/core';
-import { NewsDisplayComponent } from 'src/app/components/news/news-display/news-display.component';
+import { NewsDisplayComponent } from 'src/app/features/news/news-display/news-display.component';
 import { NewsPost } from 'src/app/core/api/api-responses';
 import { DraftSession } from '../../../drafts/draft-session';
 import { PublishSettings } from '../../draft-editor/publish-settings';
