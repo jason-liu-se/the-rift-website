@@ -1,4 +1,4 @@
-import { BulkItemResult } from 'src/app/interfaces/api-responses';
+import { BulkItemResult } from 'src/app/core/api/api-responses';
 
 /** How a content type's items are named in messages: "post", "posts". */
 export interface ItemNoun {

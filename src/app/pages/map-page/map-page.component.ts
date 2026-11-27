@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { MapSeason } from 'src/app/interfaces/api-responses';
+import { MapSeason } from 'src/app/core/api/api-responses';
 import { ICardSelection } from 'src/app/interfaces/card-selection.interface';
 import { MapProviderService } from 'src/app/services/map-provider/map-provider.service';
 import { EditButtonComponent } from '../../components/edit-button/edit-button.component';

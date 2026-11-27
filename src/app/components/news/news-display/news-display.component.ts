@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { NewsPost } from 'src/app/interfaces/api-responses';
+import { NewsPost } from 'src/app/core/api/api-responses';
 import { EditButtonComponent } from 'src/app/components/edit-button/edit-button.component';
 import { toPlainText } from 'src/app/utilities/markdown';
 import { MarkdownComponent } from 'src/app/components/markdown/markdown.component';

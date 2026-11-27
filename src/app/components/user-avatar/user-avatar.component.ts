@@ -1,6 +1,6 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
-import { AuthService } from 'src/app/services/auth/auth.service';
+import { AuthService } from 'src/app/core/auth/auth.service';
 
 /**
  * The logged-in editor's avatar and username. Falls back to their initial when

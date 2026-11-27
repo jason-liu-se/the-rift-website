@@ -1,4 +1,4 @@
-import { MAX_UPLOAD_BYTES } from '../config/uploads';
+import { MAX_UPLOAD_BYTES } from '../core/config/uploads';
 import { findImageFileProblem } from './image-files';
 
 const file = (name: string, type: string, size = 10) =>

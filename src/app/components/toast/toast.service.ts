@@ -3,7 +3,7 @@ import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { DOCUMENT } from '@angular/common';
 import { Injectable, inject } from '@angular/core';
-import { FocusRecoveryService } from 'src/app/services/focus-recovery/focus-recovery.service';
+import { FocusRecoveryService } from 'src/app/core/focus-recovery/focus-recovery.service';
 import { ToastComponent } from './toast.component';
 
 /** How long a toast stays before it dismisses itself. */

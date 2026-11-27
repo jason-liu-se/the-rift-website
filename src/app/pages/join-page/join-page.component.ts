@@ -3,7 +3,7 @@ import { BackgroundImageCardComponent } from '../../components/background-image-
 import { SectionCardComponent } from '../../components/section-card/section-card.component';
 import { MatFabButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
-import { JOIN_FORM_URL } from '../../config/site';
+import { JOIN_FORM_URL } from '../../core/config/site';
 
 @Component({
 	selector: 'app-join-page',

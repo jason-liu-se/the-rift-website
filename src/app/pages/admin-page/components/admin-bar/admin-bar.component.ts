@@ -5,11 +5,11 @@ import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { MatTooltip } from '@angular/material/tooltip';
 import { Router, RouterLink } from '@angular/router';
 import { UserAvatarComponent } from 'src/app/components/user-avatar/user-avatar.component';
-import { ADMIN_LOGIN_PATH, ADMIN_PATH } from 'src/app/config/admin';
-import { LOGO_PATH } from 'src/app/config/site';
-import { NAVBAR_HEIGHT_VARIABLE } from 'src/app/layout/navbar/navbar.component';
-import { publishHeight } from 'src/app/layout/publish-height';
-import { AuthService } from 'src/app/services/auth/auth.service';
+import { ADMIN_LOGIN_PATH, ADMIN_PATH } from 'src/app/core/config/admin';
+import { LOGO_PATH } from 'src/app/core/config/site';
+import { NAVBAR_HEIGHT_VARIABLE } from 'src/app/core/layout/navbar/navbar.component';
+import { publishHeight } from 'src/app/core/layout/publish-height';
+import { AuthService } from 'src/app/core/auth/auth.service';
 
 /**
  * The admin tools' app bar, in the public navbar's place: where you are, a

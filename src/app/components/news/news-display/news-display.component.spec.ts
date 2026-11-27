@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { NewsPost } from 'src/app/interfaces/api-responses';
+import { NewsPost } from 'src/app/core/api/api-responses';
 import { renderComponent } from 'src/app/testing/render-component';
 import { NewsDisplayComponent } from './news-display.component';
 

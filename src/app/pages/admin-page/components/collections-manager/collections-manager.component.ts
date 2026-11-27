@@ -10,7 +10,7 @@ import {
 	Injector
 } from '@angular/core';
 import { Observable } from 'rxjs';
-import { EditorCollection } from 'src/app/interfaces/api-responses';
+import { EditorCollection } from 'src/app/core/api/api-responses';
 import { CollectionContentType } from 'src/app/services/editor-content/editor-content-types';
 import { EditorContentService } from 'src/app/services/editor-content/editor-content.service';
 import { CollectionsStore } from '../../services/collections-store.service';

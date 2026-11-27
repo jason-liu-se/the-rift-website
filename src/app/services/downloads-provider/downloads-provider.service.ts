@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { Injectable, inject } from '@angular/core';
-import { DownloadCollection } from '../../interfaces/api-responses';
+import { DownloadCollection } from '../../core/api/api-responses';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 

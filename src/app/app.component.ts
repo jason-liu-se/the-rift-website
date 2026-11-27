@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { publishScrollbarGap } from './layout/publish-scrollbar-gap';
-import { SessionEndedService } from './layout/session-ended/session-ended.service';
+import { publishScrollbarGap } from './core/layout/publish-scrollbar-gap';
+import { SessionEndedService } from './core/layout/session-ended/session-ended.service';
 
 @Component({
 	selector: 'app-root',

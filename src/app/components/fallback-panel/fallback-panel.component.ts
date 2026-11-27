@@ -11,7 +11,7 @@ import {
 	viewChild
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { FocusRecoveryService } from 'src/app/services/focus-recovery/focus-recovery.service';
+import { FocusRecoveryService } from 'src/app/core/focus-recovery/focus-recovery.service';
 
 export const RETRY_FAILED_MESSAGE =
 	"Still couldn't load. Try again in a moment.";

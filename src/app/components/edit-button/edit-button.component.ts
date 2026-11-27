@@ -1,8 +1,8 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
-import { ADMIN_PATH } from 'src/app/config/admin';
-import { EditorContentType } from 'src/app/interfaces/api-requests';
-import { AuthService } from 'src/app/services/auth/auth.service';
+import { ADMIN_PATH } from 'src/app/core/config/admin';
+import { EditorContentType } from 'src/app/core/api/api-requests';
+import { AuthService } from 'src/app/core/auth/auth.service';
 
 /**
  * "Edit" on a piece of public content, for logged-in editors only: opens the

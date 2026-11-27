@@ -13,7 +13,7 @@ import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { skip } from 'rxjs';
-import { EditorContentType } from 'src/app/interfaces/api-requests';
+import { EditorContentType } from 'src/app/core/api/api-requests';
 import { EDITOR_TYPES } from '../../editor-types';
 import { EditorListComponent } from '../editor-list/editor-list.component';
 import { BULK_ACTION_HOST } from '../editor-list/bulk-action-host';

@@ -7,9 +7,9 @@ import {
 } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, distinctUntilChanged, map, of } from 'rxjs';
-import { GALLERY_FALLBACK_IMAGE } from 'src/app/config/gallery';
-import { GALLERY_PAGE_SIZE } from 'src/app/config/pagination';
-import { GalleryImage } from 'src/app/interfaces/api-responses';
+import { GALLERY_FALLBACK_IMAGE } from 'src/app/core/config/gallery';
+import { GALLERY_PAGE_SIZE } from 'src/app/core/config/pagination';
+import { GalleryImage } from 'src/app/core/api/api-responses';
 import { GalleryProviderService } from 'src/app/services/gallery-provider/gallery-provider.service';
 import { PaginatorIntlService } from 'src/app/services/paginator-intl/paginator-intl.service';
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';

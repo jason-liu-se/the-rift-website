@@ -20,8 +20,8 @@ import {
 	BulkItemRef,
 	DraftSaveRequest,
 	EditorContentType
-} from 'src/app/interfaces/api-requests';
-import { BulkItemResult } from 'src/app/interfaces/api-responses';
+} from 'src/app/core/api/api-requests';
+import { BulkItemResult } from 'src/app/core/api/api-responses';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
 import { DraftsService } from 'src/app/services/drafts/drafts.service';
 import {

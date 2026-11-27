@@ -1,5 +1,5 @@
 import { ImageLoader } from '@angular/common';
-import { IMAGE_WIDTHS } from '../config/images';
+import { IMAGE_WIDTHS } from '../core/config/images';
 
 const ALLOWED_WIDTHS = Object.values(IMAGE_WIDTHS);
 

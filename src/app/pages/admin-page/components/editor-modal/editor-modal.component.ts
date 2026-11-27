@@ -23,13 +23,13 @@ import {
 	of,
 	switchMap
 } from 'rxjs';
-import { EditorContentType } from 'src/app/interfaces/api-requests';
+import { EditorContentType } from 'src/app/core/api/api-requests';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
 import { ItemOf } from 'src/app/services/editor-content/editor-content-types';
 import {
 	BrowserStorage,
 	STORAGE_KEYS
-} from 'src/app/services/browser-storage/browser-storage.service';
+} from 'src/app/core/browser-storage/browser-storage.service';
 import { EditorContentService } from 'src/app/services/editor-content/editor-content.service';
 import { CollectionsStore } from '../../services/collections-store.service';
 import { DraftFields } from '../../drafts/draft-fields';

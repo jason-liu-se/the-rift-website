@@ -6,8 +6,8 @@ import {
 import { Injectable, inject } from '@angular/core';
 import { Observable, filter, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ImageUploadForm } from '../../interfaces/api-requests';
-import { ImageUploadResponse } from '../../interfaces/api-responses';
+import { ImageUploadForm } from '../../core/api/api-requests';
+import { ImageUploadResponse } from '../../core/api/api-responses';
 
 /** An upload's progress (0 to 1), then its result per file. */
 export type ImageUploadEvent =

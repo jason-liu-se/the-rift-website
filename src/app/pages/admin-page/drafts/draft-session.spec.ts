@@ -5,11 +5,11 @@ import {
 } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { AUTOSAVE_DELAY_MS } from 'src/app/config/admin';
-import { Draft, EditorNewsPost } from 'src/app/interfaces/api-responses';
-import { ApiStatus } from 'src/app/services/api-status/api-status.service';
-import { ApiStatusService } from 'src/app/services/api-status/api-status.service';
-import { AuthService } from 'src/app/services/auth/auth.service';
+import { AUTOSAVE_DELAY_MS } from 'src/app/core/config/admin';
+import { Draft, EditorNewsPost } from 'src/app/core/api/api-responses';
+import { ApiStatus } from 'src/app/core/api/api-status/api-status.service';
+import { ApiStatusService } from 'src/app/core/api/api-status/api-status.service';
+import { AuthService } from 'src/app/core/auth/auth.service';
 import { DraftsService } from 'src/app/services/drafts/drafts.service';
 import { LocalDraftsService } from 'src/app/services/drafts/local-drafts.service';
 import { environment } from 'src/environments/environment';

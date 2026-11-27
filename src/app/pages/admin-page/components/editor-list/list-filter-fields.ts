@@ -1,5 +1,5 @@
-import { EditorContentType } from 'src/app/interfaces/api-requests';
-import { DraftSummary } from 'src/app/interfaces/api-responses';
+import { EditorContentType } from 'src/app/core/api/api-requests';
+import { DraftSummary } from 'src/app/core/api/api-responses';
 import { ListQueryOf } from 'src/app/services/editor-content/editor-content-types';
 
 type ListQuery = ListQueryOf<EditorContentType>;

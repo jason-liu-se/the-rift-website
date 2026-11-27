@@ -5,9 +5,9 @@ import {
 } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { NewsPost } from 'src/app/interfaces/api-responses';
+import { NewsPost } from 'src/app/core/api/api-responses';
 import { environment } from 'src/environments/environment';
-import { ApiStatusService } from 'src/app/services/api-status/api-status.service';
+import { ApiStatusService } from 'src/app/core/api/api-status/api-status.service';
 import { NewsPageComponent } from './news-page.component';
 
 const PAGE_SIZE = 10;

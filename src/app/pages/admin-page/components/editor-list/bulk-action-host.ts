@@ -1,5 +1,5 @@
 import { InjectionToken, Signal } from '@angular/core';
-import { EditorContentType } from 'src/app/interfaces/api-requests';
+import { EditorContentType } from 'src/app/core/api/api-requests';
 import { BulkActionOf } from 'src/app/services/editor-content/editor-content-types';
 
 /** What a type's own bulk actions run on: the list's selection. */

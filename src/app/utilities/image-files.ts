@@ -1,4 +1,4 @@
-import { MAX_UPLOAD_BYTES, UPLOAD_IMAGE_TYPES } from '../config/uploads';
+import { MAX_UPLOAD_BYTES, UPLOAD_IMAGE_TYPES } from '../core/config/uploads';
 
 /** Why the API would refuse `file`, or undefined if it's fine to upload. */
 export function findImageFileProblem(file: File): string | undefined {

@@ -1,5 +1,5 @@
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
-import { ErrorResponse } from 'src/app/interfaces/api-responses';
+import { ErrorResponse } from 'src/app/core/api/api-responses';
 
 /** Why a write failed, for a snackbar: the API's reason when it gave one. */
 export function describeWriteError(error: unknown): string {

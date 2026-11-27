@@ -16,11 +16,8 @@ import {
 	switchMap,
 	tap
 } from 'rxjs';
-import { CollectionDraftType } from 'src/app/interfaces/api-requests';
-import {
-	DraftSummary,
-	EditorCollection
-} from 'src/app/interfaces/api-responses';
+import { CollectionDraftType } from 'src/app/core/api/api-requests';
+import { DraftSummary, EditorCollection } from 'src/app/core/api/api-responses';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
 import { DraftsService } from 'src/app/services/drafts/drafts.service';
 import {

@@ -9,14 +9,14 @@ import {
 	CollectionUpdateRequest,
 	EditorContentType,
 	GalleryImageBulkCreateRequest
-} from '../../interfaces/api-requests';
+} from '../../core/api/api-requests';
 import {
 	BulkResponse,
 	EditorCollection,
 	EditorGalleryImage,
 	EditorGalleryTags,
 	PaginatedResponse
-} from '../../interfaces/api-responses';
+} from '../../core/api/api-responses';
 import {
 	BulkUpdateRequestOf,
 	CollectionContentType,

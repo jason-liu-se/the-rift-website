@@ -1,5 +1,5 @@
 import { signal } from '@angular/core';
-import { EditorContentType } from 'src/app/interfaces/api-requests';
+import { EditorContentType } from 'src/app/core/api/api-requests';
 import { BulkActionOf } from 'src/app/services/editor-content/editor-content-types';
 import { BULK_ACTION_HOST, BulkActionHost } from './bulk-action-host';
 

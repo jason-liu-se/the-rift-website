@@ -1,5 +1,5 @@
 import { Component, input } from '@angular/core';
-import { NewsStatus } from 'src/app/interfaces/api-responses';
+import { NewsStatus } from 'src/app/core/api/api-responses';
 
 /**
  * What an admin list row is: a published item's status, or the editor's

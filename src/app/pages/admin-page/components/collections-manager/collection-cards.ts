@@ -1,7 +1,4 @@
-import {
-	DraftSummary,
-	EditorCollection
-} from 'src/app/interfaces/api-responses';
+import { DraftSummary, EditorCollection } from 'src/app/core/api/api-responses';
 import {
 	CollectionTarget,
 	NewCollectionDraft

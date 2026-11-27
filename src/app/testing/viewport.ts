@@ -1,4 +1,4 @@
-import { DESKTOP_BREAKPOINT_REM } from '../config/breakpoints';
+import { DESKTOP_BREAKPOINT_REM } from '../core/config/breakpoints';
 
 const ROOT_FONT_SIZE_PX = 16;
 const INITIAL_INNER_WIDTH = window.innerWidth;

@@ -1,4 +1,4 @@
-import { BulkItemResult } from 'src/app/interfaces/api-responses';
+import { BulkItemResult } from 'src/app/core/api/api-responses';
 import { countItems, summarizeBulkResults, toChunks } from './bulk-results';
 
 const NOUN = { one: 'post', many: 'posts' };

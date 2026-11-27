@@ -19,13 +19,13 @@ import {
 import {
 	EDITOR_PAGE_SIZE,
 	EDITOR_SEARCH_DEBOUNCE_MS
-} from 'src/app/config/admin';
-import { EditorContentType } from 'src/app/interfaces/api-requests';
+} from 'src/app/core/config/admin';
+import { EditorContentType } from 'src/app/core/api/api-requests';
 import {
 	DraftSummary,
 	PaginatedResponse
-} from 'src/app/interfaces/api-responses';
-import { AuthService } from 'src/app/services/auth/auth.service';
+} from 'src/app/core/api/api-responses';
+import { AuthService } from 'src/app/core/auth/auth.service';
 import { DraftsService } from 'src/app/services/drafts/drafts.service';
 import {
 	ListQueryOf,

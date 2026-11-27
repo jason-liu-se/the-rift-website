@@ -7,7 +7,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { GALLERY_COLLECTIONS, paginate } from 'src/app/testing/api-fixtures';
 import { expectGet, flushServerError } from 'src/app/testing/http';
-import { CONTENT_VERSION_MAX_AGE_MS } from 'src/app/config/api';
+import { CONTENT_VERSION_MAX_AGE_MS } from 'src/app/core/config/api';
 import { environment } from 'src/environments/environment';
 import { GalleryProviderService } from './gallery-provider.service';
 

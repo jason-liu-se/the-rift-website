@@ -1,5 +1,5 @@
 import { computed, signal } from '@angular/core';
-import { BulkItemRef } from 'src/app/interfaces/api-requests';
+import { BulkItemRef } from 'src/app/core/api/api-requests';
 
 /** The rows a page of the list shows: the editor's drafts, then items. */
 export interface PageRows {

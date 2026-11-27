@@ -19,7 +19,7 @@ import {
 	MapSeason,
 	NewsPost,
 	PaginatedResponse
-} from '../interfaces/api-responses';
+} from '../core/api/api-responses';
 
 export const CONTENT_VERSION: ContentVersion = { version: 1763580000000 };
 export const NEWS_DETAIL_VERSION: DetailVersion = {

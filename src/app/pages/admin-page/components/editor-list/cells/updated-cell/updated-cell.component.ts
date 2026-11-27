@@ -1,5 +1,5 @@
 import { Component, computed, input } from '@angular/core';
-import { EditorRef } from 'src/app/interfaces/api-responses';
+import { EditorRef } from 'src/app/core/api/api-responses';
 import { formatRelativeTime } from 'src/app/utilities/relative-time';
 import { formatDateTime } from '../../../../utilities/format-date-time';
 import { EditorAvatarComponent } from '../../../editor-avatar/editor-avatar.component';

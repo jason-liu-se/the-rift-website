@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { NewsPost, PaginatedResponse } from '../../interfaces/api-responses';
+import { NewsPost, PaginatedResponse } from '../../core/api/api-responses';
 
 @Injectable({
 	providedIn: 'root'

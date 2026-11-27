@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CONTACT_EMAIL } from '../../config/site';
+import { CONTACT_EMAIL } from '../../core/config/site';
 
 @Component({
 	selector: 'app-contact',

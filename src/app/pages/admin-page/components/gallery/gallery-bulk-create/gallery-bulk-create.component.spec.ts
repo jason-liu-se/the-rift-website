@@ -6,7 +6,7 @@ import {
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
-import { ApiStatusService } from 'src/app/services/api-status/api-status.service';
+import { ApiStatusService } from 'src/app/core/api/api-status/api-status.service';
 import { EDITOR_GALLERY_COLLECTIONS } from 'src/app/testing/api-fixtures';
 import { environment } from 'src/environments/environment';
 import { GalleryBulkCreateComponent } from './gallery-bulk-create.component';

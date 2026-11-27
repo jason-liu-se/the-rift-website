@@ -37,11 +37,14 @@ import {
 	of,
 	tap
 } from 'rxjs';
-import { MAX_BULK_ITEMS } from 'src/app/config/admin';
-import { MAX_GALLERY_CAPTION_LENGTH } from 'src/app/config/content-limits';
-import { MAX_UPLOAD_FILES, UPLOAD_IMAGE_TYPES } from 'src/app/config/uploads';
+import { MAX_BULK_ITEMS } from 'src/app/core/config/admin';
+import { MAX_GALLERY_CAPTION_LENGTH } from 'src/app/core/config/content-limits';
+import {
+	MAX_UPLOAD_FILES,
+	UPLOAD_IMAGE_TYPES
+} from 'src/app/core/config/uploads';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
-import { ApiStatusService } from 'src/app/services/api-status/api-status.service';
+import { ApiStatusService } from 'src/app/core/api/api-status/api-status.service';
 import { EditorContentService } from 'src/app/services/editor-content/editor-content.service';
 import { ImageUploadService } from 'src/app/services/image-upload/image-upload.service';
 import { findImageFileProblem } from 'src/app/utilities/image-files';

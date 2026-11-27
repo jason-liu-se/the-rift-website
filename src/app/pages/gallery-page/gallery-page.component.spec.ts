@@ -6,7 +6,7 @@ import {
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
-import { Dimension, GalleryImage } from 'src/app/interfaces/api-responses';
+import { Dimension, GalleryImage } from 'src/app/core/api/api-responses';
 import { environment } from 'src/environments/environment';
 import { GalleryPageComponent } from './gallery-page.component';
 

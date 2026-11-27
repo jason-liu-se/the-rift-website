@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of, switchMap, throwError } from 'rxjs';
-import { DraftType } from 'src/app/interfaces/api-requests';
-import { ApiStatusService } from 'src/app/services/api-status/api-status.service';
+import { DraftType } from 'src/app/core/api/api-requests';
+import { ApiStatusService } from 'src/app/core/api/api-status/api-status.service';
 import { DraftsService } from 'src/app/services/drafts/drafts.service';
 import { LocalDraft } from 'src/app/services/drafts/local-drafts.service';
 import {

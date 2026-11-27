@@ -1,5 +1,5 @@
 import { Component, computed, input, signal } from '@angular/core';
-import { EditorRef } from 'src/app/interfaces/api-responses';
+import { EditorRef } from 'src/app/core/api/api-responses';
 
 /**
  * Who made an edit, as a picture beside their name: their Discord avatar, or
