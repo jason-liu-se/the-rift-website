@@ -1,5 +1,6 @@
-import { Component, computed, input, signal } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
+import { untilLoadFails } from 'src/app/shared/utils/image-load-failure';
 
 /**
  * A list row's image, or a placeholder when it has none or it no longer loads,
@@ -14,13 +15,5 @@ import { MatIcon } from '@angular/material/icon';
 export class ItemThumbnail {
 	public readonly src = input<string>();
 
-	private readonly failedSrc = signal<string | undefined>(undefined);
-	protected readonly imageSrc = computed(() => {
-		const src = this.src();
-		return src !== this.failedSrc() ? src : undefined;
-	});
-
-	protected markFailed(src: string): void {
-		this.failedSrc.set(src);
-	}
+	protected readonly image = untilLoadFails(this.src);
 }

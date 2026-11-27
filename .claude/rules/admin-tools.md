@@ -55,14 +55,14 @@ The decisions are in issue #101; the API's side is in the web-server's
   field. An `isOrderable` type, filtered to one collection, drags into order
   (`list-order.ts`, one update per moved item).
 - **Collections** come from `CollectionsStore` (provided by the admin page):
-  fetched once per type, reloaded after a collection write. The Collections
-  modal lists them, and the editor's drafts of new ones, beside
-  `collection-form/`, which edits one collection draft at a time
-  (`gallery-collections`, `downloads-collections`): a new one, or an existing
-  one's title and dimensions. Side by side, the list and the form scroll
-  separately. `CollectionsEditor` (provided by the modal) owns the open draft
-  and the drafts list; `collections-manager/` runs the list's actions and shows
-  `collection-list/` (cards from `toCollectionCards()`) beside the form.
+  fetched once per type, reloaded after a collection write. Forms choose one
+  with `collection-select/`. The Collections modal lists them, and the editor's
+  drafts of new ones, beside `collection-form/`, which edits one collection
+  draft at a time (`gallery-collections`, `downloads-collections`): a new one,
+  or an existing one's title and dimensions. Side by side, the list and the form
+  scroll separately. `CollectionsEditor` (provided by the modal) owns the open
+  draft and the drafts list; `collections-manager/` runs the list's actions and
+  shows `collection-list/` (cards from `toCollectionCards()`) beside the form.
   Published and unpublished collections are the same cards: a click opens one in
   the form, showing or hiding one changes its draft, and deleting a published
   one writes at once. The form shares the item editor's publishing
@@ -75,6 +75,8 @@ The decisions are in issue #101; the API's side is in the web-server's
   (`withThumbnails`); a map's spans its taller fields, cropped narrower than
   16:9. The `/gallery` card shows the collection's first dimension's image, or
   none.
+- **Uploads:** drop zones use the `appFileDrop` directive
+  (`image-upload/file-drop.ts`).
 - **Writes** (confirm, send, snackbar) go through `EditorWriter.run()`.
 - **API:** `EditorContentApi` (items, bulk actions, collections), `DraftsApi`,
   and `ImageUploader`, typed per content type by `EditorContentTypes`

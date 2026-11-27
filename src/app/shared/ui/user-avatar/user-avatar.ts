@@ -1,6 +1,7 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { AuthSession } from 'src/app/core/auth/auth-session';
+import { untilLoadFails } from 'src/app/shared/utils/image-load-failure';
 
 /**
  * The logged-in editor's avatar and username. Falls back to their initial when
@@ -18,10 +19,7 @@ export class UserAvatar {
 	/** Turn off to show the avatar alone. */
 	public readonly showUsername = input(true);
 
-	public readonly avatarFailed = signal(false);
-	public readonly avatarUrl = computed(() =>
-		this.avatarFailed() ? undefined : this.user()?.avatarUrl
-	);
+	protected readonly avatar = untilLoadFails(() => this.user()?.avatarUrl);
 	public readonly initial = computed(() =>
 		this.user()?.username.charAt(0).toUpperCase()
 	);

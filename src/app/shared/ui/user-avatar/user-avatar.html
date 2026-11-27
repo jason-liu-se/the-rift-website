@@ -1,6 +1,6 @@
 <div class="avatar" aria-hidden="true">
-	@if (avatarUrl(); as url) {
-	<img [src]="url" alt="" (error)="avatarFailed.set(true)" />
+	@if (avatar.url(); as url) {
+	<img [src]="url" alt="" (error)="avatar.markFailed(url)" />
 	} @else if (initial(); as letter) { {{ letter }} } @else {
 	<mat-icon>person</mat-icon>
 	}
