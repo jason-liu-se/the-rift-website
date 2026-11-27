@@ -16,6 +16,7 @@ import {
 import {
 	TitleStrategy,
 	provideRouter,
+	withComponentInputBinding,
 	withInMemoryScrolling
 } from '@angular/router';
 
@@ -36,8 +37,10 @@ export const appConfig: ApplicationConfig = {
 		provideZoneChangeDetection(),
 		provideRouter(
 			routes,
-			// A fragment change (e.g. the admin page's tool links) scrolls to the
-			// matching id, if any, instead of to the top.
+			// Routed components (e.g. the admin tools) get route parameters as inputs.
+			withComponentInputBinding(),
+			// A fragment change scrolls to the matching id, if any, instead of to
+			// the top.
 			withInMemoryScrolling({
 				scrollPositionRestoration: 'enabled',
 				anchorScrolling: 'enabled'

@@ -10,6 +10,7 @@
 }
 
 .caption-card {
+	position: relative;
 	display: flex;
 	// Optimised images fill their tile, so the tile can't take the image's
 	// width: start at a 16:9 photo's width at this height.
@@ -27,6 +28,8 @@
 }
 
 .image-button {
+	// Keeps the caption card's layers under the Edit link.
+	isolation: isolate;
 	background-color: transparent;
 	border: none;
 	flex: 1 1 auto;
@@ -66,4 +69,11 @@
 
 .exit-button:hover > .exit-icon {
 	transform: rotate(90deg);
+}
+
+// Editors' Edit link, over the card's top-right corner.
+.edit {
+	position: absolute;
+	top: 8px;
+	right: 8px;
 }

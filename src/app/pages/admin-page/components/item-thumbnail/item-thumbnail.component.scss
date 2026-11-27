@@ -1,0 +1,27 @@
+@use "../../../../../theme-colours" as *;
+
+:host {
+	display: block;
+	flex: none;
+	width: 4rem;
+	aspect-ratio: 16 / 9;
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+img,
+.placeholder {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+img {
+	object-fit: cover;
+}
+
+.placeholder {
+	display: grid;
+	place-items: center;
+	background-color: rgba($colour-primary, 0.15);
+}

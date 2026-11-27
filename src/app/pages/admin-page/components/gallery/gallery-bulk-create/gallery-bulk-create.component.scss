@@ -1,0 +1,227 @@
+@use "../../../../../../theme-colours" as *;
+@use "../../../../../../font-sizes" as *;
+
+.body {
+	display: grid;
+	gap: 20px;
+}
+
+.drop-zone {
+	display: grid;
+	justify-items: center;
+	gap: 8px;
+	padding: 24px 16px;
+	border: 2px dashed $colour-light-grey;
+	border-radius: 12px;
+	text-align: center;
+
+	&.dragging {
+		border-color: $colour-primary;
+		background-color: rgba($colour-primary, 0.05);
+	}
+}
+
+.drop-icon {
+	width: 40px;
+	height: 40px;
+	font-size: 40px;
+}
+
+.drop-text {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 8px 12px;
+	margin: 0;
+}
+
+.note {
+	margin: 0;
+	font-size: $font-size-small;
+}
+
+.links {
+	justify-self: stretch;
+	text-align: left;
+
+	summary {
+		width: fit-content;
+		margin: 0 auto;
+		padding: 8px;
+		cursor: pointer;
+		font-size: $font-size-small;
+	}
+}
+
+.links-form {
+	display: grid;
+	justify-items: start;
+	gap: 8px;
+	margin-top: 8px;
+
+	mat-form-field {
+		width: 100%;
+	}
+}
+
+// Fields line up by their tops: a hint under one doesn't move it.
+.apply-all {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 12px;
+	margin: 0;
+	padding: 12px 16px 16px;
+	border: 1px solid $colour-light-grey;
+	border-radius: 8px;
+
+	legend {
+		padding: 0 4px;
+		font-weight: 600;
+	}
+}
+
+.apply-tags {
+	display: flex;
+	flex: 1 1 18rem;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 8px;
+
+	app-tag-input {
+		flex: 1 1 12rem;
+	}
+
+	// Centred on the 56px field beside it.
+	button {
+		margin-top: 8px;
+		white-space: nowrap;
+	}
+}
+
+.apply-all app-visibility-toggle {
+	margin-top: 8px;
+}
+
+.rows {
+	display: grid;
+	gap: 12px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.row {
+	display: grid;
+	grid-template-columns: auto 5rem 1fr auto;
+	gap: 12px;
+	align-items: start;
+	padding: 12px;
+	border: 1px solid $colour-light-grey;
+	border-radius: 8px;
+	background-color: $colour-light-background;
+
+	&.has-problem {
+		border-color: $colour-error;
+	}
+}
+
+.drag-handle {
+	padding: 8px 0;
+	cursor: grab;
+	touch-action: none;
+}
+
+.cdk-drag-preview {
+	box-shadow: 0 8px 24px rgba($colour-dark-text, 0.2);
+}
+
+.cdk-drag-placeholder {
+	opacity: 0.4;
+}
+
+.thumbnail {
+	width: 5rem;
+	aspect-ratio: 1;
+	border-radius: 4px;
+	object-fit: cover;
+}
+
+.row-fields {
+	display: grid;
+	// Each field keeps its own height, beside a taller one.
+	align-items: start;
+	gap: 12px;
+	min-width: 0;
+}
+
+.row-fields app-visibility-toggle {
+	justify-self: start;
+}
+
+.row-actions {
+	display: flex;
+	flex-direction: column;
+}
+
+.problem {
+	margin: 0;
+	color: $colour-error;
+	font-size: $font-size-small;
+}
+
+.footer {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px 16px;
+}
+
+.summary {
+	margin: 0;
+	font-size: $font-size-small;
+}
+
+@media (max-width: 39.99rem) {
+	.row {
+		grid-template-columns: auto 1fr auto;
+	}
+
+	.thumbnail {
+		grid-column: 2;
+		width: 100%;
+		aspect-ratio: 16 / 9;
+	}
+
+	.row-fields {
+		grid-column: 1 / -1;
+	}
+
+	.row-actions {
+		grid-column: 3;
+		grid-row: 1;
+	}
+}
+
+@media (min-width: 60rem) {
+	.row {
+		grid-template-columns: auto 8rem 1fr auto;
+	}
+
+	.thumbnail {
+		width: 8rem;
+	}
+
+	// Caption and collection side by side, then tags across.
+	.row-fields {
+		grid-template-columns: 2fr 1fr;
+
+		app-tag-input,
+		app-visibility-toggle,
+		.problem {
+			grid-column: 1 / -1;
+		}
+	}
+}

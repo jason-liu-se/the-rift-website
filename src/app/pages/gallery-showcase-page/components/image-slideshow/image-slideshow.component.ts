@@ -23,7 +23,9 @@ export class ImageSlideshowComponent implements OnInit {
 
 		// defaulting values for an empty captionedImages array
 		if (this.captionedImages.length <= 0) {
-			this.captionedImages = [{ id: '', imageUrl: '', caption: '' }];
+			this.captionedImages = [
+				{ id: '', imageUrl: '', caption: '', tags: [] }
+			];
 		}
 
 		// updating button states

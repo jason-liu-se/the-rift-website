@@ -24,12 +24,12 @@ export const ROUTES: readonly IE2eRoute[] = [
 	{
 		path: '/gallery',
 		title: 'Gallery | The Rift',
-		readyText: `${GALLERY_COLLECTIONS['season5'].length} photos`
+		readyText: `${GALLERY_COLLECTIONS[0].images.length} photos`
 	},
 	{
 		path: '/gallery/season5',
 		title: 'Season 5 Gallery | The Rift',
-		readyText: `Results: ${GALLERY_COLLECTIONS['season5'].length}`
+		readyText: `Results: ${GALLERY_COLLECTIONS[0].images.length}`
 	},
 	{
 		path: '/map',

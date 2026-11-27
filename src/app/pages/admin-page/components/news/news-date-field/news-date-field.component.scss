@@ -1,0 +1,36 @@
+@use "../../../../../../theme-colours" as *;
+@use "../../../../../../font-sizes" as *;
+
+.date-field {
+	display: grid;
+	gap: 4px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.legend {
+	padding: 0;
+	margin-bottom: 4px;
+	font-weight: 500;
+}
+
+.choices {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0 16px;
+}
+
+.when {
+	max-width: 18rem;
+}
+
+.problem {
+	margin: 0;
+	color: $colour-error;
+	font-size: $font-size-small;
+
+	&:empty {
+		display: none;
+	}
+}

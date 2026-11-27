@@ -6,8 +6,7 @@ import {
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
-import { GALLERY_FALLBACK_IMAGE } from 'src/app/config/gallery';
-import { GalleryImage } from 'src/app/interfaces/api-responses';
+import { Dimension, GalleryImage } from 'src/app/interfaces/api-responses';
 import { environment } from 'src/environments/environment';
 import { GalleryPageComponent } from './gallery-page.component';
 
@@ -18,7 +17,8 @@ describe('GalleryPageComponent', () => {
 	const photo = (url: string): GalleryImage => ({
 		id: url,
 		imageUrl: url,
-		caption: ''
+		caption: '',
+		tags: []
 	});
 	let fixture: ComponentFixture<GalleryPageComponent>;
 	let element: HTMLElement;
@@ -31,14 +31,32 @@ describe('GalleryPageComponent', () => {
 		cards().map((card) =>
 			card.querySelector('.description')?.textContent?.trim()
 		);
-	const flushNames = (names: string[]) =>
-		httpTesting.expectOne(galleryUrl).flush(names);
+	/**
+	 * Answers GET /gallery; each title is its slug in capitals, each with two
+	 * dimensions (the first is its card).
+	 */
+	const flushCollections = (
+		slugs: string[],
+		dimensionsOf = (slug: string): Dimension[] => [
+			{ name: 'Overworld', imageUrl: `${slug}-overworld.webp` },
+			{ name: 'Nether', imageUrl: `${slug}-nether.webp` }
+		]
+	) =>
+		httpTesting.expectOne(galleryUrl).flush(
+			slugs.map((slug) => ({
+				slug,
+				title: slug.toUpperCase(),
+				dimensions: dimensionsOf(slug)
+			}))
+		);
+	const cardImage = (card: Element) =>
+		card.querySelector('.background-content img')?.getAttribute('src');
 	const flushCover = (collection: string, total: number, urls: string[]) =>
 		httpTesting
 			.expectOne(coverUrl(collection))
 			.flush({ items: urls.map(photo), total });
 	const loadSeasons5And6 = () => {
-		flushNames(['season5', 'season6']);
+		flushCollections(['season5', 'season6']);
 		flushCover('season5', 12, ['five.webp']);
 		flushCover('season6', 7, ['six.webp']);
 		fixture.detectChanges();
@@ -64,51 +82,45 @@ describe('GalleryPageComponent', () => {
 	it('shows a card for each collection the API lists, linking to its page', () => {
 		loadSeasons5And6();
 
-		expect(titles()).toEqual(['Season 5', 'Season 6']);
+		expect(titles()).toEqual(['SEASON5', 'SEASON6']);
 		expect(
 			cards().map((card) => card.querySelector('a')?.getAttribute('href'))
 		).toEqual(['/gallery/season5', '/gallery/season6']);
 	});
 
-	it("shows each collection's photo count and first photo", () => {
+	it("shows each collection's photo count and its first dimension's image", () => {
 		expect(descriptions()).toEqual([]);
 
 		loadSeasons5And6();
 
 		expect(descriptions()).toEqual(['12 photos', '7 photos']);
-		const images = cards().map((card) =>
-			card.querySelector('.background-content img')?.getAttribute('src')
-		);
-		expect(images[0]).toContain('five.webp');
-		expect(images[1]).toContain('six.webp');
+		const images = cards().map(cardImage);
+		expect(images[0]).toContain('season5-overworld.webp');
+		expect(images[1]).toContain('season6-overworld.webp');
 	});
 
-	it('uses the fallback image for a collection with no photos', () => {
-		flushNames(['season7']);
+	it('leaves the card blank for a collection without dimensions', () => {
+		flushCollections(['season7'], () => []);
 		flushCover('season7', 0, []);
 		fixture.detectChanges();
 
-		expect(
-			element
-				.querySelector('.background-content img')
-				?.getAttribute('src')
-		).toContain(GALLERY_FALLBACK_IMAGE);
+		expect(cards().map(cardImage)).toEqual([undefined]);
 		expect(descriptions()).toEqual(['0 photos']);
 	});
 
 	it('orders seasons by number, so season 10 comes after season 9', () => {
-		flushNames(['season10', 'season9']);
+		flushCollections(['season10', 'season9']);
 		flushCover('season10', 1, ['ten.webp']);
 		flushCover('season9', 1, ['nine.webp']);
 		fixture.detectChanges();
 
-		expect(titles()).toEqual(['Season 9', 'Season 10']);
+		expect(titles()).toEqual(['SEASON9', 'SEASON10']);
 	});
 
 	it('says so when there are no collections, but not while loading', () => {
 		expect(element.querySelector('.empty-message')).toBeNull();
 
-		flushNames([]);
+		flushCollections([]);
 		fixture.detectChanges();
 
 		expect(cards()).toEqual([]);
@@ -118,7 +130,7 @@ describe('GalleryPageComponent', () => {
 	});
 
 	it('shows an error state when a collection fails, and loads again on Try again', () => {
-		flushNames(['season5', 'season6']);
+		flushCollections(['season5', 'season6']);
 		httpTesting
 			.expectOne(coverUrl('season5'))
 			.flush(null, { status: 500, statusText: 'Server Error' });
@@ -134,7 +146,10 @@ describe('GalleryPageComponent', () => {
 			.querySelector<HTMLButtonElement>('app-fallback-panel button')!
 			.click();
 		fixture.detectChanges();
-		loadSeasons5And6();
+		// The list of collections is reused; only the covers are asked again.
+		flushCover('season5', 12, ['five.webp']);
+		flushCover('season6', 7, ['six.webp']);
+		fixture.detectChanges();
 
 		expect(element.querySelector('app-fallback-panel')).toBeNull();
 		expect(descriptions()).toEqual(['12 photos', '7 photos']);

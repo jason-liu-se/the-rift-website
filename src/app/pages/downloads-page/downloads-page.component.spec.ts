@@ -11,7 +11,8 @@ import { DownloadsPageComponent } from './downloads-page.component';
 
 const COLLECTIONS: DownloadCollection[] = [
 	{
-		name: 'Worlds',
+		name: 'worlds',
+		title: 'Worlds',
 		items: [
 			{
 				id: '1',
@@ -30,7 +31,8 @@ const COLLECTIONS: DownloadCollection[] = [
 		]
 	},
 	{
-		name: 'Resource packs',
+		name: 'resource-packs',
+		title: 'Resource packs',
 		items: [
 			{
 				id: '3',
@@ -73,7 +75,7 @@ describe('DownloadsPageComponent', () => {
 			const cards = section.querySelectorAll('app-download-card');
 
 			expect(section.querySelector('h2')?.textContent?.trim()).toBe(
-				collection.name
+				collection.title
 			);
 			expect(cards).toHaveLength(collection.items.length);
 			cards.forEach((card, j) => {

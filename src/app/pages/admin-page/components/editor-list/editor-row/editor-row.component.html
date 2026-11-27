@@ -1,0 +1,95 @@
+@let row = this.row();
+<!-- Every cell opens the row's menu on a right-click. -->
+<td class="select" role="cell" [matContextMenuTriggerFor]="rowMenu">
+	@if (index() !== undefined) {
+		<span
+			class="drag-handle"
+			cdkDragHandle
+			matTooltip="Drag to reorder"
+			aria-hidden="true"
+		>
+			<mat-icon>drag_indicator</mat-icon>
+		</span>
+	}
+	<mat-checkbox
+		color="primary"
+		[aria-label]="'Select ' + row.name"
+		[checked]="isSelected()"
+		(change)="toggleSelected()"
+	/>
+</td>
+@for (cell of cells(); track cell.column.id) {
+	<td
+		role="cell"
+		[class]="'card-' + cell.column.card"
+		[matContextMenuTriggerFor]="rowMenu"
+	>
+		@if (cell.column.card === "title") {
+			<!-- The row opens on a click anywhere; this is its keyboard and
+				new-tab way in (Ctrl or middle click, as right-click opens the
+				row's menu). -->
+			<a class="open" [href]="href()" (click)="openFromLink($event)">
+				<ng-container
+					*ngComponentOutlet="cell.column.cell; inputs: cell.inputs"
+				/>
+			</a>
+		} @else {
+			<ng-container
+				*ngComponentOutlet="cell.column.cell; inputs: cell.inputs"
+			/>
+		}
+	</td>
+}
+<td class="actions" role="cell" [matContextMenuTriggerFor]="rowMenu">
+	<button
+		mat-icon-button
+		type="button"
+		[attr.aria-label]="'More actions for ' + row.name"
+		[matMenuTriggerFor]="rowMenu"
+	>
+		<mat-icon>more_vert</mat-icon>
+	</button>
+	<mat-menu #rowMenu="matMenu" xPosition="before">
+		@if (imageUrl(); as url) {
+			<button mat-menu-item (click)="copyImageUrl(url)">
+				<mat-icon>link</mat-icon>
+				Copy image link
+			</button>
+		}
+		@if (row.kind === "item") {
+			<button mat-menu-item (click)="actions.duplicate(row.item)">
+				<mat-icon>content_copy</mat-icon>
+				Duplicate
+			</button>
+			<button mat-menu-item (click)="actions.toggleVisibility(row)">
+				<mat-icon>{{
+					row.item.visible ? "visibility_off" : "visibility"
+				}}</mat-icon>
+				{{ row.item.visible ? "Hide from site" : "Show on site" }}
+			</button>
+			@if (canMoveUp()) {
+				<button mat-menu-item (click)="move(-1)">
+					<mat-icon>arrow_upward</mat-icon>
+					Move up
+				</button>
+			}
+			@if (canMoveDown()) {
+				<button mat-menu-item (click)="move(1)">
+					<mat-icon>arrow_downward</mat-icon>
+					Move down
+				</button>
+			}
+			@if (publicPath(); as path) {
+				<a mat-menu-item target="_blank" [href]="path">
+					<mat-icon>open_in_new</mat-icon>
+					View on site
+				</a>
+			}
+			<mat-divider />
+		}
+		<button mat-menu-item class="danger" (click)="actions.delete(row)">
+			<mat-icon>delete</mat-icon>
+			Delete
+		</button>
+	</mat-menu>
+</td>

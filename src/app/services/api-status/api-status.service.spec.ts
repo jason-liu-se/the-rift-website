@@ -1,3 +1,4 @@
+import { STORAGE_KEYS } from '../../services/browser-storage/browser-storage.service';
 import { HttpClient } from '@angular/common/http';
 import {
 	HttpTestingController,
@@ -8,7 +9,6 @@ import { PLATFORM_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { environment } from '../../../environments/environment';
 import { API_HEALTH_CHECK_INTERVAL_MS } from '../../config/api';
-import { LOGOUT_PENDING_KEY } from '../auth/auth.service';
 import { UNVERSIONED } from '../content-version/content-version.service';
 import { apiStatusInterceptor } from './api-status.interceptor';
 import { ApiStatusService } from './api-status.service';
@@ -216,20 +216,20 @@ describe('ApiStatusService', () => {
 			send();
 			answer(500);
 			TestBed.tick();
-			localStorage.setItem(LOGOUT_PENDING_KEY, 'true');
+			localStorage.setItem(STORAGE_KEYS.logoutPending, 'true');
 
 			await advance(API_HEALTH_CHECK_INTERVAL_MS);
 			answer(200, HEALTH_URL);
 			TestBed.tick();
 
 			controller.expectOne(LOGOUT_URL).flush(null);
-			expect(localStorage.getItem(LOGOUT_PENDING_KEY)).toBeNull();
+			expect(localStorage.getItem(STORAGE_KEYS.logoutPending)).toBeNull();
 		});
 
 		it('sends it once when the browser comes back online', () => {
 			window.dispatchEvent(new Event('offline'));
 			TestBed.tick();
-			localStorage.setItem(LOGOUT_PENDING_KEY, 'true');
+			localStorage.setItem(STORAGE_KEYS.logoutPending, 'true');
 
 			window.dispatchEvent(new Event('online'));
 			TestBed.tick();

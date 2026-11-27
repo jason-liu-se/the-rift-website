@@ -1,0 +1,30 @@
+@use "../../../../../../../font-sizes" as *;
+
+:host {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.details {
+	display: block;
+	font-size: $font-size-x-small;
+	font-weight: 400;
+}
+
+// A gallery card's: the image fills the card's top.
+:host(.image-on-top) {
+	display: grid;
+	gap: 4px;
+
+	.thumbnail {
+		width: 100%;
+		aspect-ratio: 4 / 3;
+		border-radius: 0;
+	}
+
+	.text {
+		padding: 8px 8px 0;
+		overflow-wrap: anywhere;
+	}
+}

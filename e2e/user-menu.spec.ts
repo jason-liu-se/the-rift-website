@@ -31,7 +31,7 @@ test.describe('user menu on desktop', () => {
 		await gotoRoute(page, routeFor('/news'));
 	});
 
-	test(`${TAG.desktopOnly} opens by keyboard, shows one avatar, and Escape restores focus`, async ({
+	test(`${TAG.desktopOnly} opens by keyboard, and Escape restores focus`, async ({
 		page
 	}) => {
 		await trigger(page).focus();
@@ -41,8 +41,6 @@ test.describe('user menu on desktop', () => {
 		await expect(
 			page.getByRole('menuitem', { name: 'Admin' })
 		).toBeFocused();
-		// The trigger's avatar is hidden: only the menu's shows.
-		await expect(page.locator('nav .avatar:visible')).toHaveCount(1);
 		await page.keyboard.press('ArrowDown');
 		await expect(
 			page.getByRole('menuitem', { name: 'Log out' })
@@ -72,7 +70,9 @@ test.describe('user menu on desktop', () => {
 		await trigger(page).click();
 		await page.getByRole('menuitem', { name: 'Log out' }).click();
 
-		await expect(page.getByText("You've logged out")).toBeVisible();
+		await expect(
+			page.locator('.message').getByText("You've logged out")
+		).toBeVisible();
 		await expect(page).toHaveURL(/\/news$/);
 		await expect(trigger(page)).toHaveCount(0);
 	});
@@ -101,7 +101,7 @@ test.describe('user menu on mobile', () => {
 test.describe('user menu position on desktop', () => {
 	// The narrowest desktop width, and a wide one.
 	for (const width of [960, 1920]) {
-		test(`${TAG.desktopOnly} is pinned to the right edge at ${width}px and the open menu covers the button`, async ({
+		test(`${TAG.desktopOnly} is pinned to the right edge at ${width}px and the menu opens below it`, async ({
 			page
 		}) => {
 			await page.setViewportSize({ width, height: 800 });
@@ -119,13 +119,9 @@ test.describe('user menu position on desktop', () => {
 			expect(join!.x + join!.width).toBeLessThan(box!.x);
 
 			await trigger(page).click();
-			const headerAvatar = page.locator('.panel-header .avatar');
-			await expect(headerAvatar).toBeVisible();
-			const open = await headerAvatar.boundingBox();
-			// Within a pixel: the same place.
-			expect(Math.abs(open!.x - box!.x)).toBeLessThan(1);
-			expect(Math.abs(open!.y - box!.y)).toBeLessThan(1);
+			await expect(menu(page)).toBeVisible();
 			const panel = await page.locator('.panel').boundingBox();
+			expect(panel!.y).toBeGreaterThan(box!.y + box!.height);
 			expect(panel!.x).toBeGreaterThanOrEqual(0);
 			expect(panel!.x + panel!.width).toBeLessThanOrEqual(width);
 		});
@@ -139,7 +135,9 @@ test.describe('focus after logging out of a public page', () => {
 		await trigger(page).click();
 		await page.getByRole('menuitem', { name: 'Log out' }).click();
 
-		await expect(page.getByText("You've logged out")).toBeVisible();
+		await expect(
+			page.locator('.message').getByText("You've logged out")
+		).toBeVisible();
 		await expect(page.locator('main')).toBeFocused();
 	});
 
@@ -151,7 +149,9 @@ test.describe('focus after logging out of a public page', () => {
 		await page.getByRole('button', { name: 'Menu' }).click();
 		await page.getByRole('button', { name: 'Log out' }).click();
 
-		await expect(page.getByText("You've logged out")).toBeVisible();
+		await expect(
+			page.locator('.message').getByText("You've logged out")
+		).toBeVisible();
 		await expect(page.locator('main')).toBeFocused();
 	});
 });
@@ -165,7 +165,9 @@ test.describe('logout while the API is down', () => {
 		await trigger(page).click();
 		await page.getByRole('menuitem', { name: 'Log out' }).click();
 
-		await expect(page.getByText("You've logged out")).toBeVisible();
+		await expect(
+			page.locator('.message').getByText("You've logged out")
+		).toBeVisible();
 		await expect(trigger(page)).toHaveCount(0);
 		await expect
 			.poll(() =>

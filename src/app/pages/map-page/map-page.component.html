@@ -15,12 +15,18 @@
 		</app-fallback-panel>
 	} @else {
 		<div class="seasons">
-			@for (season of seasons(); track season.title) {
+			@for (season of seasons(); track season.id) {
 				<app-section-card
 					[backgroundType]="'light'"
 					[title]="season.title"
 					[paddingY]="false"
 				>
+					<app-edit-button
+						class="edit"
+						type="maps"
+						[itemId]="season.id"
+						[itemName]="season.title"
+					/>
 					<app-card-selection-section
 						[items]="season.cards"
 					></app-card-selection-section>

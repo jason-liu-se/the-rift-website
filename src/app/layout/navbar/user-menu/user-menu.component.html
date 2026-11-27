@@ -2,7 +2,6 @@
 	<button
 		#trigger="ngMenuTrigger"
 		ngMenuTrigger
-		#userButton
 		type="button"
 		class="user-button"
 		aria-label="Account menu"
@@ -11,13 +10,9 @@
 	>
 		<app-user-avatar [showUsername]="false" />
 	</button>
-	<!-- Opens over the button, so its avatar takes the button's place. -->
+	<!-- Drops below the button, pointing up at it. -->
 	<div class="panel" [class.open]="trigger.expanded()">
-		<!-- Where the button's avatar was: pressing it closes the menu, like the button. -->
-		<app-user-avatar
-			class="panel-header"
-			(click)="trigger.close(); userButton.focus()"
-		/>
+		<app-user-avatar class="panel-header" />
 		<div ngMenu #accountMenu="ngMenu" class="menu" aria-label="Account">
 			<a
 				ngMenuItem

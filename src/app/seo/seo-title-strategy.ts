@@ -27,7 +27,11 @@ export class SeoTitleStrategy extends TitleStrategy {
 	override updateTitle(snapshot: RouterStateSnapshot): void {
 		const pageTitle = this.buildTitle(snapshot);
 		const title = pageTitle ? `${pageTitle} | ${SITE_NAME}` : SITE_NAME;
-		const data = deepestChild(snapshot.root).data;
+		// Child routes (e.g. an admin tool) keep their parent's description and noindex.
+		const data = Object.assign(
+			{},
+			...deepestChild(snapshot.root).pathFromRoot.map(({ data }) => data)
+		);
 		const description: string =
 			data['description'] ?? this.defaultDescription;
 		const url = siteUrl(snapshot.url.split(/[?#]/)[0]);

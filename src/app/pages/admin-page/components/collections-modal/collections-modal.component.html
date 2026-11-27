@@ -1,0 +1,17 @@
+<ng-template #content>
+	<app-modal-shell
+		[heading]="config().label + ' collections'"
+		(closed)="close()"
+	>
+		@if (collectionType(); as type) {
+			<app-collections-manager
+				[type]="type"
+				[itemNoun]="config().noun"
+				(changed)="isChanged = true"
+			/>
+		}
+		<div modalFooter>
+			<ng-container *ngTemplateOutlet="footer.template() ?? null" />
+		</div>
+	</app-modal-shell>
+</ng-template>

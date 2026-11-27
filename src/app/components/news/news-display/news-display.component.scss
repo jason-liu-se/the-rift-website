@@ -41,12 +41,6 @@ $news-post-padding: 15px;
 	padding: $news-post-padding;
 }
 
-.title,
-.date,
-.content {
-	white-space: pre-line;
-}
-
 .title {
 	margin: 0;
 	font-weight: 700;
@@ -65,7 +59,7 @@ $news-post-padding: 15px;
 }
 
 .content {
-	margin: 0;
+	display: block;
 	line-height: calc($font-size-medium + 0.2em);
 	font-size: $font-size-medium;
 }

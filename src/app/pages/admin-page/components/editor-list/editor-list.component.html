@@ -1,0 +1,75 @@
+<div class="list-head" [class.selecting]="store.selectedCount() > 0">
+	<app-list-filters
+		#filters
+		class="filters"
+		[filters]="store.filters()"
+		[fields]="store.filterFields()"
+		[searchFields]="store.config().searchFields"
+		[sortColumns]="store.sortColumns()"
+		[sort]="store.sort()"
+		[isSortShown]="store.view() === 'grid'"
+		(filtersChange)="store.setFilters($event)"
+		(sortChange)="store.setSort($event)"
+	/>
+	@if (store.selectedCount() > 0) {
+		<app-bulk-action-bar
+			class="bulk-bar"
+			(cleared)="filters.focusSearch()"
+		/>
+	}
+</div>
+<p class="cdk-visually-hidden" role="status">
+	@if (store.selectedCount() > 0) {
+		{{ store.selectedCount() }} of {{ store.selectableCount() }} selected
+	}
+</p>
+@if (store.selection.isPreviewingPage()) {
+	<p class="preview-hint">
+		Select all {{ pageRowsText() }} on this page? Press Enter or Space to
+		select them, or Escape to cancel.
+	</p>
+}
+@if (store.loadState.failed()) {
+	<app-fallback-panel
+		[heading]="'Couldn\'t load the ' + noun().many"
+		[busy]="store.loadState.retrying()"
+		(action)="store.reload()"
+	>
+		The server didn't answer. Check your connection and try again.
+	</app-fallback-panel>
+} @else if (!store.hasLoaded()) {
+	<p class="placeholder" role="status">Loading {{ noun().many }}…</p>
+	<div class="skeleton" aria-hidden="true">
+		@for (row of [1, 2, 3, 4, 5]; track row) {
+			<div class="skeleton-row"></div>
+		}
+	</div>
+} @else {
+	@if (isOrderHintShown()) {
+		<p class="hint">
+			<mat-icon aria-hidden="true">info</mat-icon>
+			Filter to one collection to drag its {{ noun().many }} into order.
+		</p>
+	}
+	<div class="progress">
+		@if (store.isLoading()) {
+			<mat-progress-bar mode="indeterminate" aria-label="Updating" />
+		}
+	</div>
+	@if (store.view() === "grid") {
+		<app-list-grid />
+	} @else {
+		<app-list-table />
+	}
+	@if (store.total() > pageSize) {
+		<mat-paginator
+			[length]="store.total()"
+			[pageSize]="pageSize"
+			[pageIndex]="store.pageIndex()"
+			[hidePageSize]="true"
+			[showFirstLastButtons]="true"
+			aria-label="Select page"
+			(page)="changePage($event)"
+		/>
+	}
+}

@@ -1,0 +1,112 @@
+<div class="search-row">
+	<mat-form-field class="search" subscriptSizing="dynamic">
+		<mat-icon matPrefix aria-hidden="true">search</mat-icon>
+		<mat-label>{{ searchLabel() }}</mat-label>
+		<input
+			matInput
+			type="search"
+			maxlength="100"
+			[ngModel]="filters().search"
+			(ngModelChange)="setFilter('search', $event)"
+		/>
+		@if (searchFields().length > 1) {
+			<button
+				mat-icon-button
+				matSuffix
+				type="button"
+				matTooltip="Search in"
+				[attr.aria-label]="'Search in: ' + searchInText()"
+				[matMenuTriggerFor]="searchInMenu"
+			>
+				<mat-icon>tune</mat-icon>
+			</button>
+		}
+	</mat-form-field>
+	<mat-menu #searchInMenu="matMenu">
+		@for (field of searchFields(); track field.value) {
+			<button
+				mat-menu-item
+				role="menuitemcheckbox"
+				[attr.aria-checked]="isSearchedIn(field.value)"
+				(click)="toggleSearchField(field.value, $event)"
+			>
+				<mat-icon>{{
+					isSearchedIn(field.value)
+						? "check_box"
+						: "check_box_outline_blank"
+				}}</mat-icon>
+				{{ field.label }}
+			</button>
+		}
+	</mat-menu>
+	<button
+		mat-stroked-button
+		type="button"
+		class="more-toggle"
+		aria-controls="more-filters"
+		[attr.aria-expanded]="isShowingMore()"
+		(click)="isShowingMore.set(!isShowingMore())"
+	>
+		<mat-icon>filter_list</mat-icon>
+		Filters
+		@if (activeCount() > 0) {
+			({{ activeCount() }})
+		}
+	</button>
+</div>
+<div id="more-filters" class="more" [class.shown]="isShowingMore()">
+	@for (field of fields(); track field.key) {
+		<mat-form-field class="compact" subscriptSizing="dynamic">
+			<mat-label>{{ field.label }}</mat-label>
+			<mat-select
+				[ngModel]="filters().values[field.key] ?? ''"
+				(ngModelChange)="setValue(field.key, $event)"
+			>
+				<mat-option value="">{{ field.anyLabel }}</mat-option>
+				@for (option of field.options; track option.value) {
+					<mat-option [value]="option.value">{{
+						option.label
+					}}</mat-option>
+				}
+			</mat-select>
+		</mat-form-field>
+	}
+	<!-- Tables sort from their headings; cards and phones have none. -->
+	<div class="sort" [class.always]="isSortShown()">
+		<mat-form-field class="compact" subscriptSizing="dynamic">
+			<mat-label>Sort by</mat-label>
+			<mat-select
+				[ngModel]="sort().sort"
+				(ngModelChange)="sortBy($event)"
+			>
+				@for (column of sortColumns(); track column.sort) {
+					<mat-option [value]="column.sort">{{
+						column.label
+					}}</mat-option>
+				}
+			</mat-select>
+		</mat-form-field>
+		<button
+			mat-stroked-button
+			type="button"
+			class="direction"
+			[attr.aria-label]="
+				'Reverse the order (now ' +
+				(sort().order === 'asc' ? 'ascending' : 'descending') +
+				')'
+			"
+			matTooltip="Reverse the order"
+			(click)="reverseSort()"
+		>
+			<mat-icon>{{
+				sort().order === "asc" ? "arrow_upward" : "arrow_downward"
+			}}</mat-icon>
+		</button>
+	</div>
+	@if (activeCount() > 0 || filters().search) {
+		<button mat-button type="button" class="clear" (click)="clear()">
+			<mat-icon>close</mat-icon>
+			Clear filters
+		</button>
+	}
+</div>

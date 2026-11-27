@@ -33,7 +33,8 @@ test('the gallery shows how many photos each collection has', async ({
 }) => {
 	await page.goto('/gallery');
 
-	for (const images of Object.values(GALLERY_COLLECTIONS)) {
+	for (const { title, images } of GALLERY_COLLECTIONS) {
+		await expect(page.getByText(title, { exact: true })).toBeVisible();
 		await expect(page.getByText(`${images.length} photos`)).toBeVisible();
 	}
 });
@@ -42,14 +43,33 @@ test("a gallery showcase shows its collection's total", async ({ page }) => {
 	await page.goto('/gallery/season5');
 
 	await expect(
-		page.getByText(`Results: ${GALLERY_COLLECTIONS['season5'].length}`)
+		page.getByText(`Results: ${GALLERY_COLLECTIONS[0].images.length}`)
 	).toBeVisible();
+});
+
+test('a gallery showcase filters its photos by tag', async ({ page }) => {
+	await page.goto('/gallery/season5');
+	await page.getByRole('button', { name: 'night', exact: true }).click();
+
+	await expect(page.getByText('Results: 1')).toBeVisible();
+	await expect(
+		page.getByRole('button', { name: 'night', exact: true })
+	).toHaveAttribute('aria-pressed', 'true');
+});
+
+test('news posts say when they were edited', async ({ page }) => {
+	await page.goto('/news');
+
+	await expect(page.getByText('Edited Fri Jan 02 2026')).toBeVisible();
 });
 
 test('the downloads page lists each collection', async ({ page }) => {
 	await page.goto('/downloads');
 
 	for (const collection of DOWNLOAD_COLLECTIONS) {
+		await expect(
+			page.getByRole('heading', { name: collection.title })
+		).toBeVisible();
 		await expect(page.getByText(collection.items[0].title)).toBeVisible();
 	}
 });
@@ -58,7 +78,7 @@ test("the map page links each season's dimensions", async ({ page }) => {
 	await page.goto('/map');
 
 	for (const { dimensions } of MAP_SEASONS) {
-		for (const { name } of dimensions) {
+		for (const { name } of dimensions ?? []) {
 			await expect(
 				page.getByRole('link', { name, exact: true })
 			).toBeVisible();
@@ -78,6 +98,11 @@ function recordApiRequests(page: Page): string[] {
 }
 
 async function openDownloadsInApp(page: Page): Promise<void> {
+	// On phones, the navbar's links are behind its Menu button.
+	const menu = page.getByRole('button', { name: 'Menu' });
+	if (await menu.isVisible()) {
+		await menu.click();
+	}
 	await page.getByRole('link', { name: 'Downloads' }).first().click();
 	await expect(
 		page.getByText(DOWNLOAD_COLLECTIONS[0].items[0].title)

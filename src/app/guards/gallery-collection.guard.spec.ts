@@ -7,9 +7,18 @@ import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 
 import { environment } from 'src/environments/environment';
-import { requireGalleryCollection } from './gallery-collection.guard';
+import { GALLERY_COLLECTIONS } from 'src/app/testing/api-fixtures';
+import {
+	requireGalleryCollection,
+	resolveFromGalleryTitle
+} from './gallery-collection.guard';
 
-describe('requireGalleryCollection', () => {
+const COLLECTIONS = GALLERY_COLLECTIONS.map(({ slug, title }) => ({
+	slug,
+	title
+}));
+
+describe('gallery collection routes', () => {
 	const galleryUrl = `${environment.API_URL}/gallery`;
 	let router: Router;
 	let httpTesting: HttpTestingController;
@@ -37,6 +46,11 @@ describe('requireGalleryCollection', () => {
 					{
 						path: 'gallery/:collection',
 						canMatch: [requireGalleryCollection],
+						resolve: {
+							heading: resolveFromGalleryTitle(
+								(title) => `Photos of ${title}`
+							)
+						},
 						children: [],
 						data: { page: 'collection' }
 					},
@@ -52,28 +66,44 @@ describe('requireGalleryCollection', () => {
 
 	const matchedPage = () =>
 		router.routerState.snapshot.root.firstChild?.data['page'];
+	const resolvedHeading = () =>
+		router.routerState.snapshot.root.firstChild?.data['heading'];
 
 	it('matches a collection the API lists', async () => {
 		await visit('/gallery/season5', (request) =>
-			request.flush(['season5', 'season6'])
+			request.flush(COLLECTIONS)
 		);
 
 		expect(matchedPage()).toBe('collection');
 	});
 
+	it("resolves text from the collection's title, with one request", async () => {
+		await visit('/gallery/season5', (request) =>
+			request.flush(COLLECTIONS)
+		);
+
+		expect(resolvedHeading()).toBe('Photos of Season 5');
+	});
+
 	it('falls through to the 404 route for any other collection', async () => {
 		await visit('/gallery/season-5', (request) =>
-			request.flush(['season5', 'season6'])
+			request.flush(COLLECTIONS)
 		);
 
 		expect(matchedPage()).toBe('not-found');
 	});
 
 	it('matches when the API fails, so the page can show its error state', async () => {
-		await visit('/gallery/season5', (request) =>
-			request.flush(null, { status: 500, statusText: 'Server Error' })
-		);
+		const serverError = { status: 500, statusText: 'Server Error' };
+		const navigation = router.navigateByUrl('/gallery/season5');
+		await Promise.resolve();
+		httpTesting.expectOne(galleryUrl).flush(null, serverError);
+		// A failure isn't kept, so the resolver asks again, then uses the slug.
+		await new Promise((resolve) => setTimeout(resolve));
+		httpTesting.expectOne(galleryUrl).flush(null, serverError);
+		await navigation;
 
 		expect(matchedPage()).toBe('collection');
+		expect(resolvedHeading()).toBe('Photos of season5');
 	});
 });

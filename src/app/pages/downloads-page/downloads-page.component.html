@@ -15,10 +15,10 @@
 		</app-fallback-panel>
 	} @else {
 		<div class="downloads-container">
-			@for (collection of downloadCollections; track collection) {
+			@for (collection of downloadCollections; track collection.name) {
 				<app-section-card
 					[backgroundType]="'light'"
-					[title]="collection.name"
+					[title]="collection.title"
 					[titlePosition]="'left'"
 					[contentPosition]="'left'"
 					[paddingY]="false"
@@ -30,6 +30,7 @@
 								[desc]="item.desc"
 								[src]="item.downloadUrl"
 								[imgSrc]="item.imageUrl"
+								[editId]="item.id"
 							></app-download-card>
 						}
 					</div>

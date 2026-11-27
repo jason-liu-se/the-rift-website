@@ -30,6 +30,12 @@ Code also runs on the server, where there's no real `window`. Touch `window` or
 other browser APIs only in event handlers, `afterNextRender`, or behind
 `isPlatformBrowser`.
 
+News titles and content are markdown, rendered to HTML by `MarkdownComponent`
+(`src/app/components/markdown/`) with `marked` on the server and in the browser
+alike. Raw HTML, unsafe links, and images outside `IMAGE_URL_PREFIXES`
+(`src/app/config/images.ts`, a copy of the API's allowlist) are never rendered,
+and Angular sanitises the result again.
+
 ## How it fits together
 
 - `src/app/app.config.ts` holds the app-wide providers; `app.config.server.ts`
@@ -63,9 +69,12 @@ other browser APIs only in event handlers, `afterNextRender`, or behind
   on first use and again once older than `CONTENT_VERSION_MAX_AGE_MS`
   (`src/app/config/api.ts`): once per server request, and in the browser, which
   reuses the server's while hydrating. Without the refresh, a long-open tab
-  would keep reading content Cloudflare cached under the old version. Writes
-  aren't `GET`s, and uncached `GET`s (the version itself, `/auth/me`) opt out
-  with `unversioned()`; a public read without `v` isn't cached.
+  would keep reading content Cloudflare cached under the old version. News reads
+  also send the news detail version as `dv` (`GET /content/version/news`,
+  refreshed the same way), which changes when a scheduled post goes live without
+  an edit. Writes aren't `GET`s, and uncached `GET`s (the version itself,
+  `/auth/me`) opt out with `unversioned()`; a public read without `v` isn't
+  cached.
 - Logged-in API requests send the API's httpOnly session cookies
   (`withCredentials`). When one answers 401 because the short-lived access token
   expired, `authRefreshInterceptor` (`src/app/services/auth/`) calls

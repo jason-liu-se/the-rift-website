@@ -6,12 +6,22 @@
 import { Page } from '@playwright/test';
 // The suite runs against `npm start`, which serves the development environment.
 import { environment } from '../../src/environments/environment.development';
-import { GalleryImage } from '../../src/app/interfaces/api-responses';
 import {
 	CONTENT_VERSION,
+	GalleryCollectionFixture,
 	DOWNLOAD_COLLECTIONS,
+	EDITOR_DOWNLOAD_COLLECTIONS,
+	EDITOR_DOWNLOAD_ITEMS,
+	EDITOR_DOWNLOAD_ITEM_ITEMS,
+	EDITOR_GALLERY_COLLECTIONS,
+	EDITOR_GALLERY_IMAGES,
+	EDITOR_MAP_SEASONS,
+	EDITOR_MAP_SEASON_ITEMS,
+	EDITOR_NEWS_POSTS,
+	EDITOR_NEWS_POST_ITEMS,
 	GALLERY_COLLECTIONS,
 	MAP_SEASONS,
+	NEWS_DETAIL_VERSION,
 	NEWS_POSTS,
 	paginate
 } from '../../src/app/testing/api-fixtures';
@@ -28,6 +38,28 @@ const BLUEMAP_PLACEHOLDER =
 	'<!doctype html><html lang="en"><title>BlueMap</title></html>';
 
 const GALLERY_PAGE_PATH = /^\/gallery\/([^/]+)$/;
+/** The editor tools' lists (unfiltered) and collections. */
+const EDITOR_LISTS: Record<string, unknown[]> = {
+	'/editor/news': EDITOR_NEWS_POSTS,
+	'/editor/gallery/images': EDITOR_GALLERY_IMAGES,
+	'/editor/downloads/items': EDITOR_DOWNLOAD_ITEMS,
+	'/editor/maps/seasons': EDITOR_MAP_SEASONS
+};
+/** Each list's items in full, as `/:id` answers. */
+const EDITOR_ITEMS: Record<string, unknown[]> = {
+	'/editor/news': EDITOR_NEWS_POST_ITEMS,
+	'/editor/gallery/images': EDITOR_GALLERY_IMAGES,
+	'/editor/downloads/items': EDITOR_DOWNLOAD_ITEM_ITEMS,
+	'/editor/maps/seasons': EDITOR_MAP_SEASON_ITEMS
+};
+/** One item of an editor list, e.g. /editor/news/news-1. */
+const EDITOR_ITEM_PATH = /^(\/editor\/.+)\/([^/]+)$/;
+const EDITOR_COLLECTIONS: Record<string, unknown[]> = {
+	'/editor/gallery/collections': EDITOR_GALLERY_COLLECTIONS,
+	'/editor/downloads/collections': EDITOR_DOWNLOAD_COLLECTIONS
+};
+
+const GALLERY_TAGS_PATH = /^\/gallery\/([^/]+)\/tags$/;
 
 export interface IMockResponse {
 	status: number;
@@ -72,8 +104,62 @@ function paginateByQuery<T>(
 		: ok(paginate(items, startIndex, limit));
 }
 
-function galleryCollection(encodedName: string): GalleryImage[] | undefined {
-	return GALLERY_COLLECTIONS[decodeURIComponent(encodedName)];
+type Row = Record<string, unknown>;
+
+/** A field's sort value: editors by username, text ignoring case. */
+function sortValue(row: Row, field: string): string | number | undefined {
+	const value = row[field];
+	if (value && typeof value === 'object' && 'username' in value) {
+		return String(value.username).toLowerCase();
+	}
+	if (typeof value === 'string') {
+		return value.toLowerCase();
+	}
+	return typeof value === 'number' ? value : undefined;
+}
+
+/**
+ * The list in `sort`/`order` order, as the server sorts: a missing value
+ * first, ties by `id`. Without `sort`, the fixture's order.
+ */
+function sortByQuery<T>(items: T[], params: URLSearchParams): T[] {
+	const fields = params.get('sort')?.split(',') ?? [];
+	const orders = params.get('order')?.split(',') ?? [];
+	const compare = (a: Row, b: Row) => {
+		for (const [index, field] of fields.entries()) {
+			const [left, right] = [sortValue(a, field), sortValue(b, field)];
+			const sign = orders[index] === 'desc' ? -1 : 1;
+			if (left === right) {
+				continue;
+			}
+			if (left === undefined || right === undefined) {
+				return (left === undefined ? -1 : 1) * sign;
+			}
+			return (left < right ? -1 : 1) * sign;
+		}
+		return String(a['id']).localeCompare(String(b['id']));
+	};
+	return fields.length > 0
+		? [...items].sort((a, b) => compare(a as Row, b as Row))
+		: items;
+}
+
+function galleryCollection(
+	encodedSlug: string
+): GalleryCollectionFixture | undefined {
+	const slug = decodeURIComponent(encodedSlug);
+	return GALLERY_COLLECTIONS.find((collection) => collection.slug === slug);
+}
+
+/** The images with every tag in `tags` (comma-separated), as the server filters. */
+function withTags(
+	collection: GalleryCollectionFixture,
+	params: URLSearchParams
+) {
+	const tags = params.get('tags')?.split(',') ?? [];
+	return collection.images.filter((image) =>
+		tags.every((tag) => image.tags.includes(tag))
+	);
 }
 
 /** The fixture response to an API request; shared with mock-api-server.ts. */
@@ -83,6 +169,9 @@ export function respondTo(url: URL): IMockResponse {
 	if (url.pathname === '/content/version') {
 		return ok(CONTENT_VERSION);
 	}
+	if (url.pathname === '/content/version/news') {
+		return ok(NEWS_DETAIL_VERSION);
+	}
 	if (url.pathname === '/news') {
 		return paginateByQuery(NEWS_POSTS, url.searchParams);
 	}
@@ -90,16 +179,56 @@ export function respondTo(url: URL): IMockResponse {
 		return ok(DOWNLOAD_COLLECTIONS);
 	}
 	if (url.pathname === '/gallery') {
-		return ok(Object.keys(GALLERY_COLLECTIONS));
+		return ok(
+			GALLERY_COLLECTIONS.map(({ slug, title, dimensions }) => ({
+				slug,
+				title,
+				...(dimensions && { dimensions })
+			}))
+		);
 	}
 	if (url.pathname === '/maps/seasons') {
 		return ok(MAP_SEASONS);
 	}
+	if (url.pathname in EDITOR_LISTS) {
+		return paginateByQuery(
+			sortByQuery(EDITOR_LISTS[url.pathname], url.searchParams),
+			url.searchParams
+		);
+	}
+	if (url.pathname === '/editor/gallery/tags') {
+		const tags = EDITOR_GALLERY_IMAGES.flatMap((image) => image.tags ?? []);
+		return ok([...new Set(tags)].sort());
+	}
+	const editorItem = EDITOR_ITEM_PATH.exec(url.pathname);
+	if (editorItem && editorItem[1] in EDITOR_ITEMS) {
+		const item = EDITOR_ITEMS[editorItem[1]].find(
+			(candidate) => (candidate as { id: string }).id === editorItem[2]
+		);
+		return item ? ok(item) : notFound;
+	}
+	if (url.pathname in EDITOR_COLLECTIONS) {
+		return ok(EDITOR_COLLECTIONS[url.pathname]);
+	}
+	if (url.pathname === '/editor/drafts') {
+		return ok([]);
+	}
 
 	const pageMatch = GALLERY_PAGE_PATH.exec(url.pathname);
 	if (pageMatch) {
-		const images = galleryCollection(pageMatch[1]);
-		return images ? paginateByQuery(images, url.searchParams) : notFound;
+		const collection = galleryCollection(pageMatch[1]);
+		return collection
+			? paginateByQuery(
+					withTags(collection, url.searchParams),
+					url.searchParams
+				)
+			: notFound;
+	}
+	const tagsMatch = GALLERY_TAGS_PATH.exec(url.pathname);
+	if (tagsMatch) {
+		const collection = galleryCollection(tagsMatch[1]);
+		const tags = collection?.images.flatMap((image) => image.tags);
+		return tags ? ok([...new Set(tags)].sort()) : notFound;
 	}
 
 	return notFound;

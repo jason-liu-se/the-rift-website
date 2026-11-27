@@ -1,33 +1,39 @@
 @use "../../../theme-colours" as *;
 @use "../../../font-sizes" as *;
+@use "../../../scrollbar-gap" as *;
 
-$radius: 12px;
-// The fixed site navbar's height on desktop (layout/navbar).
-$navbar-height: 3rem;
+// The admin bar's height (components/admin-bar).
+$bar-height: 3.5rem;
+$tab-bar-height: 4rem;
 
-// Fills the space below the navbar (the footer is hidden on admin pages).
+// Fills the space below the admin bar (no navbar or footer on admin pages).
 :host {
 	display: flex;
 	flex-direction: column;
 	flex: 1;
 }
 
-// Mobile: a tab bar above the workspace. Desktop: a sidebar beside it.
+// Mobile: the tools are a tab bar fixed to the bottom, in thumb reach.
+// Desktop: a sidebar beside the workspace.
 .admin-page {
 	display: flex;
 	flex-direction: column;
 	flex: 1;
+	@include fill-scrollbar-gap;
 	background-color: rgba($colour-light-grey, 0.4);
 	color: $colour-dark-text;
 }
 
 .tool-nav {
+	position: fixed;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 10;
+	padding: 4px 4px calc(4px + env(safe-area-inset-bottom));
+	@include fixed-fill-scrollbar-gap(4px);
+	border-top: 1px solid rgba($colour-light-text, 0.12);
 	background-color: $colour-dark-background;
-	padding: 8px;
-}
-
-.tool-nav-label {
-	display: none;
 }
 
 .tool-list {
@@ -47,12 +53,12 @@ $navbar-height: 3rem;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	justify-content: center;
 	gap: 2px;
-	padding: 8px;
+	min-height: calc($tab-bar-height - 8px);
 	border-radius: 8px;
 	color: $colour-soft-silver;
-	font-size: $font-size-small;
-	overflow-wrap: anywhere;
+	font-size: $font-size-x-small;
 	text-decoration: none;
 	transition:
 		background-color 0.15s ease-out,
@@ -65,47 +71,45 @@ $navbar-height: 3rem;
 
 	&:focus-visible {
 		outline: 2px solid $colour-light-text;
-		outline-offset: 2px;
+		outline-offset: -2px;
 	}
 
 	&.active {
-		background-color: $colour-primary;
 		color: $colour-light-text;
+
+		mat-icon {
+			border-radius: 999px;
+			background-color: $colour-primary;
+		}
 	}
+
+	mat-icon {
+		width: 3.5rem;
+		height: 1.75rem;
+		line-height: 1.75rem;
+		text-align: center;
+		transition: background-color 0.15s ease-out;
+	}
+}
+
+.tool-label {
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .workspace {
 	display: flex;
 	flex-direction: column;
-	gap: 16px;
 	flex: 1;
 	min-width: 0;
-	padding: 16px;
-}
-
-.top-bar {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: space-between;
-	align-items: center;
-	gap: 12px 16px;
-}
-
-.tool-title {
-	margin: 0;
-	font-size: $font-size-medium-plus;
-	font-weight: 600;
-}
-
-.tool-card {
-	padding: 20px;
-	border: 1px solid $colour-light-grey;
-	border-radius: $radius;
-	background-color: $colour-light-background;
+	padding: 16px 16px calc($tab-bar-height + 24px);
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.tool-link {
+	.tool-link,
+	.tool-link mat-icon {
 		transition: none;
 	}
 }
@@ -115,49 +119,48 @@ $navbar-height: 3rem;
 		flex-direction: row;
 	}
 
+	// Full height beside the workspace, however long it is; its links stay
+	// in view while it scrolls.
 	.tool-nav {
-		flex: 0 0 15rem;
-		padding: 0 12px;
-	}
-
-	// Keeps the links in view below the fixed navbar on long tools.
-	.tool-nav-content {
-		position: sticky;
-		top: calc($navbar-height + var(--status-banner-height, 0px));
-		padding: 24px 0;
-	}
-
-	.tool-nav-label {
-		display: block;
-		margin: 0 12px 12px;
-		color: $colour-soft-silver;
-		font-size: $font-size-x-small;
-		font-weight: 600;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
+		position: static;
+		// A flex item stacks by z-index even when static: under the admin bar.
+		z-index: auto;
+		box-sizing: border-box;
+		flex: 0 0 14rem;
+		padding: 16px 12px;
+		border-top: none;
 	}
 
 	.tool-list {
+		position: sticky;
+		top: calc($bar-height + var(--status-banner-height, 0px) + 16px);
 		flex-direction: column;
 	}
 
 	.tool-link {
 		flex-direction: row;
+		justify-content: flex-start;
 		gap: 12px;
-		padding: 10px 12px;
+		min-height: 44px;
+		padding: 0 12px;
+		font-size: $font-size-small;
+
+		&.active {
+			background-color: $colour-primary;
+
+			mat-icon {
+				background-color: transparent;
+			}
+		}
+
+		mat-icon {
+			width: 24px;
+			height: 24px;
+			line-height: 24px;
+		}
 	}
 
 	.workspace {
-		gap: 24px;
 		padding: 24px 32px 40px;
-	}
-
-	.top-bar {
-		padding-bottom: 20px;
-		border-bottom: 1px solid $colour-light-grey;
-	}
-
-	.tool-card {
-		padding: 32px;
 	}
 }

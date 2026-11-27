@@ -1,10 +1,19 @@
 <div class="page-template">
 	<app-status-banner></app-status-banner>
 	<div class="upper-content">
-		<app-navbar [transparent]="isTransparent"></app-navbar>
-		<main class="template" tabindex="-1" #mainContent>
-			<ng-template appPageTemplateHost></ng-template>
-		</main>
+		@if (showNavbar) {
+			<app-navbar [transparent]="isTransparent"></app-navbar>
+		}
+		<!-- A page without the navbar has its own app bar, so its own <main>. -->
+		@if (showNavbar) {
+			<main class="template" tabindex="-1" #mainContent>
+				<ng-template appPageTemplateHost></ng-template>
+			</main>
+		} @else {
+			<div class="template" tabindex="-1" #mainContent>
+				<ng-template appPageTemplateHost></ng-template>
+			</div>
+		}
 	</div>
 	<div class="lower-content">
 		@if (showContactSection) {

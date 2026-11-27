@@ -1,0 +1,105 @@
+<app-modal-shell [heading]="title()" (closed)="close()">
+	@if (preview()) {
+		<mat-button-toggle-group
+			modalTabs
+			class="pane-switch"
+			hideSingleSelectionIndicator
+			aria-label="Editor view"
+			[ngModel]="pane()"
+			(ngModelChange)="pane.set($event)"
+		>
+			<mat-button-toggle value="fields">
+				<mat-icon aria-hidden="true">edit</mat-icon>
+				Edit
+			</mat-button-toggle>
+			<mat-button-toggle value="preview">
+				<mat-icon aria-hidden="true">visibility</mat-icon>
+				Preview
+			</mat-button-toggle>
+		</mat-button-toggle-group>
+	}
+	<ng-container modalTools>
+		<app-draft-history [session]="session()" />
+		@if (itemActions(); as actions) {
+			<button
+				mat-icon-button
+				type="button"
+				aria-label="More actions"
+				matTooltip="More actions"
+				[matMenuTriggerFor]="itemMenu"
+			>
+				<mat-icon>more_vert</mat-icon>
+			</button>
+			<mat-menu #itemMenu="matMenu" xPosition="before">
+				<button
+					mat-menu-item
+					type="button"
+					(click)="actions.duplicate()"
+				>
+					<mat-icon aria-hidden="true">content_copy</mat-icon>
+					Duplicate
+				</button>
+				@if (actions.publicPath; as path) {
+					<a mat-menu-item [href]="path" target="_blank">
+						<mat-icon aria-hidden="true">open_in_new</mat-icon>
+						View on site
+					</a>
+				}
+				<button
+					mat-menu-item
+					type="button"
+					class="danger"
+					(click)="actions.remove()"
+				>
+					<mat-icon aria-hidden="true">delete</mat-icon>
+					Delete
+				</button>
+			</mat-menu>
+		}
+	</ng-container>
+
+	<app-draft-conflict
+		[session]="session()"
+		[noun]="noun()"
+		[fieldLabels]="fieldLabels()"
+		(overwrite)="overwrite()"
+		(publishAsNew)="publishAsNew()"
+		(discard)="discard()"
+	/>
+
+	<div class="panes" [class.has-preview]="!!preview()">
+		<div class="fields" [class.hidden-on-mobile]="pane() === 'preview'">
+			<ng-content />
+		</div>
+		@if (preview(); as previewComponent) {
+			<section
+				class="preview"
+				aria-label="Preview"
+				[class.hidden-on-mobile]="pane() === 'fields'"
+			>
+				<h3 class="preview-heading" aria-hidden="true">Preview</h3>
+				<!-- Shown as the site shows it, but not usable. -->
+				<div class="preview-content" inert>
+					<ng-container
+						*ngComponentOutlet="
+							previewComponent;
+							inputs: { session: session() }
+						"
+					/>
+				</div>
+			</section>
+		}
+	</div>
+
+	<app-draft-footer
+		modalFooter
+		[session]="session()"
+		[isEdit]="isEdit()"
+		[noun]="noun().one"
+		[problem]="publishProblem()"
+		[isScheduled]="isScheduled()"
+		[isPublishing]="isPublishing()"
+		(publish)="publish()"
+		(discarded)="closed.emit()"
+	/>
+</app-modal-shell>

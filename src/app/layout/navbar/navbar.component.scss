@@ -1,4 +1,5 @@
 @use "../../../theme-colours" as *;
+@use "../../../scrollbar-gap" as *;
 
 $h-logo-edge-padding: 1rem;
 // Distance from the screen edge for the pinned user avatar, as the hamburger button has.
@@ -22,6 +23,7 @@ $user-reserve: 4.5rem;
 	box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.2);
 	border-width: 1px;
 	background-color: rgba(0, 0, 0, 0.368);
+	@include fixed-fill-scrollbar-gap;
 }
 
 .rift-navbar {
@@ -180,7 +182,6 @@ $user-reserve: 4.5rem;
 		max-width: 55rem;
 		height: $navbar-height;
 		justify-content: space-between;
-		padding-left: calc(100vw - 100%);
 	}
 
 	.menu-links {
@@ -267,14 +268,17 @@ $user-reserve: 4.5rem;
 	// Pinned to the right edge of the screen, outside the centred links. Where
 	// the centred links would reach it (just above 60rem), they move left.
 	.rift-navbar-wrapper:has(.user-item) {
-		padding-right: max(0px, calc($user-reserve - (100vw - 55rem) / 2));
+		@include fixed-fill-scrollbar-gap(
+			max(0px, calc($user-reserve - (100vw - 55rem) / 2))
+		);
 	}
 
 	.user-item {
 		position: fixed;
 		// Below the status banner, like the navbar.
 		top: var(--status-banner-height, 0px);
-		right: $edge-gutter;
+		// Clear of the page scrollbar's place, so it stays put (scrollbar-gap.scss).
+		right: calc($edge-gutter + var(--scrollbar-gap, 0px));
 		// Above the Join button when the open menu covers it.
 		z-index: 1;
 		width: auto;

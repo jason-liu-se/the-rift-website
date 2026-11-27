@@ -1,0 +1,29 @@
+<!-- Still a table to assistive technology, its rows as cards; explicit
+	roles, as some browsers would otherwise stop reading it as one. -->
+<table role="table">
+	<caption class="cdk-visually-hidden">
+		{{
+			store.config().label
+		}}
+	</caption>
+	@if (store.draftRows().length > 0) {
+		<tbody
+			app-row-group
+			label="Unpublished changes"
+			layout="card"
+			[rows]="store.draftRows()"
+		></tbody>
+	}
+	@if (store.showsItems()) {
+		<tbody
+			app-row-group
+			layout="card"
+			[label]="'All ' + store.config().noun.many"
+			[rows]="store.itemRows()"
+			[count]="store.total()"
+		></tbody>
+	}
+	@if (store.pageRowCount() === 0) {
+		<tbody app-list-empty></tbody>
+	}
+</table>

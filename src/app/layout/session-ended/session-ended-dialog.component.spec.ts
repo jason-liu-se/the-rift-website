@@ -1,10 +1,10 @@
+import { STORAGE_KEYS } from '../../services/browser-storage/browser-storage.service';
 import { Dialog } from '@angular/cdk/dialog';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { requireLoggedIn } from 'src/app/guards/admin-auth.guards';
-import { LOGIN_RETURN_URL_KEY } from 'src/app/guards/login-return-url';
 import { SessionUser } from 'src/app/interfaces/api-responses';
 import {
 	AuthService,
@@ -153,7 +153,7 @@ describe('SessionEndedDialogComponent', () => {
 		button('Log in again').click();
 		await new Promise((resolve) => setTimeout(resolve));
 
-		expect(sessionStorage.getItem(LOGIN_RETURN_URL_KEY)).toBe(
+		expect(sessionStorage.getItem(STORAGE_KEYS.loginReturnUrl)).toBe(
 			'/admin#news'
 		);
 		expect(TestBed.inject(Router).url).toBe('/admin/login');
@@ -166,7 +166,7 @@ describe('SessionEndedDialogComponent', () => {
 		button('Go to the home page').click();
 		await new Promise((resolve) => setTimeout(resolve));
 
-		expect(sessionStorage.getItem(LOGIN_RETURN_URL_KEY)).toBeNull();
+		expect(sessionStorage.getItem(STORAGE_KEYS.loginReturnUrl)).toBeNull();
 		expect(TestBed.inject(Router).url).toBe('/');
 		expect(dialog()).toBeNull();
 	});

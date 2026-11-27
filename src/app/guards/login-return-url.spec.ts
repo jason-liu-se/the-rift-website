@@ -1,26 +1,33 @@
+import { TestBed } from '@angular/core/testing';
 import {
-	LOGIN_RETURN_URL_KEY,
-	saveLoginReturnUrl,
-	takeLoginReturnUrl
-} from './login-return-url';
+	BrowserStorage,
+	STORAGE_KEYS
+} from '../services/browser-storage/browser-storage.service';
+import { saveLoginReturnUrl, takeLoginReturnUrl } from './login-return-url';
 
 describe('login return URL', () => {
 	beforeEach(() => sessionStorage.clear());
 
 	it('takes a saved path once', () => {
-		saveLoginReturnUrl('/admin#news');
+		saveLoginReturnUrl(TestBed.inject(BrowserStorage), '/admin#news');
 
-		expect(takeLoginReturnUrl()).toBe('/admin#news');
-		expect(takeLoginReturnUrl()).toBeNull();
+		expect(takeLoginReturnUrl(TestBed.inject(BrowserStorage))).toBe(
+			'/admin#news'
+		);
+		expect(takeLoginReturnUrl(TestBed.inject(BrowserStorage))).toBeNull();
 	});
 
 	it.each(['//evil.example', 'https://evil.example', 'admin'])(
 		'ignores anything but a same-site path (%s)',
 		(url) => {
-			saveLoginReturnUrl(url);
+			saveLoginReturnUrl(TestBed.inject(BrowserStorage), url);
 
-			expect(takeLoginReturnUrl()).toBeNull();
-			expect(sessionStorage.getItem(LOGIN_RETURN_URL_KEY)).toBeNull();
+			expect(
+				takeLoginReturnUrl(TestBed.inject(BrowserStorage))
+			).toBeNull();
+			expect(
+				sessionStorage.getItem(STORAGE_KEYS.loginReturnUrl)
+			).toBeNull();
 		}
 	);
 });

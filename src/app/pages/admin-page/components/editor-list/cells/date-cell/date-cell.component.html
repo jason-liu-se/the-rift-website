@@ -1,0 +1,8 @@
+@if (date(); as date) {
+	{{ date === "now" ? "Now" : formatDateTime(date) }}
+}
+@if (secondary(); as secondary) {
+	<span class="details"
+		>{{ secondary.label }} {{ formatDateTime(secondary.date) }}</span
+	>
+}

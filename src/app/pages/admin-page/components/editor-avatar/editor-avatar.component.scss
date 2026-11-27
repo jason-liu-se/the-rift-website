@@ -1,0 +1,20 @@
+@use "../../../../../theme-colours" as *;
+
+:host {
+	display: block;
+	flex: none;
+}
+
+// Beside the editor's name, so only a picture: no alt text.
+.avatar {
+	display: block;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	object-fit: cover;
+}
+
+// No avatar, or it no longer loads (as after they change it).
+.placeholder {
+	background-color: rgba($colour-primary, 0.15);
+}

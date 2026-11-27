@@ -1,0 +1,26 @@
+:host {
+	display: grid;
+	// minmax(0, …): wide content (dimension cards) can't widen the modal.
+	grid-template-columns: minmax(0, 1fr);
+	gap: 32px;
+}
+
+// The list beside the form (which may hold dimension cards), each scrolling
+// on its own within the modal's height.
+@media (min-width: 60rem) {
+	:host {
+		grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+		height: 100%;
+	}
+
+	// Padding inside the scroll area keeps focus rings from being clipped;
+	// the negative margin keeps it aligned.
+	app-collection-form {
+		display: block;
+		min-height: 0;
+		margin: -4px;
+		padding: 4px;
+		overflow-y: auto;
+		overscroll-behavior: contain;
+	}
+}

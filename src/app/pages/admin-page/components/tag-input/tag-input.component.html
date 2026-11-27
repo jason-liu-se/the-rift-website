@@ -1,0 +1,44 @@
+<mat-form-field subscriptSizing="dynamic">
+	<mat-label>{{ label() }}</mat-label>
+	<input
+		matInput
+		#textInput
+		[attr.maxlength]="maxTagLength"
+		[disabled]="isFull()"
+		[placeholder]="isFull() ? 'No more tags' : 'Add a tag'"
+		[matAutocomplete]="suggestionList"
+		(input)="setTyped($event)"
+		(keydown)="addOnKey($event)"
+		(blur)="addOnBlur()"
+	/>
+	<mat-autocomplete
+		#suggestionList="matAutocomplete"
+		(optionSelected)="addSuggestion($event)"
+	>
+		@for (tag of matchingSuggestions(); track tag) {
+			<mat-option [value]="tag">{{ tag }}</mat-option>
+		}
+	</mat-autocomplete>
+	<mat-hint
+		>{{ tags().length }} / {{ maxTags() }}. Enter or comma adds
+		one.</mat-hint
+	>
+</mat-form-field>
+<!-- The chosen tags, apart from where they're typed. -->
+@if (tags().length > 0) {
+	<ul class="tags" [attr.aria-label]="label()">
+		@for (tag of tags(); track tag) {
+			<li class="tag">
+				{{ tag }}
+				<button
+					type="button"
+					class="remove"
+					[attr.aria-label]="'Remove tag ' + tag"
+					(click)="removeTag(tag)"
+				>
+					<mat-icon aria-hidden="true">close</mat-icon>
+				</button>
+			</li>
+		}
+	</ul>
+}

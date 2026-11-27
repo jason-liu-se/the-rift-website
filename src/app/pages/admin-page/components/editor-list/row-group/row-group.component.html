@@ -1,0 +1,38 @@
+<tr class="group-header" role="row">
+	<td class="select" role="cell">
+		<mat-checkbox
+			color="primary"
+			[aria-label]="'Select every ' + label() + ' row on this page'"
+			[checked]="isAllSelected()"
+			[indeterminate]="isSomeSelected() && !isAllSelected()"
+			[disabled]="rows().length === 0"
+			(change)="toggleSelected($event.checked)"
+		/>
+	</td>
+	<th scope="rowgroup" role="rowheader" [attr.colspan]="headerSpan()">
+		<button
+			type="button"
+			class="toggle"
+			[attr.aria-expanded]="isExpanded()"
+			(click)="isExpanded.set(!isExpanded())"
+		>
+			<mat-icon aria-hidden="true">{{
+				isExpanded() ? "expand_less" : "expand_more"
+			}}</mat-icon>
+			{{ label() }}
+			<span class="count">{{ count() ?? rows().length }}</span>
+		</button>
+	</th>
+</tr>
+@if (isExpanded()) {
+	@for (row of rows(); track row.kind + row.id) {
+		<tr
+			app-editor-row
+			cdkDrag
+			cdkDragLockAxis="y"
+			[cdkDragDisabled]="!isReorderable()"
+			[row]="row"
+			[layout]="layout()"
+		></tr>
+	}
+}

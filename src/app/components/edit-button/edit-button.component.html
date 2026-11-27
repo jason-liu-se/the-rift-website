@@ -1,0 +1,8 @@
+@if (isEditor()) {
+	<a class="edit-button" [href]="href()" target="_blank" rel="noopener">
+		<mat-icon aria-hidden="true">edit</mat-icon>
+		Edit<span class="cdk-visually-hidden">
+			{{ itemName() }} (opens in new tab)</span
+		>
+	</a>
+}

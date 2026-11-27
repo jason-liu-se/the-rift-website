@@ -1,10 +1,16 @@
 import { routes } from './app.routes';
 import { serverRoutes } from './app.routes.server';
 
-/** Whether a server route path covers an app route path (`*` = one segment). */
+/** Whether a server route path covers an app route path (`*` = one segment, a trailing `**` = any after it). */
 function covers(serverPath: string, appPath: string): boolean {
 	const serverSegments = serverPath.split('/');
 	const appSegments = appPath.split('/');
+	if (serverSegments.at(-1) === '**') {
+		return covers(
+			serverSegments.slice(0, -1).join('/'),
+			appSegments.slice(0, serverSegments.length - 1).join('/')
+		);
+	}
 	return (
 		serverSegments.length === appSegments.length &&
 		serverSegments.every(
@@ -29,7 +35,7 @@ describe('serverRoutes', () => {
 
 	// Browser-only pages get their robots meta tag from JavaScript, too late for
 	// crawlers that don't run it.
-	it.each(['admin', 'admin/login'])(
+	it.each(['admin', 'admin/**'])(
 		'tells crawlers not to index "%s"',
 		(path) => {
 			expect(

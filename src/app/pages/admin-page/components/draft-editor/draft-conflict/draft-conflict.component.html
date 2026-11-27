@@ -1,0 +1,104 @@
+<!-- Always in the DOM, so a new conflict is announced. -->
+<p class="cdk-visually-hidden" aria-live="assertive">
+	@if (session().conflict()) {
+		{{ noun().one }} conflict: choose how to resolve it below.
+	}
+</p>
+@if (session().conflict(); as conflict) {
+	<div class="conflict">
+		<p class="conflict-message">
+			@switch (conflict.kind) {
+				@case ("draft") {
+					These changes were also edited in another tab or on another
+					device. Which version do you want?
+				}
+				@case ("item") {
+					Someone published changes to this {{ noun().one }} while you
+					were editing. Replace them with yours, or copy what you need
+					from theirs?
+				}
+				@case ("deleted") {
+					Someone deleted this {{ noun().one }} while you were
+					editing. Publish yours as a new {{ noun().one }}, or discard
+					it?
+				}
+			}
+		</p>
+		@if (conflictRows().length > 0) {
+			<p class="version-label">The other version</p>
+			<dl class="version">
+				@for (row of conflictRows(); track row.name) {
+					<dt>{{ row.name }}</dt>
+					<dd>{{ row.value }}</dd>
+				}
+			</dl>
+		}
+		<div class="actions">
+			@switch (conflict.kind) {
+				@case ("draft") {
+					<button
+						mat-flat-button
+						color="primary"
+						type="button"
+						(click)="keepDraft('mine')"
+					>
+						Keep this one
+					</button>
+					<button
+						mat-stroked-button
+						type="button"
+						(click)="keepDraft('theirs')"
+					>
+						Use the other one
+					</button>
+				}
+				@case ("item") {
+					<button
+						mat-flat-button
+						color="primary"
+						type="button"
+						(click)="overwrite.emit()"
+					>
+						Replace with mine
+					</button>
+					<button mat-stroked-button type="button" (click)="merge()">
+						Compare and copy
+					</button>
+				}
+				@case ("deleted") {
+					<button
+						mat-flat-button
+						color="primary"
+						type="button"
+						(click)="publishAsNew.emit()"
+					>
+						Publish as new
+					</button>
+					<button
+						mat-stroked-button
+						type="button"
+						(click)="discard.emit()"
+					>
+						Discard
+					</button>
+				}
+			}
+		</div>
+	</div>
+}
+
+@if (mergeRows().length > 0) {
+	<div class="merge">
+		<p>Copy what you want from their version into yours, then publish.</p>
+		<p class="version-label">Their version</p>
+		<dl class="version">
+			@for (row of mergeRows(); track row.name) {
+				<dt>{{ row.name }}</dt>
+				<dd>{{ row.value }}</dd>
+			}
+		</dl>
+		<button mat-button type="button" (click)="stopMerging()">
+			Hide their version
+		</button>
+	</div>
+}

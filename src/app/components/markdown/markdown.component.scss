@@ -1,0 +1,25 @@
+// Unencapsulated (see the component): every rule is scoped to `.markdown`.
+.markdown {
+	overflow-wrap: anywhere;
+
+	> :first-child {
+		margin-top: 0;
+	}
+
+	> :last-child {
+		margin-bottom: 0;
+	}
+
+	img {
+		max-width: 100%;
+		height: auto;
+	}
+
+	pre {
+		overflow-x: auto;
+	}
+
+	a {
+		color: inherit;
+	}
+}

@@ -4,7 +4,17 @@
 // compile time. Relative imports only: Playwright loads this file in Node.
 import {
 	ContentVersion,
+	DetailVersion,
 	DownloadCollection,
+	EditorCollection,
+	EditorDownloadItem,
+	EditorDownloadItemSummary,
+	EditorGalleryImage,
+	EditorMapSeason,
+	EditorMapSeasonSummary,
+	EditorNewsPost,
+	EditorNewsPostSummary,
+	GalleryCollection,
 	GalleryImage,
 	MapSeason,
 	NewsPost,
@@ -12,6 +22,9 @@ import {
 } from '../interfaces/api-responses';
 
 export const CONTENT_VERSION: ContentVersion = { version: 1763580000000 };
+export const NEWS_DETAIL_VERSION: DetailVersion = {
+	version: '1763580000000-1'
+};
 
 const NEWS_POST_COUNT = 12; // more than one page of 10
 
@@ -21,31 +34,67 @@ export const NEWS_POSTS: NewsPost[] = Array.from(
 		id: `news-${index + 1}`,
 		title: `News post ${index + 1}`,
 		date: '2026-01-01T00:00:00.000Z',
-		content: `Content of news post ${index + 1}.`
+		content: `Content of news post ${index + 1}.`,
+		// The newest post was edited after it went live, and uses markdown.
+		...(index === 0 && {
+			editedAt: '2026-01-02T12:00:00.000Z',
+			content:
+				'Content of news post 1, with **bold** text, a [link](/gallery), and a list:\n\n- First\n- Second'
+		})
 	})
 );
 
-const image = (name: string, caption: string): GalleryImage => ({
+const image = (
+	name: string,
+	caption: string,
+	tags: string[] = []
+): GalleryImage => ({
 	id: name,
 	imageUrl: `/assets/general-background-images/${name}`,
-	caption
+	caption,
+	tags
 });
 
-export const GALLERY_COLLECTIONS: Record<string, GalleryImage[]> = {
-	season5: [
-		image('spawn-walkway-1.webp', 'Spawn walkway'),
-		image('iron-farm-1.webp', 'Iron farm'),
-		image('water-tower-1.webp', 'Water tower')
-	],
-	season6: [
-		image('sunrise-1.webp', 'Sunrise'),
-		image('fancy-tree-1.webp', 'Fancy tree')
-	]
-};
+/** A gallery collection with its images, as the gallery endpoints serve them. */
+export interface GalleryCollectionFixture extends GalleryCollection {
+	images: GalleryImage[];
+}
+
+export const GALLERY_COLLECTIONS: GalleryCollectionFixture[] = [
+	// Season 5 has dimensions (the first is its card); season 6 has none.
+	{
+		slug: 'season5',
+		title: 'Season 5',
+		dimensions: [
+			{
+				name: 'Overworld',
+				imageUrl: '/assets/general-background-images/fancy-tree-1.webp'
+			},
+			{
+				name: 'Nether',
+				imageUrl: '/assets/general-background-images/sunrise-1.webp'
+			}
+		],
+		images: [
+			image('spawn-walkway-1.webp', 'Spawn walkway', ['spawn']),
+			image('iron-farm-1.webp', 'Iron farm', ['farm']),
+			image('water-tower-1.webp', 'Water tower', ['night', 'spawn'])
+		]
+	},
+	{
+		slug: 'season6',
+		title: 'Season 6',
+		images: [
+			image('sunrise-1.webp', 'Sunrise'),
+			image('fancy-tree-1.webp', 'Fancy tree')
+		]
+	}
+];
 
 export const DOWNLOAD_COLLECTIONS: DownloadCollection[] = [
 	{
-		name: 'Season 5',
+		name: 'season5',
+		title: 'Season 5',
 		items: [
 			{
 				id: 'season-5-world',
@@ -86,3 +135,99 @@ export function paginate<T>(
 		total: items.length
 	};
 }
+
+// The editor tools' reads (`/editor/*`): the public content above, with the
+// audit fields the editor sees. Lists answer summaries; `/:id` the full item.
+// Index 0 is the most recently updated, so the default sort keeps this order.
+
+const EDITOR = { id: '1', username: 'editor' };
+/** The same editor with an avatar (a local image: e2e blocks other hosts). */
+const EDITOR_WITH_AVATAR = {
+	...EDITOR,
+	avatarUrl: '/assets/home/grass-block.png'
+};
+const LATEST_UPDATE_MS = Date.UTC(2026, 0, 31, 12);
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** `item` without `key`, as a list summary leaves out a long field. */
+function omit<T extends object, K extends keyof T>(
+	item: T,
+	key: K
+): Omit<T, K> {
+	const copy = { ...item };
+	delete copy[key];
+	return copy;
+}
+
+function withAudit<T extends object>(item: T, index: number) {
+	return {
+		...item,
+		visible: true,
+		status: 'live' as const,
+		revision: index + 1,
+		createdBy: EDITOR_WITH_AVATAR,
+		lastUpdatedBy: EDITOR,
+		createdAt: '2026-01-01T12:00:00.000Z',
+		updatedAt: new Date(LATEST_UPDATE_MS - index * DAY_MS).toISOString()
+	};
+}
+
+export const EDITOR_NEWS_POST_ITEMS: EditorNewsPost[] = [
+	...NEWS_POSTS.map(withAudit),
+	{
+		...withAudit(
+			{
+				id: 'news-scheduled',
+				title: 'Coming soon',
+				content: 'Something new is on the way.',
+				date: '2027-01-01T12:00:00.000Z'
+			},
+			NEWS_POSTS.length
+		),
+		status: 'scheduled'
+	}
+];
+export const EDITOR_NEWS_POSTS: EditorNewsPostSummary[] =
+	EDITOR_NEWS_POST_ITEMS.map((post) => omit(post, 'content'));
+
+export const EDITOR_GALLERY_IMAGES: EditorGalleryImage[] =
+	GALLERY_COLLECTIONS.flatMap(({ slug, images }) =>
+		images.map((image) => ({ ...image, collection: slug }))
+	).map(withAudit);
+
+export const EDITOR_GALLERY_COLLECTIONS: EditorCollection[] =
+	GALLERY_COLLECTIONS.map(({ slug, title, dimensions, images }, index) => ({
+		...withAudit(
+			{
+				slug,
+				title,
+				...(dimensions && { dimensions }),
+				itemCount: images.length
+			},
+			index
+		)
+	}));
+
+export const EDITOR_DOWNLOAD_ITEM_ITEMS: EditorDownloadItem[] =
+	DOWNLOAD_COLLECTIONS.flatMap(({ name, items }) =>
+		items.map((item, sortOrder) => ({
+			...item,
+			collection: name,
+			sortOrder
+		}))
+	).map(withAudit);
+export const EDITOR_DOWNLOAD_ITEMS: EditorDownloadItemSummary[] =
+	EDITOR_DOWNLOAD_ITEM_ITEMS.map((item) => omit(item, 'desc'));
+
+export const EDITOR_DOWNLOAD_COLLECTIONS: EditorCollection[] =
+	DOWNLOAD_COLLECTIONS.map(({ name, title, items }, index) => ({
+		...withAudit({ slug: name, title, itemCount: items.length }, index)
+	}));
+
+export const EDITOR_MAP_SEASON_ITEMS: EditorMapSeason[] =
+	MAP_SEASONS.map(withAudit);
+export const EDITOR_MAP_SEASONS: EditorMapSeasonSummary[] =
+	EDITOR_MAP_SEASON_ITEMS.map(({ dimensions = [], ...season }) => ({
+		...season,
+		dimensionCount: dimensions.length
+	}));
