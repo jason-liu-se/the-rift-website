@@ -68,9 +68,10 @@ The decisions are in issue #101; the API's side is in the web-server's
   the footer in the modal's through `ModalFooterSlot`
   (`modal-shell/modal-footer-slot.ts`). Dimensions (a name and image each) use
   the same `dimensions-editor/` as map seasons, which add BlueMap fields
-  (`withMapFields`). The collection form has no preview, so its cards show each
-  image as a thumbnail (`withThumbnails`). The `/gallery` card shows the
-  collection's first dimension's image, or none.
+  (`withMapFields`). Both show each dimension's image as a thumbnail on its card
+  (`withThumbnails`); a map's spans its taller fields, cropped narrower than
+  16:9. The `/gallery` card shows the collection's first dimension's image, or
+  none.
 - **Writes** (confirm, send, snackbar) go through `EditorWriter.run()`.
 - **API:** `EditorContentApi` (items, bulk actions, collections), `DraftsApi`,
   and `ImageUploader`, typed per content type by `EditorContentTypes`

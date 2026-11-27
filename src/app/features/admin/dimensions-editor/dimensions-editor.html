@@ -55,7 +55,11 @@
 					<mat-icon>delete</mat-icon>
 				</button>
 			</div>
-			<div class="card-body" [class.with-thumbnail]="withThumbnails()">
+			<div
+				class="card-body"
+				[class.with-thumbnail]="withThumbnails()"
+				[class.with-map-fields]="withMapFields()"
+			>
 				@if (withThumbnails()) {
 				<app-item-thumbnail [src]="dimension.imageUrl" />
 				}

@@ -15,6 +15,7 @@
 	<h3 id="dimensions-heading" class="dimensions-heading">Dimensions</h3>
 	<app-dimensions-editor
 		withMapFields
+		withThumbnails
 		[album]="{ album: 'maps' }"
 		[dimensions]="fields().dimensions ?? []"
 		(dimensionsChange)="setDimensions($event)"
