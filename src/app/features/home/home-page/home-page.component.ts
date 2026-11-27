@@ -1,9 +1,9 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Component, PLATFORM_ID, inject } from '@angular/core';
-import { WelcomeCardComponent } from './components/welcome-card/welcome-card.component';
+import { WelcomeCardComponent } from './welcome-card/welcome-card.component';
 import { MatButton } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
-import { SectionCardComponent } from '../../shared/ui/section-card/section-card.component';
+import { SectionCardComponent } from '../../../shared/ui/section-card/section-card.component';
 import { LOGO_PATH } from 'src/app/core/config/site';
 import { isDesktopWidth } from 'src/app/shared/utils/viewport.util';
 
