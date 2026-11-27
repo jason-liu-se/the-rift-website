@@ -43,20 +43,20 @@ The decisions are in issue #101; the API's side is in the web-server's
   filters from the URL, the loaded items and drafts, the selection, cleared on
   every load) and `EditorListActions` every write from it (row actions, bulk
   actions, also as the `BULK_ACTION_HOST`); both are provided by the list page.
-  Unpublished changes and every item are two collapsible row groups of the
-  type's `view`: `list-views/list-table/` (column headings that sort, `sort` and
-  `order` in the URL; cards on phones) or `list-views/list-grid/` (cards on
-  every screen, for the gallery). Both keep explicit table roles. Each column
-  (`ListColumn`, `list-columns.ts`) names a shared cell (`cells/`, or the status
-  badge) and builds its inputs from the row's `RowData` (`list-rows.ts`, the
-  same for items and drafts), with its width, sort, and place on a card; the
-  column on a card's `title` links to the editor. A row's menu is `ROW_ACTIONS`
-  (`row-actions.ts`, each with when it applies); `RowGroup` works out what each
-  row shows and `EditorRow` only displays it. Filters beside search are
-  `ListFilterField`s (`list-filter-fields.ts`): their options, URL key, API
-  query, and which drafts they keep. Phones and the grid sort with a Sort by
-  field. An `isOrderable` type, filtered to one collection, drags into order
-  (`list-order.ts`, one update per moved item).
+  Unpublished changes and every item are two collapsible row groups in
+  `list-views/list-table/`: column headings that sort (`sort` and `order` in the
+  URL) and cards on phones, or for a `grid` view (the gallery) cards on every
+  screen. It keeps explicit table roles. Each column (`ListColumn`,
+  `list-columns.ts`) names a shared cell (`cells/`, or the status badge) and
+  builds its inputs from the row's `RowData` (`list-rows.ts`, the same for items
+  and drafts), with its width, sort, and place on a card; the column on a card's
+  `title` links to the editor. A row's menu is `ROW_ACTIONS` (`row-actions.ts`,
+  each with when it applies); `RowGroup` works out what each row shows and
+  `EditorRow` only displays it. Filters beside search are `ListFilterField`s
+  (`list-filter-fields.ts`): their options, URL key, API query, and which drafts
+  they keep. Phones and the grid sort with a Sort by field. An `isOrderable`
+  type, filtered to one collection, drags into order (`list-order.ts`, one
+  update per moved item).
 - **Collections** come from `CollectionsStore` (provided by the admin page):
   fetched once per type, reloaded after a collection write. Forms choose one
   with `collection-select/`. The Collections modal lists them, and the editor's
@@ -65,13 +65,14 @@ The decisions are in issue #101; the API's side is in the web-server's
   or an existing one's title and dimensions. Side by side, the list and the form
   scroll separately. `CollectionsEditor` (provided by the modal) owns the open
   draft and the drafts list; `collections-manager/` runs the list's actions and
-  shows `collection-list/` (cards from `toCollectionCards()`) beside the form.
-  Published and unpublished collections are the same cards: a click opens one in
-  the form, showing or hiding one changes its draft, and deleting a published
-  one writes at once. The form shares the item editor's publishing
-  (`DraftPublisher`, `drafts/draft-publisher.ts`, given each editor's problems
-  and messages), footer (`draft-footer/`), undo and redo (`draft-history/`), and
-  conflict panel, with the footer in the modal's through `ModalFooterSlot`
+  shows `collection-list/` (cards from `toCollectionCards()`, with the list's
+  `StatusBadge` for unpublished ones) beside the form. Published and unpublished
+  collections are the same cards: a click opens one in the form, showing or
+  hiding one changes its draft, and deleting a published one writes at once. The
+  form shares the item editor's publishing (`DraftPublisher`,
+  `drafts/draft-publisher.ts`, given each editor's problems and messages),
+  footer (`draft-footer/`), undo and redo (`draft-history/`), and conflict
+  panel, with the footer in the modal's through `ModalFooterSlot`
   (`modal-shell/modal-footer-slot.ts`). Dimensions (a name and image each) use
   the same `dimensions-editor/` as map seasons, which add BlueMap fields
   (`withMapFields`). Both show each dimension's image as a thumbnail on its card
