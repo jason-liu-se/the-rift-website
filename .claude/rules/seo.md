@@ -1,15 +1,15 @@
 ---
 paths:
     - "src/app/app.routes.ts"
-    - "src/app/seo/**/*"
+    - "src/app/core/seo/**/*"
     - "scripts/seo/**/*"
     - "src/index.html"
 ---
 
 # SEO
 
-- **Titles and meta tags.** `SeoTitleStrategy` (`src/app/seo/`) runs after each
-  navigation and sets:
+- **Titles and meta tags.** `SeoTitleStrategy` (`src/app/core/seo/`) runs after
+  each navigation and sets:
     - the title: the route's `title` plus " | The Rift"
     - the meta description: `data.description`, falling back to the site-wide
       one in `src/index.html`

@@ -3,7 +3,7 @@
 // When BlueMap is embedded in the site's map viewer, sends the page embedding
 // it BlueMap's URL fragment (map id, camera position, view) whenever it
 // changes, so the viewer's URL can follow it. The viewer
-// (src/app/pages/blue-map-page/) only accepts messages from BlueMap's origin.
+// (src/app/features/map/blue-map-page/) only accepts messages from BlueMap's origin.
 (() => {
 	// Opened directly, not embedded: nothing to sync.
 	if (window.parent === window) {

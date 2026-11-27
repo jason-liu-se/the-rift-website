@@ -1,22 +1,19 @@
 ---
 paths:
-    - "src/app/pages/admin-page/**/*"
-    - "src/app/services/editor-content/**/*"
-    - "src/app/services/drafts/**/*"
-    - "src/app/services/image-upload/**/*"
+    - "src/app/features/admin/**/*"
     - "src/admin-theme.scss"
 ---
 
 # Admin tools
 
 The decisions are in issue #101; the API's side is in the web-server's
-`src/contract/` (synced to `src/app/interfaces/api-*.ts`).
+`src/contract/` (synced to `src/app/core/api/api-*.ts`).
 
 - **Shell:** admin routes hide the site navbar (`data.showNavbar: false`) for
   the slim `admin-bar/`; tools are a sidebar on desktop and a bottom tab bar on
   mobile. Without the navbar, `PageTemplateComponent` leaves `<main>` to the
   page, so the admin bar and tools sit outside it.
-- **Routes** (`pages/admin-page/admin.routes.ts`, under `/admin`): each tool's
+- **Routes** (`features/admin/admin.routes.ts`, under `/admin`): each tool's
   list at `/admin/<type>` (`editor-list-page/`), with routed modals over it:
   `new`, `drafts/<draftId>`, `<id>` (`editor-modal/`, the shared `draft-editor/`
   around the type's form), `bulk` (`bulk-create-modal/`), and `collections`
@@ -25,7 +22,7 @@ The decisions are in issue #101; the API's side is in the web-server's
   route's `canDeactivate` can ask first (bulk creation with rows does). Every
   modal is framed by `modal-shell/` (fixed header and footer, mobile-only tabs;
   it focuses its heading on opening). Public cards link editors to
-  `/admin/<type>/<id>` with `<app-edit-button>` (`components/edit-button/`).
+  `/admin/<type>/<id>` with `<app-edit-button>` (`shared/ui/edit-button/`).
 - **The editor** shows the type's form beside its `preview` (Edit and Preview
   tabs on mobile). The draft holds the publish choices (`visible`, news's
   `date`) beside its fields (`DRAFT_OPTION_KEYS`); `PublishSettings`
@@ -34,10 +31,10 @@ The decisions are in issue #101; the API's side is in the web-server's
   shared by the footer and the form's fields; its `ErrorStateMatcher` marks
   blank required fields only after that.
 - **Per-type differences live in `EDITOR_TYPES`**
-  (`pages/admin-page/editor-types.ts`): noun, search fields, field labels,
-  flags, the list's `filters`, `columns`, `view` and `defaultSort`, public page,
+  (`features/admin/editor-types.ts`): noun, search fields, field labels, flags,
+  the list's `filters`, `columns`, `view` and `defaultSort`, public page,
   new-item fields, and the type's form, preview, and bulk actions
-  (`components/<type>/`). Shared code reads it; never check `type === …`. A
+  (`features/admin/<type>/`). Shared code reads it; never check `type === …`. A
   type's bulk actions run through `BULK_ACTION_HOST`.
 - **The list** (`editor-list/`): `EditorListStore` owns its state (type and
   filters from the URL, the loaded items and drafts, the selection, cleared on
@@ -77,9 +74,10 @@ The decisions are in issue #101; the API's side is in the web-server's
 - **Writes** (confirm, send, snackbar) go through `EditorWriteService.run()`.
 - **API:** `EditorContentService` (items, bulk actions, collections),
   `DraftsService`, and `ImageUploadService`, typed per content type by
-  `EditorContentTypes` (`services/editor-content/editor-content-types.ts`).
-  Every `/editor/*` request uses `EDITOR_REQUEST_OPTIONS`.
-- **Drafts** (`pages/admin-page/drafts/`): the server holds them, of items or
+  `EditorContentTypes`
+  (`features/admin/editor-content/editor-content-types.ts`). Every `/editor/*`
+  request uses `EDITOR_REQUEST_OPTIONS`.
+- **Drafts** (`features/admin/drafts/`): the server holds them, of items or
   collections (`DraftTypes` in `editor-content-types.ts`). `DraftStore` owns
   every draft write (one queue, so autosave, retries, publishing, and syncing
   never race) and this browser's copies, kept only while a change waits for the
@@ -100,6 +98,6 @@ The decisions are in issue #101; the API's side is in the web-server's
   `src/admin-theme.scss`, which `AdminPageComponent` loads. Avoid `DatePipe` and
   other `@angular/common` extras: they'd join every page's initial chunk (use
   `formatDateTime`).
-- **Mirrored limits** (`config/images.ts`, `config/uploads.ts`,
-  `config/admin.ts`) copy the API's to flag problems early; the API's are the
-  ones enforced. Update both when they change.
+- **Mirrored limits** (`core/config/images.ts`, `core/config/uploads.ts`,
+  `core/config/admin.ts`) copy the API's to flag problems early; the API's are
+  the ones enforced. Update both when they change.

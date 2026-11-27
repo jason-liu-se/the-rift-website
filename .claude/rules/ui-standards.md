@@ -84,7 +84,7 @@ The whole site works by keyboard alone:
 ## Responsive
 
 - Mobile-first `min-width` queries reusing the breakpoints in
-  `src/app/config/breakpoints.ts`.
+  `src/app/core/config/breakpoints.ts`.
 - Flexible layouts (flexbox, grid, `clamp()`, relative units) over fixed widths;
   images and embeds scale to their container.
 - Reflow at 320px and 200% zoom without horizontal scroll; 24×24 CSS px minimum
@@ -104,9 +104,8 @@ The whole site works by keyboard alone:
 - Descriptive link text and real `<a routerLink>` links for navigation.
 - Compressed WebP images sized for their use; nothing render-blocking.
 - Content and background images use `<app-optimized-image>`
-  (`src/app/components/optimized-image/`), not `<img>` or CSS
-  `background-image`, so they're resized. Mark the page's LCP image (e.g. its
-  banner) `priority`, and full-screen views `original`. The admin page serves
-  originals (its own `IMAGE_LOADER`), and Discord avatars stay plain
-  `<img src>`.
+  (`src/app/shared/ui/optimized-image/`), not `<img>` or CSS `background-image`,
+  so they're resized. Mark the page's LCP image (e.g. its banner) `priority`,
+  and full-screen views `original`. The admin page serves originals (its own
+  `IMAGE_LOADER`), and Discord avatars stay plain `<img src>`.
 - Route titles and descriptions: see [seo.md](./seo.md).
