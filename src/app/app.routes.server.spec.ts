@@ -1,46 +1,39 @@
+import { RenderMode } from '@angular/ssr';
 import { routes } from './app.routes';
 import { serverRoutes } from './app.routes.server';
 
-/** Whether a server route path covers an app route path (`*` = one segment, a trailing `**` = any after it). */
-function covers(serverPath: string, appPath: string): boolean {
-	const serverSegments = serverPath.split('/');
-	const appSegments = appPath.split('/');
-	if (serverSegments.at(-1) === '**') {
-		return covers(
-			serverSegments.slice(0, -1).join('/'),
-			appSegments.slice(0, serverSegments.length - 1).join('/')
-		);
-	}
-	return (
-		serverSegments.length === appSegments.length &&
-		serverSegments.every(
-			(segment, i) => segment === '*' || segment === appSegments[i]
-		)
-	);
-}
-
 describe('serverRoutes', () => {
-	const appPaths = routes
-		.map((route) => route.path ?? '')
-		.filter((path) => path !== '**');
+	it.each(routes.map((route) => [route.path ?? '', route]))(
+		'gives the "%s" route a render mode',
+		(_, route) => {
+			expect(['prerender', 'server', 'client']).toContain(
+				route.data?.['renderMode']
+			);
+		}
+	);
 
-	// Otherwise the route falls through to the 404 entry.
-	it.each(appPaths)('gives the "%s" route a render mode', (appPath) => {
-		expect(
-			serverRoutes.some(
-				(route) => route.path !== '**' && covers(route.path, appPath)
-			)
-		).toBe(true);
+	it('turns path parameters into wildcards', () => {
+		expect(serverRoutes).toContainEqual(
+			expect.objectContaining({
+				path: 'gallery/*',
+				renderMode: RenderMode.Server
+			})
+		);
 	});
 
 	// Browser-only pages get their robots meta tag from JavaScript, too late for
 	// crawlers that don't run it.
 	it.each(['admin', 'admin/**'])(
-		'tells crawlers not to index "%s"',
+		'renders "%s" in the browser, telling crawlers not to index it',
 		(path) => {
-			expect(
-				serverRoutes.find((route) => route.path === path)?.headers
-			).toEqual(expect.objectContaining({ 'X-Robots-Tag': 'noindex' }));
+			expect(serverRoutes.find((route) => route.path === path)).toEqual(
+				expect.objectContaining({
+					renderMode: RenderMode.Client,
+					headers: expect.objectContaining({
+						'X-Robots-Tag': 'noindex'
+					})
+				})
+			);
 		}
 	);
 

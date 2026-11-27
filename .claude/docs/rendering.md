@@ -6,23 +6,25 @@ rendering it again.
 
 ## Render modes
 
-`src/app/app.routes.server.ts` sets how each route renders:
+Each route in `src/app/app.routes.ts` sets how it renders in `data.renderMode`,
+which `app.routes.server.ts` turns into Angular's server routes:
 
-| Mode                   | HTML is made                   | Use for                                        |
-| ---------------------- | ------------------------------ | ---------------------------------------------- |
-| `RenderMode.Prerender` | At build time, saved as a file | Pages whose content only changes with a deploy |
-| `RenderMode.Server`    | On each request                | Pages showing API data                         |
-| `RenderMode.Client`    | In the browser only            | Pages that can't render on a server            |
+| Mode        | HTML is made                   | Use for                                        |
+| ----------- | ------------------------------ | ---------------------------------------------- |
+| `prerender` | At build time, saved as a file | Pages whose content only changes with a deploy |
+| `server`    | On each request                | Pages showing API data                         |
+| `client`    | In the browser only            | Pages that can't render on a server            |
 
 - Changing a page's mode is a one-line edit; components work in all three.
-- The admin pages (`/admin`, `/admin/login`) use `Client`: their guards
+- The admin pages (`/admin`, `/admin/login`) use `client`: their guards
   (`src/app/core/auth/`) check the login with the API's session cookies, which
-  only the browser has. A `Client` page's robots meta tag only appears once
-  JavaScript runs, so these routes also send an `X-Robots-Tag: noindex` header.
-- Every route in `app.routes.ts` needs an entry (a unit test checks), or it
-  falls through to the last entry: the 404 page with a 404 status. The 404 page
-  also sets that status itself (`RESPONSE_INIT`), for URLs a `canMatch` guard
-  turns away under another entry (an unknown `gallery/:collection`).
+  only the browser has. A `client` page's robots meta tag only appears once
+  JavaScript runs, so a `client` route marked `noindex` also sends an
+  `X-Robots-Tag: noindex` header (and covers its child routes).
+- Every route needs a render mode (a unit test checks). The catch-all route
+  answers with a 404 status; the 404 page also sets that status itself
+  (`RESPONSE_INIT`), for URLs a `canMatch` guard turns away under another route
+  (an unknown `gallery/:collection`).
 
 ## Server-safe code
 
