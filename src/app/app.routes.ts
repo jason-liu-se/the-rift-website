@@ -30,7 +30,7 @@ export const routes: Routes = [
 			description:
 				'The latest news and announcements from The Rift Minecraft SMP.',
 			loadComponent: () =>
-				import('./pages/news-page/news-page.component').then(
+				import('./features/news/news-page/news-page.component').then(
 					(m) => m.NewsPageComponent
 				),
 			isTransparent: false
