@@ -1,6 +1,6 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
-import { ADMIN_PATH } from 'src/app/core/config/admin';
+import { ADMIN_PATH } from 'src/app/core/config/site-paths';
 import { EditorContentType } from 'src/app/core/api/api-requests';
 import { AuthSession } from 'src/app/core/auth/auth-session';
 
