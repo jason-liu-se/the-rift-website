@@ -20,7 +20,7 @@ import {
 	MAX_TAG_LENGTH,
 	MAX_TAGS_PER_IMAGE
 } from 'src/app/core/config/content-limits';
-import { normalizeTag } from 'src/app/utilities/gallery-tags';
+import { normalizeTag } from 'src/app/features/gallery/gallery-tags';
 
 /**
  * Gallery tags: type one and press Enter or a comma, or pick a suggestion.
