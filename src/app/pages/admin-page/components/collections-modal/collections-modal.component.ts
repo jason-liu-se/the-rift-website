@@ -18,23 +18,7 @@ import { ModalShellComponent } from '../modal-shell/modal-shell.component';
 /** A type's collections, in a modal over its list (`/admin/<type>/collections`). */
 @Component({
 	selector: 'app-collections-modal',
-	template: `<ng-template #content>
-		<app-modal-shell
-			[heading]="config().label + ' collections'"
-			(closed)="close()"
-		>
-			@if (collectionType(); as type) {
-				<app-collections-manager
-					[type]="type"
-					[itemNoun]="config().noun"
-					(changed)="isChanged = true"
-				/>
-			}
-			<div modalFooter>
-				<ng-container *ngTemplateOutlet="footer.template() ?? null" />
-			</div>
-		</app-modal-shell>
-	</ng-template>`,
+	templateUrl: './collections-modal.component.html',
 	imports: [
 		CollectionsManagerComponent,
 		ModalShellComponent,

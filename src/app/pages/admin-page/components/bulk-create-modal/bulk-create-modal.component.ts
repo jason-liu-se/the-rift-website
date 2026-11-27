@@ -14,9 +14,7 @@ import { GalleryBulkCreateComponent } from '../gallery/gallery-bulk-create/galle
 /** Adding many gallery images, in a modal over the gallery's list. */
 @Component({
 	selector: 'app-bulk-create-modal',
-	template: `<ng-template #content>
-		<app-gallery-bulk-create (closed)="close()" />
-	</ng-template>`,
+	templateUrl: './bulk-create-modal.component.html',
 	imports: [GalleryBulkCreateComponent]
 })
 export class BulkCreateModalComponent {

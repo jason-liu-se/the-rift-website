@@ -91,3 +91,8 @@ function, with a name that says what it owns.
 Group members in this order, with a blank line between groups: injected
 dependencies, inputs and outputs, state signals, derived (`computed`) values,
 the constructor, public methods, protected (template) methods, private methods.
+
+## Files
+
+A component's template and styles go in their own `.html` and `.scss` files
+(`templateUrl`, `styleUrl`), never inline in the `.ts`, however short.

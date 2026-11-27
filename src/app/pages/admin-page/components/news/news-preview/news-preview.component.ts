@@ -7,7 +7,7 @@ import { PublishSettings } from '../../draft-editor/publish-settings';
 /** A news post's draft as the news page shows it. */
 @Component({
 	selector: 'app-news-preview',
-	template: `<app-news-display [newsPosts]="preview()" />`,
+	templateUrl: './news-preview.component.html',
 	imports: [NewsDisplayComponent]
 })
 export class NewsPreviewComponent {

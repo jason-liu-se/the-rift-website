@@ -9,19 +9,7 @@ import { MatTooltip } from '@angular/material/tooltip';
  */
 @Component({
 	selector: 'app-visibility-toggle',
-	template: `<mat-slide-toggle
-		color="primary"
-		aria-label="Visible on the site"
-		[matTooltip]="
-			visible() ? 'Everyone can see it' : 'Only editors can see it'
-		"
-		[checked]="visible()"
-		(change)="visible.set($event.checked)"
-	>
-		<span class="state" aria-hidden="true">{{
-			visible() ? 'Visible' : 'Hidden'
-		}}</span>
-	</mat-slide-toggle>`,
+	templateUrl: './visibility-toggle.component.html',
 	styleUrl: './visibility-toggle.component.scss',
 	imports: [MatSlideToggle, MatTooltip]
 })

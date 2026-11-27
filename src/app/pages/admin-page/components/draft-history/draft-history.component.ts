@@ -8,27 +8,8 @@ import { DraftSession } from '../../drafts/draft-session';
 /** A draft's undo and redo buttons. */
 @Component({
 	selector: 'app-draft-history',
-	template: `<button
-			mat-icon-button
-			type="button"
-			aria-label="Undo"
-			matTooltip="Undo (Ctrl+Z)"
-			[disabled]="!session().canUndo()"
-			(click)="session().undo()"
-		>
-			<mat-icon>undo</mat-icon>
-		</button>
-		<button
-			mat-icon-button
-			type="button"
-			aria-label="Redo"
-			matTooltip="Redo (Ctrl+Shift+Z)"
-			[disabled]="!session().canRedo()"
-			(click)="session().redo()"
-		>
-			<mat-icon>redo</mat-icon>
-		</button>`,
-	styles: ':host { display: inline-flex; }',
+	templateUrl: './draft-history.component.html',
+	styleUrl: './draft-history.component.scss',
 	imports: [MatIcon, MatIconButton, MatTooltip]
 })
 export class DraftHistoryComponent {
