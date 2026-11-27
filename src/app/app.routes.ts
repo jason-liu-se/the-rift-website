@@ -77,7 +77,7 @@ export const routes: Routes = [
 			description:
 				'Explore interactive maps of the worlds from The Rift Minecraft SMP.',
 			loadComponent: () =>
-				import('./pages/map-page/map-page.component').then(
+				import('./features/map/map-page/map-page.component').then(
 					(m) => m.MapPageComponent
 				)
 		}
@@ -90,7 +90,7 @@ export const routes: Routes = [
 			description:
 				'Interactive maps of the worlds on The Rift Minecraft SMP.',
 			loadComponent: () =>
-				import('./pages/blue-map-page/blue-map-page.component').then(
+				import('./features/map/blue-map-page/blue-map-page.component').then(
 					(m) => m.BlueMapPageComponent
 				),
 			isTransparent: false,
