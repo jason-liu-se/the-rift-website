@@ -1,13 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
 import { MapSeason } from 'src/app/core/api/api-responses';
 import { ICardSelection } from 'src/app/shared/ui/card-selection-section/card-selection.interface';
-import { MapProviderService } from 'src/app/services/map-provider/map-provider.service';
-import { EditButtonComponent } from '../../shared/ui/edit-button/edit-button.component';
-import { BackgroundImageCardComponent } from '../../shared/ui/background-image-card/background-image-card.component';
-import { CardSelectionSectionComponent } from '../../shared/ui/card-selection-section/card-selection-section.component';
-import { SectionCardComponent } from '../../shared/ui/section-card/section-card.component';
-import { FallbackPanelComponent } from '../../shared/ui/fallback-panel/fallback-panel.component';
-import { LoadState } from '../../shared/utils/load-state';
+import { MapProviderService } from 'src/app/features/map/map-provider.service';
+import { EditButtonComponent } from '../../../shared/ui/edit-button/edit-button.component';
+import { BackgroundImageCardComponent } from '../../../shared/ui/background-image-card/background-image-card.component';
+import { CardSelectionSectionComponent } from '../../../shared/ui/card-selection-section/card-selection-section.component';
+import { SectionCardComponent } from '../../../shared/ui/section-card/section-card.component';
+import { FallbackPanelComponent } from '../../../shared/ui/fallback-panel/fallback-panel.component';
+import { LoadState } from '../../../shared/utils/load-state';
 
 interface ISeasonCards {
 	id: string;

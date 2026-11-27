@@ -11,8 +11,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { BackButtonComponent } from '../../shared/ui/back-button/back-button.component';
-import { MessageCardComponent } from './components/message-card/message-card.component';
+import { BackButtonComponent } from '../../../shared/ui/back-button/back-button.component';
+import { MessageCardComponent } from './message-card/message-card.component';
 import { MatIcon } from '@angular/material/icon';
 
 const BLUEMAP_ORIGIN = new URL(environment.BLUEMAP_URL).origin;
