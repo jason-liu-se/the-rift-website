@@ -2,7 +2,7 @@ import { Component, input, output } from '@angular/core';
 import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
-import { CollectionCard } from '../../collection-cards';
+import { CollectionCardContent } from '../../collection-cards';
 
 /**
  * One collection in the Collections modal's list: its title, details, and
@@ -22,7 +22,7 @@ import { CollectionCard } from '../../collection-cards';
 	}
 })
 export class CollectionCardComponent {
-	public readonly card = input.required<CollectionCard>();
+	public readonly card = input.required<CollectionCardContent>();
 	public readonly opened = output<void>();
 	public readonly visibilityToggled = output<void>();
 	public readonly deleted = output<void>();

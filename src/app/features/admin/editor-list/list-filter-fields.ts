@@ -11,7 +11,7 @@ export interface FilterOption {
 }
 
 /** An admin list's filters, as the editor set them. */
-export interface ListFilters {
+export interface ListFilterSettings {
 	search: string;
 	/** The fields `search` looks in; none means every field. */
 	searchFields: string[];
@@ -23,7 +23,7 @@ export interface ListFilters {
 	values: Readonly<Partial<Record<string, string>>>;
 }
 
-export const NO_FILTERS: ListFilters = {
+export const NO_FILTERS: ListFilterSettings = {
 	search: '',
 	searchFields: [],
 	sort: '',
@@ -36,7 +36,7 @@ export const NO_FILTERS: ListFilters = {
  * value is '' until one is chosen.
  */
 export interface ListFilterField {
-	/** Its value's key in `ListFilters.values`, and its URL parameter. */
+	/** Its value's key in `ListFilterSettings.values`, and its URL parameter. */
 	key: string;
 	label: string;
 	/** Fixed choices, or the type's collections. */
@@ -104,6 +104,9 @@ export const CREATED_BY_FILTER: ListFilterField = {
 };
 
 /** How many filters are set (search fields count as one, search as none). */
-export function countSetFilters({ values, searchFields }: ListFilters): number {
+export function countSetFilters({
+	values,
+	searchFields
+}: ListFilterSettings): number {
 	return Object.keys(values).length + (searchFields.length > 0 ? 1 : 0);
 }

@@ -18,7 +18,7 @@ import { EditorWriteService } from '../editor-write.service';
 import { CollectionFormComponent } from '../collection-form/collection-form.component';
 import { CollectionsEditor } from '../collections-modal/collections-editor';
 import { ItemNoun, countItems } from '../editor-list/bulk-results';
-import { CollectionCard, toCollectionCards } from './collection-cards';
+import { CollectionCardContent, toCollectionCards } from './collection-cards';
 import { CollectionListComponent } from './collection-list/collection-list.component';
 
 /**
@@ -75,7 +75,7 @@ export class CollectionsManagerComponent {
 		);
 	});
 
-	protected open(card: CollectionCard): void {
+	protected open(card: CollectionCardContent): void {
 		this.openInForm(this.editor.open(card.target));
 	}
 
@@ -84,7 +84,7 @@ export class CollectionsManagerComponent {
 		this.focusForm();
 	}
 
-	protected delete(card: CollectionCard): void {
+	protected delete(card: CollectionCardContent): void {
 		const { target, title } = card;
 		if (typeof target !== 'string') {
 			this.deleteCollection(target);

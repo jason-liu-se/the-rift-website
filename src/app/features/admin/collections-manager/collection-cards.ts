@@ -9,7 +9,7 @@ import { ItemNoun, countItems } from '../editor-list/bulk-results';
  * A collection as the list shows it: a published one with the editor's
  * draft on top, or a new one's draft.
  */
-export interface CollectionCard {
+export interface CollectionCardContent {
 	/** The published collection, or a new one's draft ID. */
 	target: CollectionTarget;
 	title: string;
@@ -55,7 +55,7 @@ export function toCollectionCards({
 	/** Where a collection's page is, before its slug (the gallery's). */
 	urlPrefix?: string;
 	itemNoun: ItemNoun;
-}): CollectionCard[] {
+}): CollectionCardContent[] {
 	const pathOf = (slug: string | undefined) => `${urlPrefix}${slug || '…'}`;
 	const newCards = newDrafts.map(({ id, fields, dimensionCount }) => {
 		const isOpen = open?.draftId === id;
