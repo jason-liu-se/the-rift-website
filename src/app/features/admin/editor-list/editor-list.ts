@@ -10,7 +10,6 @@ import { DRAFT_NOUN, countItems } from './bulk-results';
 import { EditorListStore } from './editor-list-store';
 import { COLLECTION_FILTER } from './list-filter-fields';
 import { ListFilters } from './list-filters/list-filters';
-import { ListGrid } from './list-views/list-grid/list-grid';
 import { ListTable } from './list-views/list-table/list-table';
 
 /**
@@ -27,7 +26,6 @@ import { ListTable } from './list-views/list-table/list-table';
 		BulkActionBar,
 		FallbackPanel,
 		ListFilters,
-		ListGrid,
 		ListTable,
 		MatIcon,
 		MatPaginator,

@@ -10,13 +10,8 @@
 		{{ card.title }}
 	</button>
 	<span class="details">
-		{{ card.details }} @if (!card.isVisible) { · Hidden } @if (card.status;
-		as status) {
-		<span class="unpublished">
-			<span class="dot" aria-hidden="true"></span>
-			{{ status }}
-		</span>
-		}
+		{{ card.details }}
+		<app-status-badge [status]="card.status" [hasDraft]="card.hasDraft" />
 	</span>
 </span>
 <button

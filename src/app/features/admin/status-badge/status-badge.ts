@@ -25,7 +25,8 @@ const STATUS_LABELS: Record<ItemStatus, string> = {
 	styleUrl: './status-badge.scss'
 })
 export class StatusBadge {
-	public readonly status = input.required<ItemStatus>();
+	/** None shows only whether it has unpublished changes. */
+	public readonly status = input<ItemStatus>();
 	public readonly hasDraft = input(false);
 
 	protected readonly labels = STATUS_LABELS;

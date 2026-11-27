@@ -4,6 +4,7 @@ import {
 	NewCollectionDraft
 } from '../collections-modal/collections-editor';
 import { ItemNoun, countItems } from '../editor-list/bulk-results';
+import { ItemStatus } from '../status-badge/status-badge';
 
 /**
  * A collection as the list shows it: a published one with the editor's
@@ -16,8 +17,10 @@ export interface CollectionCardContent {
 	/** Its URL, item count, and dimension count. */
 	details: string;
 	isVisible: boolean;
-	/** Why it differs from the site, if it does. */
-	status?: 'Unpublished' | 'Unpublished changes';
+	/** A new one (its visibility is the eye button's). */
+	status?: Extract<ItemStatus, 'draft'>;
+	/** A published one has unpublished changes. */
+	hasDraft: boolean;
 	isOpen: boolean;
 }
 
@@ -70,7 +73,8 @@ export function toCollectionCards({
 				)
 			].join(' · '),
 			isVisible: shown.visible ?? true,
-			status: 'Unpublished' as const,
+			status: 'draft' as const,
+			hasDraft: false,
 			isOpen
 		};
 	});
@@ -89,7 +93,7 @@ export function toCollectionCards({
 				...toDimensionCount(collection.dimensions?.length)
 			].join(' · '),
 			isVisible: shown?.visible ?? collection.visible,
-			status: hasDraft ? ('Unpublished changes' as const) : undefined,
+			hasDraft,
 			isOpen
 		};
 	});
