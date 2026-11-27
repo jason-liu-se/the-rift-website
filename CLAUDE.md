@@ -18,8 +18,8 @@ npm run lint / format                  # angular-eslint / prettier
 npm run env                            # regenerate src/environments/ (before calling `ng` directly)
 ```
 
-Scaffold with `npm run ng -- generate component components/<name>`. A Husky
-pre-commit hook lints and formats staged files.
+Scaffold with `npm run ng -- generate component features/<feature>/<name>` (or
+`shared/ui/<name>`). A Husky pre-commit hook lints and formats staged files.
 
 ## Docs and rules
 
@@ -45,12 +45,13 @@ frontmatter so it loads only when matching files are read or edited.
 - **External services.** The Rift API and BlueMap run separately. Import
   `environment` from `src/environments/` (generated from `.env`); never
   hard-code URLs.
-- **API types** come from `src/app/interfaces/api-*.ts` (`api-requests.ts` what
+- **API types** come from `src/app/core/api/api-*.ts` (`api-requests.ts` what
   each endpoint takes, `api-responses.ts` what it sends), verbatim copies of the
   web-server's contract: never edit them here (README "API contract").
-- **Services** live in `src/app/services/<name>/`, one folder per service (with
-  its spec and any closely tied interceptor). API services are thin `HttpClient`
-  wrappers returning Observables; caching happens in the consuming component.
+- **Services** sit with what they serve: a feature's at its folder's root
+  (`features/news/`), app-wide ones in `core/` by area (`core/auth/`). API
+  services are thin `HttpClient` wrappers returning Observables; caching happens
+  in the consuming component.
 - **UI components.** Build new interactive components on Angular Aria (with
   `@angular/cdk` for overlays and dialogs), styled with our own SCSS. Angular
   Material may only be used on admin pages. Details in
@@ -111,8 +112,8 @@ frontmatter so it loads only when matching files are read or edited.
   functions, side effects isolated. The concrete rules (state, data flow,
   variants, when to split) are in `.claude/rules/component-design.md`.
 - **Clarity.** Descriptive names (`.claude/rules/naming.md`), small functions,
-  guard clauses, named constants (in `src/app/config/` if shared or likely to be
-  tweaked, like page sizes, links, or seasons, so editors can find them;
+  guard clauses, named constants (in `src/app/core/config/` if shared or likely
+  to be tweaked, like page sizes, links, or seasons, so editors can find them;
   otherwise with the owning feature). Simple over clever; comment a non-obvious
   version that's worth keeping.
 - **Comments.** Comment only what the code can't say (why, a non-obvious
@@ -129,13 +130,21 @@ frontmatter so it loads only when matching files are read or edited.
 - **Dependencies.** Add a package only for substantial, likely-reused, or
   error-prone functionality (e.g. security, date/time, parsing), and justify it
   to the user.
-- **File scoping.** Group by feature, nesting related files (e.g.
-  `components/news/news-display/`). `components/` holds shared components (used
-  by more than one page, or generic UI). A component specific to one page's
-  content lives in that page's folder (`pages/<name>-page/components/`) and
-  moves to `components/`, in the same change, once another page needs it.
-  `layout/` holds the shell every route renders (`PageTemplateComponent`,
-  navbar, footer).
+- **File scoping.** `src/app/` has three areas (README "Project structure"):
+  `core/` (app-wide singletons the app can't run without: API, auth, config,
+  `layout/` for the shell every route renders, SEO), `shared/` (reusable UI and
+  pure utilities, no business logic), and `features/` (one folder per product
+  area). Folders say which area code belongs to; never add type folders
+  (`components/`, `services/`). In a feature, each page has its own folder
+  (`features/gallery/gallery-showcase-page/`) with its children nested inside,
+  and the feature's services, guards and pure functions sit at its root. A
+  component moves to `shared/ui/`, in the same change, once another feature
+  needs it. Imports only flow downward (ESLint enforces it):
+  `features → core, shared`; `core → core, shared`; `shared → shared, core`.
+  core and shared never import features, a public feature never imports another
+  (admin may import public features' display components and API services, since
+  it previews and edits them), and only `app.routes` and `app.component` import
+  `core/layout`.
 - **Tests.** Few and sturdy: test behaviour a user or caller relies on (function
   results, requests sent, where an action leads), not markup, so tests fail when
   behaviour breaks and survive UI changes (`.claude/rules/testing.md` "What to

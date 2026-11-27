@@ -83,13 +83,16 @@ New git worktrees get `.env` copied in by Claude Code (`.worktreeinclude`); run
 ```text
 src/
 ├── app/
-│   ├── components/   Shared UI pieces (used by more than one page, or generic)
-│   ├── layout/       Shell every route renders (page template, navbar, footer)
-│   ├── pages/        One component per routed page; page-only ones in <page>/components/
-│   ├── services/     Injectable services and HTTP interceptors, one folder each
-│   ├── guards/       Route guards (admin login)
-│   ├── interfaces/   Data types; api-*.ts are synced from web-server
-│   ├── seo/          Page titles, meta tags, and structured data
+│   ├── core/         App-wide singletons; imports only core and shared
+│   │   ├── api/      API types (api-*.ts synced from web-server), status, caching
+│   │   ├── auth/     Session, login guards, token refresh
+│   │   ├── config/   Tunable values (links, page sizes, limits)
+│   │   ├── layout/   Shell every route renders (page template, navbar, footer)
+│   │   └── seo/      Page titles, meta tags, and structured data
+│   ├── shared/       Reusable UI (ui/) and pure utilities (utils/), no business logic
+│   ├── features/     One folder per product area: its pages, their children, its services
+│   │   └── admin/    Admin tools; may import public features to preview them
+│   ├── testing/      Unit test helpers and API fixtures
 │   ├── app.routes.ts          Routes
 │   └── app.routes.server.ts   How each route is rendered
 ├── environments/     Generated from .env; don't edit
@@ -125,9 +128,9 @@ Setup:
    to embed it (`X-Frame-Options` / `frame-ancestors`).
 5. Turn on image transformations for the zone (Images > Transformations), and
    allow the hosts the API's images come from under Sources. Images use them
-   through `OptimizedImageComponent` (`src/app/components/optimized-image/`), as
-   WebP at three widths (`src/app/config/images.ts`). On the Free plan, once the
-   month's 5,000 unique transformations are used, new ones fail and the
+   through `OptimizedImageComponent` (`src/app/shared/ui/optimized-image/`), as
+   WebP at three widths (`src/app/core/config/images.ts`). On the Free plan,
+   once the month's 5,000 unique transformations are used, new ones fail and the
    component shows the original file instead.
 6. Verify the domain in Google Search Console, submit
    `https://<domain>/sitemap.xml`, and import the site into Bing Webmaster
@@ -162,7 +165,7 @@ with.
 The API's request and response types are owned by the
 [web-server repo](https://github.com/jason-liu-se/the-rift-web-server). This
 repo keeps a verbatim copy of each `api-*.ts` file in its `src/contract/` in
-`src/app/interfaces/` (`api-requests.ts`, `api-responses.ts`); don't edit them.
+`src/app/core/api/` (`api-requests.ts`, `api-responses.ts`); don't edit them.
 Set `LOCAL_WEB_SERVER_PATH` to your web-server checkout, then:
 
 ```bash
