@@ -6,7 +6,7 @@
 	></app-background-image-card>
 	<div class="paginated-image-showcase-container">
 		<div class="image-showcase-header">
-			<app-back-button [destination]="'/gallery'" [title]="'Gallery'" />
+			<app-back-button [destination]="galleryPath" [title]="'Gallery'" />
 			@if (paginationLength !== undefined && !loadState.failed()) {
 			<p class="page-caption" role="status">
 				{{ "Results: " + paginationLength }}

@@ -7,6 +7,7 @@ import { BackgroundImageCard } from '../../../shared/ui/background-image-card/ba
 import { CardSelectionSection } from '../../../shared/ui/card-selection-section/card-selection-section';
 import { FallbackPanel } from '../../../shared/ui/fallback-panel/fallback-panel';
 import { LoadState } from '../../../shared/utils/load-state';
+import { galleryCollectionPath } from 'src/app/core/config/site-paths';
 
 @Component({
 	selector: 'app-page-gallery',
@@ -62,7 +63,7 @@ export class GalleryPage {
 		this.galleryApi.fetchCollectionImages(slug, 0, 1).pipe(
 			map(({ total }) => ({
 				imageUrl: dimensions[0]?.imageUrl ?? '',
-				routerLink: `/gallery/${encodeURIComponent(slug)}`,
+				routerLink: galleryCollectionPath(slug),
 				title,
 				desc: `${total} photos`
 			}))

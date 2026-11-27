@@ -2,7 +2,7 @@ import { Menu, MenuItem, MenuTrigger } from '@angular/aria/menu';
 import { Component, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { UserAvatar } from 'src/app/shared/ui/user-avatar/user-avatar';
-import { ADMIN_PATH } from 'src/app/core/config/admin';
+import { ADMIN_PATH } from 'src/app/core/config/site-paths';
 import { UserLogout } from 'src/app/core/auth/user-logout';
 
 /** The signed-in user's avatar, opening a menu of their account actions. */

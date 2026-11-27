@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Toaster } from 'src/app/shared/ui/toast/toaster';
 import { FocusRecovery } from 'src/app/core/focus-recovery/focus-recovery';
-import { ADMIN_LOGIN_PATH } from 'src/app/core/config/admin';
+import { ADMIN_LOGIN_PATH } from 'src/app/core/config/site-paths';
 import { AuthSession } from './auth-session';
 import { isOnProtectedPage } from './requires-login';
 

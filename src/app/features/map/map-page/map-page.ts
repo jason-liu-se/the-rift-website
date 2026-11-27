@@ -8,6 +8,7 @@ import { CardSelectionSection } from '../../../shared/ui/card-selection-section/
 import { SectionCard } from '../../../shared/ui/section-card/section-card';
 import { FallbackPanel } from '../../../shared/ui/fallback-panel/fallback-panel';
 import { LoadState } from '../../../shared/utils/load-state';
+import { MAP_VIEWER_PATH } from 'src/app/core/config/site-paths';
 
 interface ISeasonCards {
 	id: string;
@@ -15,7 +16,6 @@ interface ISeasonCards {
 	cards: CardSelection[];
 }
 
-const MAP_VIEWER_ROUTE = '/map/viewer';
 /** Camera mode at the end of every BlueMap URL fragment. */
 const BLUEMAP_CAMERA_MODE = 'perspective';
 
@@ -33,7 +33,7 @@ function toSeasonCards({
 		title: `Season ${season}`,
 		cards: dimensions.map(({ name, imageUrl, worldId, perspective }) => ({
 			imageUrl,
-			routerLink: MAP_VIEWER_ROUTE,
+			routerLink: MAP_VIEWER_PATH,
 			fragment: `${worldId}${perspective}${BLUEMAP_CAMERA_MODE}`,
 			title: name
 		}))
