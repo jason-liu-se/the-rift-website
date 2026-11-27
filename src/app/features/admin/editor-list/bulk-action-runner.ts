@@ -12,8 +12,16 @@ import {
 	toArray
 } from 'rxjs';
 import { EDITOR_PAGE_SIZE, MAX_BULK_ITEMS } from 'src/app/core/config/admin';
-import { BulkItemRef, EditorContentType } from 'src/app/core/api/api-requests';
-import { BulkItemResult, BulkResponse } from 'src/app/core/api/api-responses';
+import {
+	BulkItemRef,
+	EditorContentType,
+	GalleryImageCreateRequest
+} from 'src/app/core/api/api-requests';
+import {
+	BulkItemResult,
+	BulkResponse,
+	EditorGalleryImage
+} from 'src/app/core/api/api-responses';
 import {
 	BulkActionOf,
 	BulkUpdateRequestOf,
@@ -46,28 +54,21 @@ export class BulkActionRunner {
 		action: BulkActionOf<T>,
 		refs: readonly BulkItemRef[]
 	): Observable<BulkItemResult<ItemOf<T>>[]> {
-		return from(toChunks(refs, MAX_BULK_ITEMS)).pipe(
-			concatMap((items) =>
-				this.send(type, action, items).pipe(
-					map(
-						({ results }) => results as BulkItemResult<ItemOf<T>>[]
-					),
-					catchError((error: unknown) => {
-						const reason = describeWriteError(error);
-						return of(
-							items.map(({ id }): BulkItemResult<ItemOf<T>> => ({
-								id,
-								outcome: 'invalid',
-								reason
-							}))
-						);
-					})
-				)
-			),
-			reduce<BulkItemResult<ItemOf<T>>[], BulkItemResult<ItemOf<T>>[]>(
-				(all, results) => [...all, ...results],
-				[]
-			)
+		return this.inChunks<BulkItemRef, ItemOf<T>>(
+			refs,
+			({ id }) => id,
+			(items) => this.send(type, action, items)
+		);
+	}
+
+	/** Creates gallery images; each result's `id` is the image's `createId`. */
+	public createGalleryImages(
+		images: readonly GalleryImageCreateRequest[]
+	): Observable<BulkItemResult<EditorGalleryImage>[]> {
+		return this.inChunks<GalleryImageCreateRequest, EditorGalleryImage>(
+			images,
+			({ createId }) => createId,
+			(items) => this.editorContent.bulkCreateGalleryImages({ items })
 		);
 	}
 
@@ -119,6 +120,34 @@ export class BulkActionRunner {
 			}),
 			reduce<{ page: { items: SummaryOf<T>[] } }, SummaryOf<T>[]>(
 				(items, { page }) => [...items, ...page.items],
+				[]
+			)
+		);
+	}
+
+	private inChunks<I, R>(
+		items: readonly I[],
+		idOf: (item: I) => string,
+		send: (chunk: I[]) => Observable<BulkResponse<unknown>>
+	): Observable<BulkItemResult<R>[]> {
+		return from(toChunks(items, MAX_BULK_ITEMS)).pipe(
+			concatMap((chunk) =>
+				send(chunk).pipe(
+					map(({ results }) => results as BulkItemResult<R>[]),
+					catchError((error: unknown) => {
+						const reason = describeWriteError(error);
+						return of(
+							chunk.map((item): BulkItemResult<R> => ({
+								id: idOf(item),
+								outcome: 'invalid',
+								reason
+							}))
+						);
+					})
+				)
+			),
+			reduce<BulkItemResult<R>[], BulkItemResult<R>[]>(
+				(all, results) => [...all, ...results],
 				[]
 			)
 		);
