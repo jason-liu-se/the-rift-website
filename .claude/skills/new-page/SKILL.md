@@ -13,28 +13,30 @@ Follow the architecture in `CLAUDE.md`. Every route renders
 
 ## 1. New component or new route?
 
-Read `src/app/app.routes.ts` and `src/app/pages/`. If an existing page already
-does this from route data or a parameter, **add a route only** and skip to
-step 3. Gallery collections need nothing: `gallery/:collection` shows whatever
-the API lists. If you're not sure, ask the user.
+Read `src/app/app.routes.ts` and `src/app/features/`. If an existing page
+already does this from route data or a parameter, **add a route only** and skip
+to step 3. Gallery collections need nothing: `gallery/:collection` shows
+whatever the API lists. If you're not sure, ask the user.
 
 ## 2. Generate the page
 
 ```bash
-npm run ng -- generate component pages/<name>-page
+npm run ng -- generate component features/<feature>/<name>-page
 ```
 
-- Build the page from existing `src/app/components/` before writing new markup,
-  extending one (a new input or variant) when the change fits its purpose.
+- `<feature>` is the product area the page belongs to: an existing folder in
+  `features/`, or a new one named for the area (`features/<name>/`).
+- Build the page from existing `src/app/shared/ui/` and its feature's components
+  before writing new markup, extending one (a new input or variant) when the
+  change fits its purpose.
 - Split the page into child components by section or concern, so the page mainly
-  composes them. Put ones only this page uses in `pages/<name>-page/components/`
-  (`npm run ng -- generate component pages/<name>-page/components/<child>`), and
-  shared ones in `components/`. If a piece another page already has fits, move
-  it to `components/` and use it from both. Follow the `new-component` skill for
-  each.
-- If the page needs API data, add or reuse a service in
-  `src/app/services/<name>/` with endpoints from `environment`, and handle
-  loading, empty, and error states.
+  composes them. Nest ones only this page uses in its folder
+  (`npm run ng -- generate component features/<feature>/<name>-page/<child>`).
+  If a piece another feature already has fits, move it to `shared/ui/` and use
+  it from both. Follow the `new-component` skill for each.
+- If the page needs API data, add or reuse a service in the feature's folder
+  (`features/<feature>/`) with endpoints from `environment`, and handle loading,
+  empty, and error states.
 - If the page reads its own route data, inject `ActivatedRoute` and read it as
   `snapshot.data['key']`.
 
@@ -45,7 +47,7 @@ Add the route to `src/app/app.routes.ts` before the `**` wildcard:
 - `component: PageTemplateComponent`
 - a unique `title` naming the page (`SeoTitleStrategy` appends " | The Rift")
   and a `data.description` for search results (`.claude/rules/seo.md`)
-- `data.loadComponent: () => import('./pages/<name>-page/<name>-page.component').then((m) => m.<Name>PageComponent)`,
+- `data.loadComponent: () => import('./features/<feature>/<name>-page/<name>-page.component').then((m) => m.<Name>PageComponent)`,
   plus any shell flags it needs. Check `PageTemplateComponent` for the flags and
   their defaults, and only set flags that differ from the defaults.
 
@@ -56,8 +58,9 @@ in event handlers, `afterNextRender`, or behind `isPlatformBrowser`.
 
 ## 4. Navigation
 
-Ask the user whether the page belongs in the navbar (`src/app/layout/navbar/`)
-or should be linked from another page. Don't decide this yourself.
+Ask the user whether the page belongs in the navbar
+(`src/app/core/layout/navbar/`) or should be linked from another page. Don't
+decide this yourself.
 
 ## 5. Tests
 
@@ -66,7 +69,7 @@ rendered content, the requests the page makes, and how it uses route data. Use
 the setup in `.claude/rules/testing.md`. Run:
 
 ```bash
-npm test -- --watch=false --include src/app/pages/<name>-page
+npm test -- --watch=false --include src/app/features/<feature>/<name>-page
 ```
 
 Add the route to `e2e/support/routes.ts` so the e2e and axe tests cover it. Run

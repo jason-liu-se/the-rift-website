@@ -15,8 +15,9 @@ the page's child components.
 
 ## 1. Reuse, extend, or create?
 
-Search `src/app/components/`, the page's own `components/` folder, and
-`src/app/layout/` for something that already does this.
+Search `src/app/shared/ui/`, the page's feature folder
+(`src/app/features/<feature>/`), and `src/app/core/layout/` for something that
+already does this.
 
 - **Reuse** it if it fits as-is.
 - **Extend** it (a new input or variant) if the change fits its purpose. Check
@@ -27,15 +28,16 @@ Search `src/app/components/`, the page's own `components/` folder, and
 
 ## 2. Where it goes
 
-| Used by                                         | Folder                                 |
-| ----------------------------------------------- | -------------------------------------- |
-| More than one page, or generic UI               | `components/<name>/`                   |
-| One page, specific to its content               | `pages/<page>-page/components/<name>/` |
-| The shell every route renders (navbar, footer…) | `layout/<name>/`                       |
+| Used by                                         | Folder                                   |
+| ----------------------------------------------- | ---------------------------------------- |
+| More than one feature, or generic UI            | `shared/ui/<name>/`                      |
+| One page, specific to its content               | `features/<feature>/<page>-page/<name>/` |
+| Several pages of one feature                    | `features/<feature>/<name>/`             |
+| The shell every route renders (navbar, footer…) | `core/layout/<name>/`                    |
 
-Nest related components under a feature folder (e.g.
-`components/news/news-display/`). If a page-only component is now needed by a
-second page, move it to `components/` with `git mv` and update its imports.
+If a feature's component is now needed by another feature, move it to
+`shared/ui/` with `git mv` and update its imports. Imports only flow downward
+(`CLAUDE.md` "File scoping"; ESLint enforces it).
 
 ## 3. Generate it
 
