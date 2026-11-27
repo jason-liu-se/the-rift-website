@@ -120,7 +120,7 @@ wide desktop widths, not only the size it was evidently built for:
 - Hard-coded URLs instead of `environment`; a new setting missing from the
   README `.env` example, or a URL setting missing from `PROCESSORS` in
   `scripts/environments/config.mjs`.
-- An interface changed in `src/app/interfaces/` but not every consumer updated.
+- An interface changed in `src/app/core/api/` but not every consumer updated.
 - Specs not updated or added for changed behaviour, missing the test setup in
   `.claude/rules/testing.md`, or written to pass rather than to catch
   regressions.

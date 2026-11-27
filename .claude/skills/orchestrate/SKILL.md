@@ -32,7 +32,7 @@ could do real damage, and let confident, low-risk work flow through.
 
 | Factor        | Low                          | High                                                                                                                                              |
 | ------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Blast radius  | One page or its components   | Shared code: `layout/`, `components/`, `src/styles.scss`, theme, `app.config*.ts`, routes                                                         |
+| Blast radius  | One page or its components   | Shared code: `core/`, `shared/`, `src/styles.scss`, theme, `app.config*.ts`, routes                                                               |
 | Reversibility | A revert fixes it            | Lingers after a revert: SEO and crawler files, security headers (`public/_headers`, `src/server.ts`), render modes, env scripts, deploy, CI, deps |
 | Sensitivity   | Visual or content            | Auth (guards, `authRefreshInterceptor`), request handling, the API contract                                                                       |
 | Clarity       | Ready plan, existing pattern | Vague plan or a new pattern                                                                                                                       |
@@ -139,11 +139,11 @@ For each finished agent:
 - Before the first merge, check for overlap:
   `git diff --name-only <base>...<branch>` for each branch, and
   `git merge-tree --write-tree <branch-a> <branch-b>` for conflicts. If the
-  branches share files, or both touch shared code (`layout/`, `components/`,
-  styles, routes), rehearse: merge them into a scratch branch, run the checks
-  and the e2e the highest tier needs, then delete it. Otherwise skip it. Work
-  that only becomes possible once both land (e.g. adopting a new shared
-  component) gets its own follow-up task.
+  branches share files, or both touch shared code (`core/`, `shared/`, styles,
+  routes), rehearse: merge them into a scratch branch, run the checks and the
+  e2e the highest tier needs, then delete it. Otherwise skip it. Work that only
+  becomes possible once both land (e.g. adopting a new shared component) gets
+  its own follow-up task.
 - Merge only what section 2 allows; never push to `main` directly.
 
 ## 8. Report
