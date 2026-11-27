@@ -1,8 +1,8 @@
 @use "../../../../../../theme-colours" as *;
 @use "../../../../../../font-sizes" as *;
 
-// Mobile: a compact card (select, name, its column, status, menu); when it
-// was updated shows on desktop only.
+// Mobile: a compact card (select; the title, details, and badge columns;
+// the menu). Desktop-only columns show in a desktop table only.
 :host {
 	display: grid;
 	grid-template-columns: auto 1fr auto;
@@ -50,7 +50,7 @@ td {
 	opacity: 0.4;
 }
 
-.main {
+.card-title {
 	grid-column: 2;
 	overflow-wrap: anywhere;
 	font-weight: 600;
@@ -72,7 +72,7 @@ td {
 	}
 }
 
-.extra {
+.card-detail {
 	grid-column: 2;
 	font-size: $font-size-x-small;
 
@@ -81,39 +81,12 @@ td {
 	}
 }
 
-.status {
+.card-badge {
 	grid-column: 2;
 }
 
-.updated {
+.card-desktop {
 	display: none;
-}
-
-.updated-layout {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	min-width: 0;
-}
-
-// Two short lines beside the avatar: who, then when.
-.updated-text {
-	display: grid;
-	min-width: 0;
-	font-size: $font-size-x-small;
-	line-height: 1.3;
-}
-
-.updated-by,
-.updated-text time {
-	font-size: $font-size-x-small;
-}
-
-.updated-by {
-	overflow: hidden;
-	font-weight: 600;
-	text-overflow: ellipsis;
-	white-space: nowrap;
 }
 
 .actions {
@@ -141,13 +114,13 @@ td {
 		vertical-align: middle;
 	}
 
-	.extra,
-	.extra:empty,
-	.updated {
+	.card-detail,
+	.card-detail:empty,
+	.card-desktop {
 		display: table-cell;
 	}
 
-	.extra {
+	.card-detail {
 		font-size: $font-size-small;
 	}
 
@@ -158,7 +131,7 @@ td {
 
 // The gallery: a card, the image on top; select and the menu over its top
 // corners, the status its bottom right, in the same place on every card.
-:host-context(.grid) {
+:host(.card) {
 	position: relative;
 	display: block;
 	padding: 0;
@@ -181,7 +154,7 @@ td {
 		background-color: rgba($colour-light-background, 0.9);
 	}
 
-	.main {
+	.card-title {
 		font-weight: 400;
 	}
 
@@ -191,7 +164,7 @@ td {
 
 	// Over the image (the card's width, at the image's 4:3), so it sits on the
 	// image's corner whatever the caption's length; clicks reach the image.
-	.status {
+	.card-badge {
 		position: absolute;
 		z-index: 1;
 		top: 0;
@@ -204,10 +177,13 @@ td {
 		aspect-ratio: 4 / 3;
 		padding: 8px;
 		pointer-events: none;
+		--status-badge-direction: column;
+		--status-badge-align: flex-end;
+		--status-badge-background: #{$colour-light-background};
 	}
 
-	.extra,
-	.updated {
+	.card-detail,
+	.card-desktop {
 		display: none;
 	}
 

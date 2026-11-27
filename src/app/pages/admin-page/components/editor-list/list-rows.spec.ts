@@ -1,6 +1,39 @@
 import { DraftSummary } from 'src/app/interfaces/api-responses';
-import { NO_FILTERS } from './list-filters/list-filters.component';
+import {
+	COLLECTION_FILTER,
+	CREATED_BY_FILTER,
+	ListFilters,
+	NO_FILTERS,
+	statusFilter
+} from './list-filter-fields';
 import { filterDrafts, toDraftRow, toListQuery } from './list-rows';
+
+const FIELDS = [
+	statusFilter([
+		{ value: 'live', label: 'Live' },
+		{ value: 'hidden', label: 'Hidden' }
+	]),
+	COLLECTION_FILTER,
+	CREATED_BY_FILTER
+];
+
+/** Filters with these set; `values` beside the rest, as the editor sets them. */
+function withFilters({
+	search = '',
+	searchFields = [],
+	...values
+}: {
+	search?: string;
+	searchFields?: string[];
+	[key: string]: string | string[] | undefined;
+}): ListFilters {
+	return {
+		...NO_FILTERS,
+		search,
+		searchFields,
+		values: values as Record<string, string>
+	};
+}
 
 const DRAFTS = [
 	{ id: 'a', type: 'news', fields: { title: 'Spawn **update**' } },
@@ -30,7 +63,7 @@ describe('filterDrafts', () => {
 		},
 		{
 			case: '"Created by me"',
-			filters: { scope: 'mine' as const },
+			filters: { by: 'mine' },
 			ids: ['a', 'b', 'c', 'd']
 		},
 		{
@@ -40,7 +73,7 @@ describe('filterDrafts', () => {
 		}
 	])('keeps the right drafts for $case', ({ filters, ids }) => {
 		expect(
-			filterDrafts(DRAFTS, { ...NO_FILTERS, ...filters }).map(
+			filterDrafts(DRAFTS, withFilters(filters), FIELDS).map(
 				({ id }) => id
 			)
 		).toEqual(ids);
@@ -63,7 +96,7 @@ describe('toListQuery', () => {
 			filters: {
 				status: 'hidden',
 				collection: 'season5',
-				scope: 'mine' as const,
+				by: 'mine',
 				searchFields: ['title', 'content']
 			},
 			search: ' night ',
@@ -85,10 +118,11 @@ describe('toListQuery', () => {
 	])('sends $case', ({ filters, search, query }) => {
 		expect(
 			toListQuery(
-				{ ...NO_FILTERS, ...filters },
+				withFilters(filters),
 				search,
 				'me',
-				DEFAULT_SORT
+				DEFAULT_SORT,
+				FIELDS
 			)
 		).toEqual(query);
 	});
@@ -121,7 +155,7 @@ describe('toDraftRow', () => {
 				: {})
 		} as DraftSummary;
 
-		expect(toDraftRow(draft, target as never).cellItem).toEqual({
+		expect(toDraftRow(draft, target as never).data.fields).toEqual({
 			title: 'Hi',
 			date
 		});

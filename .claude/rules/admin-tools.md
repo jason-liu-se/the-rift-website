@@ -34,23 +34,27 @@ The decisions are in issue #101; the API's side is in the web-server's
   shared by the footer and the form's fields; its `ErrorStateMatcher` marks
   blank required fields only after that.
 - **Per-type differences live in `EDITOR_TYPES`**
-  (`pages/admin-page/editor-types.ts`): noun, statuses, search fields, field
-  labels, flags, sortable columns (`nameColumn`, an `extraColumn`) and
-  `defaultSort`, list layout, public page, new-item fields, and the type's form,
-  preview, list cell, and bulk actions (`components/<type>/`). Shared code reads
-  it; never check `type === …`. A type's bulk actions run through
-  `BULK_ACTION_HOST`.
+  (`pages/admin-page/editor-types.ts`): noun, search fields, field labels,
+  flags, the list's `filters`, `columns`, `view` and `defaultSort`, public page,
+  new-item fields, and the type's form, preview, and bulk actions
+  (`components/<type>/`). Shared code reads it; never check `type === …`. A
+  type's bulk actions run through `BULK_ACTION_HOST`.
 - **The list** (`editor-list/`): `EditorListStore` owns its state (type and
   filters from the URL, the loaded items and drafts, the selection, cleared on
   every load) and `EditorListActions` every write from it (row actions, bulk
   actions, also as the `BULK_ACTION_HOST`); both are provided by the list page.
-  Unpublished changes and every item are two collapsible groups of one table,
-  with the same row component (`ListRow`, `list-rows.ts`); the gallery lays the
-  same table out as a grid of cards in CSS (rows keep explicit table roles). A
-  row's name links to its editor. Tables sort from their column headings
-  (`list-sort.ts`, `sort` and `order` in the URL); phones and the gallery's grid
-  use a Sort by field instead. An `isOrderable` type, filtered to one
-  collection, drags into order (`list-order.ts`, one update per moved item).
+  Unpublished changes and every item are two collapsible row groups of the
+  type's `view`: `list-views/list-table/` (column headings that sort, `sort` and
+  `order` in the URL; cards on phones) or `list-views/list-grid/` (cards on
+  every screen, for the gallery). Both keep explicit table roles. Each column
+  (`ListColumn`, `list-columns.ts`) names a shared cell (`cells/`, or the status
+  badge) and builds its inputs from the row's `RowData` (`list-rows.ts`, the
+  same for items and drafts), with its width, sort, and place on a card; the
+  column on a card's `title` links to the editor. Filters beside search are
+  `ListFilterField`s (`list-filter-fields.ts`): their options, URL key, API
+  query, and which drafts they keep. Phones and the grid sort with a Sort by
+  field. An `isOrderable` type, filtered to one collection, drags into order
+  (`list-order.ts`, one update per moved item).
 - **Collections** come from `CollectionsStore` (provided by the admin page):
   fetched once per type, reloaded after a collection write. The Collections
   modal lists them, and the editor's drafts of new ones, beside

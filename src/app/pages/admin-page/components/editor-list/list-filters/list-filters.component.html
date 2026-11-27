@@ -55,47 +55,22 @@
 	</button>
 </div>
 <div id="more-filters" class="more" [class.shown]="isShowingMore()">
-	<mat-form-field class="compact" subscriptSizing="dynamic">
-		<mat-label>Status</mat-label>
-		<mat-select
-			[ngModel]="filters().status"
-			(ngModelChange)="setFilter('status', $event)"
-		>
-			<mat-option value="">Any</mat-option>
-			@for (status of statuses(); track status.value) {
-				<mat-option [value]="status.value">{{
-					status.label
-				}}</mat-option>
-			}
-			<mat-option value="draft">Unpublished changes</mat-option>
-		</mat-select>
-	</mat-form-field>
-	@if (collections(); as collections) {
+	@for (field of fields(); track field.key) {
 		<mat-form-field class="compact" subscriptSizing="dynamic">
-			<mat-label>Collection</mat-label>
+			<mat-label>{{ field.label }}</mat-label>
 			<mat-select
-				[ngModel]="filters().collection"
-				(ngModelChange)="setFilter('collection', $event)"
+				[ngModel]="filters().values[field.key] ?? ''"
+				(ngModelChange)="setValue(field.key, $event)"
 			>
-				<mat-option value="">Any</mat-option>
-				@for (collection of collections; track collection.slug) {
-					<mat-option [value]="collection.slug">{{
-						collection.title
+				<mat-option value="">{{ field.anyLabel }}</mat-option>
+				@for (option of field.options; track option.value) {
+					<mat-option [value]="option.value">{{
+						option.label
 					}}</mat-option>
 				}
 			</mat-select>
 		</mat-form-field>
 	}
-	<mat-form-field class="compact" subscriptSizing="dynamic">
-		<mat-label>Created by</mat-label>
-		<mat-select
-			[ngModel]="filters().scope"
-			(ngModelChange)="setFilter('scope', $event)"
-		>
-			<mat-option value="all">Anyone</mat-option>
-			<mat-option value="mine">Me</mat-option>
-		</mat-select>
-	</mat-form-field>
 	<!-- Tables sort from their headings; cards and phones have none. -->
 	<div class="sort" [class.always]="isSortShown()">
 		<mat-form-field class="compact" subscriptSizing="dynamic">

@@ -1,5 +1,3 @@
-import { Type } from '@angular/core';
-
 export type SortDirection = 'asc' | 'desc';
 
 /** A list's order: the API's `sort` fields, all in one direction. */
@@ -15,30 +13,6 @@ export interface SortColumn {
 	sort: string;
 	/** The direction it sorts in first: newest first for dates. */
 	firstOrder: SortDirection;
-}
-
-/** A type's column beside the name: its cell is given the `item`. */
-export interface ExtraColumn extends SortColumn {
-	/** None for the gallery's grid, which has no table cells. */
-	cell?: Type<unknown>;
-}
-
-export const UPDATED_COLUMN: SortColumn = {
-	label: 'Updated',
-	sort: 'updatedAt',
-	firstOrder: 'desc'
-};
-
-/** A type's sortable columns, in table order. */
-export function sortColumnsOf(config: {
-	nameColumn: SortColumn;
-	extraColumn?: ExtraColumn;
-}): SortColumn[] {
-	return [
-		config.nameColumn,
-		...(config.extraColumn ? [config.extraColumn] : []),
-		UPDATED_COLUMN
-	];
 }
 
 /**

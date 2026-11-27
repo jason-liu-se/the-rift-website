@@ -18,46 +18,28 @@
 		(change)="toggleSelected()"
 	/>
 </td>
-<td class="main" role="cell" [matContextMenuTriggerFor]="rowMenu">
-	<!-- The row opens on a click anywhere; this is its keyboard and
-		new-tab way in (Ctrl or middle click, as right-click opens the
-		row's menu). -->
-	<a class="open" [href]="href()" (click)="openFromLink($event)">
-		<ng-container
-			*ngComponentOutlet="itemCell(); inputs: { item: cellItem() }"
-		/>
-	</a>
-</td>
-@if (store.extraCell(); as cell) {
-	<td class="extra" role="cell" [matContextMenuTriggerFor]="rowMenu">
-		<ng-container *ngComponentOutlet="cell; inputs: { item: cellItem() }" />
+@for (cell of cells(); track cell.column.id) {
+	<td
+		role="cell"
+		[class]="'card-' + cell.column.card"
+		[matContextMenuTriggerFor]="rowMenu"
+	>
+		@if (cell.column.card === "title") {
+			<!-- The row opens on a click anywhere; this is its keyboard and
+				new-tab way in (Ctrl or middle click, as right-click opens the
+				row's menu). -->
+			<a class="open" [href]="href()" (click)="openFromLink($event)">
+				<ng-container
+					*ngComponentOutlet="cell.column.cell; inputs: cell.inputs"
+				/>
+			</a>
+		} @else {
+			<ng-container
+				*ngComponentOutlet="cell.column.cell; inputs: cell.inputs"
+			/>
+		}
 	</td>
 }
-<td class="status" role="cell" [matContextMenuTriggerFor]="rowMenu">
-	@if (row.kind === "item") {
-		<app-status-badge
-			[status]="row.item.status"
-			[hasDraft]="row.hasDraft"
-		/>
-	} @else {
-		<app-status-badge [status]="row.isEdit ? 'edit' : 'draft'" />
-	}
-</td>
-<td class="updated" role="cell" [matContextMenuTriggerFor]="rowMenu">
-	<span class="updated-layout">
-		<app-editor-avatar [editor]="updatedBy()" />
-		<span class="updated-text">
-			<span class="updated-by">{{
-				updatedBy()?.username ?? "(unknown)"
-			}}</span>
-			@if (updatedAt(); as updatedAt) {
-				<time [attr.datetime]="updatedAt" [title]="updatedAtText()">{{
-					updatedAgo()
-				}}</time>
-			}
-		</span>
-	</span>
-</td>
 <td class="actions" role="cell" [matContextMenuTriggerFor]="rowMenu">
 	<button
 		mat-icon-button

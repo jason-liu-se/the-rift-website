@@ -2,13 +2,17 @@ import {
 	SortColumn,
 	currentSort,
 	sortByColumn,
-	sortColumnsOf,
 	toQuerySort
 } from './list-sort';
 
 const TITLE: SortColumn = { label: 'Post', sort: 'title', firstOrder: 'asc' };
 const DATE: SortColumn = { label: 'Date', sort: 'date', firstOrder: 'desc' };
-const COLUMNS = sortColumnsOf({ nameColumn: TITLE, extraColumn: DATE });
+const UPDATED: SortColumn = {
+	label: 'Updated',
+	sort: 'updatedAt',
+	firstOrder: 'desc'
+};
+const COLUMNS = [TITLE, DATE, UPDATED];
 const DEFAULT_SORT = { sort: 'updatedAt', order: 'desc' } as const;
 
 describe('currentSort', () => {
@@ -60,10 +64,8 @@ describe('sortByColumn', () => {
 	});
 
 	it('leaves the URL for the default order', () => {
-		const updated = COLUMNS.find(({ sort }) => sort === 'updatedAt')!;
-
 		expect(
-			sortByColumn({ sort: 'title', order: 'asc' }, updated, DEFAULT_SORT)
+			sortByColumn({ sort: 'title', order: 'asc' }, UPDATED, DEFAULT_SORT)
 		).toEqual({ sort: '', order: '' });
 	});
 });

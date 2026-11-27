@@ -4,7 +4,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatIcon } from '@angular/material/icon';
 import { EditorListStore } from '../editor-list.store';
-import { EditorRowComponent } from '../editor-row/editor-row.component';
+import {
+	EditorRowComponent,
+	RowLayout
+} from '../editor-row/editor-row.component';
 import { EditorListActions } from '../editor-list.actions';
 import { ListRow } from '../list-rows';
 
@@ -21,7 +24,7 @@ import { ListRow } from '../list-rows';
 	styleUrl: './row-group.component.scss',
 	imports: [CdkDrag, EditorRowComponent, MatCheckbox, MatIcon],
 	hostDirectives: [CdkDropList],
-	host: { role: 'rowgroup' }
+	host: { role: 'rowgroup', '[class.cards]': "layout() === 'card'" }
 })
 export class RowGroupComponent {
 	private store = inject(EditorListStore);
@@ -31,6 +34,7 @@ export class RowGroupComponent {
 	public readonly rows = input.required<readonly ListRow[]>();
 	/** How many there are in all, if more than this page shows. */
 	public readonly count = input<number>();
+	public readonly layout = input<RowLayout>('row');
 
 	protected readonly isExpanded = signal(true);
 	protected readonly headerSpan = computed(

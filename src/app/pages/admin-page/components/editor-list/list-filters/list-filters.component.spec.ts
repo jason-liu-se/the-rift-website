@@ -1,19 +1,24 @@
 import { TestBed } from '@angular/core/testing';
-import { EditorCollection } from 'src/app/interfaces/api-responses';
 import {
 	ListFilters,
-	ListFiltersComponent,
-	NO_FILTERS
-} from './list-filters.component';
+	NO_FILTERS,
+	ShownFilterField
+} from '../list-filter-fields';
+import { ListFiltersComponent } from './list-filters.component';
+
+const STATUS: ShownFilterField = {
+	key: 'status',
+	label: 'Status',
+	anyLabel: 'Any',
+	options: [{ value: 'live', label: 'Live' }]
+};
 
 describe('ListFiltersComponent', () => {
-	function render(collections?: EditorCollection[]) {
+	function render(fields: ShownFilterField[] = [STATUS]) {
 		TestBed.configureTestingModule({ imports: [ListFiltersComponent] });
 		const fixture = TestBed.createComponent(ListFiltersComponent);
 		fixture.componentRef.setInput('filters', NO_FILTERS);
-		fixture.componentRef.setInput('statuses', [
-			{ value: 'live', label: 'Live' }
-		]);
+		fixture.componentRef.setInput('fields', fields);
 		fixture.componentRef.setInput('searchFields', [
 			{ value: 'title', label: 'Title' }
 		]);
@@ -24,7 +29,6 @@ describe('ListFiltersComponent', () => {
 			sort: 'updatedAt',
 			order: 'desc'
 		});
-		fixture.componentRef.setInput('collections', collections);
 		fixture.detectChanges();
 		return fixture;
 	}
@@ -43,26 +47,14 @@ describe('ListFiltersComponent', () => {
 		expect(filters).toEqual({ ...NO_FILTERS, search: 'season' });
 	});
 
-	it('offers a collection filter only for types with collections', () => {
-		const labels = (fixture: ReturnType<typeof render>) =>
-			[...fixture.nativeElement.querySelectorAll('mat-label')].map(
-				(label: Element) => label.textContent
-			);
+	it("shows each of the type's filter fields", () => {
+		const labels = [
+			...render([
+				STATUS,
+				{ ...STATUS, key: 'collection', label: 'Collection' }
+			]).nativeElement.querySelectorAll('mat-label')
+		].map((label: Element) => label.textContent);
 
-		expect(labels(render())).not.toContain('Collection');
-		TestBed.resetTestingModule();
-		expect(
-			labels(
-				render([
-					{
-						slug: 'season5',
-						title: 'Season 5',
-						itemCount: 3,
-						visible: true,
-						revision: 1
-					}
-				])
-			)
-		).toContain('Collection');
+		expect(labels).toEqual(['Search', 'Status', 'Collection', 'Sort by']);
 	});
 });

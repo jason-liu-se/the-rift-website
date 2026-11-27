@@ -15,6 +15,7 @@ import { EDITOR_NEWS_POSTS } from 'src/app/testing/api-fixtures';
 import { environment } from 'src/environments/environment';
 import { EditorListActions } from './editor-list.actions';
 import { EditorListStore } from './editor-list.store';
+import { CollectionsStore } from '../../services/collections-store.service';
 
 const EDITOR_URL = `${environment.API_URL}/editor`;
 const DRAFT = {
@@ -41,6 +42,7 @@ describe('EditorListStore and EditorListActions', () => {
 			providers: [
 				EditorListStore,
 				EditorListActions,
+				CollectionsStore,
 				provideHttpClient(),
 				provideHttpClientTesting(),
 				{

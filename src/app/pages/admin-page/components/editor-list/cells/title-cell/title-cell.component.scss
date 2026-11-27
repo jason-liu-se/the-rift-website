@@ -1,4 +1,4 @@
-@use "../../../../../../font-sizes" as *;
+@use "../../../../../../../font-sizes" as *;
 
 :host {
 	display: flex;
@@ -12,8 +12,8 @@
 	font-weight: 400;
 }
 
-// In the gallery's grid: the image fills the card's top.
-:host-context(.grid) {
+// A gallery card's: the image fills the card's top.
+:host(.image-on-top) {
 	display: grid;
 	gap: 4px;
 
@@ -23,7 +23,7 @@
 		border-radius: 0;
 	}
 
-	> span {
+	.text {
 		padding: 8px 8px 0;
 		overflow-wrap: anywhere;
 	}

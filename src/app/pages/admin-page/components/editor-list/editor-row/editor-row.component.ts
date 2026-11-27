@@ -14,19 +14,18 @@ import {
 } from '@angular/material/menu';
 import { MatTooltip } from '@angular/material/tooltip';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
-import { AuthService } from 'src/app/services/auth/auth.service';
-import { formatRelativeTime } from 'src/app/utilities/relative-time';
-import { formatDateTime } from '../../../utilities/format-date-time';
-import { EditorAvatarComponent } from '../../editor-avatar/editor-avatar.component';
-import { StatusBadgeComponent } from '../../status-badge/status-badge.component';
 import { EditorListActions } from '../editor-list.actions';
 import { EditorListStore } from '../editor-list.store';
 import { ListRow } from '../list-rows';
 
+/** A table's row, or a card: a phone's, or the gallery grid's. */
+export type RowLayout = 'row' | 'card';
+
 /**
- * One row of an admin list, a published item or a draft alike: select it,
- * open it (its name's link, or a click anywhere on it), or its menu's
- * actions (from its button, or a right-click anywhere on it).
+ * One row of an admin list, a published item or a draft alike: a checkbox,
+ * a cell per column (see `ListColumn`), and a menu. Select it, open it (its
+ * title's link, or a click anywhere on it), or use its menu's actions (from
+ * its button, or a right-click anywhere on it).
  */
 @Component({
 	// A table's rows must be its own elements.
@@ -36,7 +35,6 @@ import { ListRow } from '../list-rows';
 	styleUrl: './editor-row.component.scss',
 	imports: [
 		CdkDragHandle,
-		EditorAvatarComponent,
 		MatCheckbox,
 		MatContextMenuTrigger,
 		MatDivider,
@@ -46,50 +44,34 @@ import { ListRow } from '../list-rows';
 		MatMenuItem,
 		MatMenuTrigger,
 		MatTooltip,
-		NgComponentOutlet,
-		StatusBadgeComponent
+		NgComponentOutlet
 	],
 	host: {
 		role: 'row',
 		// Ctrl+A's preview shows every row on the page as selected.
 		'[class.selected]':
 			'isSelected() || store.selection.isPreviewingPage()',
+		'[class.card]': "layout() === 'card'",
 		'(click)': 'openFromRow($event)'
 	}
 })
 export class EditorRowComponent {
 	protected readonly store = inject(EditorListStore);
-	private user = inject(AuthService).user;
 	private clipboard = inject(Clipboard);
 	private notifier = inject(AdminNotifierService);
 
 	public readonly row = input.required<ListRow>();
+	/** Cards on every screen (the gallery's grid), or table rows on desktop. */
+	public readonly layout = input<RowLayout>('row');
 
 	protected readonly actions = inject(EditorListActions);
-	protected readonly itemCell = computed(() => this.store.config().itemCell);
-	protected readonly cellItem = computed(() => {
-		const row = this.row();
-		return row.kind === 'item' ? row.item : row.cellItem;
-	});
-	/** Who last changed it: for a draft, the editor, who made every one listed. */
-	protected readonly updatedBy = computed(() => {
-		const row = this.row();
-		return row.kind === 'item'
-			? row.item.lastUpdatedBy
-			: (this.user() ?? undefined);
-	});
-	protected readonly updatedAt = computed(() => {
-		const row = this.row();
-		return row.kind === 'item' ? row.item.updatedAt : row.draft.updatedAt;
-	});
-	/** Items older than the edit history have no time. */
-	protected readonly updatedAgo = computed(() => {
-		const updatedAt = this.updatedAt();
-		return updatedAt ? formatRelativeTime(updatedAt) : '';
-	});
-	protected readonly updatedAtText = computed(() => {
-		const updatedAt = this.updatedAt();
-		return updatedAt ? formatDateTime(updatedAt) : '';
+	/** Each column's cell, with its inputs for this row. */
+	protected readonly cells = computed(() => {
+		const { data } = this.row();
+		return this.store.columns().map((column) => ({
+			column,
+			inputs: column.inputs(data, this.store.cellContext)
+		}));
 	});
 	/** Its position, while the list can be put in order; else undefined. */
 	protected readonly index = computed(() => {
@@ -115,9 +97,8 @@ export class EditorRowComponent {
 	});
 	/** A gallery card's image, for its menu's Copy image link. */
 	protected readonly imageUrl = computed(() => {
-		const row = this.row();
-		const fields = row.kind === 'item' ? row.item : row.draft.fields;
-		return this.store.isGrid() && 'imageUrl' in fields
+		const { fields } = this.row().data;
+		return this.layout() === 'card' && 'imageUrl' in fields
 			? fields.imageUrl || undefined
 			: undefined;
 	});

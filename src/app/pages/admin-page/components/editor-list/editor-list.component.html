@@ -3,12 +3,11 @@
 		#filters
 		class="filters"
 		[filters]="store.filters()"
-		[statuses]="store.config().statuses"
+		[fields]="store.filterFields()"
 		[searchFields]="store.config().searchFields"
 		[sortColumns]="store.sortColumns()"
 		[sort]="store.sort()"
-		[isSortShown]="store.isGrid()"
-		[collections]="collections()"
+		[isSortShown]="store.view() === 'grid'"
 		(filtersChange)="store.setFilters($event)"
 		(sortChange)="store.setSort($event)"
 	/>
@@ -57,137 +56,11 @@
 			<mat-progress-bar mode="indeterminate" aria-label="Updating" />
 		}
 	</div>
-	<!-- Explicit roles: phones and the gallery lay rows out as cards, which
-		some browsers would otherwise stop reading as a table. -->
-	<table class="editor-table" role="table" [class.grid]="store.isGrid()">
-		<caption class="cdk-visually-hidden">
-			{{
-				store.config().label
-			}}
-		</caption>
-		<!-- Fixed widths, so collapsing a group doesn't move the columns. -->
-		<colgroup>
-			<col class="col-select" />
-			<col />
-			@if (store.extraCell()) {
-				<col class="col-extra" />
-			}
-			<col class="col-status" />
-			<col class="col-updated" />
-			<col class="col-actions" />
-		</colgroup>
-		<thead role="rowgroup">
-			<tr role="row">
-				<th scope="col" role="columnheader" class="select">
-					<span class="cdk-visually-hidden">Select</span>
-				</th>
-				<ng-container
-					*ngTemplateOutlet="
-						sortHeading;
-						context: { $implicit: store.config().nameColumn }
-					"
-				/>
-				@if (store.extraCell()) {
-					<ng-container
-						*ngTemplateOutlet="
-							sortHeading;
-							context: { $implicit: store.config().extraColumn }
-						"
-					/>
-				}
-				<th scope="col" role="columnheader">Status</th>
-				<ng-container
-					*ngTemplateOutlet="
-						sortHeading;
-						context: { $implicit: updatedColumn }
-					"
-				/>
-				<th scope="col" role="columnheader">
-					<span class="cdk-visually-hidden">Actions</span>
-				</th>
-			</tr>
-		</thead>
-		<ng-template #sortHeading let-column>
-			<th
-				scope="col"
-				role="columnheader"
-				[attr.aria-sort]="ariaSort(column)"
-			>
-				<button
-					type="button"
-					class="sort-button"
-					[class.active]="!!ariaSort(column)"
-					(click)="sortBy(column)"
-				>
-					{{ column.label }}
-					<mat-icon aria-hidden="true">{{
-						sortIcon(column)
-					}}</mat-icon>
-				</button>
-			</th>
-		</ng-template>
-		@if (store.draftRows().length > 0) {
-			<tbody
-				app-row-group
-				label="Unpublished changes"
-				[rows]="store.draftRows()"
-			></tbody>
-		}
-		@if (showsPublished()) {
-			<tbody
-				app-row-group
-				[label]="'All ' + noun().many"
-				[rows]="store.itemRows()"
-				[count]="store.total()"
-			></tbody>
-		}
-		@if (store.pageRowCount() === 0) {
-			<tbody role="rowgroup">
-				<tr role="row">
-					<td
-						class="empty"
-						role="cell"
-						[attr.colspan]="store.columnCount()"
-					>
-						@if (hasFilters()) {
-							<p>No {{ noun().many }} match these filters.</p>
-							<button
-								mat-stroked-button
-								type="button"
-								(click)="clearFilters()"
-							>
-								<mat-icon>close</mat-icon>
-								Clear filters
-							</button>
-						} @else {
-							<p>No {{ noun().many }} yet.</p>
-							<a
-								mat-flat-button
-								color="primary"
-								[routerLink]="
-									store.config().hasBulkCreate
-										? 'bulk'
-										: 'new'
-								"
-								queryParamsHandling="preserve"
-							>
-								<mat-icon>{{
-									store.config().hasBulkCreate
-										? "upload"
-										: "add"
-								}}</mat-icon>
-								{{
-									store.config().hasBulkCreate
-										? "Upload " + noun().many
-										: "New " + noun().one
-								}}
-							</a>
-						}
-					</td>
-				</tr>
-			</tbody>
-		}
-	</table>
+	@if (store.view() === "grid") {
+		<app-list-grid />
+	} @else {
+		<app-list-table />
+	}
 	@if (store.total() > pageSize) {
 		<mat-paginator
 			[length]="store.total()"

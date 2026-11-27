@@ -62,8 +62,8 @@ th {
 	}
 }
 
-// The gallery: the group's rows are a grid of cards under its header.
-:host-context(.grid) {
+// Cards (the gallery's): the group's rows are a grid under its header.
+:host(.cards) {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
 	gap: 12px;

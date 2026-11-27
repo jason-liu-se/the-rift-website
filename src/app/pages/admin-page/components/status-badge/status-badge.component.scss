@@ -1,9 +1,13 @@
 @use "../../../../../theme-colours" as *;
 @use "../../../../../font-sizes" as *;
 
+// A card can set these to lay the badges over an image (opaque, to stay
+// readable on any picture, stacked into its corner).
 :host {
 	display: inline-flex;
+	flex-direction: var(--status-badge-direction, row);
 	flex-wrap: wrap;
+	align-items: var(--status-badge-align, normal);
 	gap: 4px;
 }
 
@@ -11,6 +15,7 @@
 	padding: 2px 8px;
 	border: 1px solid currentColor;
 	border-radius: 999px;
+	background-color: var(--status-badge-background, transparent);
 	font-size: $font-size-x-small;
 	font-weight: 600;
 	white-space: nowrap;
@@ -34,14 +39,4 @@
 .draft,
 .edit {
 	color: $colour-warning;
-}
-
-// Over a gallery card's image: opaque, to stay readable on any picture.
-:host-context(.grid) {
-	flex-direction: column;
-	align-items: flex-end;
-
-	.badge {
-		background-color: $colour-light-background;
-	}
 }

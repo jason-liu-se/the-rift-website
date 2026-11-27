@@ -34,7 +34,9 @@ import {
 import { EditorContentService } from 'src/app/services/editor-content/editor-content.service';
 import { LoadState } from 'src/app/utilities/load-state';
 import { DraftStore } from '../../drafts/draft-store.service';
-import { EDITOR_TYPES } from '../../editor-types';
+import { EDITOR_TYPES, toCollectionType } from '../../editor-types';
+import { CollectionsStore } from '../../services/collections-store.service';
+import { CellContext, ListColumn, toSortColumns } from './list-columns';
 import {
 	ListRow,
 	filterDrafts,
@@ -42,14 +44,13 @@ import {
 	toItemRow,
 	toListQuery
 } from './list-rows';
-import { ListFilters } from './list-filters/list-filters.component';
-import { fromListParams, toListParams } from './list-params';
 import {
-	ListSort,
-	currentSort,
-	sortColumnsOf,
-	toSortParams
-} from './list-sort';
+	COLLECTION_FILTER,
+	ListFilters,
+	ShownFilterField
+} from './list-filter-fields';
+import { fromListParams, toListParams } from './list-params';
+import { ListSort, currentSort, toSortParams } from './list-sort';
 import { ListSelection } from './list-selection';
 
 type Item = SummaryOf<EditorContentType>;
@@ -67,11 +68,11 @@ export class EditorListStore {
 	private draftsService = inject(DraftsService);
 	private draftStore = inject(DraftStore);
 	private auth = inject(AuthService);
+	private collectionsStore = inject(CollectionsStore);
 
-	private readonly params = toSignal(
-		this.route.queryParamMap.pipe(map(fromListParams)),
-		{ requireSync: true }
-	);
+	private readonly queryParams = toSignal(this.route.queryParamMap, {
+		requireSync: true
+	});
 	private readonly loaded = signal<
 		| {
 				type: EditorContentType;
@@ -95,9 +96,42 @@ export class EditorListStore {
 	public readonly isBusy = signal(false);
 
 	public readonly config = computed(() => EDITOR_TYPES[this.type()]);
+	private readonly params = computed(() =>
+		fromListParams(this.queryParams(), this.config().filters)
+	);
 	public readonly filters = computed(() => this.params().filters);
 	public readonly pageIndex = computed(() => this.params().pageIndex);
-	public readonly sortColumns = computed(() => sortColumnsOf(this.config()));
+	/** The type's collections, once loaded (undefined without any). */
+	private readonly collections = computed(() => {
+		const type = toCollectionType(this.type());
+		return type ? this.collectionsStore.collections(type)() : undefined;
+	});
+	/** The filters beside search, with their choices (collections once loaded). */
+	public readonly filterFields = computed<ShownFilterField[]>(() =>
+		this.config().filters.flatMap(({ key, label, anyLabel, options }) => {
+			if (options !== 'collections') {
+				return [{ key, label, anyLabel, options }];
+			}
+			const collections = this.collections();
+			return collections
+				? [
+						{
+							key,
+							label,
+							anyLabel,
+							options: collections.map(({ slug, title }) => ({
+								value: slug,
+								label: title
+							}))
+						}
+					]
+				: [];
+		})
+	);
+	public readonly columns = computed<readonly ListColumn[]>(
+		() => this.config().columns
+	);
+	public readonly sortColumns = computed(() => toSortColumns(this.columns()));
 	public readonly sort = computed(() =>
 		currentSort(
 			this.filters(),
@@ -105,13 +139,18 @@ export class EditorListStore {
 			this.config().defaultSort
 		)
 	);
-	/** The type's column between the name and status, in tables. */
-	/** Images list as a grid of cards; everything else as a table. */
-	public readonly isGrid = computed(
-		() => this.config().listLayout === 'grid'
-	);
-	public readonly extraCell = computed(() => this.config().extraColumn?.cell);
-	public readonly columnCount = computed(() => (this.extraCell() ? 6 : 5));
+	public readonly view = computed(() => this.config().view);
+	/** The table's columns: the type's, with select and the row's menu. */
+	public readonly columnCount = computed(() => this.columns().length + 2);
+	public readonly cellContext: CellContext = {
+		collectionTitle: (slug) => {
+			const type = toCollectionType(this.type());
+			if (!slug) {
+				return '';
+			}
+			return type ? this.collectionsStore.titleOf(type, slug) : slug;
+		}
+	};
 	/** In the type's default order: for orderable types, the site's. */
 	public readonly isDefaultSort = computed(() => {
 		const { sort, order } = this.config().defaultSort;
@@ -142,8 +181,13 @@ export class EditorListStore {
 			return [];
 		}
 		const items = new Map(loaded.page.items.map((item) => [item.id, item]));
-		return filterDrafts(loaded.drafts, this.filters()).map((draft) =>
-			toDraftRow(draft, items.get(draft.target?.id ?? ''))
+		const editor = this.auth.user() ?? undefined;
+		return filterDrafts(
+			loaded.drafts,
+			this.filters(),
+			this.config().filters
+		).map((draft) =>
+			toDraftRow(draft, items.get(draft.target?.id ?? ''), editor)
 		);
 	});
 	/** What Ctrl+A and the header checkbox select: every row on this page. */
@@ -166,14 +210,13 @@ export class EditorListStore {
 	 * every item is on this page, and nothing is saving.
 	 */
 	public readonly isReorderable = computed(() => {
-		const config = this.config();
-		const { collection, search, status, scope } = this.filters();
+		const { search, values } = this.filters();
+		const setKeys = Object.keys(values);
 		return (
-			config.isOrderable &&
-			!!collection &&
+			this.config().isOrderable &&
+			setKeys.length === 1 &&
+			setKeys[0] === COLLECTION_FILTER.key &&
 			!search &&
-			!status &&
-			scope === 'all' &&
 			this.isDefaultSort() &&
 			this.total() <= EDITOR_PAGE_SIZE &&
 			!this.isBusy()
@@ -198,11 +241,17 @@ export class EditorListStore {
 				this.filters(),
 				this.search(),
 				this.auth.user()?.id,
-				this.sort()
+				this.sort(),
+				this.config().filters
 			),
 			pageIndex: this.pageIndex()
 		}),
 		{ equal: (a, b) => JSON.stringify(a) === JSON.stringify(b) }
+	);
+
+	/** Items are listed, not only the editor's drafts. */
+	public readonly showsItems = computed(
+		() => this.request().query !== undefined
 	);
 
 	constructor() {
@@ -231,7 +280,7 @@ export class EditorListStore {
 	}
 
 	public setFilters(filters: ListFilters): void {
-		this.navigate(toListParams(filters, 0));
+		this.navigate(toListParams(filters, 0, this.config().filters));
 	}
 
 	public setSort(sort: ListSort): void {
@@ -242,7 +291,9 @@ export class EditorListStore {
 	}
 
 	public setPage(pageIndex: number): void {
-		this.navigate(toListParams(this.filters(), pageIndex));
+		this.navigate(
+			toListParams(this.filters(), pageIndex, this.config().filters)
+		);
 	}
 
 	/** Opens a row in the editor modal, keeping the list's filters and scroll. */

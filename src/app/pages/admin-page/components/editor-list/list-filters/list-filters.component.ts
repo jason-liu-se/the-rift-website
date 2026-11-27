@@ -21,40 +21,14 @@ import { MatInput } from '@angular/material/input';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { MatTooltip } from '@angular/material/tooltip';
-import { EditorCollection } from 'src/app/interfaces/api-responses';
+import {
+	FilterOption,
+	ListFilters,
+	NO_FILTERS,
+	ShownFilterField,
+	countSetFilters
+} from '../list-filter-fields';
 import { ListSort, SortColumn } from '../list-sort';
-
-/** A choice in a filter: what's sent, and what the editor sees. */
-export interface FilterOption {
-	value: string;
-	label: string;
-}
-
-/** An admin list's filters, as the editor set them. */
-export interface ListFilters {
-	scope: 'all' | 'mine';
-	/** A status, `draft` for the drafts only, or '' for any. */
-	status: string;
-	/** A collection's slug, or '' for any. */
-	collection: string;
-	search: string;
-	/** The fields `search` looks in; none means every field. */
-	searchFields: string[];
-	/** A sort column's `sort`, or '' for the type's default order. */
-	sort: string;
-	/** `asc` or `desc`, or '' for the column's first direction. */
-	order: string;
-}
-
-export const NO_FILTERS: ListFilters = {
-	scope: 'all',
-	status: '',
-	collection: '',
-	search: '',
-	searchFields: [],
-	sort: '',
-	order: ''
-};
 
 /** The search, filters, and sort above an admin list. */
 @Component({
@@ -83,29 +57,22 @@ export class ListFiltersComponent {
 	private host = inject<ElementRef<HTMLElement>>(ElementRef);
 
 	public readonly filters = model.required<ListFilters>();
-	public readonly statuses = input.required<readonly FilterOption[]>();
+	/** The type's filters beside search. */
+	public readonly fields = input.required<readonly ShownFilterField[]>();
 	public readonly searchFields = input.required<readonly FilterOption[]>();
 	public readonly sortColumns = input.required<readonly SortColumn[]>();
 	public readonly sort = input.required<ListSort>();
 	/** On desktop too: a list without column headings (the gallery's cards). */
 	public readonly isSortShown = input(false);
 	public readonly sortChange = output<ListSort>();
-	/** Shown as a filter when the content type has collections. */
-	public readonly collections = input<readonly EditorCollection[]>();
 
 	/** Mobile: the filters other than search are behind a button. */
 	protected readonly isShowingMore = signal(false);
 
 	/** How many filters other than search are set, for the mobile button. */
-	protected readonly activeCount = computed(() => {
-		const { status, collection, scope, searchFields } = this.filters();
-		return [
-			status,
-			collection,
-			scope === 'mine',
-			searchFields.length > 0
-		].filter(Boolean).length;
-	});
+	protected readonly activeCount = computed(() =>
+		countSetFilters(this.filters())
+	);
 	protected readonly searchInText = computed(() => {
 		const chosen = this.filters().searchFields;
 		const labels = this.searchFields()
@@ -160,10 +127,21 @@ export class ListFiltersComponent {
 			?.focus();
 	}
 
-	public setFilter<K extends keyof ListFilters>(
+	public setFilter<K extends 'search' | 'searchFields'>(
 		key: K,
 		value: ListFilters[K]
 	): void {
 		this.filters.update((filters) => ({ ...filters, [key]: value }));
+	}
+
+	/** One filter field's value; '' unsets it. */
+	protected setValue(key: string, value: string): void {
+		this.filters.update((filters) => {
+			const values = { ...filters.values, [key]: value };
+			if (!value) {
+				delete values[key];
+			}
+			return { ...filters, values };
+		});
 	}
 }

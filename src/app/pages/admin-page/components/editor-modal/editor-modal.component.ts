@@ -50,6 +50,7 @@ import {
 import { EditorListActions } from '../editor-list/editor-list.actions';
 import { EditorListStore } from '../editor-list/editor-list.store';
 import { itemName } from '../editor-list/item-name';
+import { COLLECTION_FILTER } from '../editor-list/list-filter-fields';
 
 interface EditorTarget {
 	id?: string;
@@ -215,7 +216,7 @@ export class EditorModalComponent {
 			this.collectionsStore.collections(collectionType)() ?? []
 		).map(({ slug }) => slug);
 		const candidates = [
-			this.listStore.filters().collection,
+			this.listStore.filters().values[COLLECTION_FILTER.key],
 			this.storage.get('local', this.lastCollectionKey())
 		];
 		const collection =

@@ -10,26 +10,30 @@ import {
 } from 'src/app/services/editor-content/editor-content-types';
 import { DownloadsFormComponent } from './components/downloads/downloads-form/downloads-form.component';
 import { DownloadsPreviewComponent } from './components/downloads/downloads-preview/downloads-preview.component';
-import { DownloadsItemCellComponent } from './components/downloads/downloads-item-cell/downloads-item-cell.component';
 import { ItemNoun } from './components/editor-list/bulk-results';
-import { FilterOption } from './components/editor-list/list-filters/list-filters.component';
+import { DateCellComponent } from './components/editor-list/cells/date-cell/date-cell.component';
+import { TextCellComponent } from './components/editor-list/cells/text-cell/text-cell.component';
+import { TitleCellComponent } from './components/editor-list/cells/title-cell/title-cell.component';
 import {
-	ExtraColumn,
-	ListSort,
-	SortColumn
-} from './components/editor-list/list-sort';
+	ListColumn,
+	STATUS_COLUMN,
+	UPDATED_COLUMN
+} from './components/editor-list/list-columns';
+import {
+	COLLECTION_FILTER,
+	CREATED_BY_FILTER,
+	FilterOption,
+	ListFilterField,
+	statusFilter
+} from './components/editor-list/list-filter-fields';
+import { ListSort } from './components/editor-list/list-sort';
 import { GalleryBulkActionsComponent } from './components/gallery/gallery-bulk-actions/gallery-bulk-actions.component';
 import { GalleryFormComponent } from './components/gallery/gallery-form/gallery-form.component';
 import { GalleryPreviewComponent } from './components/gallery/gallery-preview/gallery-preview.component';
-import { GalleryItemCellComponent } from './components/gallery/gallery-item-cell/gallery-item-cell.component';
 import { MapsFormComponent } from './components/maps/maps-form/maps-form.component';
-import { MapsItemCellComponent } from './components/maps/maps-item-cell/maps-item-cell.component';
 import { MoveBulkActionComponent } from './components/move-bulk-action/move-bulk-action.component';
 import { NewsFormComponent } from './components/news/news-form/news-form.component';
 import { NewsPreviewComponent } from './components/news/news-preview/news-preview.component';
-import { NewsItemCellComponent } from './components/news/news-item-cell/news-item-cell.component';
-import { NewsDateCellComponent } from './components/news/news-date-cell/news-date-cell.component';
-import { CollectionCellComponent } from './components/collection-cell/collection-cell.component';
 import { DraftFields } from './drafts/draft-fields';
 
 const RECENTLY_UPDATED: ListSort = { sort: 'updatedAt', order: 'desc' };
@@ -40,7 +44,8 @@ export interface EditorTypeConfig<T extends EditorContentType> {
 	/** A Material icon name, for the sidebar. */
 	icon: string;
 	noun: ItemNoun;
-	statuses: readonly FilterOption[];
+	/** The list's filters beside search, in order. */
+	filters: readonly ListFilterField[];
 	searchFields: readonly FilterOption[];
 	/** Each field's name as the editor sees it (e.g. in a conflict). */
 	fieldLabels: Record<keyof FieldsOf<T>, string>;
@@ -58,20 +63,16 @@ export interface EditorTypeConfig<T extends EditorContentType> {
 	newItemFields: () => DraftFields<T> | Observable<DraftFields<T>>;
 	/** The fields, given the open `session` (a `DraftSession<T>`). */
 	form: Type<unknown>;
-	/** The list's main cell, given an `item` (a `SummaryOf<T>`). */
-	itemCell: Type<unknown>;
 	/** The type's own bulk actions, beside the common ones. */
 	bulkActions?: Type<unknown>;
 	/** The draft as the site shows it, given the `session`, beside the form. */
 	preview?: Type<unknown>;
-	/** The list's main column, of `itemCell`s, as it sorts. */
-	nameColumn: SortColumn;
-	/** A column between the name and the status. */
-	extraColumn?: ExtraColumn;
+	/** The list's columns, in table order (beside select and the row's menu). */
+	columns: readonly ListColumn<T>[];
 	/** The list's order until a column is chosen. */
 	defaultSort: ListSort;
 	/** Images list as a grid of cards; everything else as a table. */
-	listLayout: 'table' | 'grid';
+	view: 'table' | 'grid';
 	/**
 	 * Can be put in order (`sortOrder`) within one collection, by dragging or
 	 * from a row's menu; `defaultSort` is then the site's order.
@@ -91,10 +92,13 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 		label: 'News',
 		icon: 'newspaper',
 		noun: { one: 'post', many: 'posts' },
-		statuses: [
-			{ value: 'live', label: 'Live' },
-			{ value: 'scheduled', label: 'Scheduled' },
-			{ value: 'hidden', label: 'Hidden' }
+		filters: [
+			statusFilter([
+				{ value: 'live', label: 'Live' },
+				{ value: 'scheduled', label: 'Scheduled' },
+				{ value: 'hidden', label: 'Hidden' }
+			]),
+			CREATED_BY_FILTER
 		],
 		searchFields: [
 			{ value: 'title', label: 'Title' },
@@ -111,17 +115,41 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 		hasBulkCreate: false,
 		newItemFields: () => ({}),
 		form: NewsFormComponent,
-		itemCell: NewsItemCellComponent,
 		preview: NewsPreviewComponent,
-		nameColumn: { label: 'Post', sort: 'title', firstOrder: 'asc' },
-		extraColumn: {
-			label: 'Post date',
-			sort: 'date',
-			firstOrder: 'desc',
-			cell: NewsDateCellComponent
-		},
+		columns: [
+			{
+				id: 'post',
+				label: 'Post',
+				cell: TitleCellComponent,
+				inputs: ({ fields }) => ({
+					title: fields.title || 'Untitled',
+					format: 'markdown',
+					hasImage: true,
+					imageUrl: fields.imageUrl
+				}),
+				sort: { by: 'title', firstOrder: 'asc' },
+				card: 'title'
+			},
+			{
+				id: 'date',
+				label: 'Post date',
+				cell: DateCellComponent,
+				inputs: ({ fields }) => ({
+					date: fields.date,
+					secondary: fields.editedAt && {
+						label: 'Edited',
+						date: fields.editedAt
+					}
+				}),
+				width: '12rem',
+				sort: { by: 'date', firstOrder: 'desc' },
+				card: 'detail'
+			},
+			STATUS_COLUMN,
+			UPDATED_COLUMN
+		],
 		defaultSort: RECENTLY_UPDATED,
-		listLayout: 'table',
+		view: 'table',
 		isOrderable: false,
 		publicPath: () => '/news'
 	},
@@ -129,7 +157,11 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 		label: 'Downloads',
 		icon: 'download',
 		noun: { one: 'download', many: 'downloads' },
-		statuses: VISIBILITY_STATUSES,
+		filters: [
+			statusFilter(VISIBILITY_STATUSES),
+			COLLECTION_FILTER,
+			CREATED_BY_FILTER
+		],
 		searchFields: [
 			{ value: 'title', label: 'Title' },
 			{ value: 'desc', label: 'Description' }
@@ -154,19 +186,38 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 		hasBulkCreate: false,
 		newItemFields: () => ({}),
 		form: DownloadsFormComponent,
-		itemCell: DownloadsItemCellComponent,
 		bulkActions: MoveBulkActionComponent,
 		preview: DownloadsPreviewComponent,
-		nameColumn: { label: 'Download', sort: 'title', firstOrder: 'asc' },
-		// Ascending, the site's order.
-		extraColumn: {
-			label: 'Collection',
-			sort: 'collection,sortOrder,title',
-			firstOrder: 'asc',
-			cell: CollectionCellComponent
-		},
+		columns: [
+			{
+				id: 'download',
+				label: 'Download',
+				cell: TitleCellComponent,
+				inputs: ({ fields }) => ({
+					title: fields.title || 'Untitled',
+					hasImage: true,
+					imageUrl: fields.imageUrl
+				}),
+				sort: { by: 'title', firstOrder: 'asc' },
+				card: 'title'
+			},
+			{
+				id: 'collection',
+				label: 'Collection',
+				cell: TextCellComponent,
+				inputs: ({ fields }, { collectionTitle }) => ({
+					text: collectionTitle(fields.collection)
+				}),
+				width: '12rem',
+				// Ascending, the site's order.
+				sort: { by: 'collection,sortOrder,title', firstOrder: 'asc' },
+				card: 'detail'
+			},
+			STATUS_COLUMN,
+			UPDATED_COLUMN
+		],
 		defaultSort: { sort: 'collection,sortOrder,title', order: 'asc' },
-		listLayout: 'table',
+		view: 'table',
 		isOrderable: true,
 		publicPath: () => '/downloads'
 	},
@@ -174,7 +225,11 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 		label: 'Gallery',
 		icon: 'photo_library',
 		noun: { one: 'image', many: 'images' },
-		statuses: VISIBILITY_STATUSES,
+		filters: [
+			statusFilter(VISIBILITY_STATUSES),
+			COLLECTION_FILTER,
+			CREATED_BY_FILTER
+		],
 		searchFields: [
 			{ value: 'caption', label: 'Caption' },
 			{ value: 'tags', label: 'Tags' }
@@ -191,17 +246,42 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 		hasBulkCreate: true,
 		newItemFields: () => ({}),
 		form: GalleryFormComponent,
-		itemCell: GalleryItemCellComponent,
 		bulkActions: GalleryBulkActionsComponent,
 		preview: GalleryPreviewComponent,
-		nameColumn: { label: 'Caption', sort: 'caption', firstOrder: 'asc' },
-		extraColumn: {
-			label: 'Uploaded',
-			sort: 'createdAt',
-			firstOrder: 'desc'
-		},
+		columns: [
+			{
+				id: 'caption',
+				label: 'Caption',
+				cell: TitleCellComponent,
+				inputs: ({ fields }, { collectionTitle }) => ({
+					title: fields.caption || 'Untitled',
+					details: [
+						collectionTitle(fields.collection),
+						fields.tags?.join(', ')
+					]
+						.filter(Boolean)
+						.join(' · '),
+					hasImage: true,
+					imageUrl: fields.imageUrl,
+					imagePosition: 'top'
+				}),
+				sort: { by: 'caption', firstOrder: 'asc' },
+				card: 'title'
+			},
+			{
+				id: 'uploaded',
+				label: 'Uploaded',
+				cell: DateCellComponent,
+				inputs: ({ fields }) => ({ date: fields.createdAt }),
+				width: '12rem',
+				sort: { by: 'createdAt', firstOrder: 'desc' },
+				card: 'desktop'
+			},
+			STATUS_COLUMN,
+			UPDATED_COLUMN
+		],
 		defaultSort: RECENTLY_UPDATED,
-		listLayout: 'grid',
+		view: 'grid',
 		isOrderable: false,
 		publicPath: (image) => `/gallery/${image.collection}`
 	},
@@ -209,7 +289,7 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 		label: 'Maps',
 		icon: 'map',
 		noun: { one: 'season', many: 'seasons' },
-		statuses: VISIBILITY_STATUSES,
+		filters: [statusFilter(VISIBILITY_STATUSES), CREATED_BY_FILTER],
 		searchFields: [
 			{ value: 'season', label: 'Season number' },
 			{ value: 'dimensions', label: 'Dimension names' }
@@ -225,10 +305,27 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 		hasBulkCreate: false,
 		newItemFields: () => newMapSeasonFields(),
 		form: MapsFormComponent,
-		itemCell: MapsItemCellComponent,
-		nameColumn: { label: 'Season', sort: 'season', firstOrder: 'desc' },
+		columns: [
+			{
+				id: 'season',
+				label: 'Season',
+				cell: TitleCellComponent,
+				inputs: ({ fields: { season, dimensionCount } }) => ({
+					title:
+						season !== undefined ? `Season ${season}` : 'Untitled',
+					details:
+						dimensionCount === undefined
+							? undefined
+							: `${dimensionCount} ${dimensionCount === 1 ? 'dimension' : 'dimensions'}`
+				}),
+				sort: { by: 'season', firstOrder: 'desc' },
+				card: 'title'
+			},
+			STATUS_COLUMN,
+			UPDATED_COLUMN
+		],
 		defaultSort: RECENTLY_UPDATED,
-		listLayout: 'table',
+		view: 'table',
 		isOrderable: false,
 		publicPath: () => '/map'
 	}

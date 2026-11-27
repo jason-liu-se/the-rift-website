@@ -316,7 +316,7 @@ test.describe('gallery images', () => {
 		await page
 			.getByRole('row')
 			.filter({ hasText: 'Spawn walkway' })
-			.locator('.main')
+			.locator('.card-title')
 			.click({ button: 'right' });
 		await page.getByRole('menuitem', { name: 'Copy image link' }).click();
 

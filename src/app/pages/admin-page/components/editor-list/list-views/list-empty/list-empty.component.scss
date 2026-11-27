@@ -1,0 +1,15 @@
+.empty {
+	display: block;
+	padding: 48px 8px;
+	text-align: center;
+
+	p {
+		margin: 0 0 16px;
+	}
+}
+
+@media (min-width: 60rem) {
+	.empty {
+		display: table-cell;
+	}
+}

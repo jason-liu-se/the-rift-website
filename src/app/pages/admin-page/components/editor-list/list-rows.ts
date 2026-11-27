@@ -3,13 +3,14 @@ import {
 	EditorContentType,
 	NewsDraftOptions
 } from 'src/app/interfaces/api-requests';
-import { DraftSummary } from 'src/app/interfaces/api-responses';
+import { DraftSummary, EditorRef } from 'src/app/interfaces/api-responses';
 import {
 	ListQueryOf,
 	SummaryOf
 } from 'src/app/services/editor-content/editor-content-types';
 import { itemName } from './item-name';
-import { ListFilters } from './list-filters/list-filters.component';
+import { RowData } from './list-columns';
+import { ListFilterField, ListFilters } from './list-filter-fields';
 import { ListSort, toQuerySort } from './list-sort';
 
 type Item = SummaryOf<EditorContentType>;
@@ -22,18 +23,14 @@ export type ListRow =
 			name: string;
 			item: Item;
 			ref: BulkItemRef;
-			/** The editor has an unpublished edit of it. */
-			hasDraft: boolean;
+			data: RowData;
 	  }
 	| {
 			kind: 'draft';
 			id: string;
 			name: string;
 			draft: DraftSummary;
-			/** An edit of a published item, rather than a new one. */
-			isEdit: boolean;
-			/** What the type's cells show of it (they take an `item`). */
-			cellItem: object;
+			data: RowData;
 	  };
 
 export type ItemRow = Extract<ListRow, { kind: 'item' }>;
@@ -46,30 +43,56 @@ export function toItemRow(item: Item, hasDraft: boolean): ItemRow {
 		name: itemName(item),
 		item,
 		ref: { id: item.id, startingRevision: item.revision },
-		hasDraft
+		data: {
+			fields: item,
+			status: item.status,
+			hasDraft,
+			updatedBy: item.lastUpdatedBy,
+			updatedAt: item.updatedAt
+		}
 	};
 }
 
-/** `published`: the item an edit draft is of, if it's loaded. */
-export function toDraftRow(draft: DraftSummary, published?: Item): DraftRow {
+/**
+ * `published`: the item an edit draft is of, if it's loaded. `editor`: who's
+ * listing it, who made every draft listed.
+ */
+export function toDraftRow(
+	draft: DraftSummary,
+	published?: Item,
+	editor?: Pick<EditorRef, 'username' | 'avatarUrl'>
+): DraftRow {
 	return {
 		kind: 'draft',
 		id: draft.id,
 		name: itemName(draft.fields),
 		draft,
-		isEdit: !!draft.target,
-		cellItem: toDraftCellItem(draft, published)
+		data: {
+			fields: toDraftFields(draft, published),
+			// An edit of a published item, or a new one.
+			status: draft.target ? 'edit' : 'draft',
+			hasDraft: false,
+			updatedBy: editor,
+			updatedAt: draft.updatedAt
+		}
 	};
 }
 
 /**
- * A draft as the type's cells show it: its fields so far, a season's
+ * A draft's fields as the cells show them: its fields so far (a cleared one,
+ * null, as unset), a season's
  * dimension count, and a news post's date: the draft's own if it has one,
  * else "now" for a new post, or the post's own for an edit (which keeps it).
  */
-function toDraftCellItem(draft: DraftSummary, published?: Item): object {
+function toDraftFields(
+	draft: DraftSummary,
+	published?: Item
+): RowData['fields'] {
+	const fields = Object.entries(draft.fields).filter(
+		([, value]) => value !== null
+	);
 	return {
-		...draft.fields,
+		...Object.fromEntries(fields),
 		...(draft.type === 'maps' && {
 			dimensionCount: draft.dimensionCount
 		}),
@@ -84,25 +107,22 @@ function toDraftCellItem(draft: DraftSummary, published?: Item): object {
 }
 
 /**
- * The drafts the filters keep, filtered here (the API lists them all): none
- * for a published status, and those whose name matches the search. The
- * editor made every one, so "Created by" keeps them all. A collection
- * filter keeps those in it.
+ * The drafts the filters keep, filtered here (the API lists them all): those
+ * whose name matches the search, and that every set filter keeps.
  */
 export function filterDrafts(
 	drafts: readonly DraftSummary[],
-	{ status, search, collection }: ListFilters
+	{ search, values }: ListFilters,
+	fields: readonly ListFilterField[]
 ): DraftSummary[] {
-	if (status && status !== 'draft') {
-		return [];
-	}
 	const words = search.trim().toLowerCase();
 	return drafts.filter(
 		(draft) =>
 			itemName(draft.fields).toLowerCase().includes(words) &&
-			(!collection ||
-				(draft.fields as { collection?: string }).collection ===
-					collection)
+			fields.every(
+				({ key, keepsDraft }) =>
+					!values[key] || keepsDraft(draft, values[key])
+			)
 	);
 }
 
@@ -111,23 +131,23 @@ export function filterDrafts(
  * order is the one the filters chose (see `currentSort`).
  */
 export function toListQuery(
-	{ scope, status, collection, searchFields }: ListFilters,
+	{ searchFields, values }: ListFilters,
 	search: string,
 	userId: string | undefined,
-	sort: ListSort
+	sort: ListSort,
+	fields: readonly ListFilterField[]
 ): ListQueryOf<EditorContentType> | undefined {
-	if (status === 'draft') {
+	const filterQueries = fields.flatMap(({ key, toQuery }) =>
+		values[key] ? [toQuery(values[key], userId)] : []
+	);
+	if (filterQueries.includes(undefined)) {
 		return undefined;
 	}
 	const words = search.trim();
-	return {
-		...toQuerySort(sort),
-		...(status && {
-			status: status as ListQueryOf<EditorContentType>['status']
-		}),
-		...(collection && { collection }),
-		...(scope === 'mine' && userId && { createdBy: userId }),
-		...(words && { q: words }),
-		...(words && searchFields.length > 0 && { in: searchFields.join(',') })
-	};
+	return Object.assign(
+		toQuerySort(sort),
+		...filterQueries,
+		words && { q: words },
+		words && searchFields.length > 0 && { in: searchFields.join(',') }
+	);
 }
