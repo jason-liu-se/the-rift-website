@@ -17,8 +17,8 @@ $bar-height: 3.5rem;
 	justify-content: space-between;
 	gap: 16px;
 	height: $bar-height;
-	padding: 0 8px 0 16px;
-	@include fill-scrollbar-gap(8px);
+	padding: 0 16px;
+	@include fill-scrollbar-gap(16px);
 	border-bottom: 1px solid rgba($colour-light-text, 0.12);
 	background-color: $colour-dark-background;
 	color: $colour-light-text;
@@ -89,19 +89,6 @@ $bar-height: 3.5rem;
 	overflow: hidden;
 	clip-path: inset(50%);
 	white-space: nowrap;
-}
-
-.account {
-	--mat-icon-button-state-layer-size: 44px;
-	padding: 4px;
-}
-
-.signed-in {
-	margin: 0;
-	padding: 8px 16px 12px;
-	border-bottom: 1px solid $colour-light-grey;
-	color: $colour-dark-text;
-	font-size: $font-size-x-small;
 }
 
 @media (min-width: 40rem) {

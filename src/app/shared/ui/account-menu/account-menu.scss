@@ -1,0 +1,124 @@
+@use "../../../../theme-colours" as *;
+
+$avatar-size: 36px;
+$panel-padding: 8px;
+$arrow-size: 8px;
+
+:host {
+	position: relative;
+	display: flex;
+	align-items: center;
+	height: 100%;
+	color: $colour-light-text;
+}
+
+.icon {
+	font-size: 1.25rem;
+}
+
+.user-button {
+	position: relative;
+	display: flex;
+	align-items: center;
+	padding: 0;
+	border: none;
+	border-radius: 50%;
+	background: transparent;
+	cursor: pointer;
+
+	&:focus-visible {
+		outline: 2px solid $colour-light-text;
+		outline-offset: 2px;
+	}
+
+	&.open {
+		outline: 2px solid rgba($colour-light-text, 0.5);
+		outline-offset: 2px;
+	}
+
+	// A 44px touch target around the smaller avatar.
+	&::after {
+		content: "";
+		position: absolute;
+		inset: calc((44px - $avatar-size) / -2);
+	}
+}
+
+// Below the button, right-aligned with it; its arrow points at the avatar.
+.panel {
+	display: none;
+	position: absolute;
+	top: calc(50% + $avatar-size / 2 + $arrow-size + 4px);
+	right: -$panel-padding;
+	z-index: 1;
+	min-width: 13rem;
+	max-width: calc(100vw - 2rem);
+	padding: $panel-padding;
+	border-radius: 8px;
+	background-color: $colour-dark-background;
+	box-shadow: 0 4px 12px rgba($colour-dark-background, 0.5);
+
+	&::before {
+		content: "";
+		position: absolute;
+		bottom: 100%;
+		right: calc($panel-padding + $avatar-size / 2 - $arrow-size);
+		border: $arrow-size solid transparent;
+		border-top: 0;
+		border-bottom-color: $colour-dark-background;
+	}
+
+	&.open {
+		display: block;
+		animation: panel-in 0.15s ease-out;
+	}
+}
+
+.panel-header {
+	justify-content: flex-start;
+	padding: 4px 0.75rem $panel-padding;
+	border-bottom: 1px solid rgba($colour-light-text, 0.2);
+}
+
+.menu {
+	display: flex;
+	flex-direction: column;
+	padding-top: $panel-padding;
+}
+
+.menu-item {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.5rem 0.75rem;
+	border: none;
+	border-radius: 4px;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	text-decoration: none;
+	cursor: pointer;
+
+	&:hover,
+	&[data-active="true"] {
+		background-color: rgba($colour-light-text, 0.12);
+	}
+
+	&:focus-visible {
+		outline: 2px solid $colour-light-text;
+		outline-offset: -2px;
+	}
+}
+
+@keyframes panel-in {
+	from {
+		opacity: 0;
+		transform: translateY(-4px);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.panel.open {
+		animation: none;
+	}
+}
