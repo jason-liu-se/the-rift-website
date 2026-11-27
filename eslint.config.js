@@ -11,7 +11,7 @@ const { readdirSync } = require("node:fs");
 const FEATURES = readdirSync("src/app/features");
 const NO_LAYOUT = {
 	regex: "(^|/)core/layout(/|$)",
-	message: "Only app.routes and app.component import core/layout."
+	message: "Only app.routes and app.ts import core/layout."
 };
 const NO_FEATURES = {
 	regex: "(^|/)features/",

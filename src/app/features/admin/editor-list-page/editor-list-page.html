@@ -1,0 +1,41 @@
+<header class="top-bar">
+	<h1 class="tool-title" tabindex="-1" #heading>
+		{{ config().label }}<span class="cdk-visually-hidden"> – Admin</span>
+	</h1>
+	<div class="tool-actions">
+		@if (config().hasCollections) {
+		<a
+			mat-stroked-button
+			routerLink="collections"
+			queryParamsHandling="preserve"
+		>
+			<mat-icon>folder_open</mat-icon>
+			{{ config().label }} collections
+		</a>
+		} @if (config().hasBulkCreate) {
+		<a
+			mat-flat-button
+			color="primary"
+			routerLink="bulk"
+			queryParamsHandling="preserve"
+		>
+			<mat-icon>upload</mat-icon>
+			Upload {{ config().noun.many }}
+		</a>
+		} @else {
+		<a
+			mat-flat-button
+			color="primary"
+			routerLink="new"
+			queryParamsHandling="preserve"
+		>
+			<mat-icon>add</mat-icon>
+			New {{ config().noun.one }}
+		</a>
+		}
+	</div>
+</header>
+<div class="tool-card">
+	<app-editor-list />
+</div>
+<router-outlet />

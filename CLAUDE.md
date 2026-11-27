@@ -34,13 +34,13 @@ frontmatter so it loads only when matching files are read or edited.
 
 - **Standalone components**, no `NgModule`. Use `inject()`, not constructor
   injection. App-wide providers are in `src/app/app.config.ts`.
-- **Every route renders `PageTemplateComponent`**, which lazy-loads the page
-  from `data.loadComponent` into a `<main>` inside the shared shell (navbar,
-  optional contact section, footer). Route data flags toggle the shell (defaults
-  in `PageTemplateComponent`). Pages read their own values from route data or
-  parameters, so a variant of a page is usually just a new route, or none (new
-  gallery collections come from the API through `gallery/:collection`). Every
-  route also needs a `title`, a `data.description`, and a render mode in
+- **Every route renders `PageTemplate`**, which lazy-loads the page from
+  `data.loadComponent` into a `<main>` inside the shared shell (navbar, optional
+  contact section, footer). Route data flags toggle the shell (defaults in
+  `PageTemplate`). Pages read their own values from route data or parameters, so
+  a variant of a page is usually just a new route, or none (new gallery
+  collections come from the API through `gallery/:collection`). Every route also
+  needs a `title`, a `data.description`, and a render mode in
   `src/app/app.routes.server.ts`.
 - **External services.** The Rift API and BlueMap run separately. Import
   `environment` from `src/environments/` (generated from `.env`); never
@@ -143,7 +143,7 @@ frontmatter so it loads only when matching files are read or edited.
   `features → core, shared`; `core → core, shared`; `shared → shared, core`.
   core and shared never import features, a public feature never imports another
   (admin may import public features' display components and API services, since
-  it previews and edits them), and only `app.routes` and `app.component` import
+  it previews and edits them), and only `app.routes` and `app.ts` import
   `core/layout`.
 - **Tests.** Few and sturdy: test behaviour a user or caller relies on (function
   results, requests sent, where an action leads), not markup, so tests fail when

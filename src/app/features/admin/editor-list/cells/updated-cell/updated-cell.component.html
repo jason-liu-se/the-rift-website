@@ -1,9 +1,0 @@
-<app-editor-avatar [editor]="editor()" />
-<span class="text">
-	<span class="by">{{ editor()?.username ?? "(unknown)" }}</span>
-	@if (updatedAt(); as updatedAt) {
-		<time [attr.datetime]="updatedAt" [title]="updatedAtText()">{{
-			updatedAgo()
-		}}</time>
-	}
-</span>

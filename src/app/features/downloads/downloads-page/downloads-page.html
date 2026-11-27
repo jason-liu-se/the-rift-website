@@ -1,0 +1,41 @@
+<div class="downloads-page">
+	<app-background-image-card
+		[src]="'/assets/general-background-images/iron-farm-1.webp'"
+		[isPageTitle]="true"
+		[title]="'Downloads'"
+		[desc]="'Check out the previous Rift seasons'"
+	></app-background-image-card>
+	@if (loadState.failed()) {
+	<app-fallback-panel
+		heading="Couldn't load the downloads"
+		[busy]="loadState.retrying()"
+		(action)="loadDownloadCollections()"
+	>
+		The server didn't answer. Check your connection and try again.
+	</app-fallback-panel>
+	} @else {
+	<div class="downloads-container">
+		@for (collection of downloadCollections; track collection.name) {
+		<app-section-card
+			[backgroundType]="'light'"
+			[title]="collection.title"
+			[titlePosition]="'left'"
+			[contentPosition]="'left'"
+			[paddingY]="false"
+		>
+			<div class="download-section">
+				@for (item of collection.items; track item.id) {
+				<app-download-card
+					[title]="item.title"
+					[desc]="item.desc"
+					[src]="item.downloadUrl"
+					[imgSrc]="item.imageUrl"
+					[editId]="item.id"
+				></app-download-card>
+				}
+			</div>
+		</app-section-card>
+		}
+	</div>
+	}
+</div>

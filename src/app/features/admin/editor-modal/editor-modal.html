@@ -1,0 +1,14 @@
+<ng-template #content>
+	@if (session(); as session) {
+	<app-draft-editor
+		[session]="session"
+		[itemActions]="itemActions()"
+		(publishedItem)="finishPublishing()"
+		(closed)="close()"
+	>
+		<ng-container *ngComponentOutlet="config.form; inputs: { session }" />
+	</app-draft-editor>
+	} @else {
+	<p class="opening" role="status">Opening…</p>
+	}
+</ng-template>

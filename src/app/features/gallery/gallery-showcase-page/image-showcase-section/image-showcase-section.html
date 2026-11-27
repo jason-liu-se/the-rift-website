@@ -1,0 +1,32 @@
+<div class="image-showcase-section">
+	<ul class="caption-card-gallery">
+		@for (image of captionedImages; track image.id; let i = $index) {
+		<li class="caption-card">
+			<button class="image-button" (click)="handleImageClick(i)">
+				<app-caption-card
+					[src]="image.imageUrl"
+					[caption]="image.caption"
+					[captionVisibility]="'hover'"
+				/>
+			</button>
+			<app-edit-button
+				class="edit"
+				type="gallery"
+				[itemId]="image.id"
+				[itemName]="image.caption"
+			/>
+		</li>
+		}
+	</ul>
+	@if (isPopUpVisible) {
+	<div class="image-pop-up">
+		<app-image-slideshow
+			[captionedImages]="captionedImages"
+			[startingIndex]="imageIndex"
+		/>
+		<button class="exit-button" mat-fab extended (click)="handleClose()">
+			<mat-icon class="exit-icon">close</mat-icon>Close
+		</button>
+	</div>
+	}
+</div>

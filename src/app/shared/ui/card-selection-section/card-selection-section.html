@@ -1,0 +1,34 @@
+<div class="collection-section">
+	<div class="collection-wrapper">
+		@for (item of items; track item) {
+		<div class="collection-card-grid collection-card">
+			@if (item.imageUrl) {
+			<!-- sizes: $collection-card-width -->
+			<app-optimized-image
+				class="background-content"
+				[src]="item.imageUrl"
+				sizes="15rem"
+			/>
+			}
+			<a
+				class="overlay-content"
+				[routerLink]="item.routerLink"
+				[fragment]="item.fragment"
+			>
+				<hr class="top-bar" />
+				<h3 class="title">{{ item.title }}</h3>
+				@if (item.desc) {
+				<p
+					class="description {{
+								alwaysShowDesc ? 'high-contrast' : 'transparent'
+							}}"
+				>
+					{{ item.desc }}
+				</p>
+				}
+				<hr class="bottom-bar" />
+			</a>
+		</div>
+		}
+	</div>
+</div>

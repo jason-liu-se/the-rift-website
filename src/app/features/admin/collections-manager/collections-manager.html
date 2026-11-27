@@ -1,0 +1,17 @@
+<app-collection-list
+	[cards]="cards()"
+	[canStartNew]="canStartNew()"
+	(opened)="open($event)"
+	(visibilityToggled)="editor.toggleVisibility($event.target)"
+	(deleted)="delete($event)"
+	(newStarted)="startNew()"
+/>
+@if (session(); as session) {
+<app-collection-form
+	class="form"
+	[type]="type()"
+	[session]="session"
+	(published)="editor.notePublished()"
+	(discarded)="editor.noteDiscarded()"
+/>
+}

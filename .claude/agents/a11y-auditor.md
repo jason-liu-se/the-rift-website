@@ -23,8 +23,8 @@ read-only inspection (`git diff/log/show`, `ls`, `cat`).
 3. For each component, read its `.html`, `.scss`, and `.ts`, the child
    components it renders, and the global styles it relies on (`src/styles.scss`,
    `src/theme*.scss`, `src/font-sizes.scss`). For pages, also read
-   `PageTemplateComponent`, the navbar, and the footer, since they share the
-   page with it.
+   `PageTemplate`, the navbar, and the footer, since they share the page with
+   it.
 
 ## Method
 

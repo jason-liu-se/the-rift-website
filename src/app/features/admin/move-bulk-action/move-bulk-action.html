@@ -1,0 +1,11 @@
+<button mat-button type="button" [matMenuTriggerFor]="moveMenu">
+	<mat-icon>drive_file_move</mat-icon>
+	Move to
+</button>
+<mat-menu #moveMenu="matMenu">
+	@for (collection of collections() ?? []; track collection.slug) {
+	<button mat-menu-item (click)="move(collection.slug)">
+		{{ collection.title }}
+	</button>
+	}
+</mat-menu>

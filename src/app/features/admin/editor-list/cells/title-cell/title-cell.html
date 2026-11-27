@@ -1,0 +1,10 @@
+@if (hasImage()) {
+<app-item-thumbnail class="thumbnail" [src]="imageUrl()" />
+}
+<span class="text">
+	@if (format() === "markdown") {
+	<app-markdown [markdown]="title()" [inline]="true" />
+	} @else { {{ title() }} } @if (details(); as details) {
+	<span class="details">{{ details }}</span>
+	}
+</span>

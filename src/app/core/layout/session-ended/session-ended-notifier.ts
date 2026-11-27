@@ -4,8 +4,8 @@ import { ToastService } from 'src/app/shared/ui/toast/toast.service';
 import { SessionEndReason } from 'src/app/core/auth/auth.service';
 import {
 	SESSION_ENDED_DIALOG_CONFIG,
-	SessionEndedDialogComponent
-} from './session-ended-dialog.component';
+	SessionEndedDialog
+} from './session-ended-dialog';
 
 /**
  * Shows that a session ended: the dialog on a protected page (it no longer
@@ -35,7 +35,7 @@ export class SessionEndedNotifier {
 		}
 		try {
 			this.dialog
-				.open(SessionEndedDialogComponent, {
+				.open(SessionEndedDialog, {
 					...SESSION_ENDED_DIALOG_CONFIG,
 					data: reason
 				})

@@ -7,7 +7,7 @@ import { ApiStatusService } from '../../api/api-status/api-status.service';
 import { StatusBannerService } from './status-banner.service';
 
 @Component({ template: '' })
-class EmptyPageComponent {}
+class EmptyPage {}
 
 describe('StatusBannerService', () => {
 	let router: Router;
@@ -19,7 +19,7 @@ describe('StatusBannerService', () => {
 				provideRouter([
 					{
 						path: '',
-						component: EmptyPageComponent,
+						component: EmptyPage,
 						// As in the app, the banner is created by the first page,
 						// after the first navigation has started.
 						canActivate: [
@@ -29,7 +29,7 @@ describe('StatusBannerService', () => {
 							}
 						]
 					},
-					{ path: 'other', component: EmptyPageComponent }
+					{ path: 'other', component: EmptyPage }
 				]),
 				provideHttpClient(),
 				provideHttpClientTesting()

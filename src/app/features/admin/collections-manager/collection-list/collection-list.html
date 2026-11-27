@@ -1,0 +1,25 @@
+<div class="list-heading">
+	<h3 id="collection-list-heading" class="subheading">
+		{{ cards().length }} {{ cards().length === 1 ? "collection" :
+		"collections" }}
+	</h3>
+	@if (canStartNew()) {
+	<button mat-button type="button" (click)="newStarted.emit()">
+		<mat-icon>add</mat-icon>
+		New collection
+	</button>
+	}
+</div>
+<ul class="collection-list">
+	@for (card of cards(); track card.target) {
+	<li
+		app-collection-card
+		[card]="card"
+		(opened)="opened.emit(card)"
+		(visibilityToggled)="visibilityToggled.emit(card)"
+		(deleted)="deleted.emit(card)"
+	></li>
+	} @empty {
+	<li class="empty">No collections yet. Create the first one.</li>
+	}
+</ul>

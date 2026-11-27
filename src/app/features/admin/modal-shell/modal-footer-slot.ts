@@ -20,7 +20,7 @@ export class ModalFooterSlot {
 }
 
 @Directive({ selector: 'ng-template[appModalFooter]' })
-export class ModalFooterDirective {
+export class ModalFooter {
 	constructor() {
 		const slot = inject(ModalFooterSlot);
 		slot.template.set(inject(TemplateRef));

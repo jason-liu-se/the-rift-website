@@ -8,12 +8,12 @@ import {
 	FieldsOf,
 	SummaryOf
 } from 'src/app/features/admin/editor-content/editor-content-types';
-import { DownloadsFormComponent } from './downloads/downloads-form/downloads-form.component';
-import { DownloadsPreviewComponent } from './downloads/downloads-preview/downloads-preview.component';
+import { DownloadsForm } from './downloads/downloads-form/downloads-form';
+import { DownloadsPreview } from './downloads/downloads-preview/downloads-preview';
 import { ItemNoun } from './editor-list/bulk-results';
-import { DateCellComponent } from './editor-list/cells/date-cell/date-cell.component';
-import { TextCellComponent } from './editor-list/cells/text-cell/text-cell.component';
-import { TitleCellComponent } from './editor-list/cells/title-cell/title-cell.component';
+import { DateCell } from './editor-list/cells/date-cell/date-cell';
+import { TextCell } from './editor-list/cells/text-cell/text-cell';
+import { TitleCell } from './editor-list/cells/title-cell/title-cell';
 import {
 	ListColumn,
 	STATUS_COLUMN,
@@ -27,13 +27,13 @@ import {
 	statusFilter
 } from './editor-list/list-filter-fields';
 import { ListSort } from './editor-list/list-sort';
-import { GalleryBulkActionsComponent } from './gallery/gallery-bulk-actions/gallery-bulk-actions.component';
-import { GalleryFormComponent } from './gallery/gallery-form/gallery-form.component';
-import { GalleryPreviewComponent } from './gallery/gallery-preview/gallery-preview.component';
-import { MapsFormComponent } from './maps/maps-form/maps-form.component';
-import { MoveBulkActionComponent } from './move-bulk-action/move-bulk-action.component';
-import { NewsFormComponent } from './news/news-form/news-form.component';
-import { NewsPreviewComponent } from './news/news-preview/news-preview.component';
+import { GalleryBulkActions } from './gallery/gallery-bulk-actions/gallery-bulk-actions';
+import { GalleryForm } from './gallery/gallery-form/gallery-form';
+import { GalleryPreview } from './gallery/gallery-preview/gallery-preview';
+import { MapsForm } from './maps/maps-form/maps-form';
+import { MoveBulkAction } from './move-bulk-action/move-bulk-action';
+import { NewsForm } from './news/news-form/news-form';
+import { NewsPreview } from './news/news-preview/news-preview';
 import { DraftFields } from './drafts/draft-fields';
 
 const RECENTLY_UPDATED: ListSort = { sort: 'updatedAt', order: 'desc' };
@@ -114,13 +114,13 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 		hasCollections: false,
 		hasBulkCreate: false,
 		newItemFields: () => ({}),
-		form: NewsFormComponent,
-		preview: NewsPreviewComponent,
+		form: NewsForm,
+		preview: NewsPreview,
 		columns: [
 			{
 				id: 'post',
 				label: 'Post',
-				cell: TitleCellComponent,
+				cell: TitleCell,
 				inputs: ({ fields }) => ({
 					title: fields.title || 'Untitled',
 					format: 'markdown',
@@ -133,7 +133,7 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 			{
 				id: 'date',
 				label: 'Post date',
-				cell: DateCellComponent,
+				cell: DateCell,
 				inputs: ({ fields }) => ({
 					date: fields.date,
 					secondary: fields.editedAt && {
@@ -185,14 +185,14 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 		hasCollections: true,
 		hasBulkCreate: false,
 		newItemFields: () => ({}),
-		form: DownloadsFormComponent,
-		bulkActions: MoveBulkActionComponent,
-		preview: DownloadsPreviewComponent,
+		form: DownloadsForm,
+		bulkActions: MoveBulkAction,
+		preview: DownloadsPreview,
 		columns: [
 			{
 				id: 'download',
 				label: 'Download',
-				cell: TitleCellComponent,
+				cell: TitleCell,
 				inputs: ({ fields }) => ({
 					title: fields.title || 'Untitled',
 					hasImage: true,
@@ -204,7 +204,7 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 			{
 				id: 'collection',
 				label: 'Collection',
-				cell: TextCellComponent,
+				cell: TextCell,
 				inputs: ({ fields }, { collectionTitle }) => ({
 					text: collectionTitle(fields.collection)
 				}),
@@ -245,14 +245,14 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 		hasCollections: true,
 		hasBulkCreate: true,
 		newItemFields: () => ({}),
-		form: GalleryFormComponent,
-		bulkActions: GalleryBulkActionsComponent,
-		preview: GalleryPreviewComponent,
+		form: GalleryForm,
+		bulkActions: GalleryBulkActions,
+		preview: GalleryPreview,
 		columns: [
 			{
 				id: 'caption',
 				label: 'Caption',
-				cell: TitleCellComponent,
+				cell: TitleCell,
 				inputs: ({ fields }, { collectionTitle }) => ({
 					title: fields.caption || 'Untitled',
 					details: [
@@ -271,7 +271,7 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 			{
 				id: 'uploaded',
 				label: 'Uploaded',
-				cell: DateCellComponent,
+				cell: DateCell,
 				inputs: ({ fields }) => ({ date: fields.createdAt }),
 				width: '12rem',
 				sort: { by: 'createdAt', firstOrder: 'desc' },
@@ -304,12 +304,12 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 		hasCollections: false,
 		hasBulkCreate: false,
 		newItemFields: () => newMapSeasonFields(),
-		form: MapsFormComponent,
+		form: MapsForm,
 		columns: [
 			{
 				id: 'season',
 				label: 'Season',
-				cell: TitleCellComponent,
+				cell: TitleCell,
 				inputs: ({ fields: { season, dimensionCount } }) => ({
 					title:
 						season !== undefined ? `Season ${season}` : 'Untitled',

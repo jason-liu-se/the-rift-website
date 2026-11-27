@@ -1,0 +1,40 @@
+<div class="news-display">
+	<ul class="news-container">
+		@for (post of newsPosts; track post.id) {
+		<li class="news-post">
+			@if (post.imageUrl) {
+			<div class="banner">
+				<app-optimized-image [src]="post.imageUrl" />
+			</div>
+			}
+			<div class="news-post-content">
+				<h2 class="title">
+					<app-markdown [markdown]="post.title" [inline]="true" />
+				</h2>
+				<p class="date">
+					<time [attr.datetime]="post.date"
+						>{{ newsPostToDateString(post) }}</time
+					>
+					@if (post.editedAt; as editedAt) {
+					<span class="edited">
+						·
+						<time [attr.datetime]="editedAt"
+							>{{ editedToDateString(editedAt) }}</time
+						>
+					</span>
+					}
+				</p>
+				@if (canEdit) {
+				<app-edit-button
+					type="news"
+					[itemId]="post.id"
+					[itemName]="toPlainText(post.title)"
+				/>
+				}
+				<hr class="separator" />
+				<app-markdown class="content" [markdown]="post.content" />
+			</div>
+		</li>
+		}
+	</ul>
+</div>

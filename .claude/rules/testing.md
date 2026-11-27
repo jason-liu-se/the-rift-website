@@ -48,8 +48,8 @@ zone.js:
 - Provide only what the component uses: `provideRouter(...)` for router links
   (with `ANY_URL_ROUTES` to assert navigation), and `provideHttpClient()` plus
   `provideHttpClientTesting()` for HTTP.
-- Anything under `PageTemplateComponent` needs a stubbed `ActivatedRoute` with
-  `snapshot.data.loadComponent`; see `page-template.component.spec.ts`.
+- Anything under `PageTemplate` needs a stubbed `ActivatedRoute` with
+  `snapshot.data.loadComponent`; see `page-template.spec.ts`.
 - Use the helpers in `src/app/testing/` before defining new ones.
 
 ## End-to-end tests (Playwright)

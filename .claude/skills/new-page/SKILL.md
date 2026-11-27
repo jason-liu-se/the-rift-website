@@ -8,8 +8,8 @@ argument-hint: <page name or description>
 
 Add the page described in: $ARGUMENTS
 
-Follow the architecture in `CLAUDE.md`. Every route renders
-`PageTemplateComponent` and lazy-loads its page from `data.loadComponent`.
+Follow the architecture in `CLAUDE.md`. Every route renders `PageTemplate` and
+lazy-loads its page from `data.loadComponent`.
 
 ## 1. New component or new route?
 
@@ -44,12 +44,12 @@ npm run ng -- generate component features/<feature>/<name>-page
 
 Add the route to `src/app/app.routes.ts` before the `**` wildcard:
 
-- `component: PageTemplateComponent`
+- `component: PageTemplate`
 - a unique `title` naming the page (`SeoTitleStrategy` appends " | The Rift")
   and a `data.description` for search results (`.claude/rules/seo.md`)
-- `data.loadComponent: () => import('./features/<feature>/<name>-page/<name>-page.component').then((m) => m.<Name>PageComponent)`,
-  plus any shell flags it needs. Check `PageTemplateComponent` for the flags and
-  their defaults, and only set flags that differ from the defaults.
+- `data.loadComponent: () => import('./features/<feature>/<name>-page/<name>-page').then((m) => m.<Name>Page)`,
+  plus any shell flags it needs. Check `PageTemplate` for the flags and their
+  defaults, and only set flags that differ from the defaults.
 
 Then give it a render mode in `src/app/app.routes.server.ts`
 (`.claude/docs/rendering.md`): `RenderMode.Server` if it shows API data,

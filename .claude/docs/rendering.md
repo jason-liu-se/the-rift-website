@@ -30,9 +30,9 @@ Code also runs on the server, where there's no real `window`. Touch `window` or
 other browser APIs only in event handlers, `afterNextRender`, or behind
 `isPlatformBrowser`.
 
-News titles and content are markdown, rendered to HTML by `MarkdownComponent`
-(`src/app/shared/ui/markdown/`) with `marked` on the server and in the browser
-alike. Raw HTML, unsafe links, and images outside `IMAGE_URL_PREFIXES`
+News titles and content are markdown, rendered to HTML by the `Markdown`
+component (`src/app/shared/ui/markdown/`) with `marked` on the server and in the
+browser alike. Raw HTML, unsafe links, and images outside `IMAGE_URL_PREFIXES`
 (`src/app/core/config/images.ts`, a copy of the API's allowlist) are never
 rendered, and Angular sanitises the result again.
 
@@ -51,11 +51,10 @@ rendered, and Angular sanitises the result again.
     - trusts Cloudflare's `X-Forwarded-For`/`-Proto` (Angular otherwise falls
       back to browser-only rendering)
     - adds the security headers that `public/_headers` sets for static files
-- `PageTemplateComponent` lazy-loads each page (`data.loadComponent`). The app
-  counts as busy until the page has loaded, so server rendering and hydration
-  wait for it. After an in-app navigation it focuses `<main>` once the page is
-  in. If a page's chunk fails to load (a tab left open across a deploy), it
-  reloads once.
+- `PageTemplate` lazy-loads each page (`data.loadComponent`). The app counts as
+  busy until the page has loaded, so server rendering and hydration wait for it.
+  After an in-app navigation it focuses `<main>` once the page is in. If a
+  page's chunk fails to load (a tab left open across a deploy), it reloads once.
 - Server-rendered pages call the API from the server, and the browser reuses
   those responses. If the API is down, or doesn't answer within
   `SERVER_API_TIMEOUT_MS` (`src/app/core/config/api.ts`, server only), the page
@@ -98,8 +97,8 @@ rendered, and Angular sanitises the result again.
   `online`, when the tab becomes visible, or after another response; only a
   health answer marks it up. It stays `up` on the server. When it returns to
   `up`, it retries a pending logout, and every `LoadState` that failed retries
-  its page. `StatusBannerComponent` (`src/app/core/layout/status-banner/`) shows
-  the status above the navbar and publishes `--status-banner-height`; its state
+  its page. `StatusBanner` (`src/app/core/layout/status-banner/`) shows the
+  status above the navbar and publishes `--status-banner-height`; its state
   lives in a root service so dismissals outlast navigations.
 - The navbar (`src/app/core/layout/navbar/`) checks the session after hydration
   only when a user is saved, so anonymous visitors make no `/auth/me` request,

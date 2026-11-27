@@ -12,7 +12,7 @@ export const originalImageLoader: ImageLoader = ({ src }) => src;
  * zone; other hosts must be allowed under Transformations > Sources.
  *
  * Returns the original file for `src` (no width), which
- * `OptimizedImageComponent` falls back to when a transformation fails, and for
+ * `OptimizedImage` falls back to when a transformation fails, and for
  * every width when `loaderParams.original` is set.
  *
  * Unlike Angular's `provideCloudflareLoader`, this accepts absolute URLs, since

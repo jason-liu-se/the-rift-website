@@ -7,45 +7,45 @@ import {
 	requireGalleryCollection,
 	resolveFromGalleryTitle
 } from './features/gallery/gallery-collection.guard';
-import { PageTemplateComponent } from './core/layout/page-template/page-template.component';
+import { PageTemplate } from './core/layout/page-template/page-template';
 
 export const routes: Routes = [
 	{
 		path: '',
-		component: PageTemplateComponent,
+		component: PageTemplate,
 		title: 'Home',
 		data: {
 			loadComponent: () =>
-				import('./features/home/home-page/home-page.component').then(
-					(m) => m.HomePageComponent
+				import('./features/home/home-page/home-page').then(
+					(m) => m.HomePage
 				),
 			showContactSection: true
 		}
 	},
 	{
 		path: 'news',
-		component: PageTemplateComponent,
+		component: PageTemplate,
 		title: 'News',
 		data: {
 			description:
 				'The latest news and announcements from The Rift Minecraft SMP.',
 			loadComponent: () =>
-				import('./features/news/news-page/news-page.component').then(
-					(m) => m.NewsPageComponent
+				import('./features/news/news-page/news-page').then(
+					(m) => m.NewsPage
 				),
 			isTransparent: false
 		}
 	},
 	{
 		path: 'gallery',
-		component: PageTemplateComponent,
+		component: PageTemplate,
 		title: 'Gallery',
 		data: {
 			description:
 				'Screenshots of builds from every season of The Rift Minecraft SMP.',
 			loadComponent: () =>
-				import('./features/gallery/gallery-page/gallery-page.component').then(
-					(m) => m.GalleryPageComponent
+				import('./features/gallery/gallery-page/gallery-page').then(
+					(m) => m.GalleryPage
 				)
 		}
 	},
@@ -53,7 +53,7 @@ export const routes: Routes = [
 		// One page per collection the API lists; other names get the 404 page.
 		path: 'gallery/:collection',
 		canMatch: [requireGalleryCollection],
-		component: PageTemplateComponent,
+		component: PageTemplate,
 		title: resolveFromGalleryTitle((title) => `${title} Gallery`),
 		resolve: {
 			collectionTitle: resolveFromGalleryTitle((title) => title),
@@ -64,34 +64,34 @@ export const routes: Routes = [
 		},
 		data: {
 			loadComponent: () =>
-				import('./features/gallery/gallery-showcase-page/gallery-showcase-page.component').then(
-					(m) => m.GalleryShowcasePageComponent
+				import('./features/gallery/gallery-showcase-page/gallery-showcase-page').then(
+					(m) => m.GalleryShowcasePage
 				)
 		}
 	},
 	{
 		path: 'map',
-		component: PageTemplateComponent,
+		component: PageTemplate,
 		title: 'Maps',
 		data: {
 			description:
 				'Explore interactive maps of the worlds from The Rift Minecraft SMP.',
 			loadComponent: () =>
-				import('./features/map/map-page/map-page.component').then(
-					(m) => m.MapPageComponent
+				import('./features/map/map-page/map-page').then(
+					(m) => m.MapPage
 				)
 		}
 	},
 	{
 		path: 'map/viewer',
-		component: PageTemplateComponent,
+		component: PageTemplate,
 		title: 'Map Viewer',
 		data: {
 			description:
 				'Interactive maps of the worlds on The Rift Minecraft SMP.',
 			loadComponent: () =>
-				import('./features/map/blue-map-page/blue-map-page.component').then(
-					(m) => m.BlueMapPageComponent
+				import('./features/map/blue-map-page/blue-map-page').then(
+					(m) => m.BlueMapPage
 				),
 			isTransparent: false,
 			showFooter: false
@@ -99,66 +99,66 @@ export const routes: Routes = [
 	},
 	{
 		path: 'about',
-		component: PageTemplateComponent,
+		component: PageTemplate,
 		title: 'About',
 		data: {
 			description: 'Learn what The Rift Minecraft SMP is about.',
 			loadComponent: () =>
-				import('./features/about/about-page/about-page.component').then(
-					(m) => m.AboutPageComponent
+				import('./features/about/about-page/about-page').then(
+					(m) => m.AboutPage
 				)
 		}
 	},
 	{
 		path: 'downloads',
-		component: PageTemplateComponent,
+		component: PageTemplate,
 		title: 'World Downloads',
 		data: {
 			description:
 				'Download the worlds from previous seasons of The Rift Minecraft SMP.',
 			loadComponent: () =>
-				import('./features/downloads/downloads-page/downloads-page.component').then(
-					(m) => m.DownloadsPageComponent
+				import('./features/downloads/downloads-page/downloads-page').then(
+					(m) => m.DownloadsPage
 				)
 		}
 	},
 	{
 		path: 'contact',
-		component: PageTemplateComponent,
+		component: PageTemplate,
 		title: 'Contact Us',
 		data: {
 			description:
 				'Get in touch with the team behind The Rift Minecraft SMP.',
 			loadComponent: () =>
-				import('./features/contact/contact-page/contact-page.component').then(
-					(m) => m.ContactPageComponent
+				import('./features/contact/contact-page/contact-page').then(
+					(m) => m.ContactPage
 				)
 		}
 	},
 	{
 		path: 'join',
-		component: PageTemplateComponent,
+		component: PageTemplate,
 		title: 'Join',
 		data: {
 			description: 'Apply to join The Rift Minecraft SMP.',
 			loadComponent: () =>
-				import('./features/join/join-page/join-page.component').then(
-					(m) => m.JoinPageComponent
+				import('./features/join/join-page/join-page').then(
+					(m) => m.JoinPage
 				),
 			isTransparent: false
 		}
 	},
 	{
 		path: 'admin/login',
-		component: PageTemplateComponent,
+		component: PageTemplate,
 		title: 'Admin Login',
 		canActivate: [requireLoggedOut],
 		data: {
 			description: 'Log in to edit The Rift website.',
 			noindex: true,
 			loadComponent: () =>
-				import('./features/admin/admin-login-page/admin-login-page.component').then(
-					(m) => m.AdminLoginPageComponent
+				import('./features/admin/admin-login-page/admin-login-page').then(
+					(m) => m.AdminLoginPage
 				),
 			isTransparent: false,
 			showFooter: false
@@ -166,15 +166,15 @@ export const routes: Routes = [
 	},
 	{
 		path: 'admin',
-		component: PageTemplateComponent,
+		component: PageTemplate,
 		title: 'Admin',
 		canActivate: [requireLoggedIn],
 		data: {
 			description: 'Tools for editors of The Rift website.',
 			noindex: true,
 			loadComponent: () =>
-				import('./features/admin/admin-page/admin-page.component').then(
-					(m) => m.AdminPageComponent
+				import('./features/admin/admin-page/admin-page').then(
+					(m) => m.AdminPage
 				),
 			showNavbar: false,
 			showFooter: false
@@ -183,13 +183,13 @@ export const routes: Routes = [
 	},
 	{
 		path: '**',
-		component: PageTemplateComponent,
+		component: PageTemplate,
 		title: 'Page Not Found',
 		data: {
 			noindex: true,
 			loadComponent: () =>
-				import('./features/error/error-page/error-page.component').then(
-					(m) => m.ErrorPageComponent
+				import('./features/error/error-page/error-page').then(
+					(m) => m.ErrorPage
 				),
 			isTransparent: false
 		}

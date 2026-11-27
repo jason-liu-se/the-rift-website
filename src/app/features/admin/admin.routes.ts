@@ -9,10 +9,10 @@ import {
 	UrlMatcher
 } from '@angular/router';
 import { EditorContentType } from 'src/app/core/api/api-requests';
-import { CollectionsModalComponent } from './collections-modal/collections-modal.component';
-import { BulkCreateModalComponent } from './bulk-create-modal/bulk-create-modal.component';
-import { EditorListPageComponent } from './editor-list-page/editor-list-page.component';
-import { EditorModalComponent } from './editor-modal/editor-modal.component';
+import { CollectionsModal } from './collections-modal/collections-modal';
+import { BulkCreateModal } from './bulk-create-modal/bulk-create-modal';
+import { EditorListPage } from './editor-list-page/editor-list-page';
+import { EditorModal } from './editor-modal/editor-modal';
 import { EDITOR_TYPES, EDITOR_TYPE_ORDER } from './editor-types';
 
 const isEditorType: CanMatchFn = (_, [segment]) =>
@@ -57,22 +57,22 @@ export default [
 		path: ':type',
 		canMatch: [isEditorType],
 		title: toolTitle,
-		component: EditorListPageComponent,
+		component: EditorListPage,
 		children: [
 			{
 				path: 'bulk',
 				canActivate: [typeHas('hasBulkCreate')],
 				canDeactivate: [
-					(modal: BulkCreateModalComponent) => modal.confirmLeave()
+					(modal: BulkCreateModal) => modal.confirmLeave()
 				],
-				component: BulkCreateModalComponent
+				component: BulkCreateModal
 			},
 			{
 				path: 'collections',
 				canActivate: [typeHas('hasCollections')],
-				component: CollectionsModalComponent
+				component: CollectionsModal
 			},
-			{ matcher: matchEditorItem, component: EditorModalComponent }
+			{ matcher: matchEditorItem, component: EditorModal }
 		]
 	}
 ] satisfies Routes;
