@@ -26,9 +26,14 @@ import {
 	NewsDraftOptions
 } from 'src/app/core/api/api-requests';
 import { AdminNotifier } from 'src/app/features/admin/admin-notifier';
-import { ItemOf } from 'src/app/features/admin/editor-content/editor-content-types';
+import {
+	ItemOf,
+	fieldLabelsOf,
+	requiredFieldsOf
+} from 'src/app/features/admin/editor-content/editor-content-types';
 import { DraftSession } from '../drafts/draft-session';
 import { findMissingFields } from '../drafts/draft-fields';
+import { UNPUBLISHED_CHANGES } from '../status-badge/status-badge';
 import { DraftPublisher } from '../drafts/draft-publisher';
 import { EDITOR_TYPES } from '../editor-type-configs';
 import { itemName } from '../editor-list/item-name';
@@ -99,8 +104,8 @@ export class DraftEditor<T extends EditorContentType> {
 	protected readonly settings = inject(PublishSettings);
 	private readonly config = computed(() => EDITOR_TYPES[this.session().type]);
 	protected readonly noun = computed(() => this.config().noun);
-	protected readonly fieldLabels = computed(
-		() => this.config().fieldLabels as Record<string, string>
+	protected readonly fieldLabels = computed(() =>
+		fieldLabelsOf(this.session().type)
 	);
 	protected readonly preview = computed(
 		() => this.config().preview as Type<unknown> | undefined
@@ -122,7 +127,7 @@ export class DraftEditor<T extends EditorContentType> {
 	private readonly missingFields = computed(() =>
 		findMissingFields(
 			this.session().fields() as Record<string, unknown>,
-			this.config().requiredFields as readonly string[]
+			requiredFieldsOf(this.session().type)
 		)
 	);
 	protected readonly publisher = new DraftPublisher<T>({
@@ -153,7 +158,7 @@ export class DraftEditor<T extends EditorContentType> {
 	protected close(): void {
 		if (this.session().hasUnpublishedChanges()) {
 			this.notifier.notifySuccess(
-				'Your changes are kept. Find them under Unpublished changes.'
+				`Your changes are kept. Find them under ${UNPUBLISHED_CHANGES}.`
 			);
 		}
 		this.session().close();

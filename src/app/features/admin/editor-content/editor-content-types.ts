@@ -156,24 +156,79 @@ export function toTargetId(item: DraftItemOf<DraftType>): string {
 	return 'id' in item ? item.id : item.slug;
 }
 
-/** Each draft type's own fields: what a draft holds and publishes. */
-export const FIELD_KEYS: {
-	[T in DraftType]: (keyof DraftOwnFieldsOf<T>)[];
-} = {
-	news: ['title', 'content', 'imageUrl'],
-	gallery: ['collection', 'caption', 'imageUrl', 'tags'],
-	downloads: [
-		'collection',
-		'title',
-		'desc',
-		'downloadUrl',
-		'imageUrl',
-		'sortOrder'
-	],
-	maps: ['season', 'imageUrl', 'dimensions'],
-	'gallery-collections': ['slug', 'title', 'dimensions'],
-	'downloads-collections': ['slug', 'title', 'dimensions']
+/** A field as the editor names it, and whether publishing needs it. */
+export interface FieldSpec {
+	label: string;
+	/** The API's required fields; the form marks them. */
+	required?: boolean;
+}
+
+export type FieldSpecsOf<T extends DraftType> = Record<
+	keyof DraftOwnFieldsOf<T>,
+	FieldSpec
+>;
+
+const COLLECTION_FIELDS: FieldSpecsOf<'gallery-collections'> = {
+	title: { label: 'Title', required: true },
+	slug: { label: 'Slug', required: true },
+	dimensions: { label: 'Dimensions' }
 };
+
+/**
+ * Each draft type's own fields (what a draft holds and publishes): their
+ * labels in the form and a conflict, and which publishing needs.
+ */
+export const DRAFT_FIELDS: { [T in DraftType]: FieldSpecsOf<T> } = {
+	news: {
+		title: { label: 'Title', required: true },
+		content: { label: 'Content', required: true },
+		imageUrl: { label: 'Banner image' }
+	},
+	gallery: {
+		collection: { label: 'Collection', required: true },
+		caption: { label: 'Caption', required: true },
+		imageUrl: { label: 'Image', required: true },
+		tags: { label: 'Tags' }
+	},
+	downloads: {
+		collection: { label: 'Collection', required: true },
+		title: { label: 'Title', required: true },
+		desc: { label: 'Description', required: true },
+		downloadUrl: { label: 'Download link', required: true },
+		imageUrl: { label: 'Image', required: true },
+		sortOrder: { label: 'Position' }
+	},
+	maps: {
+		season: { label: 'Season', required: true },
+		imageUrl: { label: 'Image' },
+		dimensions: { label: 'Dimensions', required: true }
+	},
+	'gallery-collections': COLLECTION_FIELDS,
+	'downloads-collections': COLLECTION_FIELDS
+};
+
+export function fieldKeysOf<T extends DraftType>(
+	type: T
+): (keyof DraftOwnFieldsOf<T>)[] {
+	return Object.keys(DRAFT_FIELDS[type]) as (keyof DraftOwnFieldsOf<T>)[];
+}
+
+/** Each field's label, by its key (as a conflict lists them). */
+export function fieldLabelsOf(type: DraftType): Record<string, string> {
+	return Object.fromEntries(
+		Object.entries(DRAFT_FIELDS[type]).map(([key, { label }]) => [
+			key,
+			label as string
+		])
+	);
+}
+
+/** The fields publishing needs. */
+export function requiredFieldsOf(type: DraftType): string[] {
+	return Object.entries(DRAFT_FIELDS[type] as Record<string, FieldSpec>)
+		.filter(([, { required }]) => required)
+		.map(([key]) => key);
+}
 
 /**
  * Each content type's draft options: kept in drafts, but not taken from a

@@ -1,11 +1,14 @@
 import { Type, inject } from '@angular/core';
 import { Observable, catchError, map, of } from 'rxjs';
 import { DEFAULT_MAP_DIMENSIONS } from 'src/app/core/config/maps';
-import { EditorContentType } from 'src/app/core/api/api-requests';
+import {
+	EditorContentType,
+	NewsDraftOptions
+} from 'src/app/core/api/api-requests';
+import { DraftSummary } from 'src/app/core/api/api-responses';
 import { EditorContentApi } from 'src/app/features/admin/editor-content/editor-content-api';
 import {
 	CollectionContentType,
-	FieldsOf,
 	SummaryOf
 } from 'src/app/features/admin/editor-content/editor-content-types';
 import { COLLECTION_TYPES } from './collection-type-configs';
@@ -18,6 +21,7 @@ import { TitleCell } from './editor-list/cells/title-cell/title-cell';
 import {
 	ListColumn,
 	STATUS_COLUMN,
+	columnSort,
 	UPDATED_COLUMN
 } from './editor-list/list-columns';
 import {
@@ -28,6 +32,7 @@ import {
 	statusFilter
 } from './editor-list/list-filter-fields';
 import { ListSort } from './editor-list/list-sort';
+import { ItemStatus } from './status-badge/status-badge';
 import { GalleryBulkActions } from './gallery/gallery-bulk-actions/gallery-bulk-actions';
 import { GalleryForm } from './gallery/gallery-form/gallery-form';
 import { GalleryPreview } from './gallery/gallery-preview/gallery-preview';
@@ -37,7 +42,20 @@ import { NewsForm } from './news/news-form/news-form';
 import { NewsPreview } from './news/news-preview/news-preview';
 import { DraftFields } from './drafts/draft-fields';
 
-const RECENTLY_UPDATED: ListSort = { sort: 'updatedAt', order: 'desc' };
+/** Downloads' collection column; ascending is the site's order. */
+const DOWNLOAD_COLLECTION_COLUMN: ListColumn<'downloads'> = {
+	id: 'collection',
+	label: 'Collection',
+	cell: TextCell,
+	inputs: ({ fields }, { collectionTitle }) => ({
+		text: collectionTitle(fields.collection)
+	}),
+	width: '12rem',
+	sort: { by: 'collection,sortOrder,title', firstOrder: 'asc' },
+	card: 'detail'
+};
+
+const RECENTLY_UPDATED = columnSort(UPDATED_COLUMN);
 
 /** Everything that differs between the admin tools, per content type. */
 export interface EditorTypeConfig<T extends EditorContentType> {
@@ -48,10 +66,6 @@ export interface EditorTypeConfig<T extends EditorContentType> {
 	/** The list's filters beside search, in order. */
 	filters: readonly ListFilterField[];
 	searchFields: readonly FilterOption[];
-	/** Each field's name as the editor sees it (e.g. in a conflict). */
-	fieldLabels: Record<keyof FieldsOf<T>, string>;
-	/** What publishing needs filled in (the API's required fields). */
-	requiredFields: readonly (keyof FieldsOf<T>)[];
 	/** News: publishing chooses when it goes live. */
 	hasDate: boolean;
 	hasCollections: boolean;
@@ -68,6 +82,14 @@ export interface EditorTypeConfig<T extends EditorContentType> {
 	bulkActions?: Type<unknown>;
 	/** The draft as the site shows it, given the `session`, beside the form. */
 	preview?: Type<unknown>;
+	/**
+	 * What a draft's row shows beyond its fields, as a published item's
+	 * summary would have it.
+	 */
+	draftRowFields?: (
+		draft: DraftSummary,
+		published?: object
+	) => Partial<SummaryOf<T>>;
 	/** The list's columns, in table order (beside select and the row's menu). */
 	columns: readonly ListColumn<T>[];
 	/** The list's order until a column is chosen. */
@@ -83,10 +105,7 @@ export interface EditorTypeConfig<T extends EditorContentType> {
 	publicPath: (item: SummaryOf<T>) => string;
 }
 
-const VISIBILITY_STATUSES: readonly FilterOption[] = [
-	{ value: 'live', label: 'Live' },
-	{ value: 'hidden', label: 'Hidden' }
-];
+const VISIBILITY_STATUSES: readonly ItemStatus[] = ['live', 'hidden'];
 
 export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 	news: {
@@ -94,23 +113,13 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 		icon: 'newspaper',
 		noun: { one: 'post', many: 'posts' },
 		filters: [
-			statusFilter([
-				{ value: 'live', label: 'Live' },
-				{ value: 'scheduled', label: 'Scheduled' },
-				{ value: 'hidden', label: 'Hidden' }
-			]),
+			statusFilter(['live', 'scheduled', 'hidden']),
 			CREATED_BY_FILTER
 		],
 		searchFields: [
 			{ value: 'title', label: 'Title' },
 			{ value: 'content', label: 'Content' }
 		],
-		fieldLabels: {
-			title: 'Title',
-			content: 'Content',
-			imageUrl: 'Banner image'
-		},
-		requiredFields: ['title', 'content'],
 		hasDate: true,
 		hasCollections: false,
 		hasBulkCreate: false,
@@ -152,6 +161,15 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 		defaultSort: RECENTLY_UPDATED,
 		view: 'table',
 		isOrderable: false,
+		// The draft's own date, else "now" for a new post, or the post's own for
+		// an edit (which keeps it).
+		draftRowFields: (draft, published) => ({
+			date:
+				(draft.fields as NewsDraftOptions).date ??
+				(draft.target
+					? (published as { date?: string } | undefined)?.date
+					: 'now')
+		}),
 		publicPath: () => '/news'
 	},
 	downloads: {
@@ -166,21 +184,6 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 		searchFields: [
 			{ value: 'title', label: 'Title' },
 			{ value: 'desc', label: 'Description' }
-		],
-		fieldLabels: {
-			collection: 'Collection',
-			title: 'Title',
-			desc: 'Description',
-			downloadUrl: 'Download link',
-			imageUrl: 'Image',
-			sortOrder: 'Position'
-		},
-		requiredFields: [
-			'collection',
-			'title',
-			'desc',
-			'downloadUrl',
-			'imageUrl'
 		],
 		hasDate: false,
 		hasCollections: true,
@@ -202,22 +205,11 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 				sort: { by: 'title', firstOrder: 'asc' },
 				card: 'title'
 			},
-			{
-				id: 'collection',
-				label: 'Collection',
-				cell: TextCell,
-				inputs: ({ fields }, { collectionTitle }) => ({
-					text: collectionTitle(fields.collection)
-				}),
-				width: '12rem',
-				// Ascending, the site's order.
-				sort: { by: 'collection,sortOrder,title', firstOrder: 'asc' },
-				card: 'detail'
-			},
+			DOWNLOAD_COLLECTION_COLUMN,
 			STATUS_COLUMN,
 			UPDATED_COLUMN
 		],
-		defaultSort: { sort: 'collection,sortOrder,title', order: 'asc' },
+		defaultSort: columnSort(DOWNLOAD_COLLECTION_COLUMN),
 		view: 'table',
 		isOrderable: true,
 		publicPath: () => '/downloads'
@@ -235,13 +227,6 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 			{ value: 'caption', label: 'Caption' },
 			{ value: 'tags', label: 'Tags' }
 		],
-		fieldLabels: {
-			collection: 'Collection',
-			caption: 'Caption',
-			imageUrl: 'Image',
-			tags: 'Tags'
-		},
-		requiredFields: ['collection', 'caption', 'imageUrl'],
 		hasDate: false,
 		hasCollections: true,
 		hasBulkCreate: true,
@@ -296,12 +281,6 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 			{ value: 'season', label: 'Season number' },
 			{ value: 'dimensions', label: 'Dimension names' }
 		],
-		fieldLabels: {
-			season: 'Season',
-			imageUrl: 'Image',
-			dimensions: 'Dimensions'
-		},
-		requiredFields: ['season', 'dimensions'],
 		hasDate: false,
 		hasCollections: false,
 		hasBulkCreate: false,
@@ -329,6 +308,10 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 		defaultSort: RECENTLY_UPDATED,
 		view: 'table',
 		isOrderable: false,
+		draftRowFields: (draft) => ({
+			dimensionCount:
+				'dimensionCount' in draft ? draft.dimensionCount : undefined
+		}),
 		publicPath: () => '/map'
 	}
 };

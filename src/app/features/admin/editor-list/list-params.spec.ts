@@ -7,11 +7,7 @@ import {
 } from './list-filter-fields';
 import { fromListParams, toListParams } from './list-params';
 
-const FIELDS = [
-	statusFilter([{ value: 'hidden', label: 'Hidden' }]),
-	COLLECTION_FILTER,
-	CREATED_BY_FILTER
-];
+const FIELDS = [statusFilter(['hidden']), COLLECTION_FILTER, CREATED_BY_FILTER];
 
 describe('list params', () => {
 	const filters = {

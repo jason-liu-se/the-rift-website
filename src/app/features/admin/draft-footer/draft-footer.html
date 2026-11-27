@@ -7,7 +7,7 @@
 	} @else { @if (session().hasUnpublishedChanges()) {
 	<span class="changes">
 		<span class="dot" aria-hidden="true"></span>
-		Unpublished changes
+		{{ unpublishedChanges }}
 	</span>
 	}
 	<span

@@ -9,10 +9,7 @@ import {
 import { filterDrafts, toDraftRow, toListQuery } from './list-rows';
 
 const FIELDS = [
-	statusFilter([
-		{ value: 'live', label: 'Live' },
-		{ value: 'hidden', label: 'Hidden' }
-	]),
+	statusFilter(['live', 'hidden']),
 	COLLECTION_FILTER,
 	CREATED_BY_FILTER
 ];
