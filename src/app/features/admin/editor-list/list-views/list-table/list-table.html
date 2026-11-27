@@ -1,9 +1,10 @@
-<!-- Explicit roles: phones lay rows out as cards, which some browsers would
-	otherwise stop reading as a table. -->
+<!-- Explicit roles: cards (phones, and the gallery's grid) would otherwise
+	stop some browsers reading it as a table. -->
 <table role="table">
 	<caption class="cdk-visually-hidden">
 		{{ store.config().label }}
 	</caption>
+	@if (!isGrid()) {
 	<!-- Fixed widths, so collapsing a group doesn't move the columns. -->
 	<colgroup>
 		<col class="col-select" />
@@ -44,16 +45,18 @@
 			</th>
 		</tr>
 	</thead>
-	@if (store.draftRows().length > 0) {
+	} @if (store.draftRows().length > 0) {
 	<tbody
 		app-row-group
 		label="Unpublished changes"
+		[layout]="rowLayout()"
 		[rows]="store.draftRows()"
 	></tbody>
 	} @if (store.showsItems()) {
 	<tbody
 		app-row-group
 		[label]="'All ' + store.config().noun.many"
+		[layout]="rowLayout()"
 		[rows]="store.itemRows()"
 		[count]="store.total()"
 	></tbody>

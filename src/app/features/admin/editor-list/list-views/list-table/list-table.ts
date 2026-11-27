@@ -4,13 +4,16 @@ import { MatIcon } from '@angular/material/icon';
 import { EditorListStore } from '../../editor-list-store';
 import { toSortColumn } from '../../list-columns';
 import { SortColumn, currentSort, sortByColumn } from '../../list-sort';
+import { RowLayout } from '../../row-actions';
 import { RowGroup } from '../../row-group/row-group';
 import { ListEmpty } from '../list-empty/list-empty';
 
 /**
  * A list as a table: a heading per column (sorting by it, if it sorts), and
  * the unpublished changes and every item as row groups, which can be dragged
- * into order when the list allows it. Phones show its rows as cards.
+ * into order when the list allows it. Phones show its rows as cards, and a
+ * `grid` view (the gallery's images) shows cards on every screen, without
+ * column headings (the filters have a Sort by field instead).
  */
 @Component({
 	selector: 'app-list-table',
@@ -22,6 +25,10 @@ export class ListTable {
 	private announcer = inject(LiveAnnouncer);
 	protected readonly store = inject(EditorListStore);
 
+	protected readonly isGrid = computed(() => this.store.view() === 'grid');
+	protected readonly rowLayout = computed<RowLayout>(() =>
+		this.isGrid() ? 'card' : 'row'
+	);
 	protected readonly headings = computed(() =>
 		this.store.columns().map((column) => ({
 			column,
