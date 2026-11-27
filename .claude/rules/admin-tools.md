@@ -16,13 +16,14 @@ The decisions are in issue #101; the API's side is in the web-server's
 - **Routes** (`features/admin/admin.routes.ts`, under `/admin`): each tool's
   list at `/admin/<type>` (`editor-list-page/`), with routed modals over it:
   `new`, `drafts/<draftId>`, `<id>` (`editor-modal/`, the shared `draft-editor/`
-  around the type's form), `bulk` (`bulk-create-modal/`), and `collections`
-  (`collections-modal/`). `openModalRoute()` ties a dialog to its route: every
-  way of closing it (Escape, backdrop, Close, Back) leaves the route, so a
-  route's `canDeactivate` can ask first (bulk creation with rows does). Every
-  modal is framed by `modal-shell/` (fixed header and footer, mobile-only tabs;
-  it focuses its heading on opening). Public cards link editors to
-  `/admin/<type>/<id>` with `<app-edit-button>` (`shared/ui/edit-button/`).
+  around the type's form; `EditorSessionOpener` starts its session), `bulk`
+  (`bulk-create-modal/`), and `collections` (`collections-modal/`).
+  `openModalRoute()` ties a dialog to its route: every way of closing it
+  (Escape, backdrop, Close, Back) leaves the route, so a route's `canDeactivate`
+  can ask first (bulk creation with rows does). Every modal is framed by
+  `modal-shell/` (fixed header and footer, mobile-only tabs; it focuses its
+  heading on opening). Public cards link editors to `/admin/<type>/<id>` with
+  `<app-edit-button>` (`shared/ui/edit-button/`).
 - **The editor** shows the type's form beside its `preview` (Edit and Preview
   tabs on mobile). The draft holds the publish choices (`visible`, news's
   `date`) beside its fields (`DRAFT_OPTION_KEYS`); `PublishSettings`
