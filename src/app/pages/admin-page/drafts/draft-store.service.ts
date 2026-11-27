@@ -17,10 +17,10 @@ import {
 	tap,
 	throwError
 } from 'rxjs';
-import { DraftSaveRequest, DraftType } from 'src/app/interfaces/api-requests';
-import { Draft, DraftSummary } from 'src/app/interfaces/api-responses';
-import { ApiStatusService } from 'src/app/services/api-status/api-status.service';
-import { AuthService } from 'src/app/services/auth/auth.service';
+import { DraftSaveRequest, DraftType } from 'src/app/core/api/api-requests';
+import { Draft, DraftSummary } from 'src/app/core/api/api-responses';
+import { ApiStatusService } from 'src/app/core/api/api-status/api-status.service';
+import { AuthService } from 'src/app/core/auth/auth.service';
 import { DraftsService } from 'src/app/services/drafts/drafts.service';
 import {
 	LocalDraft,

@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 
 import { ANY_URL_ROUTES } from 'src/app/testing/render-component';
-import { FocusRecoveryService } from 'src/app/services/focus-recovery/focus-recovery.service';
+import { FocusRecoveryService } from 'src/app/core/focus-recovery/focus-recovery.service';
 import {
 	FallbackPanelComponent,
 	RETRY_FAILED_MESSAGE

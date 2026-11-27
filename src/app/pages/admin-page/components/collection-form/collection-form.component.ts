@@ -15,9 +15,9 @@ import { Observable, filter } from 'rxjs';
 import {
 	MAX_COLLECTION_SLUG_LENGTH,
 	MAX_COLLECTION_TITLE_LENGTH
-} from 'src/app/config/content-limits';
-import { ImageUploadForm } from 'src/app/interfaces/api-requests';
-import { Dimension, EditorCollection } from 'src/app/interfaces/api-responses';
+} from 'src/app/core/config/content-limits';
+import { ImageUploadForm } from 'src/app/core/api/api-requests';
+import { Dimension, EditorCollection } from 'src/app/core/api/api-responses';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
 import { CollectionContentType } from 'src/app/services/editor-content/editor-content-types';
 import { discardDraft } from '../../drafts/discard-draft';

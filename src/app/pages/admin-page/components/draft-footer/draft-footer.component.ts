@@ -2,7 +2,7 @@ import { Component, computed, inject, input, output } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { EMPTY, catchError, filter } from 'rxjs';
-import { DraftType } from 'src/app/interfaces/api-requests';
+import { DraftType } from 'src/app/core/api/api-requests';
 import { discardDraft } from '../../drafts/discard-draft';
 import { DraftFields } from '../../drafts/draft-fields';
 import { DraftSession, SaveStage } from '../../drafts/draft-session';

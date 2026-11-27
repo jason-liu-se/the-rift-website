@@ -3,7 +3,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import {
 	SNACKBAR_SUCCESS_DURATION_MS,
 	SNACKBAR_UNDO_DURATION_MS
-} from '../../config/admin';
+} from '../../core/config/admin';
 
 /**
  * Confirms the admin tools' actions in a snackbar, which MatSnackBar announces

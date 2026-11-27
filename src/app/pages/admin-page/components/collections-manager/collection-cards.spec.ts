@@ -1,4 +1,4 @@
-import { DraftSummary } from 'src/app/interfaces/api-responses';
+import { DraftSummary } from 'src/app/core/api/api-responses';
 import { EDITOR_GALLERY_COLLECTIONS } from 'src/app/testing/api-fixtures';
 import { toCollectionCards } from './collection-cards';
 

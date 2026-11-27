@@ -3,11 +3,11 @@ import {
 	DraftContent,
 	DraftTarget,
 	DraftType
-} from '../../interfaces/api-requests';
+} from '../../core/api/api-requests';
 import {
 	BrowserStorage,
 	STORAGE_KEYS
-} from '../browser-storage/browser-storage.service';
+} from '../../core/browser-storage/browser-storage.service';
 
 /** A draft as this browser last saw it, saved as the editor types. */
 export type LocalDraft = DraftContent & {

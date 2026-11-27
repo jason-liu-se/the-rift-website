@@ -3,7 +3,7 @@ import { Component, computed, inject } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatProgressBar } from '@angular/material/progress-bar';
-import { EDITOR_PAGE_SIZE } from 'src/app/config/admin';
+import { EDITOR_PAGE_SIZE } from 'src/app/core/config/admin';
 import { FallbackPanelComponent } from 'src/app/components/fallback-panel/fallback-panel.component';
 import { BulkActionBarComponent } from './bulk-action-bar/bulk-action-bar.component';
 import { DRAFT_NOUN, countItems } from './bulk-results';

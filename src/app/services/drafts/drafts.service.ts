@@ -6,8 +6,8 @@ import {
 	DraftPublishRequest,
 	DraftSaveRequest,
 	DraftType
-} from '../../interfaces/api-requests';
-import { Draft, DraftSummary } from '../../interfaces/api-responses';
+} from '../../core/api/api-requests';
+import { Draft, DraftSummary } from '../../core/api/api-responses';
 import { DraftItemOf } from '../editor-content/editor-content-types';
 import { EDITOR_REQUEST_OPTIONS } from '../editor-content/editor-request-options';
 

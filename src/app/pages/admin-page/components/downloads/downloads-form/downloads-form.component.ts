@@ -8,7 +8,7 @@ import {
 	MAX_DOWNLOAD_DESCRIPTION_LENGTH,
 	MAX_DOWNLOAD_TITLE_LENGTH,
 	MAX_URL_LENGTH
-} from 'src/app/config/content-limits';
+} from 'src/app/core/config/content-limits';
 import { DraftSession } from '../../../drafts/draft-session';
 import { CollectionsStore } from '../../../services/collections-store.service';
 import { isNearLimit } from '../../../utilities/near-limit';

@@ -4,8 +4,8 @@ import {
 	PageEvent,
 	MatPaginator
 } from '@angular/material/paginator';
-import { NEWS_PAGE_SIZE } from 'src/app/config/pagination';
-import { NewsPost } from 'src/app/interfaces/api-responses';
+import { NEWS_PAGE_SIZE } from 'src/app/core/config/pagination';
+import { NewsPost } from 'src/app/core/api/api-responses';
 import { NewsPostProviderService } from 'src/app/services/news-post-provider/news-post-provider.service';
 import { PaginatorIntlService } from 'src/app/services/paginator-intl/paginator-intl.service';
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';

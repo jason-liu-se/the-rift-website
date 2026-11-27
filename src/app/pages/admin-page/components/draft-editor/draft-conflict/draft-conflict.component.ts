@@ -1,6 +1,6 @@
 import { Component, computed, input, output } from '@angular/core';
 import { MatButton } from '@angular/material/button';
-import { DraftType } from 'src/app/interfaces/api-requests';
+import { DraftType } from 'src/app/core/api/api-requests';
 import { DraftSession } from '../../../drafts/draft-session';
 import { ItemNoun } from '../../editor-list/bulk-results';
 import { toFieldRows } from '../field-values';

@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { EditorRef } from 'src/app/interfaces/api-responses';
+import { EditorRef } from 'src/app/core/api/api-responses';
 import { EditorAvatarComponent } from './editor-avatar.component';
 
 describe('EditorAvatarComponent', () => {

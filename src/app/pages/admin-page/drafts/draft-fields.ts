@@ -1,4 +1,4 @@
-import { DraftType } from 'src/app/interfaces/api-requests';
+import { DraftType } from 'src/app/core/api/api-requests';
 import {
 	DRAFT_OPTION_KEYS,
 	DraftOptionsOf,

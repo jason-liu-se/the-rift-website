@@ -11,7 +11,7 @@ import {
 	untracked,
 	viewChild
 } from '@angular/core';
-import { IMAGE_WIDTHS } from 'src/app/config/images';
+import { IMAGE_WIDTHS } from 'src/app/core/config/images';
 
 /** `480w, 960w, 1920w`: the only widths an image is offered at. */
 const SRCSET = Object.values(IMAGE_WIDTHS)

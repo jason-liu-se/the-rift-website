@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { SNACKBAR_SUCCESS_DURATION_MS } from 'src/app/config/admin';
+import { SNACKBAR_SUCCESS_DURATION_MS } from 'src/app/core/config/admin';
 import { AdminNotifierService } from './admin-notifier.service';
 
 describe('AdminNotifierService', () => {

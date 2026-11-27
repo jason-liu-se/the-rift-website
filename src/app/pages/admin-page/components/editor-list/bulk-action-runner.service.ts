@@ -11,12 +11,9 @@ import {
 	of,
 	toArray
 } from 'rxjs';
-import { EDITOR_PAGE_SIZE, MAX_BULK_ITEMS } from 'src/app/config/admin';
-import {
-	BulkItemRef,
-	EditorContentType
-} from 'src/app/interfaces/api-requests';
-import { BulkItemResult, BulkResponse } from 'src/app/interfaces/api-responses';
+import { EDITOR_PAGE_SIZE, MAX_BULK_ITEMS } from 'src/app/core/config/admin';
+import { BulkItemRef, EditorContentType } from 'src/app/core/api/api-requests';
+import { BulkItemResult, BulkResponse } from 'src/app/core/api/api-responses';
 import {
 	BulkActionOf,
 	BulkUpdateRequestOf,

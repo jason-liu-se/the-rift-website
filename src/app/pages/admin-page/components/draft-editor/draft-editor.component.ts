@@ -25,7 +25,7 @@ import { Observable, filter } from 'rxjs';
 import {
 	EditorContentType,
 	NewsDraftOptions
-} from 'src/app/interfaces/api-requests';
+} from 'src/app/core/api/api-requests';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
 import { ItemOf } from 'src/app/services/editor-content/editor-content-types';
 import { DraftSession } from '../../drafts/draft-session';

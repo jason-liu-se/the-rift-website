@@ -6,7 +6,7 @@ import { MatInput } from '@angular/material/input';
 import {
 	MAX_NEWS_CONTENT_LENGTH,
 	MAX_NEWS_TITLE_LENGTH
-} from 'src/app/config/content-limits';
+} from 'src/app/core/config/content-limits';
 import { DraftSession } from '../../../drafts/draft-session';
 import { isNearLimit } from '../../../utilities/near-limit';
 import { ImageFieldComponent } from '../../image-field/image-field.component';

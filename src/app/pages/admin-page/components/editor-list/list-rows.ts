@@ -2,8 +2,8 @@ import {
 	BulkItemRef,
 	EditorContentType,
 	NewsDraftOptions
-} from 'src/app/interfaces/api-requests';
-import { DraftSummary, EditorRef } from 'src/app/interfaces/api-responses';
+} from 'src/app/core/api/api-requests';
+import { DraftSummary, EditorRef } from 'src/app/core/api/api-responses';
 import {
 	ListQueryOf,
 	SummaryOf

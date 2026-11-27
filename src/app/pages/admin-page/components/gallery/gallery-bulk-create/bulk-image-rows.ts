@@ -1,5 +1,5 @@
-import { MAX_GALLERY_CAPTION_LENGTH } from 'src/app/config/content-limits';
-import { GalleryImageCreateRequest } from 'src/app/interfaces/api-requests';
+import { MAX_GALLERY_CAPTION_LENGTH } from 'src/app/core/config/content-limits';
+import { GalleryImageCreateRequest } from 'src/app/core/api/api-requests';
 import { isAllowedImageUrl } from 'src/app/utilities/image-urls';
 
 /** One image in a bulk creation, edited before it's published. */

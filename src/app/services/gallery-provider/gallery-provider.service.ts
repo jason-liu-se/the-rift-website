@@ -2,15 +2,15 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map, shareReplay } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { CONTENT_VERSION_MAX_AGE_MS } from '../../config/api';
+import { CONTENT_VERSION_MAX_AGE_MS } from '../../core/config/api';
 import {
 	GalleryCollection,
 	GalleryImage,
 	GalleryTags,
 	PaginatedResponse
-} from '../../interfaces/api-responses';
+} from '../../core/api/api-responses';
 import { toTagsQuery } from '../../utilities/gallery-tags';
-import { TimedRequest, reuseUntilOld } from '../../utilities/reuse-until-old';
+import { TimedRequest, reuseUntilOld } from '../../core/api/reuse-until-old';
 
 @Injectable({
 	providedIn: 'root'

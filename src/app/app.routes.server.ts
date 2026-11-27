@@ -1,5 +1,5 @@
 import { RenderMode, ServerRoute } from '@angular/ssr';
-import { NOINDEX_HEADERS } from './config/admin';
+import { NOINDEX_HEADERS } from './core/config/admin';
 
 /**
  * How each route in app.routes.ts is rendered. Every route must match an entry

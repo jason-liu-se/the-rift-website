@@ -25,11 +25,11 @@ import {
 	cloudflareImageLoader,
 	originalImageLoader
 } from './utilities/image-loaders';
-import { SeoTitleStrategy } from './seo/seo-title-strategy';
-import { apiStatusInterceptor } from './services/api-status/api-status.interceptor';
-import { authRefreshInterceptor } from './services/auth/auth-refresh.interceptor';
-import { contentVersionInterceptor } from './services/content-version/content-version.interceptor';
-import { serverApiTimeoutInterceptor } from './services/server-api-timeout/server-api-timeout.interceptor';
+import { SeoTitleStrategy } from './core/seo/seo-title-strategy';
+import { apiStatusInterceptor } from './core/api/api-status/api-status.interceptor';
+import { authRefreshInterceptor } from './core/auth/auth-refresh.interceptor';
+import { contentVersionInterceptor } from './core/api/content-version/content-version.interceptor';
+import { serverApiTimeoutInterceptor } from './core/api/server-api-timeout/server-api-timeout.interceptor';
 
 /** App-wide providers, shared by the browser and server builds. */
 export const appConfig: ApplicationConfig = {

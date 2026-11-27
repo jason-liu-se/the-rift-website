@@ -1,6 +1,6 @@
 import { Injectable, Signal, inject, signal } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { EditorCollection } from 'src/app/interfaces/api-responses';
+import { EditorCollection } from 'src/app/core/api/api-responses';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
 import { CollectionContentType } from 'src/app/services/editor-content/editor-content-types';
 import { EditorContentService } from 'src/app/services/editor-content/editor-content.service';

@@ -19,7 +19,7 @@ import { MatOption } from '@angular/material/select';
 import {
 	MAX_TAG_LENGTH,
 	MAX_TAGS_PER_IMAGE
-} from 'src/app/config/content-limits';
+} from 'src/app/core/config/content-limits';
 import { normalizeTag } from 'src/app/utilities/gallery-tags';
 
 /**

@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { forkJoin, map, Observable, of, switchMap } from 'rxjs';
-import { GalleryCollection } from 'src/app/interfaces/api-responses';
+import { GalleryCollection } from 'src/app/core/api/api-responses';
 import { ICardSelection } from 'src/app/interfaces/card-selection.interface';
 import { GalleryProviderService } from 'src/app/services/gallery-provider/gallery-provider.service';
 import { BackgroundImageCardComponent } from '../../components/background-image-card/background-image-card.component';

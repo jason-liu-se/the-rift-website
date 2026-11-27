@@ -8,7 +8,7 @@ import {
 	UrlMatchResult,
 	UrlMatcher
 } from '@angular/router';
-import { EditorContentType } from 'src/app/interfaces/api-requests';
+import { EditorContentType } from 'src/app/core/api/api-requests';
 import { CollectionsModalComponent } from './components/collections-modal/collections-modal.component';
 import { BulkCreateModalComponent } from './components/bulk-create-modal/bulk-create-modal.component';
 import { EditorListPageComponent } from './components/editor-list-page/editor-list-page.component';

@@ -1,6 +1,6 @@
 import { Injectable, Provider, inject, signal } from '@angular/core';
 import { ErrorStateMatcher } from '@angular/material/core';
-import { NewsDate } from 'src/app/interfaces/api-requests';
+import { NewsDate } from 'src/app/core/api/api-requests';
 
 /** When a news post goes live: as it was (edits), now, or a date. */
 export type DateChoice = 'keep' | 'now' | 'schedule';

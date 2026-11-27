@@ -4,7 +4,7 @@ import {
 	provideHttpClientTesting
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { BulkItemResult } from 'src/app/interfaces/api-responses';
+import { BulkItemResult } from 'src/app/core/api/api-responses';
 import { environment } from 'src/environments/environment';
 import { BulkActionRunnerService } from './bulk-action-runner.service';
 

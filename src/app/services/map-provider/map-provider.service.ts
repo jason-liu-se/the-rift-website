@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { MapSeason } from '../../interfaces/api-responses';
+import { MapSeason } from '../../core/api/api-responses';
 import { environment } from '../../../environments/environment';
 
 @Injectable({

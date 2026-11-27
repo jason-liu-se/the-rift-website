@@ -1,7 +1,7 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { SessionUser } from 'src/app/interfaces/api-responses';
-import { AuthService } from 'src/app/services/auth/auth.service';
+import { SessionUser } from 'src/app/core/api/api-responses';
+import { AuthService } from 'src/app/core/auth/auth.service';
 import { EditButtonComponent } from './edit-button.component';
 
 describe('EditButtonComponent', () => {

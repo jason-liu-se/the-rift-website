@@ -4,7 +4,7 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { of } from 'rxjs';
-import { EditorNewsPost } from 'src/app/interfaces/api-responses';
+import { EditorNewsPost } from 'src/app/core/api/api-responses';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
 import { DraftSession } from '../../drafts/draft-session';
 import { DraftEditorComponent } from './draft-editor.component';

@@ -1,4 +1,4 @@
-import { BulkItemRef } from 'src/app/interfaces/api-requests';
+import { BulkItemRef } from 'src/app/core/api/api-requests';
 
 /** What reordering reads from an item. */
 export interface OrderedItem {

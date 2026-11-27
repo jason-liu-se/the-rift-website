@@ -13,11 +13,11 @@ import {
 } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 
-import { GALLERY_FALLBACK_IMAGE } from 'src/app/config/gallery';
+import { GALLERY_FALLBACK_IMAGE } from 'src/app/core/config/gallery';
 import {
 	GalleryCollection,
 	GalleryImage
-} from 'src/app/interfaces/api-responses';
+} from 'src/app/core/api/api-responses';
 import { GALLERY_COLLECTIONS } from 'src/app/testing/api-fixtures';
 import { ANY_URL_ROUTES } from 'src/app/testing/render-component';
 import { environment } from 'src/environments/environment';

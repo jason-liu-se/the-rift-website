@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GalleryImage } from 'src/app/interfaces/api-responses';
+import { GalleryImage } from 'src/app/core/api/api-responses';
 import { renderComponent } from 'src/app/testing/render-component';
 import { ImageShowcaseSectionComponent } from './image-showcase-section.component';
 

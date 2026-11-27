@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { GalleryImage } from 'src/app/interfaces/api-responses';
+import { GalleryImage } from 'src/app/core/api/api-responses';
 import { MatIcon } from '@angular/material/icon';
 import { OptimizedImageComponent } from 'src/app/components/optimized-image/optimized-image.component';
 

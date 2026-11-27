@@ -1,10 +1,13 @@
 import { Routes } from '@angular/router';
-import { requireLoggedIn, requireLoggedOut } from './guards/admin-auth.guards';
+import {
+	requireLoggedIn,
+	requireLoggedOut
+} from './core/auth/admin-auth.guards';
 import {
 	requireGalleryCollection,
 	resolveFromGalleryTitle
 } from './guards/gallery-collection.guard';
-import { PageTemplateComponent } from './layout/page-template/page-template.component';
+import { PageTemplateComponent } from './core/layout/page-template/page-template.component';
 
 export const routes: Routes = [
 	{

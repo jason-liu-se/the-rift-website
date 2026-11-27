@@ -1,5 +1,5 @@
-import { BulkItemRef } from 'src/app/interfaces/api-requests';
-import { BulkItemResult } from 'src/app/interfaces/api-responses';
+import { BulkItemRef } from 'src/app/core/api/api-requests';
+import { BulkItemResult } from 'src/app/core/api/api-responses';
 
 /** What an update reads and changes on an item (any type's). */
 export interface UndoableItem {

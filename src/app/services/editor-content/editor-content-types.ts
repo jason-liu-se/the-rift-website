@@ -24,7 +24,7 @@ import {
 	NewsDraftOptions,
 	NewsPostCreateRequest,
 	NewsPostUpdateRequest
-} from '../../interfaces/api-requests';
+} from '../../core/api/api-requests';
 import {
 	ContentStatus,
 	EditorCollection,
@@ -36,7 +36,7 @@ import {
 	EditorNewsPost,
 	EditorNewsPostSummary,
 	NewsStatus
-} from '../../interfaces/api-responses';
+} from '../../core/api/api-responses';
 
 /** What each content type's editor endpoints take and answer. */
 export interface EditorContentTypes {

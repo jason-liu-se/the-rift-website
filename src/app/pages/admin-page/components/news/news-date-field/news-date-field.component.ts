@@ -4,7 +4,7 @@ import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatRadioButton, MatRadioGroup } from '@angular/material/radio';
 import { formatDateTime } from '../../../utilities/format-date-time';
-import { NewsDate } from 'src/app/interfaces/api-requests';
+import { NewsDate } from 'src/app/core/api/api-requests';
 import { DraftSession } from '../../../drafts/draft-session';
 import {
 	DateChoice,

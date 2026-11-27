@@ -1,4 +1,4 @@
-import { unversioned } from '../content-version/content-version.service';
+import { unversioned } from '../../core/api/content-version/content-version.service';
 
 /**
  * Options for every `/editor/*` request: the session cookies (so

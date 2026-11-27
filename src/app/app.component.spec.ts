@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { AppComponent } from './app.component';
-import { SessionEndedService } from './layout/session-ended/session-ended.service';
+import { SessionEndedService } from './core/layout/session-ended/session-ended.service';
 
 describe('AppComponent', () => {
 	beforeEach(() =>

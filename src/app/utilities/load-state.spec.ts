@@ -3,7 +3,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { PLATFORM_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-import { ApiStatusService } from '../services/api-status/api-status.service';
+import { ApiStatusService } from '../core/api/api-status/api-status.service';
 import { LoadState } from './load-state';
 
 describe('LoadState', () => {

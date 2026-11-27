@@ -8,7 +8,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
 	ApiStatus,
 	ApiStatusService
-} from 'src/app/services/api-status/api-status.service';
+} from 'src/app/core/api/api-status/api-status.service';
 import { environment } from 'src/environments/environment';
 import { ImageFieldComponent, LINK_PROBLEM } from './image-field.component';
 

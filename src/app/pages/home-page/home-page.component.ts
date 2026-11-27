@@ -4,7 +4,7 @@ import { WelcomeCardComponent } from './components/welcome-card/welcome-card.com
 import { MatButton } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { SectionCardComponent } from '../../components/section-card/section-card.component';
-import { LOGO_PATH } from 'src/app/config/site';
+import { LOGO_PATH } from 'src/app/core/config/site';
 import { isDesktopWidth } from 'src/app/utilities/viewport.util';
 
 @Component({

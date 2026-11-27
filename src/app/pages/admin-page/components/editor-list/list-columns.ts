@@ -1,6 +1,6 @@
 import { Type } from '@angular/core';
-import { EditorContentType } from 'src/app/interfaces/api-requests';
-import { EditorRef } from 'src/app/interfaces/api-responses';
+import { EditorContentType } from 'src/app/core/api/api-requests';
+import { EditorRef } from 'src/app/core/api/api-responses';
 import { SummaryOf } from 'src/app/services/editor-content/editor-content-types';
 import {
 	ItemStatus,

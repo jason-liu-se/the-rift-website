@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { Subject } from 'rxjs';
-import { AuthService } from 'src/app/services/auth/auth.service';
+import { AuthService } from 'src/app/core/auth/auth.service';
 import { renderComponent } from 'src/app/testing/render-component';
 import {
 	AdminLoginPageComponent,

@@ -15,15 +15,15 @@ import {
 	tap,
 	throwError
 } from 'rxjs';
-import { AUTOSAVE_DELAY_MS, UNDO_GROUP_MS } from 'src/app/config/admin';
+import { AUTOSAVE_DELAY_MS, UNDO_GROUP_MS } from 'src/app/core/config/admin';
 import {
 	DraftContent,
 	DraftPublishRequest,
 	DraftTarget,
 	DraftType
-} from 'src/app/interfaces/api-requests';
-import { ConflictResponse, Draft } from 'src/app/interfaces/api-responses';
-import { ApiStatus } from 'src/app/services/api-status/api-status.service';
+} from 'src/app/core/api/api-requests';
+import { ConflictResponse, Draft } from 'src/app/core/api/api-responses';
+import { ApiStatus } from 'src/app/core/api/api-status/api-status.service';
 import { DraftsService } from 'src/app/services/drafts/drafts.service';
 import {
 	DraftItemOf,

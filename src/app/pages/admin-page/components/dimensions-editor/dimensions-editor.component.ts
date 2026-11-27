@@ -26,10 +26,10 @@ import {
 	MAX_DIMENSION_NAME_LENGTH,
 	MAX_DIMENSIONS,
 	MAX_MAP_WORLD_FIELD_LENGTH
-} from 'src/app/config/content-limits';
-import { DEFAULT_MAP_PERSPECTIVE } from 'src/app/config/maps';
-import { ImageUploadForm } from 'src/app/interfaces/api-requests';
-import { Dimension, MapDimension } from 'src/app/interfaces/api-responses';
+} from 'src/app/core/config/content-limits';
+import { DEFAULT_MAP_PERSPECTIVE } from 'src/app/core/config/maps';
+import { ImageUploadForm } from 'src/app/core/api/api-requests';
+import { Dimension, MapDimension } from 'src/app/core/api/api-responses';
 import { AdminNotifierService } from 'src/app/services/admin-notifier/admin-notifier.service';
 import { ImageFieldComponent } from '../image-field/image-field.component';
 import { ItemThumbnailComponent } from '../item-thumbnail/item-thumbnail.component';

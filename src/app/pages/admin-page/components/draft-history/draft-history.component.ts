@@ -2,7 +2,7 @@ import { Component, input } from '@angular/core';
 import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
-import { DraftType } from 'src/app/interfaces/api-requests';
+import { DraftType } from 'src/app/core/api/api-requests';
 import { DraftSession } from '../../drafts/draft-session';
 
 /** A draft's undo and redo buttons. */

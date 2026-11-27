@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { DraftType } from 'src/app/interfaces/api-requests';
+import { DraftType } from 'src/app/core/api/api-requests';
 import { EditorWriteService } from '../services/editor-write.service';
 import { DraftSession } from './draft-session';
 

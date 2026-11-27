@@ -5,7 +5,7 @@ import {
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { DownloadCollection } from 'src/app/interfaces/api-responses';
+import { DownloadCollection } from 'src/app/core/api/api-responses';
 import { environment } from 'src/environments/environment';
 import { DownloadsPageComponent } from './downloads-page.component';
 

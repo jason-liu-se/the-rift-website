@@ -1,7 +1,7 @@
 import { Type, inject } from '@angular/core';
 import { Observable, catchError, map, of } from 'rxjs';
-import { DEFAULT_MAP_DIMENSIONS } from 'src/app/config/maps';
-import { EditorContentType } from 'src/app/interfaces/api-requests';
+import { DEFAULT_MAP_DIMENSIONS } from 'src/app/core/config/maps';
+import { EditorContentType } from 'src/app/core/api/api-requests';
 import { EditorContentService } from 'src/app/services/editor-content/editor-content.service';
 import {
 	CollectionContentType,
