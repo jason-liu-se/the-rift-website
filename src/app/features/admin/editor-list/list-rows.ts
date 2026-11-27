@@ -10,7 +10,7 @@ import {
 } from 'src/app/features/admin/editor-content/editor-content-types';
 import { itemName } from './item-name';
 import { RowData } from './list-columns';
-import { ListFilterField, ListFilters } from './list-filter-fields';
+import { ListFilterField, ListFilterSettings } from './list-filter-fields';
 import { ListSort, toQuerySort } from './list-sort';
 
 type Item = SummaryOf<EditorContentType>;
@@ -112,7 +112,7 @@ function toDraftFields(
  */
 export function filterDrafts(
 	drafts: readonly DraftSummary[],
-	{ search, values }: ListFilters,
+	{ search, values }: ListFilterSettings,
 	fields: readonly ListFilterField[]
 ): DraftSummary[] {
 	const words = search.trim().toLowerCase();
@@ -131,7 +131,7 @@ export function filterDrafts(
  * order is the one the filters chose (see `currentSort`).
  */
 export function toListQuery(
-	{ searchFields, values }: ListFilters,
+	{ searchFields, values }: ListFilterSettings,
 	search: string,
 	userId: string | undefined,
 	sort: ListSort,

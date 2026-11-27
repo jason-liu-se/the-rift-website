@@ -2,7 +2,7 @@ import { DraftSummary } from 'src/app/core/api/api-responses';
 import {
 	COLLECTION_FILTER,
 	CREATED_BY_FILTER,
-	ListFilters,
+	ListFilterSettings,
 	NO_FILTERS,
 	statusFilter
 } from './list-filter-fields';
@@ -26,7 +26,7 @@ function withFilters({
 	search?: string;
 	searchFields?: string[];
 	[key: string]: string | string[] | undefined;
-}): ListFilters {
+}): ListFilterSettings {
 	return {
 		...NO_FILTERS,
 		search,

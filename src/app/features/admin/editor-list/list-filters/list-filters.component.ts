@@ -23,7 +23,7 @@ import { MatOption, MatSelect } from '@angular/material/select';
 import { MatTooltip } from '@angular/material/tooltip';
 import {
 	FilterOption,
-	ListFilters,
+	ListFilterSettings,
 	NO_FILTERS,
 	ShownFilterField,
 	countSetFilters
@@ -56,7 +56,7 @@ import { ListSort, SortColumn } from '../list-sort';
 export class ListFiltersComponent {
 	private host = inject<ElementRef<HTMLElement>>(ElementRef);
 
-	public readonly filters = model.required<ListFilters>();
+	public readonly filters = model.required<ListFilterSettings>();
 	/** The type's filters beside search. */
 	public readonly fields = input.required<readonly ShownFilterField[]>();
 	public readonly searchFields = input.required<readonly FilterOption[]>();
@@ -129,7 +129,7 @@ export class ListFiltersComponent {
 
 	public setFilter<K extends 'search' | 'searchFields'>(
 		key: K,
-		value: ListFilters[K]
+		value: ListFilterSettings[K]
 	): void {
 		this.filters.update((filters) => ({ ...filters, [key]: value }));
 	}

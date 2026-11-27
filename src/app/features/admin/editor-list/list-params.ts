@@ -1,5 +1,5 @@
 import { ParamMap, Params } from '@angular/router';
-import { ListFilterField, ListFilters } from './list-filter-fields';
+import { ListFilterField, ListFilterSettings } from './list-filter-fields';
 
 /**
  * The list's search, sort, and page in the URL's query parameters, beside
@@ -22,7 +22,7 @@ export const LIST_PARAMS = {
 export function fromListParams(
 	params: ParamMap,
 	fields: readonly ListFilterField[]
-): { filters: ListFilters; pageIndex: number } {
+): { filters: ListFilterSettings; pageIndex: number } {
 	const page = Number(params.get(LIST_PARAMS.page));
 	const searchFields = params.get(LIST_PARAMS.searchFields);
 	const values = fields.flatMap(({ key, options }) => {
@@ -50,7 +50,7 @@ export function fromListParams(
  * merging them into the URL removes it.
  */
 export function toListParams(
-	filters: ListFilters,
+	filters: ListFilterSettings,
 	pageIndex: number,
 	fields: readonly ListFilterField[]
 ): Params {

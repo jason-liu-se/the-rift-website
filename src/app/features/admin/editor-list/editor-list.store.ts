@@ -46,7 +46,7 @@ import {
 } from './list-rows';
 import {
 	COLLECTION_FILTER,
-	ListFilters,
+	ListFilterSettings,
 	ShownFilterField
 } from './list-filter-fields';
 import { fromListParams, toListParams } from './list-params';
@@ -279,7 +279,7 @@ export class EditorListStore {
 		});
 	}
 
-	public setFilters(filters: ListFilters): void {
+	public setFilters(filters: ListFilterSettings): void {
 		this.navigate(toListParams(filters, 0, this.config().filters));
 	}
 

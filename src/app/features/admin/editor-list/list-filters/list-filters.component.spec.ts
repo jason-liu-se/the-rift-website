@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import {
-	ListFilters,
+	ListFilterSettings,
 	NO_FILTERS,
 	ShownFilterField
 } from '../list-filter-fields';
@@ -35,7 +35,7 @@ describe('ListFiltersComponent', () => {
 
 	it('updates the search as the editor types', async () => {
 		const fixture = render();
-		let filters: ListFilters | undefined;
+		let filters: ListFilterSettings | undefined;
 		fixture.componentInstance.filters.subscribe((f) => (filters = f));
 		const input: HTMLInputElement = fixture.nativeElement.querySelector(
 			'input[type="search"]'

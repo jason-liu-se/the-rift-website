@@ -46,7 +46,7 @@ import { DraftStore } from './draft-store.service';
  *   overwrite
  * - `deleted`: the item was deleted; publish as new or discard
  */
-export type DraftConflict<T extends DraftType> =
+export type SaveConflict<T extends DraftType> =
 	| { kind: 'draft'; theirs: Draft }
 	| { kind: 'item'; theirs: DraftItemOf<T> }
 	| { kind: 'deleted' };
@@ -61,7 +61,7 @@ export type SaveState<T extends DraftType> =
 	| { stage: 'saved' }
 	| { stage: 'failed' }
 	/** The server refused a save or publish. */
-	| { stage: 'conflict'; conflict: DraftConflict<T> }
+	| { stage: 'conflict'; conflict: SaveConflict<T> }
 	| { stage: 'published' };
 
 export type SaveStage = SaveState<DraftType>['stage'];
