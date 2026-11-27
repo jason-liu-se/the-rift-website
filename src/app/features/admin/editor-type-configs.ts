@@ -8,6 +8,7 @@ import {
 	FieldsOf,
 	SummaryOf
 } from 'src/app/features/admin/editor-content/editor-content-types';
+import { COLLECTION_TYPES } from './collection-type-configs';
 import { DownloadsForm } from './downloads/downloads-form/downloads-form';
 import { DownloadsPreview } from './downloads/downloads-preview/downloads-preview';
 import { ItemNoun } from './editor-list/bulk-results';
@@ -283,7 +284,8 @@ export const EDITOR_TYPES: { [T in EditorContentType]: EditorTypeConfig<T> } = {
 		defaultSort: RECENTLY_UPDATED,
 		view: 'grid',
 		isOrderable: false,
-		publicPath: (image) => `/gallery/${image.collection}`
+		publicPath: (image) =>
+			`${COLLECTION_TYPES.gallery.pathPrefix}${image.collection}`
 	},
 	maps: {
 		label: 'Maps',

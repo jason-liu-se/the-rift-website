@@ -35,7 +35,9 @@ The decisions are in issue #101; the API's side is in the web-server's
   flags, the list's `filters`, `columns`, `view` and `defaultSort`, public page,
   new-item fields, and the type's form, preview, and bulk actions
   (`features/admin/<type>/`). Shared code reads it; never check `type === …`. A
-  type's bulk actions run through `BULK_ACTION_HOST`.
+  type's bulk actions run through `BULK_ACTION_HOST`. Collections' differences
+  (their page's path, upload album) live in `COLLECTION_TYPES`
+  (`collection-type-configs.ts`).
 - **The list** (`editor-list/`): `EditorListStore` owns its state (type and
   filters from the URL, the loaded items and drafts, the selection, cleared on
   every load) and `EditorListActions` every write from it (row actions, bulk
@@ -63,9 +65,10 @@ The decisions are in issue #101; the API's side is in the web-server's
   `collection-list/` (cards from `toCollectionCards()`) beside the form.
   Published and unpublished collections are the same cards: a click opens one in
   the form, showing or hiding one changes its draft, and deleting a published
-  one writes at once. The form shares the item editor's footer
-  (`draft-footer/`), undo and redo (`draft-history/`), and conflict panel, with
-  the footer in the modal's through `ModalFooterSlot`
+  one writes at once. The form shares the item editor's publishing
+  (`DraftPublisher`, `drafts/draft-publisher.ts`, given each editor's problems
+  and messages), footer (`draft-footer/`), undo and redo (`draft-history/`), and
+  conflict panel, with the footer in the modal's through `ModalFooterSlot`
   (`modal-shell/modal-footer-slot.ts`). Dimensions (a name and image each) use
   the same `dimensions-editor/` as map seasons, which add BlueMap fields
   (`withMapFields`). Both show each dimension's image as a thumbnail on its card

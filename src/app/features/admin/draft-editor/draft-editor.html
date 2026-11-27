@@ -58,9 +58,9 @@
 		[session]="session()"
 		[noun]="noun()"
 		[fieldLabels]="fieldLabels()"
-		(overwrite)="overwrite()"
-		(publishAsNew)="publishAsNew()"
-		(discard)="discard()"
+		(overwrite)="publisher.overwrite()"
+		(publishAsNew)="publisher.publishAsNew()"
+		(discard)="publisher.discard()"
 	/>
 
 	<div class="panes" [class.has-preview]="!!preview()">
@@ -92,10 +92,10 @@
 		[session]="session()"
 		[isEdit]="isEdit()"
 		[noun]="noun().one"
-		[problem]="publishProblem()"
+		[problem]="publisher.problem()"
 		[isScheduled]="isScheduled()"
-		[isPublishing]="isPublishing()"
-		(publish)="publish()"
+		[isPublishing]="publisher.isPublishing()"
+		(publish)="publisher.publish()"
 		(discarded)="closed.emit()"
 	/>
 </app-modal-shell>
