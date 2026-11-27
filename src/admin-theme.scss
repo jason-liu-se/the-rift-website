@@ -59,6 +59,11 @@
 	@include mat.select-density(-3);
 }
 
+// The bulk action bar's Clear button fits the filters' height it takes.
+.bulk-bar {
+	@include mat.icon-button-density(-2);
+}
+
 // Hints and errors under admin fields: smaller and quieter than the fields
 // they explain. (The site's base style sizes every element, so their
 // children too.)
