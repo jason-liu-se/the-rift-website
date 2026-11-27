@@ -22,14 +22,14 @@
 	overflow: hidden;
 }
 
-// Not a grid item: the image inside is positioned against the page.
+// Positioned out of the grid, so neither it nor its <source> takes a row.
 .photo-frame {
-	display: contents;
+	position: absolute;
+	inset: 0;
 }
 
 .photo {
-	position: absolute;
-	inset: 0;
+	display: block;
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
