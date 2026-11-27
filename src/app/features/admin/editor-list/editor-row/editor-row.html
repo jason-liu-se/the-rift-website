@@ -1,7 +1,7 @@
 @let row = this.row();
 <!-- Every cell opens the row's menu on a right-click. -->
 <td class="select" role="cell" [matContextMenuTriggerFor]="rowMenu">
-	@if (index() !== undefined) {
+	@if (isDraggable()) {
 	<span
 		class="drag-handle"
 		cdkDragHandle
@@ -15,7 +15,7 @@
 		color="primary"
 		[aria-label]="'Select ' + row.name"
 		[checked]="isSelected()"
-		(change)="toggleSelected()"
+		(change)="selectionToggled.emit()"
 	/>
 </td>
 @for (cell of cells(); track cell.column.id) {
@@ -48,44 +48,22 @@
 		<mat-icon>more_vert</mat-icon>
 	</button>
 	<mat-menu #rowMenu="matMenu" xPosition="before">
-		@if (imageUrl(); as url) {
-		<button mat-menu-item (click)="copyImageUrl(url)">
-			<mat-icon>link</mat-icon>
-			Copy image link
-		</button>
-		} @if (row.kind === "item") {
-		<button mat-menu-item (click)="actions.duplicate(row.item)">
-			<mat-icon>content_copy</mat-icon>
-			Duplicate
-		</button>
-		<button mat-menu-item (click)="actions.toggleVisibility(row)">
-			<mat-icon
-				>{{ row.item.visible ? "visibility_off" : "visibility"
-				}}</mat-icon
-			>
-			{{ row.item.visible ? "Hide from site" : "Show on site" }}
-		</button>
-		@if (canMoveUp()) {
-		<button mat-menu-item (click)="move(-1)">
-			<mat-icon>arrow_upward</mat-icon>
-			Move up
-		</button>
-		} @if (canMoveDown()) {
-		<button mat-menu-item (click)="move(1)">
-			<mat-icon>arrow_downward</mat-icon>
-			Move down
-		</button>
-		} @if (publicPath(); as path) {
-		<a mat-menu-item target="_blank" [href]="path">
-			<mat-icon>open_in_new</mat-icon>
-			View on site
-		</a>
-		}
+		@for (action of menu(); track action.label) { @if (action.startsGroup) {
 		<mat-divider />
-		}
-		<button mat-menu-item class="danger" (click)="actions.delete(row)">
-			<mat-icon>delete</mat-icon>
-			Delete
+		} @if (action.href; as href) {
+		<a mat-menu-item target="_blank" [href]="href">
+			<mat-icon>{{ action.icon }}</mat-icon>
+			{{ action.label }}
+		</a>
+		} @else {
+		<button
+			mat-menu-item
+			[class.danger]="action.isDanger"
+			(click)="action.run?.()"
+		>
+			<mat-icon>{{ action.icon }}</mat-icon>
+			{{ action.label }}
 		</button>
+		} }
 	</mat-menu>
 </td>

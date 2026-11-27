@@ -50,7 +50,9 @@ The decisions are in issue #101; the API's side is in the web-server's
   (`ListColumn`, `list-columns.ts`) names a shared cell (`cells/`, or the status
   badge) and builds its inputs from the row's `RowData` (`list-rows.ts`, the
   same for items and drafts), with its width, sort, and place on a card; the
-  column on a card's `title` links to the editor. Filters beside search are
+  column on a card's `title` links to the editor. A row's menu is `ROW_ACTIONS`
+  (`row-actions.ts`, each with when it applies); `RowGroup` works out what each
+  row shows and `EditorRow` only displays it. Filters beside search are
   `ListFilterField`s (`list-filter-fields.ts`): their options, URL key, API
   query, and which drafts they keep. Phones and the grid sort with a Sort by
   field. An `isOrderable` type, filtered to one collection, drags into order
