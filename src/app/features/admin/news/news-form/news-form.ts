@@ -7,6 +7,7 @@ import {
 	MAX_NEWS_CONTENT_LENGTH,
 	MAX_NEWS_TITLE_LENGTH
 } from 'src/app/core/config/content-limits';
+import { DRAFT_FIELDS } from '../../editor-content/editor-content-types';
 import { DraftSession } from '../../drafts/draft-session';
 import { isNearLimit } from '../../near-limit';
 import { ImageField } from '../../image-field/image-field';
@@ -34,6 +35,7 @@ import { NewsDateField } from '../news-date-field/news-date-field';
 export class NewsForm {
 	public readonly session = input.required<DraftSession<'news'>>();
 
+	protected readonly spec = DRAFT_FIELDS.news;
 	protected readonly maxTitleLength = MAX_NEWS_TITLE_LENGTH;
 	protected readonly maxContentLength = MAX_NEWS_CONTENT_LENGTH;
 	protected readonly fields = computed(() => this.session().fields());

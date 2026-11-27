@@ -5,6 +5,7 @@ import { EditorListStore } from '../../editor-list-store';
 import { toSortColumn } from '../../list-columns';
 import { SortColumn, currentSort, sortByColumn } from '../../list-sort';
 import { RowLayout } from '../../row-actions';
+import { UNPUBLISHED_CHANGES } from '../../../status-badge/status-badge';
 import { RowGroup } from '../../row-group/row-group';
 import { ListEmpty } from '../list-empty/list-empty';
 
@@ -25,6 +26,7 @@ export class ListTable {
 	private announcer = inject(LiveAnnouncer);
 	protected readonly store = inject(EditorListStore);
 
+	protected readonly unpublishedChanges = UNPUBLISHED_CHANGES;
 	protected readonly isGrid = computed(() => this.store.view() === 'grid');
 	protected readonly rowLayout = computed<RowLayout>(() =>
 		this.isGrid() ? 'card' : 'row'

@@ -9,6 +9,7 @@ import { MAX_GALLERY_CAPTION_LENGTH } from 'src/app/core/config/content-limits';
 import { EditorContentApi } from 'src/app/features/admin/editor-content/editor-content-api';
 import { COLLECTION_TYPES } from '../../collection-type-configs';
 import { CollectionSelect } from '../../collection-select/collection-select';
+import { DRAFT_FIELDS } from '../../editor-content/editor-content-types';
 import { DraftSession } from '../../drafts/draft-session';
 import { isNearLimit } from '../../near-limit';
 import { ImageField } from '../../image-field/image-field';
@@ -37,6 +38,7 @@ import { TagInput } from '../../tag-input/tag-input';
 export class GalleryForm {
 	public readonly session = input.required<DraftSession<'gallery'>>();
 
+	protected readonly spec = DRAFT_FIELDS.gallery;
 	protected readonly maxCaptionLength = MAX_GALLERY_CAPTION_LENGTH;
 	protected readonly isNearLimit = isNearLimit;
 	protected readonly fields = computed(() => this.session().fields());

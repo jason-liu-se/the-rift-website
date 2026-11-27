@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { MatFormField, MatHint, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MapDimension } from 'src/app/core/api/api-responses';
+import { DRAFT_FIELDS } from '../../editor-content/editor-content-types';
 import { DraftSession } from '../../drafts/draft-session';
 import {
 	DimensionsEditor,
@@ -29,6 +30,7 @@ import {
 export class MapsForm {
 	public readonly session = input.required<DraftSession<'maps'>>();
 
+	protected readonly spec = DRAFT_FIELDS.maps;
 	protected readonly fields = computed(() => this.session().fields());
 
 	/** An empty or partial number isn't a season yet. */

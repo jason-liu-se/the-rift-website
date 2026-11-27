@@ -32,13 +32,15 @@ The decisions are in issue #101; the API's side is in the web-server's
   shared by the footer and the form's fields; its `ErrorStateMatcher` marks
   blank required fields only after that.
 - **Per-type differences live in `EDITOR_TYPES`**
-  (`features/admin/editor-type-configs.ts`): noun, search fields, field labels,
-  flags, the list's `filters`, `columns`, `view` and `defaultSort`, public page,
-  new-item fields, and the type's form, preview, and bulk actions
-  (`features/admin/<type>/`). Shared code reads it; never check `type === …`. A
-  type's bulk actions run through `BULK_ACTION_HOST`. Collections' differences
-  (their page's path, upload album) live in `COLLECTION_TYPES`
-  (`collection-type-configs.ts`).
+  (`features/admin/editor-type-configs.ts`): noun, search fields, flags, what a
+  draft's row adds (`draftRowFields`), the list's `filters`, `columns`, `view`
+  and `defaultSort`, public page, new-item fields, and the type's form, preview,
+  and bulk actions (`features/admin/<type>/`). Shared code reads it; never check
+  `type === …`. Each draft type's fields (label, required) are `DRAFT_FIELDS`
+  (`editor-content-types.ts`), which the forms, conflicts and publish checks
+  read; statuses' labels are `STATUS_LABELS` (`status-badge/`). A type's bulk
+  actions run through `BULK_ACTION_HOST`. Collections' differences (their page's
+  path, upload album) live in `COLLECTION_TYPES` (`collection-type-configs.ts`).
 - **The list** (`editor-list/`): `EditorListStore` owns its state (type and
   filters from the URL, the loaded items and drafts, the selection, cleared on
   every load) and `EditorListActions` every write from it (row actions, bulk

@@ -1,6 +1,11 @@
 import { EditorContentType } from 'src/app/core/api/api-requests';
 import { DraftSummary } from 'src/app/core/api/api-responses';
 import { ListQueryOf } from 'src/app/features/admin/editor-content/editor-content-types';
+import {
+	ItemStatus,
+	STATUS_LABELS,
+	UNPUBLISHED_CHANGES
+} from '../status-badge/status-badge';
 
 type ListQuery = ListQueryOf<EditorContentType>;
 
@@ -64,15 +69,16 @@ export type ShownFilterField = Pick<
 export const DRAFTS_ONLY_STATUS = 'draft';
 
 /** A type's statuses, and its unpublished changes on their own. */
-export function statusFilter(
-	statuses: readonly FilterOption[]
-): ListFilterField {
+export function statusFilter(statuses: readonly ItemStatus[]): ListFilterField {
 	return {
 		key: 'status',
 		label: 'Status',
 		options: [
-			...statuses,
-			{ value: DRAFTS_ONLY_STATUS, label: 'Unpublished changes' }
+			...statuses.map((status) => ({
+				value: status,
+				label: STATUS_LABELS[status]
+			})),
+			{ value: DRAFTS_ONLY_STATUS, label: UNPUBLISHED_CHANGES }
 		],
 		anyLabel: 'Any',
 		toQuery: (status) =>
