@@ -21,7 +21,6 @@ import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
-import { MatOption, MatSelect } from '@angular/material/select';
 import { MatTooltip } from '@angular/material/tooltip';
 import {
 	EMPTY,
@@ -55,6 +54,7 @@ import {
 	summarizeBulkResults,
 	toChunks
 } from '../../editor-list/bulk-results';
+import { CollectionSelect } from '../../collection-select/collection-select';
 import { ModalShell } from '../../modal-shell/modal-shell';
 import { TagInput } from '../../tag-input/tag-input';
 import {
@@ -64,12 +64,12 @@ import {
 	parsePastedLinks,
 	toCreateRequest
 } from './bulk-image-rows';
-import { CollectionsStore } from '../../collections-store';
 import { VisibilityToggle } from '../../visibility-toggle/visibility-toggle';
 
 const IMAGES = { one: 'image', many: 'images' };
 const NOT_ALLOWED_LINK = "This link isn't from imgbb or imgur.";
 
+import { FileDrop } from '../../image-upload/file-drop';
 /**
  * Adds many gallery images at once: drop, paste, or choose files (or add
  * links), apply a collection, tags, and visibility to all, adjust and order
@@ -81,6 +81,8 @@ const NOT_ALLOWED_LINK = "This link isn't from imgbb or imgur.";
 	templateUrl: './gallery-bulk-create.html',
 	styleUrl: './gallery-bulk-create.scss',
 	imports: [
+		CollectionSelect,
+		FileDrop,
 		CdkDrag,
 		CdkDragHandle,
 		CdkDropList,
@@ -91,8 +93,6 @@ const NOT_ALLOWED_LINK = "This link isn't from imgbb or imgur.";
 		MatIconButton,
 		MatInput,
 		MatLabel,
-		MatOption,
-		MatSelect,
 		MatTooltip,
 		ModalShell,
 		TagInput,
@@ -114,11 +114,6 @@ export class GalleryBulkCreate {
 
 	protected readonly acceptedTypes = UPLOAD_IMAGE_TYPES.join(',');
 	protected readonly maxCaptionLength = MAX_GALLERY_CAPTION_LENGTH;
-	private readonly allCollections =
-		inject(CollectionsStore).collections('gallery');
-	protected readonly collections = computed(
-		() => this.allCollections() ?? []
-	);
 	protected readonly rows = signal<BulkImageRow[]>([]);
 	/** Rows not yet published (published ones leave the list). */
 	public readonly rowCount = computed(() => this.rows().length);
@@ -128,7 +123,6 @@ export class GalleryBulkCreate {
 	protected readonly allTags = signal<string[]>([]);
 	protected readonly isAllVisible = signal(true);
 	protected readonly isPublishing = signal(false);
-	protected readonly isDragging = signal(false);
 	protected readonly canUpload = computed(() => this.apiStatus() === 'up');
 	/** "3 images · 1 needs a caption": what's left before publishing. */
 	protected readonly summary = computed(() => {
@@ -166,21 +160,6 @@ export class GalleryBulkCreate {
 		const files = [...(input.files ?? [])];
 		input.value = '';
 		this.addFiles(files);
-	}
-
-	protected allowDrop(event: DragEvent): void {
-		if (this.canUpload() && event.dataTransfer?.types.includes('Files')) {
-			event.preventDefault();
-			this.isDragging.set(true);
-		}
-	}
-
-	protected addDropped(event: DragEvent): void {
-		this.isDragging.set(false);
-		if (this.canUpload() && event.dataTransfer?.files.length) {
-			event.preventDefault();
-			this.addFiles([...event.dataTransfer.files]);
-		}
 	}
 
 	/** Pasted image files become rows; pasted text goes where it's typed. */
@@ -228,7 +207,7 @@ export class GalleryBulkCreate {
 		);
 	}
 
-	private addFiles(files: File[]): void {
+	protected addFiles(files: File[]): void {
 		this.rows.update((rows) => [
 			...rows,
 			...files.map((file) => ({

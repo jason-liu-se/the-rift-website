@@ -1,5 +1,6 @@
-import { Component, computed, input, signal } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { EditorRef } from 'src/app/core/api/api-responses';
+import { untilLoadFails } from 'src/app/shared/utils/image-load-failure';
 
 /**
  * Who made an edit, as a picture beside their name: their Discord avatar, or
@@ -14,13 +15,5 @@ import { EditorRef } from 'src/app/core/api/api-responses';
 export class EditorAvatar {
 	public readonly editor = input<Pick<EditorRef, 'username' | 'avatarUrl'>>();
 
-	private readonly failedUrl = signal<string | undefined>(undefined);
-	protected readonly avatarUrl = computed(() => {
-		const url = this.editor()?.avatarUrl;
-		return url !== this.failedUrl() ? url : undefined;
-	});
-
-	protected markFailed(url: string): void {
-		this.failedUrl.set(url);
-	}
+	protected readonly avatar = untilLoadFails(() => this.editor()?.avatarUrl);
 }
