@@ -9,12 +9,18 @@ import {
 } from './features/gallery/gallery-collection-guard';
 import { PageTemplate } from './core/layout/page-template/page-template';
 
+/**
+ * Every page. Each sets `data.renderMode` (see `app.routes.server.ts`):
+ * `prerender` for content that only changes with a deploy, `server` for API
+ * data, `client` for pages that need the browser's login cookies.
+ */
 export const routes: Routes = [
 	{
 		path: '',
 		component: PageTemplate,
 		title: 'Home',
 		data: {
+			renderMode: 'prerender',
 			loadComponent: () =>
 				import('./features/home/home-page/home-page').then(
 					(m) => m.HomePage
@@ -27,6 +33,7 @@ export const routes: Routes = [
 		component: PageTemplate,
 		title: 'News',
 		data: {
+			renderMode: 'server',
 			description:
 				'The latest news and announcements from The Rift Minecraft SMP.',
 			loadComponent: () =>
@@ -41,6 +48,7 @@ export const routes: Routes = [
 		component: PageTemplate,
 		title: 'Gallery',
 		data: {
+			renderMode: 'server',
 			description:
 				'Screenshots of builds from every season of The Rift Minecraft SMP.',
 			loadComponent: () =>
@@ -63,6 +71,7 @@ export const routes: Routes = [
 			)
 		},
 		data: {
+			renderMode: 'server',
 			loadComponent: () =>
 				import('./features/gallery/gallery-showcase-page/gallery-showcase-page').then(
 					(m) => m.GalleryShowcasePage
@@ -74,6 +83,7 @@ export const routes: Routes = [
 		component: PageTemplate,
 		title: 'Maps',
 		data: {
+			renderMode: 'server',
 			description:
 				'Explore interactive maps of the worlds from The Rift Minecraft SMP.',
 			loadComponent: () =>
@@ -87,6 +97,9 @@ export const routes: Routes = [
 		component: PageTemplate,
 		title: 'Map Viewer',
 		data: {
+			// Only the page around the BlueMap iframe: the map, picked by the URL
+			// fragment (which never reaches the server), loads in the browser.
+			renderMode: 'prerender',
 			description:
 				'Interactive maps of the worlds on The Rift Minecraft SMP.',
 			loadComponent: () =>
@@ -102,6 +115,7 @@ export const routes: Routes = [
 		component: PageTemplate,
 		title: 'About',
 		data: {
+			renderMode: 'prerender',
 			description: 'Learn what The Rift Minecraft SMP is about.',
 			loadComponent: () =>
 				import('./features/about/about-page/about-page').then(
@@ -114,6 +128,7 @@ export const routes: Routes = [
 		component: PageTemplate,
 		title: 'World Downloads',
 		data: {
+			renderMode: 'server',
 			description:
 				'Download the worlds from previous seasons of The Rift Minecraft SMP.',
 			loadComponent: () =>
@@ -127,6 +142,7 @@ export const routes: Routes = [
 		component: PageTemplate,
 		title: 'Contact Us',
 		data: {
+			renderMode: 'prerender',
 			description:
 				'Get in touch with the team behind The Rift Minecraft SMP.',
 			loadComponent: () =>
@@ -140,6 +156,7 @@ export const routes: Routes = [
 		component: PageTemplate,
 		title: 'Join',
 		data: {
+			renderMode: 'prerender',
 			description: 'Apply to join The Rift Minecraft SMP.',
 			loadComponent: () =>
 				import('./features/join/join-page/join-page').then(
@@ -154,6 +171,7 @@ export const routes: Routes = [
 		title: 'Admin Login',
 		canActivate: [requireLoggedOut],
 		data: {
+			renderMode: 'client',
 			description: 'Log in to edit The Rift website.',
 			noindex: true,
 			loadComponent: () =>
@@ -170,6 +188,7 @@ export const routes: Routes = [
 		title: 'Admin',
 		canActivate: [requireLoggedIn],
 		data: {
+			renderMode: 'client',
 			description: 'Tools for editors of The Rift website.',
 			noindex: true,
 			loadComponent: () =>
@@ -186,6 +205,7 @@ export const routes: Routes = [
 		component: PageTemplate,
 		title: 'Page Not Found',
 		data: {
+			renderMode: 'server',
 			noindex: true,
 			loadComponent: () =>
 				import('./features/error/error-page/error-page').then(
