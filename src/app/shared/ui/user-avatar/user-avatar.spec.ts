@@ -1,7 +1,7 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { SessionUser } from 'src/app/core/api/api-responses';
-import { AuthService } from 'src/app/core/auth/auth.service';
+import { AuthSession } from 'src/app/core/auth/auth-session';
 import { renderComponent } from 'src/app/testing/render-component';
 import { UserAvatar } from './user-avatar';
 
@@ -10,7 +10,7 @@ const AVATAR_URL = 'https://cdn.discordapp.test/avatars/1/a.png';
 function render(user: SessionUser | null) {
 	TestBed.configureTestingModule({
 		imports: [UserAvatar],
-		providers: [{ provide: AuthService, useValue: { user: signal(user) } }]
+		providers: [{ provide: AuthSession, useValue: { user: signal(user) } }]
 	});
 	return renderComponent(UserAvatar);
 }
@@ -61,7 +61,7 @@ describe('UserAvatar', () => {
 			imports: [UserAvatar],
 			providers: [
 				{
-					provide: AuthService,
+					provide: AuthSession,
 					useValue: { user: signal({ id: '1', username: 'steve' }) }
 				}
 			]

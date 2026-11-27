@@ -5,7 +5,7 @@ import { MatButton } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { SectionCard } from '../../../shared/ui/section-card/section-card';
 import { LOGO_PATH } from 'src/app/core/config/site';
-import { isDesktopWidth } from 'src/app/shared/utils/viewport.util';
+import { isDesktopWidth } from 'src/app/shared/utils/viewport';
 
 @Component({
 	selector: 'app-page-home',

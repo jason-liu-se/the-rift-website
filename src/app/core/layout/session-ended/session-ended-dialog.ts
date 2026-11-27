@@ -5,9 +5,9 @@ import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { ADMIN_LOGIN_PATH } from 'src/app/core/config/admin';
 import { saveLoginReturnUrl } from 'src/app/core/auth/login-return-url';
-import { BrowserStorage } from 'src/app/core/browser-storage/browser-storage.service';
+import { BrowserStorage } from 'src/app/core/browser-storage/browser-storage';
 import { isOnProtectedPage } from 'src/app/core/auth/requires-login';
-import { AuthService, SessionEndReason } from 'src/app/core/auth/auth.service';
+import { AuthSession, SessionEndReason } from 'src/app/core/auth/auth-session';
 
 const COPY: Record<SessionEndReason, { heading: string; text: string }> = {
 	expired: {
@@ -50,7 +50,7 @@ export class SessionEndedDialog {
 	private dialogRef = inject(DialogRef);
 	private router = inject(Router);
 	private storage = inject(BrowserStorage);
-	private user = inject(AuthService).user;
+	private user = inject(AuthSession).user;
 
 	public readonly copy = COPY[inject<SessionEndReason>(DIALOG_DATA)];
 

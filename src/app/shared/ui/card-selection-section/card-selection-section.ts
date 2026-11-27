@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { ICardSelection } from 'src/app/shared/ui/card-selection-section/card-selection.interface';
+import { CardSelection } from 'src/app/shared/ui/card-selection-section/card-selection';
 import { RouterLink } from '@angular/router';
 import { OptimizedImage } from 'src/app/shared/ui/optimized-image/optimized-image';
 
@@ -11,7 +11,7 @@ import { OptimizedImage } from 'src/app/shared/ui/optimized-image/optimized-imag
 })
 export class CardSelectionSection {
 	@Input({ required: true })
-	public items!: ICardSelection[];
+	public items!: CardSelection[];
 
 	@Input() public alwaysShowDesc = false;
 }

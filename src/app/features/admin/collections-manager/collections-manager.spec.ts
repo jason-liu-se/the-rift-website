@@ -9,12 +9,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { of } from 'rxjs';
 import { AUTOSAVE_DELAY_MS } from 'src/app/core/config/admin';
-import { AdminNotifierService } from 'src/app/features/admin/admin-notifier.service';
-import { ApiStatusService } from 'src/app/core/api/api-status/api-status.service';
-import { AuthService } from 'src/app/core/auth/auth.service';
+import { AdminNotifier } from 'src/app/features/admin/admin-notifier';
+import { ApiStatusMonitor } from 'src/app/core/api/api-status/api-status-monitor';
+import { AuthSession } from 'src/app/core/auth/auth-session';
 import { EDITOR_GALLERY_COLLECTIONS } from 'src/app/testing/api-fixtures';
 import { environment } from 'src/environments/environment';
-import { CollectionsStore } from '../collections-store.service';
+import { CollectionsStore } from '../collections-store';
 import { findSlugProblem, toSlug } from '../collection-form/collection-slug';
 import { CollectionsEditor } from '../collections-modal/collections-editor';
 import { ModalFooterSlot } from '../modal-shell/modal-footer-slot';
@@ -126,15 +126,15 @@ describe('CollectionsManager', () => {
 				provideHttpClient(),
 				provideHttpClientTesting(),
 				{
-					provide: ApiStatusService,
+					provide: ApiStatusMonitor,
 					useValue: { status: signal('up') }
 				},
 				{
-					provide: AuthService,
+					provide: AuthSession,
 					useValue: { user: signal({ id: 'me' }) }
 				},
 				{
-					provide: AdminNotifierService,
+					provide: AdminNotifier,
 					useValue: {
 						notifySuccess: vi.fn(),
 						notifyFailure,

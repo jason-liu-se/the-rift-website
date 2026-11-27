@@ -8,9 +8,9 @@ import { MatOption, MatSelect } from '@angular/material/select';
 import { catchError, of } from 'rxjs';
 import { MAX_GALLERY_CAPTION_LENGTH } from 'src/app/core/config/content-limits';
 import { ImageUploadForm } from 'src/app/core/api/api-requests';
-import { EditorContentService } from 'src/app/features/admin/editor-content/editor-content.service';
+import { EditorContentApi } from 'src/app/features/admin/editor-content/editor-content-api';
 import { DraftSession } from '../../drafts/draft-session';
-import { CollectionsStore } from '../../collections-store.service';
+import { CollectionsStore } from '../../collections-store';
 import { isNearLimit } from '../../near-limit';
 import { ImageField } from '../../image-field/image-field';
 import { TagInput } from '../../tag-input/tag-input';
@@ -53,7 +53,7 @@ export class GalleryForm {
 		return collection ? { album: 'gallery', collection } : undefined;
 	});
 	protected readonly tagSuggestions = toSignal(
-		inject(EditorContentService)
+		inject(EditorContentApi)
 			.fetchGalleryTags()
 			.pipe(catchError(() => of([]))),
 		{ initialValue: [] }

@@ -10,7 +10,7 @@ import {
 	MAX_URL_LENGTH
 } from 'src/app/core/config/content-limits';
 import { DraftSession } from '../../drafts/draft-session';
-import { CollectionsStore } from '../../collections-store.service';
+import { CollectionsStore } from '../../collections-store';
 import { isNearLimit } from '../../near-limit';
 import { ImageField } from '../../image-field/image-field';
 

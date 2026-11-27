@@ -1,7 +1,7 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { Component, computed, inject } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
-import { EditorListStore } from '../../editor-list.store';
+import { EditorListStore } from '../../editor-list-store';
 import { toSortColumn } from '../../list-columns';
 import { SortColumn, currentSort, sortByColumn } from '../../list-sort';
 import { RowGroup } from '../../row-group/row-group';

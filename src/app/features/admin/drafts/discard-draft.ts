@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { DraftType } from 'src/app/core/api/api-requests';
-import { EditorWriteService } from '../editor-write.service';
+import { EditorWriter } from '../editor-writer';
 import { DraftSession } from './draft-session';
 
 /**
@@ -8,7 +8,7 @@ import { DraftSession } from './draft-session';
  * was discarded.
  */
 export function discardDraft(
-	writer: EditorWriteService,
+	writer: EditorWriter,
 	session: DraftSession<DraftType>,
 	noun: string,
 	isEdit: boolean

@@ -24,19 +24,19 @@ import {
 	switchMap
 } from 'rxjs';
 import { EditorContentType } from 'src/app/core/api/api-requests';
-import { AdminNotifierService } from 'src/app/features/admin/admin-notifier.service';
+import { AdminNotifier } from 'src/app/features/admin/admin-notifier';
 import { ItemOf } from 'src/app/features/admin/editor-content/editor-content-types';
 import {
 	BrowserStorage,
 	STORAGE_KEYS
-} from 'src/app/core/browser-storage/browser-storage.service';
-import { EditorContentService } from 'src/app/features/admin/editor-content/editor-content.service';
-import { CollectionsStore } from '../collections-store.service';
+} from 'src/app/core/browser-storage/browser-storage';
+import { EditorContentApi } from 'src/app/features/admin/editor-content/editor-content-api';
+import { CollectionsStore } from '../collections-store';
 import { DraftFields } from '../drafts/draft-fields';
 import { DraftSession } from '../drafts/draft-session';
-import { DraftSessionsService } from '../drafts/draft-sessions.service';
-import { DraftStore } from '../drafts/draft-store.service';
-import { EDITOR_TYPES, toCollectionType } from '../editor-types';
+import { DraftSessions } from '../drafts/draft-sessions';
+import { DraftStore } from '../drafts/draft-store';
+import { EDITOR_TYPES, toCollectionType } from '../editor-type-configs';
 import { openModalRoute } from '../modal-route';
 import { describeWriteError } from '../write-errors';
 import {
@@ -47,8 +47,8 @@ import {
 	PublishSettings,
 	providePublishSettings
 } from '../draft-editor/publish-settings';
-import { EditorListActions } from '../editor-list/editor-list.actions';
-import { EditorListStore } from '../editor-list/editor-list.store';
+import { EditorListActions } from '../editor-list/editor-list-actions';
+import { EditorListStore } from '../editor-list/editor-list-store';
 import { itemName } from '../editor-list/item-name';
 import { COLLECTION_FILTER } from '../editor-list/list-filter-fields';
 
@@ -72,10 +72,10 @@ interface EditorTarget {
 export class EditorModal {
 	private router = inject(Router);
 	private route = inject(ActivatedRoute);
-	private sessions = inject(DraftSessionsService);
-	private editorContent = inject(EditorContentService);
+	private sessions = inject(DraftSessions);
+	private editorContent = inject(EditorContentApi);
 	private injector = inject(Injector);
-	private notifier = inject(AdminNotifierService);
+	private notifier = inject(AdminNotifier);
 	private listStore = inject(EditorListStore);
 	private listActions = inject(EditorListActions);
 	private settings = inject(PublishSettings);

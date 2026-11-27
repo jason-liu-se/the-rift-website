@@ -7,8 +7,8 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
 	ApiStatus,
-	ApiStatusService
-} from 'src/app/core/api/api-status/api-status.service';
+	ApiStatusMonitor
+} from 'src/app/core/api/api-status/api-status-monitor';
 import { environment } from 'src/environments/environment';
 import { ImageField, LINK_PROBLEM } from './image-field';
 
@@ -53,7 +53,7 @@ describe('ImageField', () => {
 			providers: [
 				provideHttpClient(),
 				provideHttpClientTesting(),
-				{ provide: ApiStatusService, useValue: { status } }
+				{ provide: ApiStatusMonitor, useValue: { status } }
 			]
 		});
 		fixture = TestBed.createComponent(ImageField);

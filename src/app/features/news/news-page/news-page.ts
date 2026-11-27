@@ -6,8 +6,8 @@ import {
 } from '@angular/material/paginator';
 import { NEWS_PAGE_SIZE } from 'src/app/core/config/pagination';
 import { NewsPost } from 'src/app/core/api/api-responses';
-import { NewsPostProviderService } from 'src/app/features/news/news-post-provider.service';
-import { PaginatorIntlService } from 'src/app/shared/paginator-intl/paginator-intl.service';
+import { NewsApi } from 'src/app/features/news/news-api';
+import { PaginatorIntl } from 'src/app/shared/paginator-intl/paginator-intl';
 import { BackgroundImageCard } from '../../../shared/ui/background-image-card/background-image-card';
 import { NewsDisplay } from '../news-display/news-display';
 import { FallbackPanel } from '../../../shared/ui/fallback-panel/fallback-panel';
@@ -17,11 +17,11 @@ import { LoadState } from '../../../shared/utils/load-state';
 	selector: 'app-page-news',
 	templateUrl: './news-page.html',
 	styleUrls: ['./news-page.scss'],
-	providers: [{ provide: MatPaginatorIntl, useClass: PaginatorIntlService }],
+	providers: [{ provide: MatPaginatorIntl, useClass: PaginatorIntl }],
 	imports: [BackgroundImageCard, MatPaginator, NewsDisplay, FallbackPanel]
 })
 export class NewsPage {
-	private newsPostProvider = inject(NewsPostProviderService);
+	private newsApi = inject(NewsApi);
 
 	public paginationLength!: number;
 	public pageSize = NEWS_PAGE_SIZE;
@@ -70,7 +70,7 @@ export class NewsPage {
 		const isLatestRequest = () => request === this.latestRequest;
 
 		this.loadState.start();
-		this.newsPostProvider
+		this.newsApi
 			.getNewsPosts(requestedPageIndex * this.pageSize, this.pageSize)
 			.subscribe({
 				next: ({ items, total }) => {

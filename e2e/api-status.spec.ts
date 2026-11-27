@@ -96,7 +96,7 @@ test(`${TAG.desktopOnly} the account menu sits below the banner and is not cover
 	page,
 	context
 }) => {
-	// Must match SAVED_USER_KEY (auth.service.ts, which pulls in Angular).
+	// Must match SAVED_USER_KEY (auth-session.ts, which pulls in Angular).
 	const editor = JSON.stringify({ id: '1', username: 'editor' });
 	await page.addInitScript(
 		(user) => localStorage.setItem('session-user', user),

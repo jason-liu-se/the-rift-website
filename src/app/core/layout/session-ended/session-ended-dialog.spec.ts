@@ -1,12 +1,12 @@
-import { STORAGE_KEYS } from '../../browser-storage/browser-storage.service';
+import { STORAGE_KEYS } from '../../browser-storage/browser-storage';
 import { Dialog } from '@angular/cdk/dialog';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
-import { requireLoggedIn } from 'src/app/core/auth/admin-auth.guards';
+import { requireLoggedIn } from 'src/app/core/auth/admin-auth-guards';
 import { SessionUser } from 'src/app/core/api/api-responses';
-import { AuthService, SessionEndReason } from 'src/app/core/auth/auth.service';
+import { AuthSession, SessionEndReason } from 'src/app/core/auth/auth-session';
 import {
 	SESSION_ENDED_DIALOG_CONFIG,
 	SessionEndedDialog
@@ -33,7 +33,7 @@ describe('SessionEndedDialog', () => {
 					{ path: '**', children: [] }
 				]),
 				{
-					provide: AuthService,
+					provide: AuthSession,
 					// The guard lets the editor in; `user` is what the dialog watches.
 					useValue: {
 						user,

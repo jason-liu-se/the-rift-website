@@ -17,8 +17,8 @@ import { MatInput } from '@angular/material/input';
 import { MAX_URL_LENGTH } from 'src/app/core/config/content-limits';
 import { UPLOAD_IMAGE_TYPES } from 'src/app/core/config/uploads';
 import { ImageUploadForm } from 'src/app/core/api/api-requests';
-import { ApiStatusService } from 'src/app/core/api/api-status/api-status.service';
-import { ImageUploadService } from 'src/app/features/admin/image-upload/image-upload.service';
+import { ApiStatusMonitor } from 'src/app/core/api/api-status/api-status-monitor';
+import { ImageUploader } from 'src/app/features/admin/image-upload/image-uploader';
 import { findImageFileProblem } from 'src/app/features/admin/image-upload/image-files';
 import { isAllowedImageUrl } from 'src/app/shared/utils/image-urls';
 import { describeWriteError } from '../write-errors';
@@ -59,8 +59,8 @@ export const LINK_PROBLEM =
 	}
 })
 export class ImageField {
-	private uploads = inject(ImageUploadService);
-	private apiStatus = inject(ApiStatusService);
+	private uploads = inject(ImageUploader);
+	private apiStatus = inject(ApiStatusMonitor);
 	private fileInput =
 		viewChild.required<ElementRef<HTMLInputElement>>('fileInput');
 

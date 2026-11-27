@@ -13,9 +13,9 @@ import {
 	MatMenuTrigger
 } from '@angular/material/menu';
 import { MatTooltip } from '@angular/material/tooltip';
-import { AdminNotifierService } from 'src/app/features/admin/admin-notifier.service';
-import { EditorListActions } from '../editor-list.actions';
-import { EditorListStore } from '../editor-list.store';
+import { AdminNotifier } from 'src/app/features/admin/admin-notifier';
+import { EditorListActions } from '../editor-list-actions';
+import { EditorListStore } from '../editor-list-store';
 import { ListRow } from '../list-rows';
 
 /** A table's row, or a card: a phone's, or the gallery grid's. */
@@ -58,7 +58,7 @@ export type RowLayout = 'row' | 'card';
 export class EditorRow {
 	protected readonly store = inject(EditorListStore);
 	private clipboard = inject(Clipboard);
-	private notifier = inject(AdminNotifierService);
+	private notifier = inject(AdminNotifier);
 
 	public readonly row = input.required<ListRow>();
 	/** Cards on every screen (the gallery's grid), or table rows on desktop. */

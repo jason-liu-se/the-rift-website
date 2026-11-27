@@ -1,4 +1,4 @@
-import { STORAGE_KEYS } from '../../browser-storage/browser-storage.service';
+import { STORAGE_KEYS } from '../../browser-storage/browser-storage';
 import { ApplicationRef, Component, Type } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, provideRouter } from '@angular/router';

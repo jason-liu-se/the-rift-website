@@ -1,7 +1,7 @@
 import { Dialog } from '@angular/cdk/dialog';
 import { Injectable, inject } from '@angular/core';
-import { ToastService } from 'src/app/shared/ui/toast/toast.service';
-import { SessionEndReason } from 'src/app/core/auth/auth.service';
+import { Toaster } from 'src/app/shared/ui/toast/toaster';
+import { SessionEndReason } from 'src/app/core/auth/auth-session';
 import {
 	SESSION_ENDED_DIALOG_CONFIG,
 	SessionEndedDialog
@@ -9,14 +9,14 @@ import {
 
 /**
  * Shows that a session ended: the dialog on a protected page (it no longer
- * works), the toast anywhere else. Loaded by `SessionEndedService` on first
+ * works), the toast anywhere else. Loaded by `SessionEndWatcher` on first
  * use, keeping the CDK overlay out of the initial bundle.
  */
 @Injectable({
 	providedIn: 'root'
 })
 export class SessionEndedNotifier {
-	private toast = inject(ToastService);
+	private toast = inject(Toaster);
 	private dialog = inject(Dialog);
 	private dialogOpen = false;
 

@@ -21,7 +21,7 @@ import { StatusBanner } from '../status-banner/status-banner';
 import {
 	BrowserStorage,
 	STORAGE_KEYS
-} from 'src/app/core/browser-storage/browser-storage.service';
+} from 'src/app/core/browser-storage/browser-storage';
 
 @Component({
 	selector: 'app-page-template',

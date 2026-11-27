@@ -13,7 +13,7 @@ import { CollectionsModal } from './collections-modal/collections-modal';
 import { BulkCreateModal } from './bulk-create-modal/bulk-create-modal';
 import { EditorListPage } from './editor-list-page/editor-list-page';
 import { EditorModal } from './editor-modal/editor-modal';
-import { EDITOR_TYPES, EDITOR_TYPE_ORDER } from './editor-types';
+import { EDITOR_TYPES, EDITOR_TYPE_ORDER } from './editor-type-configs';
 
 const isEditorType: CanMatchFn = (_, [segment]) =>
 	EDITOR_TYPE_ORDER.includes(segment.path as EditorContentType);

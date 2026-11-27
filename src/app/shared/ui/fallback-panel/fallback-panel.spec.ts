@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 
 import { ANY_URL_ROUTES } from 'src/app/testing/render-component';
-import { FocusRecoveryService } from 'src/app/core/focus-recovery/focus-recovery.service';
+import { FocusRecovery } from 'src/app/core/focus-recovery/focus-recovery';
 import { FallbackPanel, RETRY_FAILED_MESSAGE } from './fallback-panel';
 
 @Component({
@@ -133,10 +133,10 @@ describe('FallbackPanel', () => {
 	});
 
 	describe('focus', () => {
-		let focusRecovery: FocusRecoveryService;
+		let focusRecovery: FocusRecovery;
 
 		beforeEach(() => {
-			focusRecovery = TestBed.inject(FocusRecoveryService);
+			focusRecovery = TestBed.inject(FocusRecovery);
 		});
 
 		it('moves to the heading when focus was in the content it replaced', () => {

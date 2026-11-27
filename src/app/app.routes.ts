@@ -2,11 +2,11 @@ import { Routes } from '@angular/router';
 import {
 	requireLoggedIn,
 	requireLoggedOut
-} from './core/auth/admin-auth.guards';
+} from './core/auth/admin-auth-guards';
 import {
 	requireGalleryCollection,
 	resolveFromGalleryTitle
-} from './features/gallery/gallery-collection.guard';
+} from './features/gallery/gallery-collection-guard';
 import { PageTemplate } from './core/layout/page-template/page-template';
 
 export const routes: Routes = [

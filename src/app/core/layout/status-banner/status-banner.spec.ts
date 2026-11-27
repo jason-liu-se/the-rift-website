@@ -1,11 +1,11 @@
-import { STORAGE_KEYS } from '../../browser-storage/browser-storage.service';
+import { STORAGE_KEYS } from '../../browser-storage/browser-storage';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
-import { apiStatusInterceptor } from '../../api/api-status/api-status.interceptor';
-import { ApiStatusService } from '../../api/api-status/api-status.service';
+import { apiStatusInterceptor } from '../../api/api-status/api-status-interceptor';
+import { ApiStatusMonitor } from '../../api/api-status/api-status-monitor';
 import { stubResizeObserver } from '../testing/resize-observer';
 import { StatusBanner } from './status-banner';
 
@@ -19,7 +19,7 @@ const EDITOR_DOWN =
 describe('StatusBanner', () => {
 	let fixture: ComponentFixture<StatusBanner>;
 	let element: HTMLElement;
-	let apiStatus: ApiStatusService;
+	let apiStatus: ApiStatusMonitor;
 	let router: Router;
 
 	let resize: () => void;
@@ -37,7 +37,7 @@ describe('StatusBanner', () => {
 				provideHttpClientTesting()
 			]
 		});
-		apiStatus = TestBed.inject(ApiStatusService);
+		apiStatus = TestBed.inject(ApiStatusMonitor);
 		router = TestBed.inject(Router);
 		fixture = TestBed.createComponent(StatusBanner);
 		element = fixture.nativeElement;

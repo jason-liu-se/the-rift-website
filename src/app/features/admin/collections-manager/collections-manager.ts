@@ -12,9 +12,9 @@ import {
 import { Observable } from 'rxjs';
 import { EditorCollection } from 'src/app/core/api/api-responses';
 import { CollectionContentType } from 'src/app/features/admin/editor-content/editor-content-types';
-import { EditorContentService } from 'src/app/features/admin/editor-content/editor-content.service';
-import { CollectionsStore } from '../collections-store.service';
-import { EditorWriteService } from '../editor-write.service';
+import { EditorContentApi } from 'src/app/features/admin/editor-content/editor-content-api';
+import { CollectionsStore } from '../collections-store';
+import { EditorWriter } from '../editor-writer';
 import { CollectionForm } from '../collection-form/collection-form';
 import { CollectionsEditor } from '../collections-modal/collections-editor';
 import { ItemNoun, countItems } from '../editor-list/bulk-results';
@@ -34,8 +34,8 @@ import { CollectionList } from './collection-list/collection-list';
 	imports: [CollectionForm, CollectionList]
 })
 export class CollectionsManager {
-	private editorContent = inject(EditorContentService);
-	private writer = inject(EditorWriteService);
+	private editorContent = inject(EditorContentApi);
+	private writer = inject(EditorWriter);
 	private store = inject(CollectionsStore);
 	private injector = inject(Injector);
 	protected readonly editor = inject(CollectionsEditor);

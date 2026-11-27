@@ -7,8 +7,8 @@ import {
 	provideRouter
 } from '@angular/router';
 import { of } from 'rxjs';
-import { AuthService } from './auth.service';
-import { requireLoggedIn, requireLoggedOut } from './admin-auth.guards';
+import { AuthSession } from './auth-session';
+import { requireLoggedIn, requireLoggedOut } from './admin-auth-guards';
 import { isOnProtectedPage, requiresLogin } from './requires-login';
 
 /** A route snapshot whose ancestors (root first) and itself use these configs. */
@@ -61,7 +61,7 @@ describe('isOnProtectedPage', () => {
 					}
 				]),
 				{
-					provide: AuthService,
+					provide: AuthSession,
 					useValue: {
 						checkSession: () => of({ id: '1', username: 'editor' })
 					}

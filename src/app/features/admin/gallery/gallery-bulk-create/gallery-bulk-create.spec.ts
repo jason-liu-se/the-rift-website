@@ -5,12 +5,12 @@ import {
 } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { AdminNotifierService } from 'src/app/features/admin/admin-notifier.service';
-import { ApiStatusService } from 'src/app/core/api/api-status/api-status.service';
+import { AdminNotifier } from 'src/app/features/admin/admin-notifier';
+import { ApiStatusMonitor } from 'src/app/core/api/api-status/api-status-monitor';
 import { EDITOR_GALLERY_COLLECTIONS } from 'src/app/testing/api-fixtures';
 import { environment } from 'src/environments/environment';
 import { GalleryBulkCreate } from './gallery-bulk-create';
-import { CollectionsStore } from '../../collections-store.service';
+import { CollectionsStore } from '../../collections-store';
 
 const EDITOR_URL = `${environment.API_URL}/editor`;
 
@@ -57,10 +57,10 @@ describe('GalleryBulkCreate', () => {
 				provideHttpClient(),
 				provideHttpClientTesting(),
 				{
-					provide: ApiStatusService,
+					provide: ApiStatusMonitor,
 					useValue: { status: signal('up') }
 				},
-				{ provide: AdminNotifierService, useValue: { notify } }
+				{ provide: AdminNotifier, useValue: { notify } }
 			]
 		});
 		httpTesting = TestBed.inject(HttpTestingController);

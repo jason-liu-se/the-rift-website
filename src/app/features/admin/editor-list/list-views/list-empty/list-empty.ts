@@ -2,7 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
-import { EditorListStore } from '../../editor-list.store';
+import { EditorListStore } from '../../editor-list-store';
 import { NO_FILTERS, countSetFilters } from '../../list-filter-fields';
 
 /**

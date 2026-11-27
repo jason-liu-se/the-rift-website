@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import {
 	BrowserStorage,
 	STORAGE_KEYS
-} from '../browser-storage/browser-storage.service';
+} from '../browser-storage/browser-storage';
 import { saveLoginReturnUrl, takeLoginReturnUrl } from './login-return-url';
 
 describe('login return URL', () => {

@@ -1,7 +1,7 @@
 import { Page } from '@playwright/test';
 import { environment } from '../../src/environments/environment.development';
 
-// Must match SAVED_USER_KEY and LOGOUT_PENDING_KEY (auth.service.ts, which
+// Must match SAVED_USER_KEY and LOGOUT_PENDING_KEY (auth-session.ts, which
 // pulls in Angular).
 export const SAVED_USER_KEY = 'session-user';
 export const LOGOUT_PENDING_KEY = 'logout-pending';

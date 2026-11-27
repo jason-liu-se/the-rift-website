@@ -2,7 +2,7 @@ import { Component, InjectionToken, inject, signal } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { ActivatedRoute } from '@angular/router';
 import { LoginErrorCode } from 'src/app/core/api/api-responses';
-import { AuthService } from 'src/app/core/auth/auth.service';
+import { AuthSession } from 'src/app/core/auth/auth-session';
 import { FeedbackCard } from 'src/app/shared/ui/feedback-card/feedback-card';
 
 const LOGIN_ERROR_MESSAGES: Record<LoginErrorCode, string> = {
@@ -35,7 +35,7 @@ export const NAVIGATE_TO = new InjectionToken<(url: string) => void>(
 	imports: [FeedbackCard, MatButton]
 })
 export class AdminLoginPage {
-	private auth = inject(AuthService);
+	private auth = inject(AuthSession);
 	private navigateTo = inject(NAVIGATE_TO);
 
 	public readonly errorMessage = loginErrorMessage(

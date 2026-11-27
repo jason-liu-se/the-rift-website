@@ -43,10 +43,10 @@ import {
 	MAX_UPLOAD_FILES,
 	UPLOAD_IMAGE_TYPES
 } from 'src/app/core/config/uploads';
-import { AdminNotifierService } from 'src/app/features/admin/admin-notifier.service';
-import { ApiStatusService } from 'src/app/core/api/api-status/api-status.service';
-import { EditorContentService } from 'src/app/features/admin/editor-content/editor-content.service';
-import { ImageUploadService } from 'src/app/features/admin/image-upload/image-upload.service';
+import { AdminNotifier } from 'src/app/features/admin/admin-notifier';
+import { ApiStatusMonitor } from 'src/app/core/api/api-status/api-status-monitor';
+import { EditorContentApi } from 'src/app/features/admin/editor-content/editor-content-api';
+import { ImageUploader } from 'src/app/features/admin/image-upload/image-uploader';
 import { findImageFileProblem } from 'src/app/features/admin/image-upload/image-files';
 import { isAllowedImageUrl } from 'src/app/shared/utils/image-urls';
 import { describeWriteError } from '../../write-errors';
@@ -64,7 +64,7 @@ import {
 	parsePastedLinks,
 	toCreateRequest
 } from './bulk-image-rows';
-import { CollectionsStore } from '../../collections-store.service';
+import { CollectionsStore } from '../../collections-store';
 import { VisibilityToggle } from '../../visibility-toggle/visibility-toggle';
 
 const IMAGES = { one: 'image', many: 'images' };
@@ -101,10 +101,10 @@ const NOT_ALLOWED_LINK = "This link isn't from imgbb or imgur.";
 	host: { '(paste)': 'addPasted($event)' }
 })
 export class GalleryBulkCreate {
-	private uploads = inject(ImageUploadService);
-	private editorContent = inject(EditorContentService);
-	private notifier = inject(AdminNotifierService);
-	private apiStatus = inject(ApiStatusService).status;
+	private uploads = inject(ImageUploader);
+	private editorContent = inject(EditorContentApi);
+	private notifier = inject(AdminNotifier);
+	private apiStatus = inject(ApiStatusMonitor).status;
 	private announcer = inject(LiveAnnouncer);
 	private injector = inject(Injector);
 	private host = inject<ElementRef<HTMLElement>>(ElementRef);

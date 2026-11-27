@@ -30,7 +30,7 @@ import {
 import { DEFAULT_MAP_PERSPECTIVE } from 'src/app/core/config/maps';
 import { ImageUploadForm } from 'src/app/core/api/api-requests';
 import { Dimension, MapDimension } from 'src/app/core/api/api-responses';
-import { AdminNotifierService } from 'src/app/features/admin/admin-notifier.service';
+import { AdminNotifier } from 'src/app/features/admin/admin-notifier';
 import { ImageField } from '../image-field/image-field';
 import { ItemThumbnail } from '../item-thumbnail/item-thumbnail';
 import { parseBlueMapLink } from './bluemap-link';
@@ -71,7 +71,7 @@ export class DimensionsEditor {
 	private announcer = inject(LiveAnnouncer);
 	private injector = inject(Injector);
 	private host = inject<ElementRef<HTMLElement>>(ElementRef);
-	private notifier = inject(AdminNotifierService);
+	private notifier = inject(AdminNotifier);
 	/** Undo outlives the editor (its toast stays), so it checks first. */
 	private isDestroyed = false;
 

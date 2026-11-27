@@ -1,13 +1,13 @@
 import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID, effect, inject, signal, untracked } from '@angular/core';
-import { ApiStatusService } from '../../core/api/api-status/api-status.service';
+import { ApiStatusMonitor } from '../../core/api/api-status/api-status-monitor';
 
 /**
  * Whether a page's API request failed, for showing `app-fallback-panel` in place
  * of its content. Create it in an injection context (a field initializer).
  *
  * `retry` is the page's own retry (also its error state's button). It runs by
- * itself, once, when the API comes back (`ApiStatusService`) while the page
+ * itself, once, when the API comes back (`ApiStatusMonitor`) while the page
  * is showing a failure, so a recovered site doesn't need a click.
  *
  * Failures are only shown in the browser. A failed or timed-out request
@@ -29,7 +29,7 @@ export class LoadState {
 		if (!this.isBrowser) {
 			return;
 		}
-		const apiStatus = inject(ApiStatusService).status;
+		const apiStatus = inject(ApiStatusMonitor).status;
 		let previous = apiStatus();
 		effect(() => {
 			const current = apiStatus();

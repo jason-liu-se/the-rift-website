@@ -18,10 +18,10 @@ import {
 } from 'src/app/core/config/content-limits';
 import { ImageUploadForm } from 'src/app/core/api/api-requests';
 import { Dimension, EditorCollection } from 'src/app/core/api/api-responses';
-import { AdminNotifierService } from 'src/app/features/admin/admin-notifier.service';
+import { AdminNotifier } from 'src/app/features/admin/admin-notifier';
 import { CollectionContentType } from 'src/app/features/admin/editor-content/editor-content-types';
 import { discardDraft } from '../drafts/discard-draft';
-import { EditorWriteService } from '../editor-write.service';
+import { EditorWriter } from '../editor-writer';
 import { describeWriteError } from '../write-errors';
 import { CollectionSession } from '../collections-modal/collections-editor';
 import { DimensionsEditor } from '../dimensions-editor/dimensions-editor';
@@ -69,8 +69,8 @@ const FIELD_LABELS = {
 	host: { '(keydown)': 'handleShortcuts($event)' }
 })
 export class CollectionForm {
-	private notifier = inject(AdminNotifierService);
-	private writer = inject(EditorWriteService);
+	private notifier = inject(AdminNotifier);
+	private writer = inject(EditorWriter);
 
 	public readonly type = input.required<CollectionContentType>();
 	public readonly session = input.required<CollectionSession>();
